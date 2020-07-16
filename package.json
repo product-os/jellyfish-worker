@@ -1,0 +1,44 @@
+{
+  "name": "@balena/jellyfish-worker",
+  "version": "0.0.1",
+  "description": "Worker library for Jellyfish",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "lint": "eslint lib",
+    "unit": "ava -v",
+    "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes && npm run lint && npm run unit",
+    "doc": "jsdoc2md --template doc/README.hbs lib/index.js > README.md"
+  },
+  "author": "Balena.io. <hello@balena.io>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@balena/jellyfish-assert": "0.0.13",
+    "@balena/jellyfish-jellyscript": "0.0.9",
+    "@balena/jellyfish-logger": "0.0.12",
+    "@balena/jellyfish-uuid": "0.0.13",
+    "bluebird": "^3.7.2",
+    "errio": "^1.2.2",
+    "fast-equals": "^2.0.0",
+    "json-e": "^4.1.0",
+    "lodash": "^4.17.19",
+    "moment": "^2.27.0",
+    "skhema": "^5.3.0",
+    "typed-errors": "^1.1.0"
+  },
+  "devDependencies": {
+    "ava": "^3.10.1",
+    "catch-uncommitted": "^1.6.2",
+    "eslint": "^7.4.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsdoc": "^29.2.0",
+    "eslint-plugin-lodash": "^7.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "jsdoc-to-markdown": "^6.0.1"
+  }
+}
