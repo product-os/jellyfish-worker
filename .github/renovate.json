@@ -8,6 +8,9 @@
   "rangeStrategy": "bump",
   "commitMessagePrefix": "patch",
   "prHourlyLimit": 0,
+  "labels": [
+    "dependencies"
+  ],
   "packageRules": [
     {
       "groupName": "non-major",
