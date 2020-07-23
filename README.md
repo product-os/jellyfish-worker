@@ -35,7 +35,7 @@ Jellyfish worker library module.
         * [.replaceCard(context, insertSession, typeCard, options, card)](#module_worker.Worker+replaceCard) ⇒ <code>Object</code>
         * [.setTriggers(context, objects)](#module_worker.Worker+setTriggers)
         * [.upsertTrigger(context, card)](#module_worker.Worker+upsertTrigger)
-        * [.removeTrigger(context, slug)](#module_worker.Worker+removeTrigger)
+        * [.removeTrigger(context, id)](#module_worker.Worker+removeTrigger)
         * [.getTriggers()](#module_worker.Worker+getTriggers) ⇒ <code>Array.&lt;Object&gt;</code>
         * [.pre(session, request)](#module_worker.Worker+pre) ⇒ <code>Object</code> \| <code>Undefined</code>
         * [.execute(session, request)](#module_worker.Worker+execute) ⇒ <code>Object</code>
@@ -57,7 +57,7 @@ Jellyfish worker library module.
     * [.replaceCard(context, insertSession, typeCard, options, card)](#module_worker.Worker+replaceCard) ⇒ <code>Object</code>
     * [.setTriggers(context, objects)](#module_worker.Worker+setTriggers)
     * [.upsertTrigger(context, card)](#module_worker.Worker+upsertTrigger)
-    * [.removeTrigger(context, slug)](#module_worker.Worker+removeTrigger)
+    * [.removeTrigger(context, id)](#module_worker.Worker+removeTrigger)
     * [.getTriggers()](#module_worker.Worker+getTriggers) ⇒ <code>Array.&lt;Object&gt;</code>
     * [.pre(session, request)](#module_worker.Worker+pre) ⇒ <code>Object</code> \| <code>Undefined</code>
     * [.execute(session, request)](#module_worker.Worker+execute) ⇒ <code>Object</code>
@@ -202,7 +202,7 @@ worker.upsertTrigger({ ... })
 ```
 <a name="module_worker.Worker+removeTrigger"></a>
 
-#### worker.removeTrigger(context, slug)
+#### worker.removeTrigger(context, id)
 **Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
 **Summary**: Remove a single registered trigger  
 **Access**: public  
@@ -210,12 +210,12 @@ worker.upsertTrigger({ ... })
 | Param | Type | Description |
 | --- | --- | --- |
 | context | <code>Object</code> | execution context |
-| slug | <code>Object</code> | slug of trigger card |
+| id | <code>Object</code> | id of trigger card |
 
 **Example**  
 ```js
 const worker = new Worker({ ... })
-worker.removeTrigger('trigger-ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
+worker.removeTrigger('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
 ```
 <a name="module_worker.Worker+getTriggers"></a>
 
