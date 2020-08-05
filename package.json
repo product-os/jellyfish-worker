@@ -6,10 +6,16 @@
   "directories": {
     "lib": "lib"
   },
+  "deplint": {
+    "files": [
+      "lib/**/*.{js}"
+    ],
+    "modules": [
+      "lib"
+    ]
+  },
   "scripts": {
-    "lint": "eslint lib",
-    "unit": "ava -v",
-    "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes && npm run lint && npm run unit",
+    "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes && make lint && make test",
     "doc": "jsdoc2md --template doc/README.hbs lib/index.js > README.md"
   },
   "author": "Balena.io. <hello@balena.io>",
@@ -31,6 +37,8 @@
   "devDependencies": {
     "ava": "^3.11.1",
     "catch-uncommitted": "^1.6.2",
+    "depcheck": "^1.0.0",
+    "deplint": "^1.1.2",
     "eslint": "^7.6.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.22.0",
@@ -39,6 +47,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "jsdoc-to-markdown": "^6.0.1"
+    "jsdoc-to-markdown": "^6.0.1",
+    "shellcheck": "^0.4.4"
   }
 }
