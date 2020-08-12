@@ -22,9 +22,9 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^0.0.21",
-    "@balena/jellyfish-jellyscript": "^0.0.17",
+    "@balena/jellyfish-jellyscript": "^0.0.18",
     "@balena/jellyfish-logger": "^0.0.24",
-    "@balena/jellyfish-uuid": "^0.0.22",
+    "@balena/jellyfish-uuid": "^0.0.23",
     "bluebird": "^3.7.2",
     "errio": "^1.2.2",
     "fast-equals": "^2.0.0",
@@ -37,7 +37,7 @@
   "devDependencies": {
     "ava": "^3.11.1",
     "catch-uncommitted": "^1.6.2",
-    "depcheck": "^1.0.0",
+    "depcheck": "^1.2.0",
     "deplint": "^1.1.2",
     "eslint": "^7.6.0",
     "eslint-config-standard": "^14.1.1",
