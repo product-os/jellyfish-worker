@@ -1,6 +1,6 @@
 {
   "name": "@balena/jellyfish-worker",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Worker library for Jellyfish",
   "main": "lib/index.js",
   "directories": {
