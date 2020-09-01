@@ -26,8 +26,8 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.0.6",
-    "@balena/jellyfish-jellyscript": "^0.0.40",
-    "@balena/jellyfish-logger": "^0.0.61",
+    "@balena/jellyfish-jellyscript": "^0.0.41",
+    "@balena/jellyfish-logger": "^0.0.63",
     "@balena/jellyfish-uuid": "^1.0.7",
     "bluebird": "^3.7.2",
     "errio": "^1.2.2",
@@ -39,7 +39,7 @@
     "typed-errors": "^1.1.0"
   },
   "devDependencies": {
-    "@balena/jellycheck": "^0.0.5",
+    "@balena/jellycheck": "^0.0.7",
     "ava": "^3.12.1",
     "catch-uncommitted": "^1.6.2",
     "depcheck": "^1.2.0",
