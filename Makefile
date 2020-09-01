@@ -33,13 +33,10 @@ endif
 # -----------------------------------------------
 
 lint:
-	./node_modules/.bin/eslint --ext .js $(ESLINT_OPTION_FIX) lib
-	./scripts/check-filenames.sh
-	./scripts/check-licenses.sh
-	./scripts/check-deployable-lib.sh
-	shellcheck ./scripts/*.sh
-	./node_modules/.bin/deplint
-	./node_modules/.bin/depcheck --ignore-bin-package
+	npx eslint --ext .js $(ESLINT_OPTION_FIX) lib
+	npx jellycheck
+	npx deplint
+	npx depcheck --ignore-bin-package
 
 test:
 	node $(NODE_DEBUG_ARGS) ./node_modules/.bin/ava -v $(AVA_ARGS) $(FILES)
