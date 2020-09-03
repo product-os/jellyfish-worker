@@ -1,6 +1,6 @@
 {
   "name": "@balena/jellyfish-worker",
-  "version": "1.0.65",
+  "version": "1.0.66",
   "repository": {
     "type": "git",
     "url": "https://github.com/product-os/jellyfish-worker.git"
