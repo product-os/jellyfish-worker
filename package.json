@@ -28,10 +28,10 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.0.12",
-    "@balena/jellyfish-jellyscript": "^1.0.1",
+    "@balena/jellyfish-assert": "^1.0.13",
+    "@balena/jellyfish-jellyscript": "^1.0.2",
     "@balena/jellyfish-logger": "^0.0.87",
-    "@balena/jellyfish-uuid": "^1.0.13",
+    "@balena/jellyfish-uuid": "^1.0.14",
     "bluebird": "^3.7.2",
     "errio": "^1.2.2",
     "fast-equals": "^2.0.0",
