@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@balena/jellycheck": "^0.0.7",
-    "ava": "^3.12.1",
+    "ava": "^3.13.0",
     "catch-uncommitted": "^1.6.2",
     "depcheck": "^1.2.0",
     "deplint": "^1.1.2",
