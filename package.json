@@ -29,8 +29,8 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.0.22",
-    "@balena/jellyfish-jellyscript": "^1.0.27",
-    "@balena/jellyfish-logger": "^0.0.130",
+    "@balena/jellyfish-jellyscript": "^1.0.29",
+    "@balena/jellyfish-logger": "^0.0.131",
     "@balena/jellyfish-uuid": "^1.0.24",
     "bluebird": "^3.7.2",
     "errio": "^1.2.2",
