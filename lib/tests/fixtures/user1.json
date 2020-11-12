@@ -1,0 +1,21 @@
+{
+  "id": "93d7ff1b-4aaa-4951-9c60-af5721c06ff2",
+  "data": {
+    "profile": {
+      "name": {
+        "first": "John",
+        "last": "Doe"
+      }
+    }
+  },
+  "slug": "user-johndoe-0da17b1d-5704-4a97-b190-d50845a5d10c",
+  "tags": [],
+  "type": "user@1.0.0",
+  "active": true,
+  "markers": [],
+  "version": "1.0.0",
+  "requires": [],
+  "created_at": "2020-11-10T04:54:06.260Z",
+  "updated_at": "2020-11-10T04:54:07.011Z",
+  "capabilities": []
+}

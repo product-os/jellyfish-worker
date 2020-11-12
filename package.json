@@ -29,7 +29,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.0.23",
-    "@balena/jellyfish-jellyscript": "^1.0.37",
+    "@balena/jellyfish-jellyscript": "2.0.0-evaluate-all-fields-when-patching-a459f3c0d9be6419a4e17a1611ffb1e41a872d52",
     "@balena/jellyfish-logger": "^0.0.139",
     "@balena/jellyfish-uuid": "^1.0.24",
     "bluebird": "^3.7.2",
@@ -54,9 +54,11 @@
     "eslint-plugin-lodash": "^7.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
+    "fast-json-patch": "^3.0.0-1",
     "husky": "^4.3.0",
     "jsdoc-to-markdown": "^6.0.1",
-    "lint-staged": "^10.5.1"
+    "lint-staged": "^10.5.1",
+    "sinon": "^9.2.1"
   },
   "husky": {
     "hooks": {
