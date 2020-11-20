@@ -30,7 +30,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.0.33",
-    "@balena/jellyfish-jellyscript": "^2.0.9",
+    "@balena/jellyfish-jellyscript": "3.0.0-link-aggregation-5245599f8350cac27e7824ca8a935133aa9c7a9a",
     "@balena/jellyfish-logger": "^0.0.160",
     "@balena/jellyfish-uuid": "^1.0.35",
     "bluebird": "^3.7.2",
