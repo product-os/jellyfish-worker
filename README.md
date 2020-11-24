@@ -37,6 +37,10 @@ Jellyfish worker library module.
         * [.upsertTrigger(context, card)](#module_worker.Worker+upsertTrigger)
         * [.removeTrigger(context, id)](#module_worker.Worker+removeTrigger)
         * [.getTriggers()](#module_worker.Worker+getTriggers) ⇒ <code>Array.&lt;Object&gt;</code>
+        * [.setSubscriptions(context, subscriptions)](#module_worker.Worker+setSubscriptions)
+        * [.upsertSubscription(context, subscription)](#module_worker.Worker+upsertSubscription)
+        * [.removeSubscription(context, id)](#module_worker.Worker+removeSubscription)
+        * [.getSubscriptions()](#module_worker.Worker+getSubscriptions) ⇒ <code>Array.&lt;Object&gt;</code>
         * [.pre(session, request)](#module_worker.Worker+pre) ⇒ <code>Object</code> \| <code>Undefined</code>
         * [.execute(session, request)](#module_worker.Worker+execute) ⇒ <code>Object</code>
         * [.tick(context, session, options)](#module_worker.Worker+tick)
@@ -59,6 +63,10 @@ Jellyfish worker library module.
     * [.upsertTrigger(context, card)](#module_worker.Worker+upsertTrigger)
     * [.removeTrigger(context, id)](#module_worker.Worker+removeTrigger)
     * [.getTriggers()](#module_worker.Worker+getTriggers) ⇒ <code>Array.&lt;Object&gt;</code>
+    * [.setSubscriptions(context, subscriptions)](#module_worker.Worker+setSubscriptions)
+    * [.upsertSubscription(context, subscription)](#module_worker.Worker+upsertSubscription)
+    * [.removeSubscription(context, id)](#module_worker.Worker+removeSubscription)
+    * [.getSubscriptions()](#module_worker.Worker+getSubscriptions) ⇒ <code>Array.&lt;Object&gt;</code>
     * [.pre(session, request)](#module_worker.Worker+pre) ⇒ <code>Object</code> \| <code>Undefined</code>
     * [.execute(session, request)](#module_worker.Worker+execute) ⇒ <code>Object</code>
     * [.tick(context, session, options)](#module_worker.Worker+tick)
@@ -229,6 +237,70 @@ worker.removeTrigger('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
 const worker = new Worker({ ... })
 const triggers = worker.getTriggers()
 console.log(triggers.length)
+```
+<a name="module_worker.Worker+setSubscriptions"></a>
+
+#### worker.setSubscriptions(context, subscriptions)
+**Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
+**Summary**: Set all registered subscriptions  
+**Access**: public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| context | <code>Object</code> | execution context |
+| subscriptions | <code>Array.&lt;Object&gt;</code> | subscriptions |
+
+**Example**  
+```js
+const worker = new Worker({ ... })
+worker.setSubscriptions([ ... ])
+```
+<a name="module_worker.Worker+upsertSubscription"></a>
+
+#### worker.upsertSubscription(context, subscription)
+**Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
+**Summary**: Upsert a single registered subscription  
+**Access**: public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| context | <code>Object</code> | execution context |
+| subscription | <code>Object</code> | subscription card |
+
+**Example**  
+```js
+const worker = new Worker({ ... })
+worker.upsertSubscription({ ... })
+```
+<a name="module_worker.Worker+removeSubscription"></a>
+
+#### worker.removeSubscription(context, id)
+**Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
+**Summary**: Remove a single registered subscription  
+**Access**: public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| context | <code>Object</code> | execution context |
+| id | <code>Object</code> | id of subscription card |
+
+**Example**  
+```js
+const worker = new Worker({ ... })
+worker.removeSubscription('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
+```
+<a name="module_worker.Worker+getSubscriptions"></a>
+
+#### worker.getSubscriptions() ⇒ <code>Array.&lt;Object&gt;</code>
+**Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
+**Summary**: Get all registered subscriptions  
+**Returns**: <code>Array.&lt;Object&gt;</code> - subscriptions  
+**Access**: public  
+**Example**  
+```js
+const worker = new Worker({ ... })
+const subscriptions = worker.getSubscriptions()
+console.log(subscriptions.length)
 ```
 <a name="module_worker.Worker+pre"></a>
 
