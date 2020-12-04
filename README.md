@@ -37,6 +37,10 @@ Jellyfish worker library module.
         * [.upsertTrigger(context, card)](#module_worker.Worker+upsertTrigger)
         * [.removeTrigger(context, id)](#module_worker.Worker+removeTrigger)
         * [.getTriggers()](#module_worker.Worker+getTriggers) ⇒ <code>Array.&lt;Object&gt;</code>
+        * [.setTransformers(context, transformers)](#module_worker.Worker+setTransformers)
+        * [.upsertTransformer(context, transformer)](#module_worker.Worker+upsertTransformer)
+        * [.removeTransformer(context, id)](#module_worker.Worker+removeTransformer)
+        * [.getTransformers()](#module_worker.Worker+getTransformers) ⇒ <code>Array.&lt;Object&gt;</code>
         * [.setSubscriptions(context, subscriptions)](#module_worker.Worker+setSubscriptions)
         * [.upsertSubscription(context, subscription)](#module_worker.Worker+upsertSubscription)
         * [.removeSubscription(context, id)](#module_worker.Worker+removeSubscription)
@@ -63,6 +67,10 @@ Jellyfish worker library module.
     * [.upsertTrigger(context, card)](#module_worker.Worker+upsertTrigger)
     * [.removeTrigger(context, id)](#module_worker.Worker+removeTrigger)
     * [.getTriggers()](#module_worker.Worker+getTriggers) ⇒ <code>Array.&lt;Object&gt;</code>
+    * [.setTransformers(context, transformers)](#module_worker.Worker+setTransformers)
+    * [.upsertTransformer(context, transformer)](#module_worker.Worker+upsertTransformer)
+    * [.removeTransformer(context, id)](#module_worker.Worker+removeTransformer)
+    * [.getTransformers()](#module_worker.Worker+getTransformers) ⇒ <code>Array.&lt;Object&gt;</code>
     * [.setSubscriptions(context, subscriptions)](#module_worker.Worker+setSubscriptions)
     * [.upsertSubscription(context, subscription)](#module_worker.Worker+upsertSubscription)
     * [.removeSubscription(context, id)](#module_worker.Worker+removeSubscription)
@@ -237,6 +245,70 @@ worker.removeTrigger('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
 const worker = new Worker({ ... })
 const triggers = worker.getTriggers()
 console.log(triggers.length)
+```
+<a name="module_worker.Worker+setTransformers"></a>
+
+#### worker.setTransformers(context, transformers)
+**Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
+**Summary**: Set all registered transformers  
+**Access**: public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| context | <code>Object</code> | execution context |
+| transformers | <code>Array.&lt;Object&gt;</code> | transformers |
+
+**Example**  
+```js
+const worker = new Worker({ ... })
+worker.settransformers([ ... ])
+```
+<a name="module_worker.Worker+upsertTransformer"></a>
+
+#### worker.upsertTransformer(context, transformer)
+**Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
+**Summary**: Upsert a single registered transformer  
+**Access**: public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| context | <code>Object</code> | execution context |
+| transformer | <code>Object</code> | transformer card |
+
+**Example**  
+```js
+const worker = new Worker({ ... })
+worker.upserttransformer({ ... })
+```
+<a name="module_worker.Worker+removeTransformer"></a>
+
+#### worker.removeTransformer(context, id)
+**Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
+**Summary**: Remove a single registered transformer  
+**Access**: public  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| context | <code>Object</code> | execution context |
+| id | <code>Object</code> | id of transformer card |
+
+**Example**  
+```js
+const worker = new Worker({ ... })
+worker.removetransformer('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
+```
+<a name="module_worker.Worker+getTransformers"></a>
+
+#### worker.getTransformers() ⇒ <code>Array.&lt;Object&gt;</code>
+**Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
+**Summary**: Get all registered transformers  
+**Returns**: <code>Array.&lt;Object&gt;</code> - transformers  
+**Access**: public  
+**Example**  
+```js
+const worker = new Worker({ ... })
+const transformers = worker.gettransformers()
+console.log(transformers.length)
 ```
 <a name="module_worker.Worker+setSubscriptions"></a>
 
