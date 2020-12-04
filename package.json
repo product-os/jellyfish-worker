@@ -29,8 +29,8 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.0.31",
-    "@balena/jellyfish-jellyscript": "^2.0.3",
-    "@balena/jellyfish-logger": "^0.0.152",
+    "@balena/jellyfish-jellyscript": "^2.0.4",
+    "@balena/jellyfish-logger": "^0.0.154",
     "@balena/jellyfish-uuid": "^1.0.33",
     "bluebird": "^3.7.2",
     "errio": "^1.2.2",
@@ -56,7 +56,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "husky": "^4.3.0",
     "jsdoc-to-markdown": "^6.0.1",
-    "lint-staged": "^10.5.2"
+    "lint-staged": "^10.5.3"
   },
   "husky": {
     "hooks": {
