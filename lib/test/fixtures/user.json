@@ -1,0 +1,67 @@
+{
+  "id": "3cccf88e-34a0-4b80-b715-ea531335f0da",
+  "data": {
+    "schema": {
+      "type": "object",
+      "required": [
+        "slug",
+        "data"
+      ],
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "object",
+                  "properties": {
+                    "fullName": {
+                      "type": "string",
+                      "$$formula": "CONCATENATE(this.data.profile.name.first, ' ', this.data.profile.name.last)"
+                    },
+                    "initials": {
+                      "type": "string",
+                      "$$formula": "CONCATENATE(LEFT(this.data.profile.name.first, 1), LEFT(this.data.profile.name.last, 1))"
+                    },
+                    "last": {
+                      "type": "string",
+                      "title": "Last name"
+                    },
+                    "first": {
+                      "type": "string",
+                      "title": "First name"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^user-[a-z0-9-]+$"
+        },
+        "markers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9-_/:+]+$"
+          }
+        }
+      }
+    }
+  },
+  "name": "Jellyfish User",
+  "slug": "user",
+  "tags": [],
+  "type": "type@1.0.0",
+  "links": {},
+  "active": true,
+  "markers": [],
+  "version": "1.0.0",
+  "requires": [],
+  "linked_at": {},
+  "capabilities": []
+}
