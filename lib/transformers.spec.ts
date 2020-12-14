@@ -4,8 +4,8 @@
  * Proprietary and confidential.
  */
 
-import sinon from 'sinon';
-import _ from 'lodash';
+import * as sinon from 'sinon';
+import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import * as transformers from './transformers';
 import { core } from '@balena/jellyfish-types';

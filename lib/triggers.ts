@@ -4,14 +4,14 @@
  * Proprietary and confidential.
  */
 
-import _ from 'lodash';
-import jsone from 'json-e';
-import skhema from 'skhema';
+import * as _ from 'lodash';
+import * as skhema from 'skhema';
 import * as assert from '@balena/jellyfish-assert';
 import { JSONSchema, core, worker } from '@balena/jellyfish-types';
 import * as errors from './errors';
 import * as utils from './utils';
 import { LogContext, JellyfishKernel } from './types';
+import jsone = require('json-e');
 
 interface CompileContext {
 	timestamp: string;

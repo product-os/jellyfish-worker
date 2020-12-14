@@ -14,4 +14,6 @@ declare module 'errio' {
 			stack: boolean;
 		},
 	) => object;
+
+	let fromObject: (data: any) => Error;
 }

@@ -4,9 +4,9 @@
  * Proprietary and confidential.
  */
 
-import Bluebird from 'bluebird';
-import errio from 'errio';
-import _ from 'lodash';
+import * as Bluebird from 'bluebird';
+import * as errio from 'errio';
+import * as _ from 'lodash';
 import { Operation } from 'fast-json-patch';
 import { v4 as uuidv4 } from 'uuid';
 import * as assert from '@balena/jellyfish-assert';
@@ -28,7 +28,8 @@ import * as utils from './utils';
 import * as triggers from './triggers';
 import CARDS from './cards';
 
-const logger = getLogger(__filename);
+// TODO: use a single logger instance for the worker
+const logger = getLogger('worker');
 
 export { triggers, errors, executor, CARDS, utils };
 

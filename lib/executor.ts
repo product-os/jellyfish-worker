@@ -4,7 +4,7 @@
  * Proprietary and confidential.
  */
 
-import Bluebird from 'bluebird';
+import * as Bluebird from 'bluebird';
 import * as errio from 'errio';
 import * as _ from 'lodash';
 import * as skhema from 'skhema';
@@ -26,7 +26,7 @@ import {
 } from './types';
 import { core, worker } from '@balena/jellyfish-types';
 
-const logger = getLogger(__filename);
+const logger = getLogger('worker');
 
 /**
  * @summary The "type" card type
@@ -731,7 +731,7 @@ export const insertCard = async (
 
 	object.type = `${typeCard.slug}@${typeCard.version}`;
 
-	let card = null;
+	let card: core.Contract | null = null;
 	if (object.slug) {
 		card = await jellyfish.getCardBySlug(
 			context,
@@ -788,7 +788,7 @@ export const replaceCard = async (
 
 	object.type = `${typeCard.slug}@${typeCard.version}`;
 
-	let card = null;
+	let card: core.Contract | null = null;
 	if (object.slug) {
 		card = await jellyfish.getCardBySlug(
 			context,
@@ -921,7 +921,7 @@ export const run = async (
 		action: core.ActionContract;
 		arguments: any;
 		timestamp: any;
-		epoch: any;
+		epoch?: any;
 		type: string;
 	},
 ) => {
