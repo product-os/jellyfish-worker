@@ -4,15 +4,15 @@
  * Proprietary and confidential.
  */
 
-import Bluebird from 'bluebird';
-import _ from 'lodash';
-import skhema from 'skhema';
+import * as Bluebird from 'bluebird';
+import * as _ from 'lodash';
+import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
 import { getLogger } from '@balena/jellyfish-logger';
 import { JSONSchema, core } from '@balena/jellyfish-types';
 import { LogContext, QueueWaitResult, EnqueueOptions } from './types';
 
-const logger = getLogger(__filename);
+const logger = getLogger('worker');
 
 export interface EvaluateOptions {
 	transformers: core.Contract[];

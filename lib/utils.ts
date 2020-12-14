@@ -10,7 +10,7 @@ import { getLogger } from '@balena/jellyfish-logger';
 import { JSONSchema, core } from '@balena/jellyfish-types';
 import { LogContext, JellyfishKernel } from './types';
 
-const logger = getLogger(__filename);
+const logger = getLogger('worker');
 
 /**
  * @summary Get the current timestamp
