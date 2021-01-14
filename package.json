@@ -63,7 +63,8 @@
   "lint-staged": {
     "*.js": [
       "eslint --cache --fix",
-      "npm run doc"
+      "npm run doc",
+      "git add README.md"
     ]
   }
 }
