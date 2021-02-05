@@ -57,7 +57,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "husky": "^5.0.8",
     "jsdoc-to-markdown": "^6.0.1",
-    "lint-staged": "^10.5.3",
+    "lint-staged": "^10.5.4",
     "sinon": "^9.2.4"
   },
   "lint-staged": {
