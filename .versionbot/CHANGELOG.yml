@@ -1,0 +1,13 @@
+- commits:
+    - subject: Add versionbot CHANGELOG.yml
+      hash: fe47041b1ef1fe4e9ee89e1d6e038481d0bfe8e1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 3.0.27
+  date: 2021-02-20T09:14:11.305Z
