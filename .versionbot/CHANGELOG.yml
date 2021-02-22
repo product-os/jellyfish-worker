@@ -1,4 +1,17 @@
 - commits:
+    - subject: Handle undefined $transformer in card data
+      hash: be25c8b3b24ea2b5d53d64c265e0da219a7508c1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 3.0.34
+  date: 2021-02-22T04:06:10.907Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 1ee18c1dfecbb49574df0f4f24bc1f74cd3b731d
       body: ''
