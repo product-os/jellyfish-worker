@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^1.0.29'
+      hash: ad1d0904da6ba5f6eb4ea0da30a19d534797e2fd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.0.35
+  date: 2021-02-22T04:19:10.246Z
+- commits:
     - subject: Handle undefined $transformer in card data
       hash: be25c8b3b24ea2b5d53d64c265e0da219a7508c1
       body: ''
