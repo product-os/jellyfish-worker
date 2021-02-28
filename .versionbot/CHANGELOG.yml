@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency jsdoc-to-markdown to v7'
+      hash: 0a763b2c43957ae8c21374a751de54c09e7c8c4c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.0.48
+  date: 2021-02-28T04:29:21.232Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: dafb143820e64628bd4293133ca606284f8c75d3
       body: ''
