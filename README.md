@@ -40,7 +40,7 @@ Jellyfish worker library module.
         * [.setTransformers(context, transformers)](#module_worker.Worker+setTransformers)
         * [.upsertTransformer(context, transformer)](#module_worker.Worker+upsertTransformer)
         * [.removeTransformer(context, id)](#module_worker.Worker+removeTransformer)
-        * [.getTransformers()](#module_worker.Worker+getTransformers) ⇒ <code>Array.&lt;Object&gt;</code>
+        * [.getLatestTransformers()](#module_worker.Worker+getLatestTransformers) ⇒ <code>Array.&lt;Object&gt;</code>
         * [.setSubscriptions(context, subscriptions)](#module_worker.Worker+setSubscriptions)
         * [.upsertSubscription(context, subscription)](#module_worker.Worker+upsertSubscription)
         * [.removeSubscription(context, id)](#module_worker.Worker+removeSubscription)
@@ -70,7 +70,7 @@ Jellyfish worker library module.
     * [.setTransformers(context, transformers)](#module_worker.Worker+setTransformers)
     * [.upsertTransformer(context, transformer)](#module_worker.Worker+upsertTransformer)
     * [.removeTransformer(context, id)](#module_worker.Worker+removeTransformer)
-    * [.getTransformers()](#module_worker.Worker+getTransformers) ⇒ <code>Array.&lt;Object&gt;</code>
+    * [.getLatestTransformers()](#module_worker.Worker+getLatestTransformers) ⇒ <code>Array.&lt;Object&gt;</code>
     * [.setSubscriptions(context, subscriptions)](#module_worker.Worker+setSubscriptions)
     * [.upsertSubscription(context, subscription)](#module_worker.Worker+upsertSubscription)
     * [.removeSubscription(context, id)](#module_worker.Worker+removeSubscription)
@@ -297,17 +297,17 @@ worker.upserttransformer({ ... })
 const worker = new Worker({ ... })
 worker.removetransformer('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
 ```
-<a name="module_worker.Worker+getTransformers"></a>
+<a name="module_worker.Worker+getLatestTransformers"></a>
 
-#### worker.getTransformers() ⇒ <code>Array.&lt;Object&gt;</code>
+#### worker.getLatestTransformers() ⇒ <code>Array.&lt;Object&gt;</code>
 **Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
-**Summary**: Get all registered transformers  
+**Summary**: Get filtered list of transformers, where only latest version of each major version exists.  
 **Returns**: <code>Array.&lt;Object&gt;</code> - transformers  
 **Access**: public  
 **Example**  
 ```js
 const worker = new Worker({ ... })
-const transformers = worker.gettransformers()
+const transformers = worker.getLatestTransformers()
 console.log(transformers.length)
 ```
 <a name="module_worker.Worker+setSubscriptions"></a>
