@@ -1,4 +1,17 @@
 - commits:
+    - subject: Filter transformer versions
+      hash: 3b69eb30a0644403bb7a32b425aa8001f65397a4
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Scott Lowe <scott@balena.io>
+        signed-off-by: Scott Lowe <scott@balena.io>
+      author: Scott Lowe
+      nested: []
+  version: 3.1.0
+  date: 2021-03-02T17:24:36.739Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^2.1.53'
       hash: dd98329291acd90d0100baf4dc5f70d94e0163ca
       body: ''
