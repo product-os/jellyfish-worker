@@ -1,4 +1,17 @@
 - commits:
+    - subject: add initial status to transformer tasks
+      hash: 26cb8fa1ad228b62cd42eb5c0c7f4d3db2b15c78
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 3.1.1
+  date: 2021-03-03T11:09:33.994Z
+- commits:
     - subject: Filter transformer versions
       hash: 3b69eb30a0644403bb7a32b425aa8001f65397a4
       body: ''
