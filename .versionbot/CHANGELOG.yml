@@ -1,4 +1,17 @@
 - commits:
+    - subject: Change tick log loglevel to debug
+      hash: bbe03626da1b9bc2a0a9070002c9fd4c3228107b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 3.1.3
+  date: 2021-03-04T23:39:49.982Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-uuid to ^1.0.69'
       hash: 16f758cf26abc7cff30abcee13d36edfff0265cd
       body: ''
