@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-uuid to ^1.0.69'
+      hash: 16f758cf26abc7cff30abcee13d36edfff0265cd
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.2
+  date: 2021-03-04T08:53:11.031Z
+- commits:
     - subject: add initial status to transformer tasks
       hash: 26cb8fa1ad228b62cd42eb5c0c7f4d3db2b15c78
       body: ''
