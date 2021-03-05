@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 9b4e7de7bfdce490e09408f9a9eab14c531aaeea
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.4
+  date: 2021-03-05T01:28:30.839Z
+- commits:
     - subject: Change tick log loglevel to debug
       hash: bbe03626da1b9bc2a0a9070002c9fd4c3228107b
       body: ''
