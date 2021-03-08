@@ -1,4 +1,21 @@
 - commits:
+    - subject: Improve performance of trigger contract matching
+      hash: e3a400b4f37b1afaa7855f5c50df2cdf378f9151
+      body: |
+        With this change, we only load the inserted contract using the user's
+        session when evaluating subscriptions, as it is redundant to
+        make this request when evaluating triggered actions (the contract is
+        already restricted by the session permissions in that code path)
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 3.1.6
+  date: 2021-03-08T01:57:13.253Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-uuid to ^1.0.71'
       hash: fdb606a8f3fc819e357dcdc6de682e04e014aa61
       body: ''
