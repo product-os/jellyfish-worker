@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency eslint-plugin-lodash to ^7.2.0'
+      hash: 66bdd5e3a207200afb4eb9e87cce90ffbd23f2ed
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.7
+  date: 2021-03-10T08:14:30.875Z
+- commits:
     - subject: Improve performance of trigger contract matching
       hash: e3a400b4f37b1afaa7855f5c50df2cdf378f9151
       body: |
