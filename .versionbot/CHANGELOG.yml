@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 01a6087f0c7be32a810a39c3457cfc535a89f1da
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.8
+  date: 2021-03-10T10:15:57.516Z
+- commits:
     - subject: 'patch: Update dependency eslint-plugin-lodash to ^7.2.0'
       hash: 66bdd5e3a207200afb4eb9e87cce90ffbd23f2ed
       body: ''
