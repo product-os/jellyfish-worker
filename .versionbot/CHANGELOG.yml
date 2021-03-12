@@ -1,4 +1,17 @@
 - commits:
+    - subject: support transformers within contract-repositories
+      hash: 8833fa97f0e7af274963f52542afd957fa2fa389
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 3.1.14
+  date: 2021-03-12T10:54:51.334Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^2.1.56'
       hash: e75280873cabbb92e6c5f47576b377068e887e95
       body: ''
