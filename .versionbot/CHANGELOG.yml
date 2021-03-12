@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency json-e to ^4.4.0'
+      hash: 5ad994a77ea18fff665c82f53095b5e198414c75
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.15
+  date: 2021-03-12T19:55:55.818Z
+- commits:
     - subject: support transformers within contract-repositories
       hash: 8833fa97f0e7af274963f52542afd957fa2fa389
       body: ''
