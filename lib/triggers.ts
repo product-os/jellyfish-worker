@@ -4,20 +4,47 @@
  * Proprietary and confidential.
  */
 
-const _ = require('lodash')
-const jsone = require('json-e')
-const skhema = require('skhema')
-const assert = require('@balena/jellyfish-assert')
-const errors = require('./errors')
-const utils = require('./utils')
+import _ from 'lodash';
+import jsone from 'json-e';
+import skhema from 'skhema';
+import assert from '@balena/jellyfish-assert';
+import { JSONSchema, core, worker } from '@balena/jellyfish-types';
+import * as errors from './errors';
+import * as utils from './utils';
+import { LogContext, JellyfishKernel } from './types';
 
-exports.matchesCard = async (context, jellyfish, session, filter, card) => {
+interface CompileContext {
+	timestamp: string;
+	epoch: number;
+	matchRE: (
+		pattern: string | RegExp,
+		flags: string | undefined,
+		str: string,
+	) => RegExpMatchArray;
+	source?: core.Contract;
+}
+
+interface GetRequestOptions {
+	currentDate: Date;
+	mode?: 'update' | 'insert';
+	context: LogContext;
+	session: string;
+}
+
+export const matchesCard = async (
+	context: LogContext,
+	jellyfish: JellyfishKernel,
+	session: string,
+	filter: JSONSchema,
+	card: core.Contract | null,
+) => {
 	if (!card) {
-		return false
+		return false;
 	}
 
-	const isValid = skhema.isValid(filter, card)
-	const isLink = card.type.split('@')[0] === 'link'
+	// TS-TODO: Change the Skhema module to accept interfaces that extend JSONSchema
+	const isValid = skhema.isValid(filter as any, card);
+	const isLink = card.type.split('@')[0] === 'link';
 
 	/*
 	 * We don't discard triggers that didn't match the card
@@ -30,7 +57,7 @@ exports.matchesCard = async (context, jellyfish, session, filter, card) => {
 	 * the trigger when the corresponding link card is created.
 	 */
 	if (!isValid && !isLink) {
-		return false
+		return false;
 	}
 
 	/*
@@ -39,7 +66,7 @@ exports.matchesCard = async (context, jellyfish, session, filter, card) => {
 	 * against the card or not.
 	 */
 	if (!filter || !filter.$$links) {
-		return isValid ? card : false
+		return isValid ? card : false;
 	}
 
 	/*
@@ -54,23 +81,29 @@ exports.matchesCard = async (context, jellyfish, session, filter, card) => {
 	 */
 
 	// So that we don't modify the object
-	const schema = _.cloneDeep(filter)
+	const schema = _.cloneDeep(filter);
 
 	// We need the full card so we pass it to the trigger
 	// templating engine
-	schema.additionalProperties = true
+	schema.additionalProperties = true;
 
-	schema.required.push('id', 'links')
-	schema.properties.id = {
-		type: 'string'
+	if (!schema.required) {
+		schema.required = [];
 	}
+	if (!schema.properties) {
+		schema.properties = {};
+	}
+	schema.required.push('id', 'links');
+	schema.properties.id = {
+		type: 'string',
+	};
 
 	// Expand links so they are available from the
 	// templating engine.
 	schema.properties.links = {
 		type: 'object',
-		additionalProperties: true
-	}
+		additionalProperties: true,
+	};
 
 	/*
 	 * This is the tricky part, where we augment the trigger
@@ -80,26 +113,28 @@ exports.matchesCard = async (context, jellyfish, session, filter, card) => {
 	 * link name in the trigger schema.
 	 */
 	if (isLink) {
-		const linkType = Object.keys(schema.$$links)[0]
+		const linkContract: core.LinkContract = card as core.LinkContract;
+		const linkType = Object.keys(schema.$$links!)[0];
 		if (linkType === card.name) {
-			schema.properties.id.const = card.data.from.id
+			schema.properties.id.const = linkContract.data.from.id;
 		} else if (linkType === card.data.inverseName) {
-			schema.properties.id.const = card.data.to.id
+			schema.properties.id.const = linkContract.data.to.id;
 
-		// Abort if the link doesn't match.
+			// Abort if the link doesn't match.
 		} else {
-			return false
+			return false;
 		}
 	} else {
-		schema.properties.id.const = card.id
+		schema.properties.id.const = card.id;
 	}
 
 	// Run the query
-	return _.first(await jellyfish.query(
-		context, session, schema, {
-			limit: 1
-		}))
-}
+	return _.first(
+		await jellyfish.query(context, session, schema, {
+			limit: 1,
+		}),
+	);
+};
 
 /**
  * @summary Compile the trigger data
@@ -120,31 +155,39 @@ exports.matchesCard = async (context, jellyfish, session, filter, card) => {
  *   console.log(data.arguments)
  * }
  */
-const compileTrigger = (trigger, card, currentDate) => {
-	const context = {
+const compileTrigger = (
+	trigger: string | Record<any, any>,
+	card: core.Contract | null,
+	currentDate: Date,
+) => {
+	const context: CompileContext = {
 		timestamp: currentDate.toISOString(),
 		epoch: currentDate.valueOf(),
-		matchRE: (pattern, flags, string) => {
-			const regEx = flags ? new RegExp(pattern, flags) : new RegExp(pattern)
-			const match = string.match(regEx)
-			return match || []
-		}
-	}
+		matchRE: (
+			pattern: string | RegExp,
+			flags: string | undefined,
+			str: string,
+		) => {
+			const regEx = flags ? new RegExp(pattern, flags) : new RegExp(pattern);
+			const match = str.match(regEx);
+			return match || [];
+		},
+	};
 
 	if (card) {
-		context.source = card
+		context.source = card;
 	}
 
 	try {
-		return jsone(trigger, context)
+		return jsone(trigger, context);
 	} catch (error) {
 		if (error.name === 'InterpreterError') {
-			return null
+			return null;
 		}
 
-		throw error
+		throw error;
 	}
-}
+};
 
 /**
  * @summary Get a request from a trigger
@@ -177,27 +220,49 @@ const compileTrigger = (trigger, card, currentDate) => {
  * console.log(request.originator)
  * console.log(request.card)
  */
-exports.getRequest = async (jellyfish, trigger, card, options = {}) => {
-	const match = await exports.matchesCard(
-		options.context, jellyfish, options.session, trigger.filter, card)
+export const getRequest = async (
+	jellyfish: JellyfishKernel,
+	trigger: {
+		filter: any;
+		mode: any;
+		arguments: any;
+		target: any;
+		action: any;
+		id: any;
+	},
+	// If getRequest is called by a time triggered action, then card will be null
+	card: core.Contract | null,
+	options: GetRequestOptions,
+) => {
+	const match = await matchesCard(
+		options.context,
+		jellyfish,
+		options.session,
+		trigger.filter,
+		card,
+	);
 	if (card && !match) {
-		return null
+		return null;
 	}
 
 	if (trigger.mode && trigger.mode !== options.mode) {
-		return null
+		return null;
 	}
 
 	// We are not interested in compiling the rest of
 	// the properties, and skipping them here means that
 	// the templating engine will be a bit faster
-	const compiledTrigger = compileTrigger({
-		arguments: trigger.arguments,
-		target: trigger.target
-	}, match || card, options.currentDate)
+	const compiledTrigger = compileTrigger(
+		{
+			arguments: trigger.arguments,
+			target: trigger.target,
+		},
+		match || card,
+		options.currentDate,
+	);
 
 	if (!compiledTrigger) {
-		return null
+		return null;
 	}
 
 	return {
@@ -206,9 +271,9 @@ exports.getRequest = async (jellyfish, trigger, card, options = {}) => {
 		originator: trigger.id,
 		context: options.context,
 		currentDate: options.currentDate,
-		card: compiledTrigger.target
-	}
-}
+		card: compiledTrigger.target,
+	};
+};
 
 /**
  * @summary Get all triggered actions associated with a type
@@ -229,47 +294,52 @@ exports.getRequest = async (jellyfish, trigger, card, options = {}) => {
  *   console.log(card)
  * }
  */
-exports.getTypeTriggers = async (context, jellyfish, session, type) => {
-	return jellyfish.query(context, session, {
+export const getTypeTriggers = async (
+	context: LogContext,
+	jellyfish: JellyfishKernel,
+	session: string,
+	type: string,
+): Promise<worker.TriggeredActionContract[]> => {
+	return jellyfish.query<worker.TriggeredActionContract>(context, session, {
 		type: 'object',
 		additionalProperties: true,
-		required: [ 'id', 'version', 'active', 'type', 'data' ],
+		required: ['id', 'version', 'active', 'type', 'data'],
 		properties: {
 			id: {
-				type: 'string'
+				type: 'string',
 			},
 			version: {
-				type: 'string'
+				type: 'string',
 			},
 			active: {
 				type: 'boolean',
-				const: true
+				const: true,
 			},
 			type: {
 				type: 'string',
-				const: 'triggered-action@1.0.0'
+				const: 'triggered-action@1.0.0',
 			},
 			data: {
 				type: 'object',
 				additionalProperties: true,
 
 				// We only want to consider cards that act based on a filter
-				required: [ 'type', 'filter' ],
+				required: ['type', 'filter'],
 
 				properties: {
 					type: {
 						type: 'string',
-						const: type
+						const: type,
 					},
 					filter: {
 						type: 'object',
-						additionalProperties: true
-					}
-				}
-			}
-		}
-	})
-}
+						additionalProperties: true,
+					},
+				},
+			},
+		},
+	});
+};
 
 /**
  * @summary Get the start date of a triggered action
@@ -292,19 +362,21 @@ exports.getTypeTriggers = async (context, jellyfish, session, type) => {
  *
  * console.log(date.toISOString())
  */
-exports.getStartDate = (trigger) => {
+export const getStartDate = (trigger: {
+	data: { startDate?: string | number | Date };
+}): Date => {
 	if (trigger && trigger.data && trigger.data.startDate) {
-		const date = new Date(trigger.data.startDate)
+		const date = new Date(trigger.data.startDate);
 
 		// Detect if the parsed date object is valid
 		if (!isNaN(date.getTime())) {
-			return date
+			return date;
 		}
 	}
 
 	// The oldest possible date
-	return new Date('1970-01-01Z00:00:00:000')
-}
+	return new Date('1970-01-01Z00:00:00:000');
+};
 
 /**
  * @summary Get the next execution date for a trigger
@@ -321,25 +393,37 @@ exports.getStartDate = (trigger) => {
  *   console.log(nextExecutionDate.toISOString())
  * }
  */
-exports.getNextExecutionDate = (trigger, lastExecutionDate) => {
+// TS-TODO: Detangle all the different structures that triggers can be in
+export const getNextExecutionDate = (
+	trigger: { data: { interval: string; startDate: string | number | Date } },
+	lastExecutionDate: Date,
+): Date | null => {
 	if (!trigger || !trigger.data || !trigger.data.interval) {
-		return null
+		return null;
 	}
 
-	const startDate = exports.getStartDate(trigger)
-	if (!lastExecutionDate ||
-			!_.isDate(lastExecutionDate) ||
-			isNaN(lastExecutionDate.getTime())) {
-		return startDate
+	const startDate = getStartDate(trigger);
+	if (
+		!lastExecutionDate ||
+		!_.isDate(lastExecutionDate) ||
+		isNaN(lastExecutionDate.getTime())
+	) {
+		return startDate;
 	}
 
 	// The interval should be an ISO 8601 duration string, like PT1H
-	const duration = utils.durationToMs(trigger.data.interval)
-	assert.INTERNAL(null, duration !== 0,
+	const duration = utils.durationToMs(trigger.data.interval);
+	assert.INTERNAL(
+		null,
+		duration !== 0,
 		errors.WorkerInvalidDuration,
-		`Invalid interval: ${trigger.data.interval}`)
+		`Invalid interval: ${trigger.data.interval}`,
+	);
 
-	const intervals = Math.floor(Math.abs(lastExecutionDate - startDate) / duration)
-	const times = lastExecutionDate >= startDate || intervals === 0 ? intervals + 1 : 0
-	return new Date(startDate.getTime() + (duration * times))
-}
+	const intervals = Math.floor(
+		Math.abs(lastExecutionDate.getTime() - startDate.getTime()) / duration,
+	);
+	const times =
+		lastExecutionDate >= startDate || intervals === 0 ? intervals + 1 : 0;
+	return new Date(startDate.getTime() + duration * times);
+};

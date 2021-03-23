@@ -6,66 +6,80 @@
     "url": "https://github.com/product-os/jellyfish-worker.git"
   },
   "engines": {
-    "node": ">=14.2.0"
+    "node": ">=12.5.0"
   },
   "description": "Worker library for Jellyfish",
-  "main": "lib/index.js",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "build/"
+  ],
   "directories": {
     "lib": "lib"
   },
+  "scripts": {
+    "clean": "rimraf build",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "lint": "balena-lint --typescript lib && npm run check && deplint && depcheck --ignore-bin-package --ignores=shellcheck,@types/jest",
+    "lint-fix": "balena-lint --typescript --fix lib",
+    "unit": "jest lib",
+    "test": "catch-uncommitted --skip-node-versionbot-changes && npm run lint && npm run unit",
+    "doc": "typedoc lib/ && touch docs/.nojekyll",
+    "prepack": "npm run build",
+    "check": "jellycheck"
+  },
   "deplint": {
     "files": [
-      "lib/**/*.{js}"
+      "lib/**/*.{ts}"
     ],
     "modules": [
       "lib"
     ]
   },
   "lint-staged": {
-    "*.js": [
-      "eslint --cache --fix",
-      "npm run doc",
-      "git add README.md"
+    "*.{ts,tsx}": [
+      "balena-lint --typescript --fix",
+      "npm run doc"
     ]
-  },
-  "scripts": {
-    "test": "npm run doc && catch-uncommitted --skip-node-versionbot-changes && make lint && make test",
-    "doc": "jsdoc2md --template doc/README.hbs lib/index.js > README.md"
   },
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.1.5",
-    "@balena/jellyfish-jellyscript": "^2.1.62",
+    "@balena/jellyfish-jellyscript": "^3.0.12",
     "@balena/jellyfish-logger": "^2.1.22",
+    "@balena/jellyfish-types": "^0.4.0",
     "@balena/jellyfish-uuid": "^1.0.83",
+    "@types/bluebird": "^3.5.33",
+    "@types/lodash": "^4.14.168",
+    "@types/semver": "^7.3.4",
     "bluebird": "^3.7.2",
     "errio": "^1.2.2",
     "fast-equals": "^2.0.0",
+    "fast-json-patch": "^3.0.0-1",
     "iso8601-duration": "^1.3.0",
     "json-e": "^4.4.1",
     "lodash": "^4.17.21",
     "semver": "^7.3.5",
     "skhema": "^5.3.3",
-    "typed-errors": "^1.1.0"
+    "typed-error": "^3.2.1"
   },
   "devDependencies": {
     "@balena/jellycheck": "^0.1.1",
-    "ava": "^3.15.0",
+    "@balena/lint": "^5.4.1",
+    "@types/jest": "^26.0.21",
+    "@types/sinon": "^9.0.11",
     "catch-uncommitted": "^1.6.2",
     "depcheck": "^1.4.0",
     "deplint": "^1.1.3",
-    "eslint": "^7.23.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsdoc": "^32.3.0",
-    "eslint-plugin-lodash": "^7.2.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
-    "jsdoc-to-markdown": "^7.0.1",
+    "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
+    "rimraf": "^3.0.2",
     "simple-git-hooks": "^2.3.1",
-    "sinon": "^10.0.0"
+    "sinon": "^10.0.0",
+    "ts-jest": "^26.5.4",
+    "typedoc": "^0.20.33",
+    "typescript": "^4.2.3"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
