@@ -38,7 +38,7 @@
     "@balena/jellyfish-assert": "^1.1.1",
     "@balena/jellyfish-jellyscript": "^2.1.62",
     "@balena/jellyfish-logger": "^1.0.57",
-    "@balena/jellyfish-uuid": "^1.0.77",
+    "@balena/jellyfish-uuid": "^1.0.78",
     "bluebird": "^3.7.2",
     "errio": "^1.2.2",
     "fast-equals": "^2.0.0",
