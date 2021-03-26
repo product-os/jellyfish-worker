@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-uuid to ^1.0.78'
+      hash: ca6bf3dfc4ae0a7e501a7e5ffc3f3b1c5b6f055e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.35
+  date: 2021-03-26T07:23:21.895Z
+- commits:
     - subject: Replace husky with simple-git-hooks
       hash: 7d6d0db5ece5a583e2542dae2254e58f72fc4715
       body: ''
