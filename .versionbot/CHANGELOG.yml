@@ -1,4 +1,17 @@
 - commits:
+    - subject: Only run release versions of transformers
+      hash: f2add5197e30e802233ba106a09a0936e962e134
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Scott Lowe <scott@balena.io>
+        signed-off-by: Scott Lowe <scott@balena.io>
+      author: Scott Lowe
+      nested: []
+  version: 3.1.38
+  date: 2021-03-30T15:21:53.710Z
+- commits:
     - subject: add support for simple "requirements" specification for transformers
       hash: 969fd3ad8c5bc800aa36aefd9b393ce29b1eb402
       body: ''
