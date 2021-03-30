@@ -1,4 +1,17 @@
 - commits:
+    - subject: add support for simple "requirements" specification for transformers
+      hash: 969fd3ad8c5bc800aa36aefd9b393ce29b1eb402
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 3.1.37
+  date: 2021-03-30T14:50:11.135Z
+- commits:
     - subject: 'patch: Update dependency eslint to ^7.23.0'
       hash: 6cec9c79c30a8e56782b9e54f64e6b41397fed08
       body: ''
