@@ -301,7 +301,7 @@ worker.removetransformer('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
 
 #### worker.getLatestTransformers() ⇒ <code>Array.&lt;Object&gt;</code>
 **Kind**: instance method of [<code>Worker</code>](#module_worker.Worker)  
-**Summary**: Get filtered list of transformers, where only latest version of each major version exists.  
+**Summary**: Get filtered list of transformers, where only latest release version of each major version exists.  
 **Returns**: <code>Array.&lt;Object&gt;</code> - transformers  
 **Access**: public  
 **Example**  
