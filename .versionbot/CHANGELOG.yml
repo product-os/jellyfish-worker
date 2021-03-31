@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 1b0074402e036241d3dfc7297f4086a5e465197d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.39
+  date: 2021-03-31T00:55:20.754Z
+- commits:
     - subject: Only run release versions of transformers
       hash: f2add5197e30e802233ba106a09a0936e962e134
       body: ''
