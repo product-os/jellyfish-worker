@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency sinon to v10'
+      hash: 07aaff51ddc9a7830c10ac50968efd1f02bd2ed7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 3.1.42
+  date: 2021-04-01T01:48:30.177Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to v2'
       hash: 264f6ee15526f7dbbc44350e9f8610a467afaa6f
       body: ''
