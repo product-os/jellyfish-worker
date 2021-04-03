@@ -37,7 +37,7 @@
   "dependencies": {
     "@balena/jellyfish-assert": "^1.1.4",
     "@balena/jellyfish-jellyscript": "^2.1.62",
-    "@balena/jellyfish-logger": "^2.1.19",
+    "@balena/jellyfish-logger": "^2.1.20",
     "@balena/jellyfish-uuid": "^1.0.82",
     "bluebird": "^3.7.2",
     "errio": "^1.2.2",
