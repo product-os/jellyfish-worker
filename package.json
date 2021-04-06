@@ -46,9 +46,9 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.1.5",
-    "@balena/jellyfish-jellyscript": "^3.0.12",
+    "@balena/jellyfish-jellyscript": "^3.0.31",
     "@balena/jellyfish-logger": "^2.1.22",
-    "@balena/jellyfish-types": "^0.4.0",
+    "@balena/jellyfish-types": "^0.4.20",
     "@balena/jellyfish-uuid": "^1.0.83",
     "@types/bluebird": "^3.5.33",
     "@types/lodash": "^4.14.168",
@@ -67,7 +67,7 @@
   "devDependencies": {
     "@balena/jellycheck": "^0.1.1",
     "@balena/lint": "^5.4.1",
-    "@types/jest": "^26.0.21",
+    "@types/jest": "^26.0.22",
     "@types/sinon": "^9.0.11",
     "catch-uncommitted": "^1.6.2",
     "depcheck": "^1.4.0",
@@ -78,7 +78,7 @@
     "simple-git-hooks": "^2.3.1",
     "sinon": "^10.0.0",
     "ts-jest": "^26.5.4",
-    "typedoc": "^0.20.33",
+    "typedoc": "^0.20.35",
     "typescript": "^4.2.3"
   },
   "simple-git-hooks": {
