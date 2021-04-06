@@ -1,4 +1,17 @@
 - commits:
+    - subject: Convert to TypeScript
+      hash: 67f2618a109298349b256cff173bf46b8a4eead3
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 4.0.0
+  date: 2021-04-05T16:29:10.880Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^2.1.22'
       hash: 3b8c118a04638dbc15ff60f5198f2b7e8f66ee8c
       body: ''
