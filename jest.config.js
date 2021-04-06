@@ -5,7 +5,6 @@
  */
 
 module.exports = {
-	create: require('./create'),
-	update: require('./update'),
-	'triggered-action': require('./triggered-action')
-}
+	preset: "ts-jest",
+	testEnvironment: "node",
+};

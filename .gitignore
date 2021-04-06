@@ -67,7 +67,7 @@ dump.rdb
 *.lock
 
 # Built files
-dist/
+build/
 .cache-loader/
 *.0x
 
@@ -86,3 +86,6 @@ dist/
 
 # tmp directory
 tmp/
+
+# typedoc documentation
+/docs
