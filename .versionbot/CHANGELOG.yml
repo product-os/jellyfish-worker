@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency fast-equals to ^2.0.1'
+      hash: 02c510859eb0b478fec6e4c2f545f629290a1c28
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.0.11
+  date: 2021-04-07T14:43:02.019Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^3.0.37'
       hash: e8f61c4767ee8b314c7235b58abf2b090fd6c6b1
       body: ''
