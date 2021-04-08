@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency sinon to ^10.0.1'
+      hash: 327c9dd59a6ed7e87983b832742d39c5be3c0fd8
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.0.14
+  date: 2021-04-08T08:55:21.701Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 7488e7ae6a1008a2cf59a16d2b519803f2517aa0
       body: ''
