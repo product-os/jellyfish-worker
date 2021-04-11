@@ -16,7 +16,7 @@ import * as triggers from './triggers';
 import assert from '@balena/jellyfish-assert';
 import jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
-import uuid from '@balena/jellyfish-uuid';
+import * as uuid from '@balena/jellyfish-uuid';
 import { Operation } from 'fast-json-patch';
 import {
 	LogContext,

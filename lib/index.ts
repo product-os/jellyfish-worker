@@ -8,10 +8,10 @@ import Bluebird from 'bluebird';
 import errio from 'errio';
 import _ from 'lodash';
 import { Operation } from 'fast-json-patch';
-import uuid from '@balena/jellyfish-uuid';
-import assert from '@balena/jellyfish-assert';
+import * as uuid from '@balena/jellyfish-uuid';
+import * as assert from '@balena/jellyfish-assert';
 import { getLogger } from '@balena/jellyfish-logger';
-import semver from 'semver';
+import * as semver from 'semver';
 import {
 	JellyfishKernel,
 	LogContext,
