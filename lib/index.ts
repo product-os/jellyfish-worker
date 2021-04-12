@@ -8,7 +8,7 @@ import Bluebird from 'bluebird';
 import errio from 'errio';
 import _ from 'lodash';
 import { Operation } from 'fast-json-patch';
-import * as uuid from '@balena/jellyfish-uuid';
+import { v4 as uuidv4 } from 'uuid';
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger } from '@balena/jellyfish-logger';
 import * as semver from 'semver';
@@ -310,7 +310,7 @@ export class Worker {
 	 */
 	async initialize(context: any) {
 		// TS-TODO: type this correctly
-		this.id = await uuid.random();
+		this.id = uuidv4();
 		this.sync = context.sync;
 
 		// Insert worker specific cards
