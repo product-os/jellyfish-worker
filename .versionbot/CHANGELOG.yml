@@ -1,4 +1,17 @@
 - commits:
+    - subject: Fix uuid module imports
+      hash: b5f59f4c73bd2f49a86c6d1a3a5c3ca7ed3ec1c4
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 4.0.36
+  date: 2021-04-12T01:14:05.486Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^3.0.55'
       hash: d82a6902980aa32aed142785dbe553f3823263e5
       body: ''
