@@ -16,7 +16,7 @@ import * as triggers from './triggers';
 import assert from '@balena/jellyfish-assert';
 import jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
-import * as uuid from '@balena/jellyfish-uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { Operation } from 'fast-json-patch';
 import {
 	LogContext,
@@ -285,7 +285,7 @@ const commit = async (
 					{
 						version: '1.0.0',
 						type: 'notification@1.0.0',
-						slug: `notification-${await uuid.random()}`,
+						slug: `notification-${uuidv4()}`,
 						tags: [],
 						links: {},
 						requires: [],
@@ -321,7 +321,7 @@ const commit = async (
 						slug: `link-${filteredCard.id}-has-attached-${
 							// TS-TODO: assert notification exists
 							notification!.id
-						}-${await uuid.random()}`,
+						}-${uuidv4()}`,
 						tags: [],
 						links: {},
 						requires: [],

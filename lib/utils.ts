@@ -5,7 +5,7 @@
  */
 
 import iso8601Duration from 'iso8601-duration';
-import * as uuid from '@balena/jellyfish-uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { getLogger } from '@balena/jellyfish-logger';
 import { JSONSchema, core } from '@balena/jellyfish-types';
 import { LogContext, JellyfishKernel } from './types';
@@ -116,7 +116,7 @@ export const hasCard = async (
  * const slug = await utils.getEventSlug('execute')
  */
 export const getEventSlug = async (type: string): Promise<string> => {
-	const id = await uuid.random();
+	const id = uuidv4();
 	return `${type}-${id}`;
 };
 
