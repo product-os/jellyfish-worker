@@ -1,0 +1,166 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@balena/jellyfish-worker</title>
+	<meta name="description" content="Documentation for @balena/jellyfish-worker">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@balena/jellyfish-worker</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>@balena/jellyfish-worker</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#jellyfish-worker" id="jellyfish-worker" style="color: inherit; text-decoration: none;">
+					<h1>Jellyfish Worker</h1>
+				</a>
+				<p>Jellyfish workers are in charge of consuming action requests from the queue,
+					executing them, and reporting back the results. This module provides an lower
+					level interface to write a worker server. The intention is that we can write
+					multiple types of workers, optimised for different tasks using a single shared
+				framework.</p>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h1>Usage</h1>
+				</a>
+				<p>Below is an example how to use this library:</p>
+				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">Worker</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@balena/jellyfish-worker&#039;</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">worker</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Worker</span><span style="color: #000000">(</span><span style="color: #001080">jellyfish</span><span style="color: #000000">, </span><span style="color: #001080">jellyfish</span><span style="color: #000000">.</span><span style="color: #001080">sessions</span><span style="color: #000000">.</span><span style="color: #001080">admin</span><span style="color: #000000">, </span><span style="color: #001080">actionLibrary</span><span style="color: #000000">, </span><span style="color: #001080">consumer</span><span style="color: #000000">)</span>
+<span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">worker</span><span style="color: #000000">.</span><span style="color: #795E26">initialize</span><span style="color: #000000">(</span><span style="color: #001080">context</span><span style="color: #000000">)</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">id</span><span style="color: #000000"> = </span><span style="color: #001080">worker</span><span style="color: #000000">.</span><span style="color: #795E26">getId</span><span style="color: #000000">()</span>
+<span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">`Worker ID: </span><span style="color: #0000FF">${</span><span style="color: #001080">worker</span><span style="color: #000000FF">.</span><span style="color: #795E26">getId</span><span style="color: #000000FF">()</span><span style="color: #0000FF">}</span><span style="color: #A31515">`</span><span style="color: #000000">)</span>
+</code></pre>
+				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
+					<h1>Documentation</h1>
+				</a>
+				<p><a href="https://github.com/product-os/jellyfish-worker/actions/workflows/publish-docs.yml"><img src="https://github.com/product-os/jellyfish-worker/actions/workflows/publish-docs.yml/badge.svg" alt="Publish Documentation"></a></p>
+				<p>Visit the website for complete documentation: <a href="https://product-os.github.io/jellyfish-worker">https://product-os.github.io/jellyfish-worker</a></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/cards.html">cards</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/cards_create.html">cards/create</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/cards_triggered_action.html">cards/triggered-<wbr>action</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/cards_update.html">cards/update</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/errors.html">errors</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/executor.html">executor</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/index.html">index</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/index_spec.html">index.spec</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/transformers.html">transformers</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/transformers_spec.html">transformers.spec</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/triggers.html">triggers</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/types.html">types</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/utils.html">utils</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/utils_spec.html">utils.spec</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
