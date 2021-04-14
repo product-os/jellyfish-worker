@@ -8,9 +8,6 @@ on:
     tags:
       - '*'
 
-env:
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
 jobs:
   publish-docs:
     runs-on: ubuntu-latest
@@ -22,6 +19,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '12'
+
+      - name: Update .npmrc file with NPM Token
+        uses: dkershner6/use-npm-token-action@v1
+        with:
+          token: "${{ secrets.NPM_TOKEN }}"
 
       - name: Install NPM dependencies
         run: npm ci
