@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 3e730df49caae9fb694fb616588c9a465a36894a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.0.77
+  date: 2021-04-16T10:50:45.220Z
+- commits:
     - subject: Make transformers.evaluate have a consistent return type
       hash: 6c6e67404a5058cd4a3153485e35b39b3f9ae9c6
       body: ''
