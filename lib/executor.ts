@@ -13,7 +13,7 @@ import * as utils from './utils';
 import * as errors from './errors';
 import * as transformers from './transformers';
 import * as triggers from './triggers';
-import assert from '@balena/jellyfish-assert';
+import * as assert from '@balena/jellyfish-assert';
 import jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
 import { v4 as uuidv4 } from 'uuid';
