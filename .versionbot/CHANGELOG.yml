@@ -1,4 +1,27 @@
 - commits:
+    - subject: Make transformers.evaluate have a consistent return type
+      hash: 6c6e67404a5058cd4a3153485e35b39b3f9ae9c6
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Fix imports in executor file
+      hash: 47a597283a01f5c864668e217abc7e5422191378
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 4.0.76
+  date: 2021-04-16T10:40:12.812Z
+- commits:
     - subject: Fix jellyfish-assert imports
       hash: 110450042972f796a2259125c62e9d0f0652d0ac
       body: ''
