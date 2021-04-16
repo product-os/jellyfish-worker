@@ -7,7 +7,7 @@
 import _ from 'lodash';
 import jsone from 'json-e';
 import skhema from 'skhema';
-import assert from '@balena/jellyfish-assert';
+import * as assert from '@balena/jellyfish-assert';
 import { JSONSchema, core, worker } from '@balena/jellyfish-types';
 import * as errors from './errors';
 import * as utils from './utils';
