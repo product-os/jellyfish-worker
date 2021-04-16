@@ -5,16 +5,16 @@
  */
 
 import Bluebird from 'bluebird';
-import errio from 'errio';
+import * as errio from 'errio';
 import * as _ from 'lodash';
-import skhema from 'skhema';
-import fastEquals from 'fast-equals';
+import * as skhema from 'skhema';
+import * as fastEquals from 'fast-equals';
 import * as utils from './utils';
 import * as errors from './errors';
 import * as transformers from './transformers';
 import * as triggers from './triggers';
 import * as assert from '@balena/jellyfish-assert';
-import jellyscript from '@balena/jellyfish-jellyscript';
+import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
 import { v4 as uuidv4 } from 'uuid';
 import { Operation } from 'fast-json-patch';
