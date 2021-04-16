@@ -1,4 +1,17 @@
 - commits:
+    - subject: Fix jellyfish-assert imports
+      hash: 110450042972f796a2259125c62e9d0f0652d0ac
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 4.0.75
+  date: 2021-04-16T06:47:05.249Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 5e78f84da92b51b047c7908c161268b574f5e815
       body: ''
