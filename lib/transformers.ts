@@ -30,14 +30,14 @@ export interface EvaluateOptions {
 }
 
 // TS-TODO: Transformers should be a default model and included in this module
-export const evaluate = ({
+export const evaluate = async ({
 	transformers,
 	oldCard,
 	newCard,
 	context,
 	query,
 	executeAndAwaitAction,
-}: EvaluateOptions): null | Promise<any> => {
+}: EvaluateOptions): Promise<null> => {
 	if (!transformers || !Array.isArray(transformers)) {
 		return null;
 	}
@@ -52,7 +52,7 @@ export const evaluate = ({
 		_.get(oldCard.data, ['$transformer', 'artifactReady']) !== true &&
 		_.get(newCard.data, ['$transformer', 'artifactReady']) === true
 	) {
-		return Bluebird.map(transformers, async (transformer) => {
+		await Bluebird.map(transformers, async (transformer) => {
 			// TODO: Allow transformer input filter to match $$links, by re-using the trigger filter
 			const match =
 				transformer.data.inputFilter &&
