@@ -62,7 +62,7 @@ const getEvaluateParamsStub = (
 };
 
 describe('.evaluate()', () => {
-	test('should create a task if a transformer matches a card that has been set to artifactReady:true', async () => {
+	test('should create a task if a transformer matches a card that changed artifactReady:false->true', async () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
@@ -87,6 +87,61 @@ describe('.evaluate()', () => {
 			data: {
 				$transformer: {
 					artifactReady: true,
+				},
+			},
+		};
+
+		const { executeSpy, params } = getEvaluateParamsStub(
+			[(transformer as any) as core.Contract],
+			(oldCard as any) as core.Contract,
+			(newCard as any) as core.Contract,
+		);
+
+		await transformers.evaluate(params as transformers.EvaluateOptions);
+
+		// Two actions were executed
+		expect(executeSpy.calledTwice).toBe(true);
+		// The first call was for a task
+		expect(executeSpy.firstCall.firstArg.card).toBe('task@1.0.0');
+		// The first call was to create a card
+		expect(executeSpy.firstCall.firstArg.action).toBe(
+			'action-create-card@1.0.0',
+		);
+
+		// The second call was for a link
+		expect(executeSpy.secondCall.firstArg.card).toBe('link@1.0.0');
+
+		// The second call was to create a card
+		expect(executeSpy.secondCall.firstArg.action).toBe(
+			'action-create-card@1.0.0',
+		);
+	});
+
+	test('should create a task if a transformer matches a card that changed artifactReady:date1->date2', async () => {
+		const transformer = {
+			id: uuid(),
+			slug: 'test-transformer',
+			type: 'transformer@@1.0.0',
+			data: {
+				inputFilter: {
+					type: 'object',
+				},
+			},
+		};
+
+		const oldCard = {
+			type: 'card@1.0.0',
+			data: {
+				$transformer: {
+					artifactReady: '2018-12-18T11:08:45Z',
+				},
+			},
+		};
+		const newCard = {
+			type: 'card@1.0.0',
+			data: {
+				$transformer: {
+					artifactReady: '2020-12-18T11:08:45Z',
 				},
 			},
 		};
