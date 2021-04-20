@@ -17,7 +17,7 @@ export interface WorkerTriggerObjectInput {
 	arguments: worker.TriggeredActionData2['arguments'];
 	interval?: worker.TriggeredActionData2['interval'];
 	filter: worker.TriggeredActionData2['filter'];
-	mode: worker.TriggeredActionData2['mode'];
+	mode?: worker.TriggeredActionData2['mode'];
 	schedule: worker.TriggeredActionData2['schedule'];
 }
 
@@ -33,7 +33,7 @@ export interface ParsedWorkerTriggerObject {
 	startDate?: any;
 	filter: worker.TriggeredActionData2['filter'];
 	interval?: worker.TriggeredActionData2['interval'];
-	mode: worker.TriggeredActionData2['mode'];
+	mode?: worker.TriggeredActionData2['mode'];
 }
 
 // tslint:disable: jsdoc-format

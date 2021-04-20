@@ -181,7 +181,6 @@ const parseTrigger = (
 		arguments: trigger.arguments,
 		schedule: trigger.schedule,
 		filter: {},
-		mode: 'update',
 	};
 
 	// TODO: "startDate" is not on the triggered-action type definition.
