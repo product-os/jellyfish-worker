@@ -46,12 +46,11 @@ export const evaluate = async ({
 		return null;
 	}
 
-	// Only evaluate transformers if `data.$transformer.artifactReady` has been toggled to true,
-	// indicating that the corresponding artefact is available in the registry
-	if (
-		_.get(oldCard.data, ['$transformer', 'artifactReady']) !== true &&
-		_.get(newCard.data, ['$transformer', 'artifactReady']) === true
-	) {
+	// Only evaluate transformers if `data.$transformer.artifactReady` is truthy and has been changed,
+	// so irrelevant updates don't re-trigger a transformer
+	const oldReady = _.get(oldCard.data, ['$transformer', 'artifactReady']);
+	const newReady = _.get(newCard.data, ['$transformer', 'artifactReady']);
+	if (oldReady !== newReady && newReady) {
 		await Bluebird.map(transformers, async (transformer) => {
 			// TODO: Allow transformer input filter to match $$links, by re-using the trigger filter
 			const match =
