@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^2.1.28'
+      hash: eb9fe0a40da5bd859474f5a8a5230ea3c694a350
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.1.1
+  date: 2021-04-20T19:58:52.327Z
+- commits:
     - subject: change transformer.artifactReady to allow re-triggering
       hash: 73dc9c77054d330f2e21af68e34ee96f8e71f4fd
       body: ''
