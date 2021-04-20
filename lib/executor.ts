@@ -232,9 +232,6 @@ const commit = async (
 					return;
 				}
 
-				console.log(creatorSession);
-				console.log(insertedCard);
-
 				const targetContract = await jellyfish.getCardById(
 					context,
 					creatorSession.id,

@@ -224,11 +224,12 @@ export const getRequest = async (
 	jellyfish: JellyfishKernel,
 	trigger: {
 		filter: any;
-		mode: any;
+		mode?: any;
 		arguments: any;
 		target: any;
 		action: any;
 		id: any;
+		slug?: any;
 	},
 	// If getRequest is called by a time triggered action, then card will be null
 	card: core.Contract | null,
