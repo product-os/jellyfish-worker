@@ -1,4 +1,17 @@
 - commits:
+    - subject: change transformer.artifactReady to allow re-triggering
+      hash: 73dc9c77054d330f2e21af68e34ee96f8e71f4fd
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 4.1.0
+  date: 2021-04-20T14:58:16.760Z
+- commits:
     - subject: Allow the trigger `mode` field to be undefined
       hash: 36f4a12d7227bc4f79ddba090c18f2eeb3dcfecb
       body: |
