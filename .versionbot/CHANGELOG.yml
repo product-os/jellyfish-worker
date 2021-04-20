@@ -1,4 +1,19 @@
 - commits:
+    - subject: Allow the trigger `mode` field to be undefined
+      hash: 36f4a12d7227bc4f79ddba090c18f2eeb3dcfecb
+      body: |
+        The typescript conversion changed the mode to default to `update`, which
+        caused some triggered actions to no longer run.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 4.0.105
+  date: 2021-04-20T13:36:44.090Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^3.0.106'
       hash: 7c964913fa461de3a1480981f08913d84acaf9a3
       body: ''
