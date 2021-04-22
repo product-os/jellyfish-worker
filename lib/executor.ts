@@ -645,7 +645,6 @@ const commit = async (
 					filter: trigger.data.filter,
 					arguments: trigger.data.arguments,
 					schedule: 'async',
-					mode: 'update',
 				};
 
 				if (trigger.data.mode) {
