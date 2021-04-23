@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: bcc224af25566afc4e88c2eb5505ac20afc9f4c9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.1.10
+  date: 2021-04-23T02:26:57.395Z
+- commits:
     - subject: Fix bug where trigger "mode" always defaults to "update"
       hash: 3ece5b2778306e52606401618f03b889d3fbcf6c
       body: |
