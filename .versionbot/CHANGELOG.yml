@@ -1,4 +1,17 @@
 - commits:
+    - subject: Migrate worker integration tests from main app
+      hash: a4a35f16c8f91e4deafa444566355c356b725212
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 4.1.17
+  date: 2021-04-23T20:53:42.764Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^3.0.115'
       hash: b676d5d97f38e7b20dd5c1af0fb6938ffaa97ad2
       body: ''
