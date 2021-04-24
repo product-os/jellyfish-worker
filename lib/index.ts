@@ -4,9 +4,9 @@
  * Proprietary and confidential.
  */
 
-import Bluebird from 'bluebird';
-import errio from 'errio';
-import _ from 'lodash';
+import * as Bluebird from 'bluebird';
+import * as errio from 'errio';
+import * as _ from 'lodash';
 import { Operation } from 'fast-json-patch';
 import { v4 as uuidv4 } from 'uuid';
 import * as assert from '@balena/jellyfish-assert';
@@ -28,7 +28,8 @@ import * as utils from './utils';
 import * as triggers from './triggers';
 import CARDS from './cards';
 
-const logger = getLogger(__filename);
+// TODO: use a single logger instance for the worker
+const logger = getLogger('worker');
 
 export { triggers, errors, executor, CARDS, utils };
 
@@ -102,6 +103,7 @@ const runExecutor = async (
 	);
 };
 
+// TS-TODO: These asserts are largely useless and can be removed once everything is converted to TS
 const parseTrigger = (
 	context: LogContext,
 	trigger: WorkerTriggerObjectInput,
@@ -180,7 +182,6 @@ const parseTrigger = (
 		target: trigger.target,
 		arguments: trigger.arguments,
 		schedule: trigger.schedule,
-		filter: {},
 	};
 
 	// TODO: "startDate" is not on the triggered-action type definition.
@@ -1033,6 +1034,7 @@ export class Worker {
 			triggers: currentTriggers.length,
 		});
 
+		// TS-TODO: This code is pretty abominated and needs to be reviewed and straightened out
 		await Bluebird.map(
 			currentTriggers,
 			async (trigger) => {
@@ -1045,24 +1047,17 @@ export class Worker {
 					context,
 					trigger.id,
 				);
-
-				if (!lastExecutionEvent) {
-					return null;
-				}
-
-				// TS-TODO: It seems that `.getNextExecutionDate` expects a full contract, not the parsed trigger object provided here
-				// As a result it never actually runs. This needs to be detangled.
 				const nextExecutionDate = triggers.getNextExecutionDate(
 					{
 						data: trigger as any,
 					},
-					new Date(lastExecutionEvent.created_at),
+					lastExecutionEvent as any,
 				);
 
 				// Ignore the trigger if its not time to execute it yet
 				if (
 					!nextExecutionDate ||
-					options.currentDate < nextExecutionDate.getTime()
+					(options.currentDate as any) < (nextExecutionDate as any)
 				) {
 					return null;
 				}
@@ -1071,14 +1066,12 @@ export class Worker {
 				// is no input card that caused the trigger.
 				const inputCard = null;
 
-				// TODO: if card is null `.getRequest` will always return null, so
-				// this function will never do anything, this needs to be fixed
 				const request = await triggers.getRequest(
 					this.jellyfish,
 					trigger,
 					inputCard,
 					{
-						currentDate: new Date(options.currentDate),
+						currentDate: options.currentDate as any,
 						context,
 						session,
 					},
@@ -1090,7 +1083,6 @@ export class Worker {
 					return null;
 				}
 
-				// TS-TODO: Fix this type casting
 				return this.producer.enqueue(this.getId(), session, request as any);
 			},
 			{

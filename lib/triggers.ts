@@ -4,14 +4,14 @@
  * Proprietary and confidential.
  */
 
-import _ from 'lodash';
-import jsone from 'json-e';
-import skhema from 'skhema';
+import * as _ from 'lodash';
+import * as skhema from 'skhema';
 import * as assert from '@balena/jellyfish-assert';
 import { JSONSchema, core, worker } from '@balena/jellyfish-types';
 import * as errors from './errors';
 import * as utils from './utils';
 import { LogContext, JellyfishKernel } from './types';
+import jsone = require('json-e');
 
 interface CompileContext {
 	timestamp: string;
@@ -223,7 +223,7 @@ const compileTrigger = (
 export const getRequest = async (
 	jellyfish: JellyfishKernel,
 	trigger: {
-		filter: any;
+		filter?: any;
 		mode?: any;
 		arguments: any;
 		target: any;
@@ -397,7 +397,7 @@ export const getStartDate = (trigger: {
 // TS-TODO: Detangle all the different structures that triggers can be in
 export const getNextExecutionDate = (
 	trigger: { data: { interval: string; startDate: string | number | Date } },
-	lastExecutionDate: Date,
+	lastExecutionDate?: Date,
 ): Date | null => {
 	if (!trigger || !trigger.data || !trigger.data.interval) {
 		return null;
