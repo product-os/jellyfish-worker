@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 0de7c1ce6c5b21583e18f660bdf2e6274cdfb1f3
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.1.18
+  date: 2021-04-24T03:15:46.844Z
+- commits:
     - subject: Migrate worker integration tests from main app
       hash: a4a35f16c8f91e4deafa444566355c356b725212
       body: ''
