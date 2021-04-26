@@ -73,7 +73,7 @@
     "@balena/jellyfish-plugin-default": "^9.1.4",
     "@balena/jellyfish-queue": "^1.0.6",
     "@balena/lint": "^5.4.1",
-    "@types/jest": "^26.0.22",
+    "@types/jest": "^26.0.23",
     "@types/sinon": "^10.0.0",
     "@types/uuid": "^8.3.0",
     "catch-uncommitted": "^1.6.2",
