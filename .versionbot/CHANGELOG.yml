@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update renovate config to use shared config base
+      hash: 3eb223b2db06ac17c9dc8376fee1befe3d89b1c0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 4.1.28
+  date: 2021-04-26T07:22:57.422Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^3.0.124'
       hash: 08b01fd21538b375ec82c74ac9cc0ebe913727b7
       body: ''
