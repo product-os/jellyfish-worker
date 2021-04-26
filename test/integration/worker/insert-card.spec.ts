@@ -5,31 +5,31 @@
  */
 
 import * as helpers from './helpers';
+import { strict as assert } from 'assert';
+import { TypeContract } from '@balena/jellyfish-types/build/core';
 
-let context: any;
+let ctx: helpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	try {
-		context = await helpers.worker.before(context);
-	} catch (error) {
-		console.error(error);
-	}
+	ctx = await helpers.worker.before(ctx);
 });
 
-afterAll(async () => {
-	helpers.worker.after(context);
+afterAll(() => {
+	return helpers.worker.after(ctx);
 });
 
 describe('.insertCard()', () => {
-	test.only('should pass a triggered action originator', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+	test('should pass a triggered action originator', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<TypeContract>(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
 
-		const command = context.generateRandomSlug();
-		context.worker.setTriggers(context.context, [
+		assert(typeCard !== null);
+
+		const command = ctx.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
@@ -61,17 +61,18 @@ describe('.insertCard()', () => {
 			},
 		]);
 
-		await context.worker.insertCard(
-			context.context,
-			context.session,
+		await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
 			typeCard,
 			{
 				timestamp: new Date().toISOString(),
-				actor: context.actor.id,
+				actor: ctx.actor.id,
 				attachEvents: true,
+				reason: null,
 			},
 			{
-				slug: context.generateRandomSlug(),
+				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command,
@@ -79,23 +80,27 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const card = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${command}@1.0.0`,
 		);
+
+		assert(card !== null);
 		expect(card.data.originator).toBe('cb3523c5-b37d-41c8-ae32-9e7cc9309165');
 	});
 
 	test('should take an originator option', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug<TypeContract>(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
 
-		const command = context.generateRandomSlug();
-		context.worker.setTriggers(context.context, [
+		assert(typeCard !== null);
+
+		const command = ctx.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
@@ -126,18 +131,19 @@ describe('.insertCard()', () => {
 			},
 		]);
 
-		await context.worker.insertCard(
-			context.context,
-			context.session,
+		await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
 			typeCard,
 			{
 				timestamp: new Date().toISOString(),
-				actor: context.actor.id,
+				actor: ctx.actor.id,
 				originator: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				attachEvents: true,
+				reason: null,
 			},
 			{
-				slug: context.generateRandomSlug(),
+				slug: ctx.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command,
@@ -145,11 +151,12 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const card = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${command}@latest`,
 		);
+		assert(card !== null);
 		expect(card.data.originator).toBe('4a962ad9-20b5-4dd8-a707-bf819593cc84');
 	});
 });

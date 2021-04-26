@@ -22,6 +22,7 @@
   },
   "include": [
     "lib/**/*.ts",
+    "test/**/*.ts",
     "@types/**/*.d.ts"
   ]
 }

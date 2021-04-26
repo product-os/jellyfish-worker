@@ -18,7 +18,9 @@ export interface WorkerTriggerObjectInput {
 	interval?: worker.TriggeredActionData2['interval'];
 	filter?: worker.TriggeredActionData2['filter'];
 	mode?: worker.TriggeredActionData2['mode'];
-	schedule: worker.TriggeredActionData2['schedule'];
+	schedule?: worker.TriggeredActionData2['schedule'];
+	// TS-TODO: figure out if startDate is used. This is part of the "tick()" spaghetti mess
+	startDate?: string;
 }
 
 // This is how triggers are stored in the state of the worker instance
@@ -55,7 +57,7 @@ export interface EnqueueOptions {
 
 export interface LogContext {
 	id: string;
-	api: string;
+	api?: string;
 }
 
 export interface QueueWaitResult {

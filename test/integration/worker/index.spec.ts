@@ -17,7 +17,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	return helpers.worker.after();
+	return helpers.worker.after(context);
 });
 
 describe('.getId()', () => {

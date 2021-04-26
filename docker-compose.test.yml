@@ -4,12 +4,12 @@ services:
   sut:
     build:
       context: .
-      dockerfile: Dockerfile.ci
+      dockerfile: Dockerfile
       args:
         NPM_TOKEN: $NPM_TOKEN
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
     environment:
       - DATABASE=postgres
       - LOGLEVEL=crit

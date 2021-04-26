@@ -7,52 +7,59 @@
 import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import * as helpers from './helpers';
+import { strict as assert } from 'assert';
+import { Contract } from '@balena/jellyfish-types/build/core';
 
-let context: any;
+let ctx: helpers.IntegrationTestContext & {
+	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
+};
 
 beforeAll(async () => {
-	context = await helpers.worker.before();
+	ctx = await helpers.worker.before();
 
-	context.waitForMatch = async (waitQuery: any, times = 20) => {
+	ctx.waitForMatch = async <T extends Contract>(waitQuery: any, times = 20) => {
 		if (times === 0) {
 			throw new Error('The wait query did not resolve');
 		}
-		const results = await context.jellyfish.query(
-			context.context,
-			context.session,
+		const results = await ctx.jellyfish.query<T>(
+			ctx.context,
+			ctx.session,
 			waitQuery,
 		);
 		if (results.length > 0) {
 			return results[0];
 		}
 		await Bluebird.delay(500);
-		return context.waitForMatch(waitQuery, times - 1);
+		return ctx.waitForMatch(waitQuery, times - 1);
 	};
 });
 
 afterAll(() => {
-	return helpers.worker.after(context);
+	return helpers.worker.after(ctx);
 });
 
 describe('.execute()', () => {
 	test('should execute an action', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+
+		assert(typeCard !== null);
+
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
 					reason: null,
 					properties: {
-						slug: context.generateRandomSlug(),
+						slug: ctx.generateRandomSlug(),
 						version: '1.0.0',
 						data: {
 							foo: 'bar',
@@ -62,35 +69,39 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			request,
 		);
 
 		expect(result.error).toBe(false);
-		const card = await context.jellyfish.getCardById(
-			context.context,
-			context.session,
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
 			result.data.id,
 		);
+		assert(card !== null);
 		expect(card.data.foo).toBe('bar');
 	});
 
 	test('should execute a triggered action given a matching mode', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const actionCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'action-create-card@latest',
 		);
 
-		const command = context.generateRandomSlug();
-		context.worker.setTriggers(context.context, [
+		assert(typeCard !== null);
+		assert(actionCard !== null);
+
+		const command = ctx.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
@@ -120,16 +131,17 @@ describe('.execute()', () => {
 						slug: command,
 					},
 				},
+				schedule: 'sync',
 			},
 		]);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: context.context,
+				context: ctx.context,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -145,44 +157,46 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
-			context.context,
-			request,
-		);
+		await ctx.flush(ctx.session);
+		const result = await ctx.queue.producer.waitResults(ctx.context, request);
 
 		expect(result.error).toBe(false);
 
-		const card = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const card = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${command}@latest`,
 		);
 		expect(card).toBeTruthy();
 
-		const resultCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const resultCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${slug}@latest`,
 		);
+
+		assert(resultCard !== null);
 
 		expect(resultCard.data.command).toBe(command);
 	});
 
 	test('should not execute a triggered action given a non matching mode', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const actionCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'action-create-card@latest',
 		);
 
-		const command = context.generateRandomSlug();
-		context.worker.setTriggers(context.context, [
+		assert(typeCard !== null);
+		assert(actionCard !== null);
+
+		const command = ctx.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
@@ -215,13 +229,13 @@ describe('.execute()', () => {
 			},
 		]);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: context.context,
+				context: ctx.context,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -237,45 +251,47 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
-			context.context,
-			request,
-		);
+		await ctx.flush(ctx.session);
+		const result = await ctx.queue.producer.waitResults(ctx.context, request);
 
 		expect(result.error).toBe(false);
 
-		const card = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const card = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${command}@latest`,
 		);
 
 		expect(card).toBeFalsy();
 
-		const resultCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const resultCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${slug}@latest`,
 		);
+
+		assert(resultCard !== null);
 
 		expect(resultCard.data.command).toBe(command);
 	});
 
 	test('should not execute a triggered action with a future start date', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const actionCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'action-create-card@latest',
 		);
 
-		const command = context.generateRandomSlug();
-		context.worker.setTriggers(context.context, [
+		assert(typeCard !== null);
+		assert(actionCard !== null);
+
+		const command = ctx.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
@@ -308,13 +324,13 @@ describe('.execute()', () => {
 			},
 		]);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: context.context,
+				context: ctx.context,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -330,17 +346,14 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
-			context.context,
-			request,
-		);
+		await ctx.flush(ctx.session);
+		const result = await ctx.queue.producer.waitResults(ctx.context, request);
 
 		expect(result.error).toBe(false);
 
-		const card = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const card = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${command}@latest`,
 		);
 
@@ -348,19 +361,22 @@ describe('.execute()', () => {
 	});
 
 	test('should execute a triggered action with a top level anyOf', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const actionCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'action-create-card@latest',
 		);
 
-		const command = context.generateRandomSlug();
-		context.worker.setTriggers(context.context, [
+		assert(typeCard !== null);
+		assert(actionCard !== null);
+
+		const command = ctx.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
@@ -403,13 +419,13 @@ describe('.execute()', () => {
 			},
 		]);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: context.context,
+				context: ctx.context,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -425,40 +441,40 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
-			context.context,
-			request,
-		);
+		await ctx.flush(ctx.session);
+		const result = await ctx.queue.producer.waitResults(ctx.context, request);
 		expect(result.error).toBe(false);
 
-		const card = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const card = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${command}@latest`,
 		);
 		expect(card).toBeTruthy();
 	});
 
 	test('should add a create event when creating a card', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const actionCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'action-create-card@latest',
 		);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		assert(typeCard !== null);
+		assert(actionCard !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: context.context,
+				context: ctx.context,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -474,54 +490,53 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			request,
 		);
+
 		expect(result.error).toBe(false);
 
-		const timeline = await context.jellyfish.query(
-			context.context,
-			context.session,
-			{
-				type: 'object',
-				additionalProperties: true,
-				required: ['data'],
-				properties: {
-					data: {
-						type: 'object',
-						required: ['target'],
-						additionalProperties: true,
-						properties: {
-							target: {
-								type: 'string',
-								const: result.data.id,
-							},
+		const timeline = await ctx.jellyfish.query(ctx.context, ctx.session, {
+			type: 'object',
+			additionalProperties: true,
+			required: ['data'],
+			properties: {
+				data: {
+					type: 'object',
+					required: ['target'],
+					additionalProperties: true,
+					properties: {
+						target: {
+							type: 'string',
+							const: result.data.id,
 						},
 					},
 				},
 			},
-		);
+		});
 
 		expect(timeline.length).toBe(1);
 		expect(timeline[0].type).toBe('create@1.0.0');
 	});
 
 	test('should be able to AGGREGATE based on the card timeline', async () => {
-		const typeType = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeType = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'type@latest',
 		);
 
-		const slug = context.generateRandomSlug({ prefix: 'test-type' });
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		assert(typeType !== null);
+
+		const slug = ctx.generateRandomSlug({ prefix: 'test-type' });
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeType.id,
 				type: typeType.type,
 				arguments: {
@@ -558,26 +573,26 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const typeResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const typeResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			request,
 		);
 		expect(typeResult.error).toBe(false);
 
-		const threadRequest = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const threadRequest = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeResult.data.id,
 				type: typeResult.data.type,
 				arguments: {
 					reason: null,
 					properties: {
 						version: '1.0.0',
-						slug: context.generateRandomSlug(),
+						slug: ctx.generateRandomSlug(),
 						data: {
 							mentions: [],
 						},
@@ -586,19 +601,19 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const threadResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const threadResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			threadRequest,
 		);
 		expect(threadResult.error).toBe(false);
 
-		const messageRequest1 = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const messageRequest1 = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
@@ -611,12 +626,12 @@ describe('.execute()', () => {
 			},
 		);
 
-		const messageRequest2 = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const messageRequest2 = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
@@ -629,14 +644,14 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		await context.flush(context.session);
-		const messageResult1 = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		await ctx.flush(ctx.session);
+		const messageResult1 = await ctx.queue.producer.waitResults(
+			ctx.context,
 			messageRequest1,
 		);
-		const messageResult2 = await context.queue.producer.waitResults(
-			context.context,
+		const messageResult2 = await ctx.queue.producer.waitResults(
+			ctx.context,
 			messageRequest2,
 		);
 
@@ -644,7 +659,7 @@ describe('.execute()', () => {
 		expect(messageResult2.error).toBe(false);
 
 		// AGGREGATE is asynchronous, so we will need to wait for the actions to be processed
-		const thread = await context.waitForMatch({
+		const thread = await ctx.waitForMatch({
 			type: 'object',
 			properties: {
 				id: {
@@ -664,25 +679,29 @@ describe('.execute()', () => {
 			required: ['id', 'data'],
 		});
 
-		expect(_.sortBy(thread.data.mentions)).toEqual(
+		assert(thread !== null);
+
+		expect(_.sortBy(thread.data.mentions as string[])).toEqual(
 			_.sortBy(['johndoe', 'janedoe', 'johnsmith']),
 		);
 	});
 
 	test('AGGREGATE should create a property on the target if it does not exist', async () => {
-		const typeType = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeType = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'type@latest',
 		);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		assert(typeType !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeType.id,
 				type: typeType.type,
 				arguments: {
@@ -719,25 +738,25 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const typeResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const typeResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			request,
 		);
 		expect(typeResult.error).toBe(false);
 
-		const threadRequest = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const threadRequest = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeResult.data.id,
 				type: typeResult.data.type,
 				arguments: {
 					reason: null,
 					properties: {
-						slug: context.generateRandomSlug(),
+						slug: ctx.generateRandomSlug(),
 						version: '1.0.0',
 						data: {},
 					},
@@ -745,19 +764,19 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const threadResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const threadResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			threadRequest,
 		);
 		expect(threadResult.error).toBe(false);
 
-		const messageRequest = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const messageRequest = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
@@ -771,15 +790,15 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const messageResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const messageResult = await ctx.queue.producer.waitResults(
+			ctx.context,
 			messageRequest,
 		);
 		expect(messageResult.error).toBe(false);
 
 		await expect(
-			context.waitForMatch({
+			ctx.waitForMatch({
 				type: 'object',
 				properties: {
 					id: {
@@ -804,19 +823,21 @@ describe('.execute()', () => {
 	});
 
 	test('AGGREGATE should work with $$ prefixed properties', async () => {
-		const typeType = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeType = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'type@latest',
 		);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		assert(typeType !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeType.id,
 				type: typeType.type,
 				arguments: {
@@ -853,26 +874,26 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const typeResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const typeResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			request,
 		);
 
 		expect(typeResult.error).toBe(false);
 
-		const threadRequest = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const threadRequest = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeResult.data.id,
 				type: 'type',
 				arguments: {
 					reason: null,
 					properties: {
-						slug: context.generateRandomSlug(),
+						slug: ctx.generateRandomSlug(),
 						version: '1.0.0',
 						data: {
 							$$mentions: [],
@@ -882,21 +903,21 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const threadResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const threadResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			threadRequest,
 		);
 
 		expect(threadResult.error).toBe(false);
 
-		const messageRequest = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const messageRequest = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
 				card: threadResult.data.id,
-				context: context.context,
+				context: ctx.context,
 				type: slug,
 				arguments: {
 					type: 'message',
@@ -909,16 +930,16 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const messageResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const messageResult = await ctx.queue.producer.waitResults(
+			ctx.context,
 			messageRequest,
 		);
 
 		expect(messageResult.error).toBe(false);
 
 		await expect(
-			context.waitForMatch({
+			ctx.waitForMatch({
 				type: 'object',
 				properties: {
 					id: {
@@ -943,19 +964,21 @@ describe('.execute()', () => {
 	});
 
 	test('should create a message with tags', async () => {
-		const typeType = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeType = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'type@latest',
 		);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		assert(typeType !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeType.id,
 				type: typeType.type,
 				arguments: {
@@ -981,44 +1004,44 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const typeResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const typeResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			request,
 		);
 		expect(typeResult.error).toBe(false);
 
-		const threadRequest = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const threadRequest = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: typeResult.data.id,
 				type: typeResult.data.type,
 				arguments: {
 					reason: null,
 					properties: {
-						slug: context.generateRandomSlug(),
+						slug: ctx.generateRandomSlug(),
 						version: '1.0.0',
 					},
 				},
 			},
 		);
 
-		await context.flush(context.session);
-		const threadResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const threadResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			threadRequest,
 		);
 		expect(threadResult.error).toBe(false);
 
-		const messageRequest = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const messageRequest = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
-				context: context.context,
+				context: ctx.context,
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
@@ -1032,50 +1055,51 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const messageResult = await context.queue.producer.waitResults(
-			context.context,
+		await ctx.flush(ctx.session);
+		const messageResult: any = await ctx.queue.producer.waitResults(
+			ctx.context,
 			messageRequest,
 		);
 
 		expect(messageResult.error).toBe(false);
 
-		const element = await context.jellyfish.getCardById(
-			context.context,
-			context.session,
+		const element = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
 			messageResult.data.id,
-			{
-				type: messageResult.data.type,
-			},
 		);
+
+		assert(element !== null);
 
 		expect(element.tags).toEqual(['testtag']);
 	});
 
 	test('should add an execution event to the action request', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const actionCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'action-create-card@latest',
 		);
+		assert(typeCard !== null);
+		assert(actionCard !== null);
 
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: context.context,
+				context: ctx.context,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
 					reason: null,
 					properties: {
-						slug: context.generateRandomSlug(),
+						slug: ctx.generateRandomSlug(),
 						version: '1.0.0',
 						data: {
 							foo: 'bar',
@@ -1085,54 +1109,49 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
-			context.context,
-			request,
-		);
+		await ctx.flush(ctx.session);
+		const result = await ctx.queue.producer.waitResults(ctx.context, request);
 		expect(result.error).toBe(false);
 
-		const timeline = await context.jellyfish.query(
-			context.context,
-			context.session,
-			{
-				type: 'object',
-				additionalProperties: true,
-				required: ['data'],
-				properties: {
-					data: {
-						type: 'object',
-						required: ['target'],
-						additionalProperties: true,
-						properties: {
-							target: {
-								type: 'string',
-								const: request.id,
-							},
+		const timeline = await ctx.jellyfish.query(ctx.context, ctx.session, {
+			type: 'object',
+			additionalProperties: true,
+			required: ['data'],
+			properties: {
+				data: {
+					type: 'object',
+					required: ['target'],
+					additionalProperties: true,
+					properties: {
+						target: {
+							type: 'string',
+							const: request.id,
 						},
 					},
 				},
 			},
-		);
+		});
 
 		expect(timeline.length).toBe(1);
 		expect(timeline[0].type).toBe('execute@1.0.0');
 	});
 
 	test('should execute a triggered action', async () => {
-		const typeCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const actionCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			'action-create-card@latest',
 		);
+		assert(typeCard !== null);
+		assert(actionCard !== null);
 
-		const command = context.generateRandomSlug();
-		context.worker.setTriggers(context.context, [
+		const command = ctx.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
@@ -1164,13 +1183,13 @@ describe('.execute()', () => {
 			},
 		]);
 
-		const slug = context.generateRandomSlug();
-		const request = await context.queue.producer.enqueue(
-			context.worker.getId(),
-			context.session,
+		const slug = ctx.generateRandomSlug();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: context.context,
+				context: ctx.context,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -1186,27 +1205,26 @@ describe('.execute()', () => {
 			},
 		);
 
-		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
-			context.context,
-			request,
-		);
+		await ctx.flush(ctx.session);
+		const result = await ctx.queue.producer.waitResults(ctx.context, request);
 
 		expect(result.error).toBe(false);
 
-		const card = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const card = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${command}@latest`,
 		);
 
 		expect(card).toBeTruthy();
 
-		const resultCard = await context.jellyfish.getCardBySlug(
-			context.context,
-			context.session,
+		const resultCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
 			`${slug}@latest`,
 		);
+
+		assert(resultCard !== null);
 
 		expect(resultCard.data.command).toBe(command);
 	});
