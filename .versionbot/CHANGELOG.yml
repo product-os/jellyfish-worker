@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major Docker tags'
+      hash: 2caca0ef4a2dbaaae6c9c19771df6ee9a327803a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.1.29
+  date: 2021-04-26T07:36:13.448Z
+- commits:
     - subject: Update renovate config to use shared config base
       hash: 3eb223b2db06ac17c9dc8376fee1befe3d89b1c0
       body: ''
