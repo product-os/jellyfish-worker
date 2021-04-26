@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @types/jest to ^26.0.23'
+      hash: a7a52573c2203b22765fe6b8354269c42f202ebc
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.1.31
+  date: 2021-04-26T11:31:02.725Z
+- commits:
     - subject: 'patch: Update dependency @types/semver to ^7.3.5'
       hash: ac8c10654ad620aee93f2c4f7ad75152f8010cf2
       body: ''
