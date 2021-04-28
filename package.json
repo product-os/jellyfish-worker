@@ -47,7 +47,7 @@
   "dependencies": {
     "@balena/jellyfish-assert": "^1.1.10",
     "@balena/jellyfish-jellyscript": "^3.0.129",
-    "@balena/jellyfish-logger": "^2.1.37",
+    "@balena/jellyfish-logger": "^2.1.38",
     "@balena/jellyfish-types": "^0.5.59",
     "@types/bluebird": "^3.5.33",
     "@types/lodash": "^4.14.168",
@@ -60,7 +60,7 @@
     "json-e": "^4.4.1",
     "lodash": "^4.17.21",
     "semver": "^7.3.5",
-    "skhema": "^5.3.3",
+    "skhema": "^5.3.4",
     "typed-error": "^3.2.1",
     "uuid": "^8.3.2"
   },
