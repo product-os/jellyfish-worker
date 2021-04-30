@@ -1,4 +1,19 @@
 - commits:
+    - subject: 'patch: Migrate worker/action integration tests from main Jellyfish repo'
+      hash: 99741330f1695881167f067568bf308a2d3b5eff
+      body: |
+        This PR also converts the tests to jest and converts them to Typescript.
+        We should consider if these tests should be placed alongside the actions
+        they actually test in the action-library repo, however this conversion
+        process is a valuable step in any case.
+      footer:
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 4.1.54
+  date: 2021-04-30T14:40:11.161Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: cb61f355b4d20fc3766beb39ef43e3758605a0a6
       body: ''
