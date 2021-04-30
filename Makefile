@@ -174,9 +174,10 @@ lint:
 	npx deplint
 	npx depcheck --ignore-bin-package
 
+# TODO: Remove the forceExit flag
+# Force exit jest because it seems that backend disconnect doesn't safely close open handles
 test:
-	node $(NODE_DEBUG_ARGS) ./node_modules/.bin/jest $(FILES)
+	node $(NODE_DEBUG_ARGS) ./node_modules/.bin/jest --verbose --maxWorkers=1 --forceExit $(FILES)
 
-# FILES="./test/integration/**/*.spec.ts" make test
 test-integration:
-	FILES="./test/integration/worker/triggers.spec.ts" make test
+	FILES="./test/integration" make test

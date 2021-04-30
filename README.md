@@ -33,6 +33,8 @@ Visit the website for complete documentation: https://product-os.github.io/jelly
 
 # Testing
 
+Unit tests can be easily run with the command `npm test`. This will run all unit tests (found in the `/lib` folder).
+
 The integration tests require a postgres DB and redis server. The simplest way to run the tests locally is with docker-compose.
 
 ```

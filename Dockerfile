@@ -1,13 +1,11 @@
-FROM balena/open-balena-base:v11.1.2
+FROM resinci/jellyfish-test:v1.3.43
 
 WORKDIR /usr/src/jellyfish
+
+COPY package.json package-lock.json /usr/src/jellyfish/
 ARG NPM_TOKEN
-
-# Install npm packages
-COPY package.json package-lock.json ./
 RUN echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc && \
-	npm ci && rm -f ~/.npmrc
+    npm ci && rm -f ~/.npmrc
 
-# Copy in source and run lint and unit tests
 COPY . ./
-RUN npm run test
+CMD /bin/bash -c "make test-integration"

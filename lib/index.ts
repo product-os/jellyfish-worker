@@ -410,7 +410,7 @@ export class Worker {
 			timestamp: any;
 			reason: any;
 			actor: any;
-			originator: any;
+			originator?: any;
 			attachEvents: any;
 		},
 		card: Partial<core.Contract>,
@@ -829,7 +829,13 @@ export class Worker {
 	 */
 	async pre(
 		session: string,
-		request: { action: string; context: LogContext; arguments: any },
+		request: {
+			action: string;
+			context: LogContext;
+			arguments: any;
+			card: string;
+			type: string;
+		},
 	) {
 		const actionDefinition = this.library[request.action.split('@')[0]];
 		assert.USER(

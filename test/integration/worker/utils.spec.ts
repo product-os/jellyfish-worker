@@ -11,16 +11,11 @@ import { v4 as uuidv4 } from 'uuid';
 let context: any;
 
 beforeAll(async () => {
-	try {
-		context = await helpers.jellyfish.before();
-	} catch (error) {
-		console.error('AN ERROR');
-		console.error(error);
-	}
+	context = await helpers.jellyfish.before();
 });
 
 afterAll(() => {
-	helpers.jellyfish.after(context);
+	return helpers.jellyfish.after(context);
 });
 
 describe('.hasCard()', () => {

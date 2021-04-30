@@ -17,6 +17,7 @@ import {
 	// 	SessionContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
+import { core } from '@balena/jellyfish-types';
 import {
 	ActionPayload,
 	QueueConsumer,
@@ -36,6 +37,19 @@ export interface IntegrationCoreTestContext {
 		consumer: QueueConsumer;
 		producer: QueueProducer;
 	};
+	jellyfish: core.JellyfishKernel;
+	worker: InstanceType<typeof Worker>;
+	flush: (session: string) => Promise<any>;
+	processAction: (
+		session: string,
+		action: {
+			action: string;
+			context: any;
+			card: string;
+			type: string;
+			arguments: any;
+		},
+	) => Promise<{ error: boolean; data: any }>;
 }
 
 export interface IntegrationTestContext
@@ -136,7 +150,7 @@ const before = async (context: any = {}, options: any = {}) => {
 	context.generateRandomID = utils.generateRandomID;
 };
 
-const after = async (context: any = {}) => {
+const after = async (context: any) => {
 	if (context.queue) {
 		await context.queue.consumer.cancel();
 	}
@@ -218,7 +232,7 @@ export const worker = {
 				action,
 			);
 			await context.flush(session);
-			return context.queue.producer.waitResults(context, createRequest);
+			return context.queue.producer.waitResults(context.context, createRequest);
 		};
 
 		return context;
