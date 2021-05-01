@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 582ca4e0b32378e9a6cdfa019c9c1e128be49c9d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.1.59
+  date: 2021-05-01T12:33:21.233Z
+- commits:
     - subject: Exclude test source from build target
       hash: 4da051cbd277faea505acd9e578621e203e16d47
       body: ''
