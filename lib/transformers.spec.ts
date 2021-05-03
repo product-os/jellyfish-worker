@@ -11,7 +11,7 @@ import * as transformers from './transformers';
 import { core } from '@balena/jellyfish-types';
 
 const getEvaluateParamsStub = (
-	transformerCards: core.Contract[],
+	transformerCards: Array<core.Contract<transformers.TransformerData>>,
 	oldCard: core.Contract | null,
 	newCard: core.Contract,
 	returnActor: boolean = true,
@@ -36,7 +36,7 @@ const getEvaluateParamsStub = (
 			api: '0',
 		},
 
-		// Query is only used to receive and actorId, so just stub the response here
+		// Query is only used to receive an actorId, so just stub the response here
 		query: async (
 			_schema: Parameters<transformers.EvaluateOptions['query']>[0],
 			_opts: Parameters<transformers.EvaluateOptions['query']>[1],
@@ -66,7 +66,7 @@ describe('.evaluate()', () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
-			type: 'transformer@@1.0.0',
+			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
@@ -92,7 +92,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract],
+			[(transformer as any) as core.Contract<transformers.TransformerData>],
 			(oldCard as any) as core.Contract,
 			(newCard as any) as core.Contract,
 		);
@@ -117,14 +117,25 @@ describe('.evaluate()', () => {
 		);
 	});
 
-	test('should create a task if a transformer matches a card that changed artifactReady:date1->date2', async () => {
+	test('should create a task if a transformer matches a card that was ready before, but only matches now', async () => {
 		const transformer = {
 			id: uuid(),
-			slug: 'test-transformer',
-			type: 'transformer@@1.0.0',
+			slug: 'test-late-match-transformer',
+			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
+					properties: {
+						data: {
+							type: 'object',
+							required: ['a'],
+							properties: {
+								a: {
+									const: 1,
+								},
+							},
+						},
+					},
 				},
 			},
 		};
@@ -143,11 +154,12 @@ describe('.evaluate()', () => {
 				$transformer: {
 					artifactReady: '2020-12-18T11:08:45Z',
 				},
+				a: 1,
 			},
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract],
+			[(transformer as any) as core.Contract<transformers.TransformerData>],
 			(oldCard as any) as core.Contract,
 			(newCard as any) as core.Contract,
 		);
@@ -176,7 +188,7 @@ describe('.evaluate()', () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
-			type: 'transformer@@1.0.0',
+			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
@@ -209,7 +221,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract],
+			[(transformer as any) as core.Contract<transformers.TransformerData>],
 			(oldCard as any) as core.Contract,
 			(newCard as any) as core.Contract,
 		);
@@ -224,7 +236,7 @@ describe('.evaluate()', () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
-			type: 'transformer@@1.0.0',
+			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
@@ -242,7 +254,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract],
+			[(transformer as any) as core.Contract<transformers.TransformerData>],
 			null,
 			(newCard as any) as core.Contract,
 		);
@@ -257,7 +269,7 @@ describe('.evaluate()', () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
-			type: 'transformer@@1.0.0',
+			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
@@ -283,7 +295,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract],
+			[(transformer as any) as core.Contract<transformers.TransformerData>],
 			(oldCard as any) as core.Contract,
 			(newCard as any) as core.Contract,
 			false,
