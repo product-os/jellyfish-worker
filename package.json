@@ -48,7 +48,7 @@
     "@balena/jellyfish-assert": "^1.1.11",
     "@balena/jellyfish-jellyscript": "^3.0.164",
     "@balena/jellyfish-logger": "^2.1.41",
-    "@balena/jellyfish-types": "^0.5.96",
+    "@balena/jellyfish-types": "^0.5.97",
     "@types/bluebird": "^3.5.33",
     "@types/lodash": "^4.14.168",
     "@types/semver": "^7.3.5",
