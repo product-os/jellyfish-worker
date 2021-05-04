@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: de3682b568b7b8f8ca38440a042188fcd85c3bb9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.2.1
+  date: 2021-05-04T16:55:42.186Z
+- commits:
     - subject: run Transformers as soon as they (individually) match a contract
       hash: 5cca3cca4e1272fba4c293b55a19de712268b8c9
       body: |
