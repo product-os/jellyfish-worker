@@ -1,4 +1,19 @@
 - commits:
+    - subject: run Transformers as soon as they (individually) match a contract
+      hash: 5cca3cca4e1272fba4c293b55a19de712268b8c9
+      body: |
+        before all Transformers would be triggered if their input-filter matched
+        when the `artifactReady` flag was toggled
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 4.2.0
+  date: 2021-05-04T11:04:51.976Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-types to ^0.5.97'
       hash: c53eea2e069ef40e98abfd94dfdb2034f72ef281
       body: ''
