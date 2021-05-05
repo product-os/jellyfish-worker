@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency catch-uncommitted to v2'
+      hash: a89564e114bf300a2b1ff12b81517fc9c3e2a302
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.2.6
+  date: 2021-05-05T20:25:12.348Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: bb6be7e9df07bae6686fdf9d21b0e1620a39267a
       body: ''
