@@ -1,4 +1,4 @@
-FROM resinci/jellyfish-test:v1.3.44
+FROM resinci/jellyfish-test:v1.3.45
 
 WORKDIR /usr/src/jellyfish
 
