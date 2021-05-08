@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: ee28ae0f369d1022d2117cafdfe76a2697ba156d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.2.9
+  date: 2021-05-08T00:58:32.590Z
+- commits:
     - subject: 'patch: Update dependency lint-staged to v11'
       hash: 0d242c3f27bf65c1b79d0686081afb04afa1d9b6
       body: ''
