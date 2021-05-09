@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency fast-equals to ^2.0.2'
+      hash: 8b6dd18f95613fc5a2581e8c902094ae117d7e55
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.2.14
+  date: 2021-05-09T07:55:12.053Z
+- commits:
     - subject: 'build(deps): bump hosted-git-info from 2.8.8 to 2.8.9'
       hash: 369f4408a7bb707000f6476e5e69df6041ba7813
       body: >
