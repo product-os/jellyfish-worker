@@ -1,4 +1,17 @@
 - commits:
+    - subject: 'transformer: artifactReady changes should re-trigger'
+      hash: b299b06647626df469451524dfdf14fa9248c6a4
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 4.3.0
+  date: 2021-05-11T14:56:49.788Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: d4cf5c06e163f26a5b0788d390c38ac66b577685
       body: ''
