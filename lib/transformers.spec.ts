@@ -117,6 +117,61 @@ describe('.evaluate()', () => {
 		);
 	});
 
+	test('should create a task if a transformer matches a card that changed artifactReady:truthy->other-truthy', async () => {
+		const transformer = {
+			id: uuid(),
+			slug: 'test-transformer',
+			type: 'transformer@1.0.0',
+			data: {
+				inputFilter: {
+					type: 'object',
+				},
+			},
+		};
+
+		const oldCard = {
+			type: 'card@1.0.0',
+			data: {
+				$transformer: {
+					artifactReady: true,
+				},
+			},
+		};
+		const newCard = {
+			type: 'card@1.0.0',
+			data: {
+				$transformer: {
+					artifactReady: new Date().toISOString(),
+				},
+			},
+		};
+
+		const { executeSpy, params } = getEvaluateParamsStub(
+			[(transformer as any) as core.Contract<transformers.TransformerData>],
+			(oldCard as any) as core.Contract,
+			(newCard as any) as core.Contract,
+		);
+
+		await transformers.evaluate(params as transformers.EvaluateOptions);
+
+		// Two actions were executed
+		expect(executeSpy.calledTwice).toBe(true);
+		// The first call was for a task
+		expect(executeSpy.firstCall.firstArg.card).toBe('task@1.0.0');
+		// The first call was to create a card
+		expect(executeSpy.firstCall.firstArg.action).toBe(
+			'action-create-card@1.0.0',
+		);
+
+		// The second call was for a link
+		expect(executeSpy.secondCall.firstArg.card).toBe('link@1.0.0');
+
+		// The second call was to create a card
+		expect(executeSpy.secondCall.firstArg.action).toBe(
+			'action-create-card@1.0.0',
+		);
+	});
+
 	test('should create a task if a transformer matches a card that was ready before, but only matches now', async () => {
 		const transformer = {
 			id: uuid(),
@@ -256,6 +311,51 @@ describe('.evaluate()', () => {
 		const { executeSpy, params } = getEvaluateParamsStub(
 			[(transformer as any) as core.Contract<transformers.TransformerData>],
 			null,
+			(newCard as any) as core.Contract,
+		);
+
+		await transformers.evaluate(params);
+
+		// No actions were executed
+		expect(executeSpy.notCalled).toBe(true);
+	});
+
+	test('should not create a task when card change is not relevant', async () => {
+		const transformer = {
+			id: uuid(),
+			slug: 'test-transformer',
+			type: 'transformer@1.0.0',
+			data: {
+				inputFilter: {
+					type: 'object',
+				},
+			},
+		};
+
+		const oldCard = {
+			type: 'card@1.0.0',
+			data: {
+				$transformer: {
+					artifactReady: true,
+				},
+				a: 1,
+			},
+		};
+
+		const newCard = {
+			type: 'card@1.0.0',
+			data: {
+				$transformer: {
+					artifactReady: true,
+				},
+				a: 2,
+				b: 3,
+			},
+		};
+
+		const { executeSpy, params } = getEvaluateParamsStub(
+			[(transformer as any) as core.Contract<transformers.TransformerData>],
+			(oldCard as any) as core.Contract,
 			(newCard as any) as core.Contract,
 		);
 
