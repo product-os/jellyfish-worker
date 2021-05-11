@@ -57,7 +57,8 @@ export const evaluate = async ({
 	if (!readyNow) {
 		return null;
 	}
-	const readyPreviously = oldCard.data?.$transformer?.artifactReady;
+	const artifactReadyChanged =
+		oldCard.data?.$transformer?.artifactReady !== readyNow;
 
 	await Bluebird.map(transformers, async (transformer: Transformer) => {
 		if (!transformer.data.inputFilter) {
@@ -70,7 +71,8 @@ export const evaluate = async ({
 			oldCard,
 		);
 
-		const shouldRun = matchesNow && (!matchedPreviously || !readyPreviously);
+		const shouldRun =
+			matchesNow && (!matchedPreviously || artifactReadyChanged);
 
 		if (!shouldRun) {
 			return;
