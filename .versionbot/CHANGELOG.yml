@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update non-major'
+      hash: 52fa5974a7ae8f3e19069cae8de6565d8fccf445
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.3.1
+  date: 2021-05-12T00:39:52.430Z
+- commits:
     - subject: 'transformer: artifactReady changes should re-trigger'
       hash: b299b06647626df469451524dfdf14fa9248c6a4
       body: ''
