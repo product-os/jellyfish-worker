@@ -1,4 +1,18 @@
 - commits:
+    - subject: fix link creation trasformer->task
+      hash: 8abcfe09ab7409b47014649abc557f39bb3706cc
+      body: |
+        create action doesn't like specifying the type twice
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 4.3.4
+  date: 2021-05-13T12:03:03.125Z
+- commits:
     - subject: 'patch: Update non-major'
       hash: 17b183ae52664ff1047c0528dde194147bed8914
       body: ''
