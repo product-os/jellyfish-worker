@@ -124,7 +124,6 @@ export const evaluate = async ({
 			arguments: {
 				reason: null,
 				properties: {
-					type: 'link@1.0.0',
 					slug: `link-${transformer.id}-generated-${
 						result.data.id
 					}-${uuidv4()}`,
