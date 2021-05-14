@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove action integration tests
+      hash: bc7f72e8b063e58f07404be21e58fa548b3b7daa
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 4.3.7
+  date: 2021-05-14T02:03:41.337Z
+- commits:
     - subject: 'patch: Update dependency @types/semver to ^7.3.6'
       hash: 8affae35984819f49f2a6a953e8d8e3753bc568e
       body: ''
