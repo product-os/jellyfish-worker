@@ -47,9 +47,6 @@ export const evaluate = async ({
 	if (!transformers || !Array.isArray(transformers)) {
 		return null;
 	}
-	if (!oldCard) {
-		return null;
-	}
 
 	// Only run transformers with cards with a valid artifact (`data.$transformer.artifactReady` is truthy)
 	// and their input filter matches now, but didn't match before (or artifact wasn't ready)
@@ -58,7 +55,7 @@ export const evaluate = async ({
 		return null;
 	}
 	const artifactReadyChanged =
-		oldCard.data?.$transformer?.artifactReady !== readyNow;
+		oldCard?.data?.$transformer?.artifactReady !== readyNow;
 
 	await Bluebird.map(transformers, async (transformer: Transformer) => {
 		if (!transformer.data.inputFilter) {
@@ -68,7 +65,7 @@ export const evaluate = async ({
 		const matchesNow = skhema.isValid(transformer.data.inputFilter, newCard);
 		const matchedPreviously = skhema.isValid(
 			transformer.data.inputFilter,
-			oldCard,
+			oldCard || {},
 		);
 
 		const shouldRun =
