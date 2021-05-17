@@ -1,4 +1,17 @@
 - commits:
+    - subject: allow transformers to match on card creation
+      hash: 2e114620b45a0b0c6658d12b09f70cff5a535ffa
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 4.4.0
+  date: 2021-05-17T14:02:42.421Z
+- commits:
     - subject: 'patch: Update resinci/jellyfish-test Docker tag to v1.3.46'
       hash: 18e2ee3174a716635b2d6489da0a8755a6d47038
       body: ''
