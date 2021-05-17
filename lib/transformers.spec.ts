@@ -287,7 +287,7 @@ describe('.evaluate()', () => {
 		expect(executeSpy.notCalled).toBe(true);
 	});
 
-	test('should not create a task when a there is no previous card', async () => {
+	test('should create a task even when a there is no previous card', async () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
@@ -316,8 +316,22 @@ describe('.evaluate()', () => {
 
 		await transformers.evaluate(params);
 
-		// No actions were executed
-		expect(executeSpy.notCalled).toBe(true);
+		// Two actions were executed
+		expect(executeSpy.calledTwice).toBe(true);
+		// The first call was for a task
+		expect(executeSpy.firstCall.firstArg.card).toBe('task@1.0.0');
+		// The first call was to create a card
+		expect(executeSpy.firstCall.firstArg.action).toBe(
+			'action-create-card@1.0.0',
+		);
+
+		// The second call was for a link
+		expect(executeSpy.secondCall.firstArg.card).toBe('link@1.0.0');
+
+		// The second call was to create a card
+		expect(executeSpy.secondCall.firstArg.action).toBe(
+			'action-create-card@1.0.0',
+		);
 	});
 
 	test('should not create a task when card change is not relevant', async () => {
