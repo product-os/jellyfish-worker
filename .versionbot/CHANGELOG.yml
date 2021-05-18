@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @types/bluebird to ^3.5.35'
+      hash: 3c4e436156d2c6c82cdf37e28044fd7d010ae8a6
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 4.4.2
+  date: 2021-05-18T23:22:02.694Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^2.1.60'
       hash: a11d8c8e7c321b4f212cd0bcce03ddb172c62400
       body: ''
