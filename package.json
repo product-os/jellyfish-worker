@@ -45,9 +45,9 @@
   "author": "Balena.io. <hello@balena.io>",
   "license": "UNLICENSED",
   "dependencies": {
-    "@balena/jellyfish-assert": "^1.1.17",
-    "@balena/jellyfish-jellyscript": "^3.0.190",
-    "@balena/jellyfish-logger": "^2.1.62",
+    "@balena/jellyfish-assert": "^1.1.20",
+    "@balena/jellyfish-jellyscript": "^3.0.191",
+    "@balena/jellyfish-logger": "^2.1.64",
     "@balena/jellyfish-types": "^0.5.116",
     "@types/bluebird": "^3.5.35",
     "@types/lodash": "^4.14.169",
