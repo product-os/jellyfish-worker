@@ -39,6 +39,8 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -73,6 +75,7 @@
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="executor.html#insertcard" class="tsd-kind-icon">insert<wbr>Card</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="executor.html#patchcard" class="tsd-kind-icon">patch<wbr>Card</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="executor.html#replacecard" class="tsd-kind-icon">replace<wbr>Card</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-protected"><a href="executor.html#run" class="tsd-kind-icon">run</a></li>
 							</ul>
 						</section>
 					</div>
@@ -90,7 +93,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/master/lib/executor.ts#L714">lib/executor.ts:714</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/026a91b/lib/executor.ts#L714">lib/executor.ts:714</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -174,7 +177,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/master/lib/executor.ts#L832">lib/executor.ts:832</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/026a91b/lib/executor.ts#L832">lib/executor.ts:832</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -215,7 +218,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/master/lib/executor.ts#L771">lib/executor.ts:771</a></li>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/026a91b/lib/executor.ts#L771">lib/executor.ts:771</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -240,6 +243,122 @@
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Contract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContractData</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-protected">
+					<a name="run" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> <span class="tsd-flag ts-flagProtected">Protected</span> run</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-protected">
+						<li class="tsd-signature tsd-kind-icon">run<span class="tsd-signature-symbol">(</span>jellyfish<span class="tsd-signature-symbol">: </span><a href="../interfaces/types.jellyfishkernel.html" class="tsd-signature-type" data-tsd-kind="Interface">JellyfishKernel</a>, session<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, library<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span>, request<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>action<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ActionContract</span><span class="tsd-signature-symbol">; </span>actor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>arguments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>card<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>context<span class="tsd-signature-symbol">: </span><a href="../interfaces/types.logcontext.html" class="tsd-signature-type" data-tsd-kind="Interface">LogContext</a><span class="tsd-signature-symbol">; </span>epoch<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>timestamp<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/026a91b/lib/executor.ts#L909">lib/executor.ts:909</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>summary</dt>
+									<dd><p>Execute an action request</p>
+									</dd>
+									<dt>function</dt>
+									<dd></dd>
+									<dt>example</dt>
+									<dd><p>const session = &#39;4a962ad9-20b5-4dd8-a707-bf819593cc84&#39;
+											const result = await executor.run(jellyfish, session, { ... }, { ... }, { ... })
+										console.log(result)</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>jellyfish: <a href="../interfaces/types.jellyfishkernel.html" class="tsd-signature-type" data-tsd-kind="Interface">JellyfishKernel</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>jellyfish instance</p>
+									</div>
+								</li>
+								<li>
+									<h5>session: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>session id</p>
+									</div>
+								</li>
+								<li>
+									<h5>context: <span class="tsd-signature-type">any</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>execution context</p>
+									</div>
+								</li>
+								<li>
+									<h5>library: <span class="tsd-signature-symbol">{}</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>actions library</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-index-signature">
+											<h5><span class="tsd-signature-symbol">[</span>x: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-symbol">{ </span>handler<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></h5>
+											<ul class="tsd-parameters">
+												<li class="tsd-parameter">
+													<h5>handler<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5>request: <span class="tsd-signature-symbol">{ </span>action<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ActionContract</span><span class="tsd-signature-symbol">; </span>actor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>arguments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>card<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>context<span class="tsd-signature-symbol">: </span><a href="../interfaces/types.logcontext.html" class="tsd-signature-type" data-tsd-kind="Interface">LogContext</a><span class="tsd-signature-symbol">; </span>epoch<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>timestamp<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>request</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>action<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ActionContract</span></h5>
+											<div class="tsd-comment tsd-typography">
+												<p>action card</p>
+											</div>
+										</li>
+										<li class="tsd-parameter">
+											<h5>actor<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+											<div class="tsd-comment tsd-typography">
+												<p>actor id</p>
+											</div>
+										</li>
+										<li class="tsd-parameter">
+											<h5>arguments<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+											<div class="tsd-comment tsd-typography">
+												<p>action arguments</p>
+											</div>
+										</li>
+										<li class="tsd-parameter">
+											<h5>card<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+											<div class="tsd-comment tsd-typography">
+												<p>action input card id or slug</p>
+											</div>
+										</li>
+										<li class="tsd-parameter">
+											<h5>context<span class="tsd-signature-symbol">: </span><a href="../interfaces/types.logcontext.html" class="tsd-signature-type" data-tsd-kind="Interface">LogContext</a></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> epoch<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">any</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>timestamp<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+											<div class="tsd-comment tsd-typography">
+												<p>action timestamp</p>
+											</div>
+										</li>
+										<li class="tsd-parameter">
+											<h5>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>action result</p>
 						</li>
 					</ul>
 				</section>
@@ -305,6 +424,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="executor.html#replacecard" class="tsd-kind-icon">replace<wbr>Card</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-protected">
+						<a href="executor.html#run" class="tsd-kind-icon">run</a>
 					</li>
 				</ul>
 			</nav>
