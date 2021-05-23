@@ -65,7 +65,7 @@
     "@balena/jellyfish-action-library": "^10.1.13",
     "@balena/jellyfish-config": "^1.0.3",
     "@balena/jellyfish-core": "^2.13.129",
-    "@balena/jellyfish-environment": "^4.1.13",
+    "@balena/jellyfish-environment": "^4.1.14",
     "@balena/jellyfish-plugin-base": "^2.1.93",
     "@balena/jellyfish-plugin-default": "^9.8.10",
     "@balena/jellyfish-queue": "^1.0.88",
