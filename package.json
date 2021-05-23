@@ -62,11 +62,11 @@
   },
   "devDependencies": {
     "@balena/jellycheck": "^0.1.1",
-    "@balena/jellyfish-action-library": "^10.1.20",
+    "@balena/jellyfish-action-library": "^10.1.21",
     "@balena/jellyfish-config": "^1.0.4",
     "@balena/jellyfish-core": "^2.13.132",
     "@balena/jellyfish-environment": "^4.1.15",
-    "@balena/jellyfish-plugin-base": "^2.1.95",
+    "@balena/jellyfish-plugin-base": "^2.1.96",
     "@balena/jellyfish-plugin-default": "^9.8.14",
     "@balena/jellyfish-queue": "^1.0.90",
     "@balena/jellyfish-types": "^0.5.116",
