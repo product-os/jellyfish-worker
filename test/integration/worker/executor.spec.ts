@@ -6,7 +6,7 @@
 
 import * as _ from 'lodash';
 import * as helpers from './helpers';
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 import { errors, executor, utils } from '../../../lib';
 
 let context: any;

@@ -6,7 +6,7 @@
 
 import * as helpers from './helpers';
 import * as _ from 'lodash';
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 import { Worker } from '../../../lib/index';
 import { v4 as uuidv4 } from 'uuid';
 

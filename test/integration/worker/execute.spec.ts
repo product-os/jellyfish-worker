@@ -4,7 +4,7 @@
  * Proprietary and confidential.
  */
 
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import * as helpers from './helpers';
 import { strict as assert } from 'assert';
