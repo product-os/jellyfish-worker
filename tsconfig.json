@@ -1,28 +1,3 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "outDir": "build",
-    "esModuleInterop": false,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
-    "removeComments": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2015",
-    "declaration": true,
-    "skipLibCheck": true,
-    "noImplicitAny": false
-  },
-  "typedocOptions": {
-    "excludePrivate": true,
-    "excludeProtected": true,
-    "excludeExternals": true,
-    "gitRevision": "master",
-    "out": "docs"
-  },
-  "include": [
-    "lib/**/*.ts",
-    "test/**/*.ts",
-    "@types/**/*.d.ts"
-  ]
+  "extends": "@balena/jellyfish-config/config/tsconfig.json"
 }

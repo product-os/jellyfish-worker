@@ -4,7 +4,7 @@
  * Proprietary and confidential.
  */
 
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 import * as errio from 'errio';
 import * as _ from 'lodash';
 import * as skhema from 'skhema';

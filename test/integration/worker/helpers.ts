@@ -10,7 +10,7 @@ import * as _ from 'lodash';
 import * as errio from 'errio';
 import CARDS from '../../../lib/cards';
 import * as utils from '../utils';
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 import { v4 as uuidv4 } from 'uuid';
 import * as helpers from '../backend-helpers';
 import {

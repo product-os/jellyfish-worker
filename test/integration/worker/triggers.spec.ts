@@ -7,7 +7,7 @@
 import * as helpers from './helpers';
 import { triggers, errors } from '../../../lib/index';
 import { v4 as uuidv4 } from 'uuid';
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 
 let context: any;
 
