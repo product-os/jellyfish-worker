@@ -258,11 +258,12 @@ const commit = async (
 					return;
 				}
 
-				const notificationTypeCard = await jellyfish.getCardBySlug<core.TypeContract>(
-					context,
-					session,
-					'notification@1.0.0',
-				);
+				const notificationTypeCard =
+					await jellyfish.getCardBySlug<core.TypeContract>(
+						context,
+						session,
+						'notification@1.0.0',
+					);
 
 				if (!notificationTypeCard) {
 					return;
@@ -291,11 +292,12 @@ const commit = async (
 					},
 				);
 
-				const linkTypeContract = await jellyfish.getCardBySlug<core.TypeContract>(
-					context,
-					session,
-					'link@1.0.0',
-				);
+				const linkTypeContract =
+					await jellyfish.getCardBySlug<core.TypeContract>(
+						context,
+						session,
+						'link@1.0.0',
+					);
 
 				if (!linkTypeContract) {
 					return;
