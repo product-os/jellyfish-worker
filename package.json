@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@balena/jellycheck": "^0.1.1",
-    "@balena/jellyfish-action-library": "^10.1.29",
+    "@balena/jellyfish-action-library": "^10.1.30",
     "@balena/jellyfish-config": "^1.0.4",
     "@balena/jellyfish-core": "^2.13.133",
     "@balena/jellyfish-environment": "^4.1.15",
