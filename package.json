@@ -70,7 +70,7 @@
     "@balena/jellyfish-plugin-default": "^9.8.16",
     "@balena/jellyfish-queue": "^1.0.93",
     "@balena/jellyfish-types": "^0.5.119",
-    "@balena/lint": "^5.4.2",
+    "@balena/lint": "^6.0.0",
     "@types/bluebird": "^3.5.35",
     "@types/jest": "^26.0.23",
     "@types/lodash": "^4.14.170",
