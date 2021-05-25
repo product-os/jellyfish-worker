@@ -23,11 +23,11 @@ describe('.durationToMs()', () => {
 
 describe('.getActionArgumentsSchema()', () => {
 	test('should return a wildcard schema if no args', () => {
-		const schema = utils.getActionArgumentsSchema(({
+		const schema = utils.getActionArgumentsSchema({
 			data: {
 				arguments: {},
 			},
-		} as any) as core.ActionContract);
+		} as any as core.ActionContract);
 
 		expect(schema).toEqual({
 			type: 'object',
@@ -35,7 +35,7 @@ describe('.getActionArgumentsSchema()', () => {
 	});
 
 	test('should parse one argument', () => {
-		const schema = utils.getActionArgumentsSchema(({
+		const schema = utils.getActionArgumentsSchema({
 			data: {
 				arguments: {
 					foo: {
@@ -43,7 +43,7 @@ describe('.getActionArgumentsSchema()', () => {
 					},
 				},
 			},
-		} as any) as core.ActionContract);
+		} as any as core.ActionContract);
 
 		expect(schema).toEqual({
 			type: 'object',
@@ -58,7 +58,7 @@ describe('.getActionArgumentsSchema()', () => {
 	});
 
 	test('should parse two arguments', () => {
-		const schema = utils.getActionArgumentsSchema(({
+		const schema = utils.getActionArgumentsSchema({
 			data: {
 				arguments: {
 					foo: {
@@ -69,7 +69,7 @@ describe('.getActionArgumentsSchema()', () => {
 					},
 				},
 			},
-		} as any) as core.ActionContract);
+		} as any as core.ActionContract);
 
 		expect(schema).toEqual({
 			type: 'object',

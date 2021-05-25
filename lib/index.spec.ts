@@ -40,11 +40,11 @@ describe('Worker.updateCurrentTransformers()', () => {
 
 		// TS-TODO: is there a better way to instantiate a simple Worker?
 		const worker = new Worker(
-			({} as any) as JellyfishKernel,
+			{} as any as JellyfishKernel,
 			'session-foo',
 			{},
-			({} as any) as QueueConsumer,
-			({} as any) as QueueProducer,
+			{} as any as QueueConsumer,
+			{} as any as QueueProducer,
 		);
 		worker.transformers = transformers;
 		worker.updateLatestTransformers();

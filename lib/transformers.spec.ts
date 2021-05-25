@@ -51,7 +51,8 @@ const getEvaluateParamsStub = (
 				  ]
 				: [];
 		},
-		executeAndAwaitAction: (executeSpy as any) as transformers.EvaluateOptions['executeAndAwaitAction'],
+		executeAndAwaitAction:
+			executeSpy as any as transformers.EvaluateOptions['executeAndAwaitAction'],
 	};
 
 	// Return the spy and stub as a tuple
@@ -92,9 +93,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract<transformers.TransformerData>],
-			(oldCard as any) as core.Contract,
-			(newCard as any) as core.Contract,
+			[transformer as any as core.Contract<transformers.TransformerData>],
+			oldCard as any as core.Contract,
+			newCard as any as core.Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -147,9 +148,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract<transformers.TransformerData>],
-			(oldCard as any) as core.Contract,
-			(newCard as any) as core.Contract,
+			[transformer as any as core.Contract<transformers.TransformerData>],
+			oldCard as any as core.Contract,
+			newCard as any as core.Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -214,9 +215,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract<transformers.TransformerData>],
-			(oldCard as any) as core.Contract,
-			(newCard as any) as core.Contract,
+			[transformer as any as core.Contract<transformers.TransformerData>],
+			oldCard as any as core.Contract,
+			newCard as any as core.Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -276,9 +277,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract<transformers.TransformerData>],
-			(oldCard as any) as core.Contract,
-			(newCard as any) as core.Contract,
+			[transformer as any as core.Contract<transformers.TransformerData>],
+			oldCard as any as core.Contract,
+			newCard as any as core.Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -309,9 +310,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract<transformers.TransformerData>],
+			[transformer as any as core.Contract<transformers.TransformerData>],
 			null,
-			(newCard as any) as core.Contract,
+			newCard as any as core.Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -368,9 +369,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract<transformers.TransformerData>],
-			(oldCard as any) as core.Contract,
-			(newCard as any) as core.Contract,
+			[transformer as any as core.Contract<transformers.TransformerData>],
+			oldCard as any as core.Contract,
+			newCard as any as core.Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -409,9 +410,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[(transformer as any) as core.Contract<transformers.TransformerData>],
-			(oldCard as any) as core.Contract,
-			(newCard as any) as core.Contract,
+			[transformer as any as core.Contract<transformers.TransformerData>],
+			oldCard as any as core.Contract,
+			newCard as any as core.Contract,
 			false,
 		);
 
