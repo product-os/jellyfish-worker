@@ -186,17 +186,14 @@ const commit = async (
 	}
 
 	if (options.subscriptions) {
-		Bluebird.map(options.subscriptions, async (subscription) => {
+		Bluebird.map(options.subscriptions, async (subscription: any) => {
 			try {
-				// TS-TODO: update the links type definition to be an array of contracts
-				const view = _.find(
-					subscription.links!['is attached to'] as core.ViewContract[],
-					{
-						type: 'view@1.0.0',
-					},
-				);
-
-				if (!view) {
+				/*
+				 * Skip if not subscribed to this type of operation
+				 */
+				if (
+					!subscription.data.operations.includes(current ? 'update' : 'insert')
+				) {
 					return;
 				}
 
@@ -227,11 +224,6 @@ const commit = async (
 					createCard.data.actor,
 				);
 
-				// TODO: Improve this gaurd
-				if (!view.data.allOf || !view.data.allOf.length) {
-					return;
-				}
-
 				const targetContract = await jellyfish.getCardById(
 					context,
 					creatorSession.id,
@@ -244,13 +236,13 @@ const commit = async (
 
 				/*
 				 * Retrieve the card using the subscription creators permissions and
-				 * check if it matches the view schema
+				 * check if it matches the query
 				 */
 				const filteredCard = await triggers.matchesCard(
 					context,
 					jellyfish,
 					creatorSession.id,
-					view.data.allOf[0].schema,
+					subscription.data.query,
 					targetContract,
 				);
 
