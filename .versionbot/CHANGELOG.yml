@@ -1,4 +1,51 @@
 - commits:
+    - subject: update JellyScript major version
+      hash: 530bffbb55a630ad7da1ffb503a6ba6348d66fff
+      body: ''
+      footer:
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+        Change-type: major
+        change-type: major
+      author: Martin Rauscher
+      nested: []
+    - subject: fix wrong expectation for JSON Patch MOVE semantics
+      hash: 0881d03c7ac016cfaface69a38ab83c581a29ac0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: fix local unit test run
+      hash: 496b332d913f6b5534606b8f4ed329511aa0789c
+      body: >
+        jest would not interpret "lib" as a relative path by default and also
+        run integration tests
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: support links in formulas
+      hash: e37b99742bdf4312f4b16eb907de62bad0573d13
+      body: >
+        this change queries link cards when the type of a card contains formulas
+        with `this.links["something"]`
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 5.0.0
+  date: 2021-05-31T18:39:06.442Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 93fe0c8c534b13e10f511f3337e9098c912bc2bb
       body: ''
