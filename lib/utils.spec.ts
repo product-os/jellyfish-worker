@@ -5,7 +5,7 @@
  */
 
 import * as utils from './utils';
-import { core } from '@balena/jellyfish-types';
+import { core, JSONSchema } from '@balena/jellyfish-types';
 
 describe('.durationToMs()', () => {
 	test('converts a duration to milliseconds', () => {
@@ -84,5 +84,56 @@ describe('.getActionArgumentsSchema()', () => {
 			additionalProperties: false,
 			required: ['foo', 'bar'],
 		});
+	});
+});
+
+describe('.getQueryWithOptionalLinks()', () => {
+	test('returns a query with all optional links', () => {
+		const object = {
+			id: 'fake-uuid-kind-of',
+			slug: 'test-1',
+			data: {
+				tags: ['tag1'],
+			},
+			type: 'test@1.0.0',
+			version: '1.0.0',
+		} as any as core.Contract;
+
+		const query = utils.getQueryWithOptionalLinks(object, [
+			'is owned by',
+			'has attached element',
+		]);
+		const expected: JSONSchema = {
+			type: 'object',
+			description: 'Get card with optional links',
+			anyOf: [
+				true,
+				{
+					$$links: {
+						'is owned by': {
+							type: 'object',
+							additionalProperties: true,
+						},
+					},
+				},
+				{
+					$$links: {
+						'has attached element': {
+							type: 'object',
+							additionalProperties: true,
+						},
+					},
+				},
+			],
+			required: ['id'],
+			properties: {
+				id: {
+					type: 'string',
+					const: object.id,
+				},
+			},
+			additionalProperties: true,
+		};
+		expect(query).toStrictEqual(expected);
 	});
 });

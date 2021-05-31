@@ -401,6 +401,7 @@ const commit = async (
 				return null;
 			}
 
+			// trigger.target might result in multiple cards in a single action request
 			const identifiers = _.uniq(_.castArray(request.card));
 
 			// We need to execute triggered actions using a privileged session
@@ -761,9 +762,16 @@ export const insertCard = async (
 		options,
 		async () => {
 			// TS-TODO: Fix these "any" castings
+			const objectWithLinks = await getObjectWithLinks(
+				context,
+				jellyfish,
+				session,
+				object,
+				typeCard,
+			);
 			const result = jellyscript.evaluateObject(
 				typeCard.data.schema,
-				object as any,
+				objectWithLinks as any,
 			);
 			return jellyfish.insertCard(context, session, result as any);
 		},
@@ -822,9 +830,17 @@ export const replaceCard = async (
 		options,
 		async () => {
 			// TS-TODO: Remove these `any` castings
+			const objectWithLinks = await getObjectWithLinks(
+				context,
+				jellyfish,
+				session,
+				object,
+				typeCard,
+			);
+
 			const result = jellyscript.evaluateObject(
 				typeCard.data.schema,
-				object as any,
+				objectWithLinks as any,
 			);
 			return jellyfish.replaceCard(context, session, result as any);
 		},
@@ -871,9 +887,16 @@ export const patchCard = async (
 		options,
 		async () => {
 			// TS-TODO: Remove these any castings
+			const objectWithLinks = await getObjectWithLinks(
+				context,
+				jellyfish,
+				session,
+				object,
+				typeCard,
+			);
 			const newPatch = jellyscript.evaluatePatch(
 				typeCard.data.schema,
-				object as any,
+				objectWithLinks as any,
 				patch,
 			);
 			return jellyfish.patchCardBySlug(
@@ -995,3 +1018,51 @@ export const run = async (
 		arguments: request.arguments,
 	});
 };
+
+/**
+ * Returns an object that will include all links referenced in evaluated fields
+ * in the type card's schema.
+ *
+ * If no links are referenced in evaluated fields, the original object is returned
+ * immediately.
+ *
+ * @param {Object} context - execution context
+ * @param {Object} jellyfish - jellyfish instance
+ * @param {String} session - session id
+ * @param {Object} card - card to fill with links
+ * @param {Object} typeCard - type card
+ *
+ * @returns {Object} - the card with any links referenced in the evaluated fields
+ * of it's type card's schema.
+ */
+async function getObjectWithLinks<
+	PContract extends Partial<TContract> | TContract,
+	TContract extends core.Contract<TData>,
+	TData extends core.ContractData,
+>(
+	context: LogContext,
+	jellyfish: JellyfishKernel,
+	session: string,
+	card: PContract,
+	typeCard: core.TypeContract,
+): Promise<PContract> {
+	const linkVerbs = jellyscript.getReferencedLinkVerbs(typeCard);
+	if (!linkVerbs.length) {
+		return card;
+	}
+	let queriedCard: TContract | null = null;
+	if ((card.slug && card.version) || card.id) {
+		const query = utils.getQueryWithOptionalLinks(card, linkVerbs);
+		[queriedCard] = await jellyfish.query<TContract>(context, session, query);
+	}
+	const cardWithLinks = queriedCard || card;
+
+	// Optional links may not be populated so explicitly set to an empty array here
+	linkVerbs.forEach((linkVerb) => {
+		if (!_.has(cardWithLinks, ['links', linkVerb])) {
+			_.set(cardWithLinks, ['links', linkVerb], []);
+		}
+	});
+
+	return cardWithLinks as PContract;
+}

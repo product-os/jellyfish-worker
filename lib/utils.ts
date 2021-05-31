@@ -6,6 +6,7 @@
 
 import iso8601Duration from 'iso8601-duration';
 import { v4 as uuidv4 } from 'uuid';
+import * as _ from 'lodash';
 import { getLogger } from '@balena/jellyfish-logger';
 import { JSONSchema, core } from '@balena/jellyfish-types';
 import { LogContext, JellyfishKernel } from './types';
@@ -167,4 +168,50 @@ export const getActorKey = async (
 			},
 		}),
 	);
+};
+
+export const getQueryWithOptionalLinks = (
+	object: { id?: string; slug?: string; version?: string },
+	linkVerbs: string[] = [],
+): JSONSchema => {
+	const required = object.id ? ['id'] : ['slug', 'version'];
+	const properties: { [key: string]: JSONSchema } = object.id
+		? {
+				id: {
+					type: 'string',
+					const: object.id,
+				},
+		  }
+		: {
+				slug: {
+					type: 'string',
+					const: object.slug,
+				},
+				version: {
+					type: 'string',
+					const: object.version,
+				},
+		  };
+	return {
+		type: 'object',
+		description: 'Get card with optional links',
+
+		// All links will be optional
+		anyOf: [
+			true,
+			...linkVerbs.map((linkVerb) => {
+				return {
+					$$links: {
+						[linkVerb]: {
+							type: 'object',
+							additionalProperties: true,
+						},
+					},
+				};
+			}),
+		],
+		required,
+		properties,
+		additionalProperties: true,
+	};
 };

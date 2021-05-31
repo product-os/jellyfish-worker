@@ -485,7 +485,7 @@ describe('Worker', () => {
 			links: {},
 			tags: [],
 			data: {
-				bar: 'hello',
+				// bar: 'hello', // removed by json patch move operation
 				foo: 'HELLO',
 			},
 		});
