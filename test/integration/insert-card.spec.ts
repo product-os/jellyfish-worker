@@ -902,7 +902,6 @@ describe('.insertCard()', () => {
 
 		expect(generatedTrigger).toEqual({
 			id: generatedTrigger!.id,
-			schedule: 'async',
 			slug: `triggered-action-${slug}-data-mentions`,
 			action: 'action-set-add@1.0.0',
 			target: {

@@ -253,7 +253,6 @@ const commit = async (
 	if (options.triggers) {
 		const runTrigger = async (trigger: {
 			slug?: any;
-			schedule?: any;
 			filter: any;
 			mode: any;
 			arguments: any;
@@ -293,20 +292,13 @@ const commit = async (
 			// trigger.target might result in multiple cards in a single action request
 			const identifiers = _.uniq(_.castArray(request.card));
 
-			// We need to execute triggered actions using a privileged session
-			// as the triggered actions might involve things that the original
-			// user may not have access to. i.e. triggered actions are system rules
-			// might be system rules setup by an admin with privilege to insert
-			// triggered actions.
-			const triggerSession = options.context.privilegedSession;
-
 			const triggerCards = await Bluebird.map(
 				identifiers,
 				async (identifier) => {
 					const triggerCard = await getInputCard(
 						context,
 						jellyfish,
-						triggerSession,
+						session,
 						identifier,
 					);
 					assert.INTERNAL(
@@ -326,7 +318,9 @@ const commit = async (
 						return;
 					}
 					const actionRequest = {
-						card: triggerCard,
+						// Re-enqueuing an action request expects the "card" option to be an
+						// id, not a full card.
+						card: triggerCard.id,
 						action: request.action,
 						actor: options.actor,
 						context: request.context,
@@ -338,65 +332,35 @@ const commit = async (
 						// don't break the chain
 						originator: options.originator || request.originator,
 					};
-					return trigger.schedule === 'enqueue'
-						? // Re-enqueuing an action request expects the "card" option to be an
-						  // id, not a full card.
-						  options.executeAction(triggerSession, {
-								...actionRequest,
-								card: actionRequest.card.id,
-						  })
-						: options.library[request.action.split('@')[0]].handler(
-								triggerSession,
-								options.context,
-								triggerCard,
-								actionRequest,
-						  );
+
+					return options.executeAction(session, actionRequest);
 				}),
 			);
 		};
 
-		const [asyncTriggers, syncTriggers] = _.partition(options.triggers, {
-			schedule: 'async',
-		});
-
-		// Run the synchronous, "blocking" triggers first
-		// as well as the triggers to enqueue
-		await Bluebird.map(syncTriggers, runTrigger, {
-			// Triggers can't be processed concurrently as they may modify cards, which
-			// can cause race conditions if they are not done in serial
-			concurrency: 1,
-		});
-
-		// Don't await aync triggers
-		Bluebird.map(
-			asyncTriggers,
-			(trigger) => {
-				return runTrigger(trigger).catch((error) => {
-					const errorObject = errio.toObject(error, {
-						stack: true,
-					});
-
-					const logData = {
-						error: errorObject,
-						input: insertedCard.slug,
-						trigger: trigger.slug,
-					};
-
-					if (error.expected) {
-						logger.warn(
-							context,
-							'Execute error in asynchronous trigger',
-							logData,
-						);
-					} else {
-						logger.error(context, 'Execute error', logData);
-					}
+		await Bluebird.map(options.triggers, (trigger) => {
+			return runTrigger(trigger).catch((error) => {
+				const errorObject = errio.toObject(error, {
+					stack: true,
 				});
-			},
-			{
-				concurrency: 1,
-			},
-		);
+
+				const logData = {
+					error: errorObject,
+					input: insertedCard.slug,
+					trigger: trigger.slug,
+				};
+
+				if (error.expected) {
+					logger.warn(
+						context,
+						'Execute error in asynchronous trigger',
+						logData,
+					);
+				} else {
+					logger.error(context, 'Execute error', logData);
+				}
+			});
+		});
 	}
 
 	if (options.attachEvents) {
@@ -419,11 +383,8 @@ const commit = async (
 			},
 		};
 
-		// We use a privileged session here as we want the worker
-		// to be able to create update/create events but not necessarily
-		// the user.
 		await options.library[request.action.split('@')[0]].handler(
-			options.context.privilegedSession,
+			session,
 			options.context,
 			insertedCard,
 			request as any,
@@ -536,16 +497,10 @@ const commit = async (
 					target: trigger.data.target,
 					filter: trigger.data.filter,
 					arguments: trigger.data.arguments,
-					schedule: 'async',
 				};
 
 				if (trigger.data.mode) {
 					triggerObject.mode = trigger.data.mode;
-				}
-
-				// Triggered actions default to being asynchronous
-				if (_.has(trigger.data, ['schedule'])) {
-					triggerObject.schedule = trigger.data.schedule;
 				}
 
 				// Registered the newly created trigger
@@ -905,6 +860,7 @@ export const run = async (
 		timestamp: request.timestamp,
 		epoch: request.epoch,
 		arguments: request.arguments,
+		originator: request.originator,
 	});
 };
 

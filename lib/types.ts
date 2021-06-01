@@ -81,7 +81,6 @@ export interface WorkerTriggerObjectInput {
 	interval?: worker.TriggeredActionData2['interval'];
 	filter?: worker.TriggeredActionData2['filter'];
 	mode?: worker.TriggeredActionData2['mode'];
-	schedule?: worker.TriggeredActionData2['schedule'];
 	// TS-TODO: figure out if startDate is used. This is part of the "tick()" spaghetti mess
 	startDate?: string;
 }
@@ -94,7 +93,6 @@ export interface ParsedWorkerTriggerObject {
 	action: worker.TriggeredActionData2['action'];
 	target: worker.TriggeredActionData2['target'];
 	arguments: worker.TriggeredActionData2['arguments'];
-	schedule: worker.TriggeredActionData2['schedule'];
 	startDate?: any;
 	filter?: worker.TriggeredActionData2['filter'];
 	interval?: worker.TriggeredActionData2['interval'];
