@@ -38,8 +38,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "npm run lint-fix",
-      "git add ."
+      "balena-lint --fix"
     ]
   },
   "author": "Balena.io. <hello@balena.io>",
