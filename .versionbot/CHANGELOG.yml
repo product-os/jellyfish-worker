@@ -1,4 +1,20 @@
 - commits:
+    - subject: 'build(deps): bump ws from 7.4.4 to 7.4.6'
+      hash: fea5d64097aae90712c1a17793cda3d8b91d4b22
+      body: |
+        Bumps [ws](https://github.com/websockets/ws) from 7.4.4 to 7.4.6.
+        - [Release notes](https://github.com/websockets/ws/releases)
+        - [Commits](https://github.com/websockets/ws/compare/7.4.4...7.4.6)
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: 'dependabot[bot] <support@github.com>'
+        signed-off-by: 'dependabot[bot] <support@github.com>'
+      author: 'dependabot[bot]'
+      nested: []
+  version: 5.0.4
+  date: 2021-06-04T01:48:11.980Z
+- commits:
     - subject: Improve lint-staged config
       hash: 8fafbb2272fda8791c6beeca472d9e941c7e74f3
       body: ''
