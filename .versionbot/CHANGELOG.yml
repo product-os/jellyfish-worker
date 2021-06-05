@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @types/sinon to ^10.0.2'
+      hash: 3e5ed32e412c7befff70cdfd7d737be327cf4009
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 5.0.5
+  date: 2021-06-05T07:08:12.914Z
+- commits:
     - subject: 'build(deps): bump ws from 7.4.4 to 7.4.6'
       hash: fea5d64097aae90712c1a17793cda3d8b91d4b22
       body: |
