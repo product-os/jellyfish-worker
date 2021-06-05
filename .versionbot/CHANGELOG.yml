@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: d5a813cb29f1c760987167e3b84ed6447e457efc
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 5.0.6
+  date: 2021-06-05T07:22:12.615Z
+- commits:
     - subject: 'patch: Update dependency @types/sinon to ^10.0.2'
       hash: 3e5ed32e412c7befff70cdfd7d737be327cf4009
       body: ''
