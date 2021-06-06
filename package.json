@@ -63,7 +63,7 @@
     "@balena/jellycheck": "^0.1.1",
     "@balena/jellyfish-action-library": "^11.0.3",
     "@balena/jellyfish-config": "^1.0.6",
-    "@balena/jellyfish-core": "^2.13.134",
+    "@balena/jellyfish-core": "^3.0.27",
     "@balena/jellyfish-environment": "^4.1.15",
     "@balena/jellyfish-plugin-base": "^2.1.98",
     "@balena/jellyfish-plugin-default": "^10.0.1",
