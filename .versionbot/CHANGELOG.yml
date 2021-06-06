@@ -1,4 +1,17 @@
 - commits:
+    - subject: Bump sinon to v11.1.1
+      hash: f02e4e7c14c708716cce6c857eef20344f81b49e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 5.0.11
+  date: 2021-06-06T13:17:53.711Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.0.10'
       hash: df0d3ee80dfc9cb9c7b4d50caf751942431752aa
       body: ''
