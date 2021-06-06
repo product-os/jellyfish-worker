@@ -9,17 +9,8 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { v4 as uuidv4 } from 'uuid';
 import * as utils from './utils';
-import {
-	JellyfishKernel,
-	Cache as JellyfishCache,
-	Context,
-} from '@balena/jellyfish-types/build/core';
-import {
-	Backend,
-	Kernel,
-	errors,
-	MemoryCache as Cache,
-} from '@balena/jellyfish-core';
+import { Context } from '@balena/jellyfish-types/build/core';
+import { Backend, Kernel, errors, MemoryCache } from '@balena/jellyfish-core';
 
 export interface BackendTestOptions {
 	suffix?: string;
@@ -27,9 +18,9 @@ export interface BackendTestOptions {
 }
 
 export interface BackendCoreTestContext {
-	cache: JellyfishCache;
+	cache: InstanceType<typeof MemoryCache>;
 	context: Context;
-	backend: JellyfishKernel['backend'];
+	backend: InstanceType<typeof Backend>;
 }
 
 const backendBefore = async (
@@ -39,7 +30,7 @@ const backendBefore = async (
 	const suffix = options.suffix || uuidv4();
 	const dbName = `test_${suffix.replace(/-/g, '_')}`;
 
-	context.cache = new Cache(
+	context.cache = new MemoryCache(
 		Object.assign({}, defaultEnvironment.redis, {
 			namespace: dbName,
 		}),
@@ -84,7 +75,7 @@ const backendAfter = async (context: BackendCoreTestContext): Promise<void> => {
 };
 
 export interface BackendGeneralTestContext {
-	kernel: JellyfishKernel;
+	kernel: InstanceType<typeof Kernel>;
 	generateRandomSlug: typeof utils.generateRandomSlug;
 	generateRandomID: typeof utils.generateRandomID;
 }
