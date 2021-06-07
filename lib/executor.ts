@@ -232,16 +232,6 @@ const commit = async (
 					return;
 				}
 
-				const targetContract = await jellyfish.getCardById(
-					context,
-					creatorSession.id,
-					insertedCard.id,
-				);
-
-				if (!targetContract) {
-					return;
-				}
-
 				/*
 				 * Retrieve the card using the subscription creators permissions and
 				 * check if it matches the view schema
@@ -251,10 +241,27 @@ const commit = async (
 					jellyfish,
 					creatorSession.id,
 					view.data.allOf[0].schema,
-					targetContract,
+					insertedCard,
 				);
 
 				if (!filteredCard) {
+					return;
+				}
+
+				/*
+				 * Ignore if the card was already matching before update
+				 */
+				const wasMatchingBeforeUpdate =
+					current &&
+					(await triggers.matchesCard(
+						context,
+						jellyfish,
+						creatorSession.id,
+						view.data.allOf[0].schema,
+						current,
+					));
+
+				if (wasMatchingBeforeUpdate) {
 					return;
 				}
 
