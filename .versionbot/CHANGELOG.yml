@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 80a1d1a5ee92610a6197f07450dbe6e35efd7c44
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 5.0.16
+  date: 2021-06-08T04:58:55.529Z
+- commits:
     - subject: 'build(deps): bump glob-parent from 5.1.1 to 5.1.2'
       hash: 5015e2fe5f8acdee90c9ddd361231392f543ee16
       body: >
