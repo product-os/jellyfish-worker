@@ -1,4 +1,17 @@
 - commits:
+    - subject: Simplify development setup
+      hash: 4c15bac865a0104687f237c1c1d9978f70bc68e9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 5.0.22
+  date: 2021-06-10T09:20:12.106Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.1.1'
       hash: 585cef894121818ddf747bf030b3a47949554c11
       body: ''
