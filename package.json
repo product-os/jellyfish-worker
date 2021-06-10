@@ -23,6 +23,7 @@
     "lint": "balena-lint ./lib && npm run check && deplint && depcheck --ignore-bin-package --ignores=shellcheck,@types/jest",
     "lint-fix": "balena-lint --fix ./lib",
     "unit": "jest ./lib",
+    "integration": "jest --verbose --maxWorkers=1 --forceExit ./test/integration",
     "test": "npm run lint && npm run unit",
     "doc": "typedoc ./lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
@@ -60,6 +61,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@balena/ci-task-runner": "^0.2.160",
     "@balena/jellycheck": "^0.1.1",
     "@balena/jellyfish-action-library": "^12.0.1",
     "@balena/jellyfish-config": "^1.0.6",

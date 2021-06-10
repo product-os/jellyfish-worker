@@ -11,7 +11,7 @@ framework.
 Below is an example how to use this library:
 
 ```js
-const Worker = require('@balena/jellyfish-worker');
+import { Worker } from '@balena/jellyfish-worker';
 
 const worker = new Worker(
 	jellyfish,
@@ -38,11 +38,5 @@ Unit tests can be easily run with the command `npm test`. This will run all unit
 The integration tests require a postgres DB and redis server. The simplest way to run the tests locally is with docker-compose.
 
 ```
-docker-compose -f docker-compose.yml up --build
-```
-
-The tests can then be run from your host with:
-
-```
-LOGLEVEL=warn POSTGRES_USER=docker POSTGRES_PASSWORD=docker make test-integration
+docker-compose -f docker-compose.test.yml -f docker-compose.yml up --build --exit-code-from=sut
 ```

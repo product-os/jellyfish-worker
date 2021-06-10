@@ -23,5 +23,7 @@ services:
       - REDIS_PORT=6379
       - CI=1
       - NPM_TOKEN
+    env_file:
+      - test.env
     networks:
       - internal
