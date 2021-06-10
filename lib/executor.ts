@@ -12,11 +12,11 @@ import * as fastEquals from 'fast-equals';
 import * as utils from './utils';
 import * as errors from './errors';
 import * as transformers from './transformers';
+import * as subscriptions from './subscriptions';
 import * as triggers from './triggers';
 import * as assert from '@balena/jellyfish-assert';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
-import { v4 as uuidv4 } from 'uuid';
 import { Operation } from 'fast-json-patch';
 import {
 	LogContext,
@@ -187,184 +187,87 @@ const commit = async (
 
 	if (options.subscriptions) {
 		Bluebird.map(options.subscriptions, async (subscription) => {
-			try {
-				// TS-TODO: update the links type definition to be an array of contracts
-				const view = _.find(
-					subscription.links!['is attached to'] as core.ViewContract[],
-					{
-						type: 'view@1.0.0',
-					},
-				);
-
-				if (!view) {
-					return;
-				}
-
-				const createCard = _.find(
-					subscription.links![
-						'has attached element'
-					] as worker.CreateContract[],
-					{
-						type: 'create@1.0.0',
-					},
-				);
-
-				if (!createCard) {
-					return;
-				}
-
-				assert.INTERNAL(
-					context,
-					createCard && createCard.data && createCard.data.actor,
-					errors.WorkerNoElement,
-					`Subscription (${subscription.slug}) should have attached create event`,
-				);
-
-				const creatorSession = await utils.getActorKey(
-					context,
-					jellyfish,
-					session,
-					createCard.data.actor,
-				);
-
-				// TODO: Improve this gaurd
-				if (!view.data.allOf || !view.data.allOf.length) {
-					return;
-				}
-
-				/*
-				 * Retrieve the card using the subscription creators permissions and
-				 * check if it matches the view schema
-				 */
-				const filteredCard = await triggers.matchesCard(
-					context,
-					jellyfish,
-					creatorSession.id,
-					view.data.allOf[0].schema,
-					insertedCard,
-				);
-
-				if (!filteredCard) {
-					return;
-				}
-
-				/*
-				 * Ignore if the card was already matching before update
-				 */
-				const wasMatchingBeforeUpdate =
-					current &&
-					(await triggers.matchesCard(
-						context,
-						jellyfish,
-						creatorSession.id,
-						view.data.allOf[0].schema,
-						current,
-					));
-
-				if (wasMatchingBeforeUpdate) {
-					return;
-				}
-
-				const notificationTypeCard =
-					await jellyfish.getCardBySlug<core.TypeContract>(
-						context,
-						session,
-						'notification@1.0.0',
-					);
-
-				if (!notificationTypeCard) {
-					return;
-				}
-
-				const notification = await insertCard(
-					context,
-					jellyfish,
-					creatorSession.id,
-					notificationTypeCard,
-					{
-						...options,
-						attachEvents: true,
-						timestamp: Date.now(),
-						replace: false,
-					},
-					{
-						version: '1.0.0',
-						type: 'notification@1.0.0',
-						slug: `notification-${uuidv4()}`,
-						tags: [],
-						links: {},
-						requires: [],
-						capabilities: [],
-						active: true,
-					},
-				);
-
-				const linkTypeContract =
-					await jellyfish.getCardBySlug<core.TypeContract>(
-						context,
-						session,
-						'link@1.0.0',
-					);
-
-				if (!linkTypeContract) {
-					return;
-				}
-
-				await insertCard(
-					context,
-					jellyfish,
-					creatorSession.id,
-					linkTypeContract,
-					{
-						...options,
-						attachEvents: true,
-						timestamp: Date.now(),
-						replace: false,
-					},
-					{
-						version: '1.0.0',
-						type: 'link@1.0.0',
-						slug: `link-${filteredCard.id}-has-attached-${
-							// TS-TODO: assert notification exists
-							notification!.id
-						}-${uuidv4()}`,
-						tags: [],
-						links: {},
-						requires: [],
-						capabilities: [],
-						active: true,
-						name: 'has attached',
-						data: {
-							inverseName: 'is attached to',
-							from: {
-								id: filteredCard.id,
-								type: filteredCard.type,
+			subscriptions
+				.evaluate({
+					subscription,
+					oldCard: current,
+					newCard: insertedCard,
+					getCreatorSession: async (card: core.Contract) => {
+						const createCard = _.find(
+							card.links!['has attached element'] as worker.CreateContract[],
+							{
+								type: 'create@1.0.0',
 							},
-							to: {
-								// TS-TODO: assert notification exists
-								id: notification!.id,
-								type: notification!.type,
-							},
-						},
+						);
+
+						if (!createCard || !createCard.data || !createCard.data.actor) {
+							return null;
+						}
+
+						return utils.getActorKey(
+							context,
+							jellyfish,
+							session,
+							createCard.data.actor,
+						);
 					},
-				);
-			} catch (error) {
-				const errorObject = errio.toObject(error, {
-					stack: true,
+					insertCard: async (
+						insertedCardType: core.TypeContract,
+						actorSession: string,
+						object: any,
+					) => {
+						return insertCard(
+							context,
+							jellyfish,
+							actorSession,
+							insertedCardType,
+							{
+								...options,
+								attachEvents: true,
+								timestamp: Date.now(),
+								replace: false,
+							},
+							object,
+						);
+					},
+					query: (querySchema, queryOpts = {}) => {
+						return jellyfish.query(
+							context,
+							options.context.privilegedSession,
+							querySchema,
+							queryOpts,
+						);
+					},
+					getCardBySlug: (slug: string) => {
+						return jellyfish.getCardBySlug(context, session, slug);
+					},
+					matchesCard: (actorSession, schema, card) => {
+						return triggers.matchesCard(
+							context,
+							jellyfish,
+							actorSession,
+							schema,
+							card,
+						);
+					},
+				})
+				.catch((error) => {
+					const errorObject = errio.toObject(error, {
+						stack: true,
+					});
+
+					const logData = {
+						error: errorObject,
+						input: insertedCard.slug,
+						subscription: subscription.slug,
+					};
+
+					if (error.expected) {
+						logger.warn(context, 'Execute error in subscription', logData);
+					} else {
+						logger.error(context, 'Execute error', logData);
+					}
 				});
-
-				const logData = {
-					error: errorObject,
-					input: insertedCard.slug,
-					subscription: subscription.slug,
-				};
-
-				if (error.expected) {
-					logger.warn(context, 'Execute error in subscription', logData);
-				} else {
-					logger.error(context, 'Execute error', logData);
-				}
-			}
 		});
 	}
 
