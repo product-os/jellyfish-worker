@@ -8,6 +8,8 @@ import { v4 as uuid } from 'uuid';
 import coreMixins = require('@balena/jellyfish-core/lib/cards/mixins');
 import PluginDefault = require('@balena/jellyfish-plugin-default');
 import ActionLibrary = require('@balena/jellyfish-action-library');
+import DiscoursePlugin = require('@balena/jellyfish-plugin-discourse');
+import FlowdockPlugin = require('@balena/jellyfish-plugin-flowdock');
 
 import { PluginManager } from '@balena/jellyfish-plugin-base';
 
@@ -16,7 +18,12 @@ const context = {
 };
 
 const pluginManager = new PluginManager(context, {
-	plugins: [PluginDefault as any, ActionLibrary as any],
+	plugins: [
+		PluginDefault as any,
+		ActionLibrary as any,
+		FlowdockPlugin as any,
+		DiscoursePlugin as any,
+	],
 });
 
 export const loadDefaultCards = () => {
