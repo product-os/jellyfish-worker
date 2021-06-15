@@ -1,4 +1,19 @@
 - commits:
+    - subject: Bump internal dependencies
+      hash: cbf956d39f4b6c4c333cc80f440715261a93d7af
+      body: |
+        This change fixes some internal references, mainly due to upgrades to
+        Typescript in other modules.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Josh Bowling
+      nested: []
+  version: 5.0.38
+  date: 2021-06-15T11:34:46.895Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.17'
       hash: 50c6ba225c3b3ae479824e939d82df7804ff7eb2
       body: ''
