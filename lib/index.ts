@@ -337,52 +337,13 @@ export class Worker {
 			defaults: this.jellyfish.defaults,
 			sync: this.sync,
 			getEventSlug: utils.getEventSlug,
-			getCardById: (lsession: string, id: string) => {
-				return self.jellyfish.getCardById(context, lsession, id);
-			},
-			getCardBySlug: (lsession: string, slug: string) => {
-				return self.jellyfish.getCardBySlug(context, lsession, slug);
-			},
-			query: (
-				lsession: string,
-				schema: Parameters<JellyfishKernel['query']>[2],
-				options: Parameters<JellyfishKernel['query']>[3],
-			) => {
-				return self.jellyfish.query(context, lsession, schema, options);
-			},
+			getCardById: _.partial(self.jellyfish.getCardById, context),
+			getCardBySlug: _.partial(self.jellyfish.getCardBySlug, context),
+			query: _.partial(self.jellyfish.query, context),
 			privilegedSession: this.session,
-			insertCard: (
-				lsession: string,
-				typeCard: Parameters<Worker['insertCard']>[2],
-				options: Parameters<Worker['insertCard']>[3],
-				card: Parameters<Worker['insertCard']>[4],
-			) => {
-				return self.insertCard(context, lsession, typeCard, options, card);
-			},
-			replaceCard: (
-				lsession: string,
-				typeCard: Parameters<Worker['replaceCard']>[2],
-				options: Parameters<Worker['replaceCard']>[3],
-				card: Parameters<Worker['replaceCard']>[4],
-			) => {
-				return self.replaceCard(context, lsession, typeCard, options, card);
-			},
-			patchCard: (
-				lsession: string,
-				typeCard: Parameters<Worker['patchCard']>[2],
-				options: Parameters<Worker['patchCard']>[3],
-				card: Parameters<Worker['patchCard']>[4],
-				patch: Parameters<Worker['patchCard']>[5],
-			) => {
-				return self.patchCard(
-					context,
-					lsession,
-					typeCard,
-					options,
-					card,
-					patch,
-				);
-			},
+			insertCard: _.partial(self.insertCard, context),
+			replaceCard: _.partial(self.replaceCard, context),
+			patchCard: _.partial(self.patchCard, context),
 			cards: this.jellyfish.cards,
 		};
 	}
