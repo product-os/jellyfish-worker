@@ -537,7 +537,7 @@ const commit = async (
 			options.context.privilegedSession,
 			options.context,
 			insertedCard,
-			request,
+			request as any,
 		);
 	}
 
