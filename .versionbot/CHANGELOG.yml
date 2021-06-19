@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/ci-task-runner to ^0.2.168'
+      hash: e646fb0ec82584b0aa923812786186ecc23d7b96
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 5.0.46
+  date: 2021-06-19T08:48:13.355Z
+- commits:
     - subject: 'patch: Update dependency @balena/ci-task-runner to ^0.2.167'
       hash: 7f16e6b3b81f4da2046c59feef0dba456f113ffa
       body: ''
