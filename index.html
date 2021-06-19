@@ -70,7 +70,7 @@
 					<h1>Usage</h1>
 				</a>
 				<p>Below is an example how to use this library:</p>
-				<pre><code class="language-js"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">Worker</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@balena/jellyfish-worker&#039;</span><span style="color: #000000">);</span>
+				<pre><code class="language-js"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">Worker</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@balena/jellyfish-worker&#039;</span><span style="color: #000000">;</span>
 
 <span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">worker</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Worker</span><span style="color: #000000">(</span>
 <span style="color: #000000">    </span><span style="color: #001080">jellyfish</span><span style="color: #000000">,</span>
@@ -93,10 +93,7 @@
 				</a>
 				<p>Unit tests can be easily run with the command <code>npm test</code>. This will run all unit tests (found in the <code>/lib</code> folder).</p>
 				<p>The integration tests require a postgres DB and redis server. The simplest way to run the tests locally is with docker-compose.</p>
-				<pre><code><span style="color: #001080">docker</span><span style="color: #000000">-</span><span style="color: #001080">compose</span><span style="color: #000000"> -</span><span style="color: #001080">f</span><span style="color: #000000"> </span><span style="color: #001080">docker</span><span style="color: #000000">-</span><span style="color: #001080">compose</span><span style="color: #000000">.</span><span style="color: #001080">yml</span><span style="color: #000000"> </span><span style="color: #001080">up</span><span style="color: #000000"> --</span><span style="color: #001080">build</span>
-</code></pre>
-				<p>The tests can then be run from your host with:</p>
-				<pre><code><span style="color: #0070C1">LOGLEVEL</span><span style="color: #000000">=</span><span style="color: #001080">warn</span><span style="color: #000000"> </span><span style="color: #0070C1">POSTGRES_USER</span><span style="color: #000000">=</span><span style="color: #001080">docker</span><span style="color: #000000"> </span><span style="color: #0070C1">POSTGRES_PASSWORD</span><span style="color: #000000">=</span><span style="color: #001080">docker</span><span style="color: #000000"> </span><span style="color: #001080">make</span><span style="color: #000000"> </span><span style="color: #001080">test</span><span style="color: #000000">-</span><span style="color: #001080">integration</span>
+				<pre><code><span style="color: #001080">docker</span><span style="color: #000000">-</span><span style="color: #001080">compose</span><span style="color: #000000"> -</span><span style="color: #001080">f</span><span style="color: #000000"> </span><span style="color: #001080">docker</span><span style="color: #000000">-</span><span style="color: #001080">compose</span><span style="color: #000000">.</span><span style="color: #001080">test</span><span style="color: #000000">.</span><span style="color: #001080">yml</span><span style="color: #000000"> -</span><span style="color: #001080">f</span><span style="color: #000000"> </span><span style="color: #001080">docker</span><span style="color: #000000">-</span><span style="color: #001080">compose</span><span style="color: #000000">.</span><span style="color: #001080">yml</span><span style="color: #000000"> </span><span style="color: #001080">up</span><span style="color: #000000"> --</span><span style="color: #001080">build</span><span style="color: #000000"> --</span><span style="color: #001080">exit</span><span style="color: #000000">-</span><span style="color: #001080">code</span><span style="color: #000000">-</span><span style="color: #001080">from</span><span style="color: #000000">=</span><span style="color: #001080">sut</span>
 </code></pre>
 			</div>
 		</div>
@@ -104,7 +101,7 @@
 			<nav class="tsd-navigation primary">
 				<ul>
 					<li class=" ">
-						<a href="modules.html">Exports</a>
+						<a href="modules.html">Modules</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="modules/cards.html">cards</a>
