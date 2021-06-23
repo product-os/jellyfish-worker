@@ -63,7 +63,7 @@
   "devDependencies": {
     "@balena/ci-task-runner": "^0.3.1",
     "@balena/jellycheck": "^0.1.1",
-    "@balena/jellyfish-action-library": "^13.0.4",
+    "@balena/jellyfish-action-library": "^14.0.6",
     "@balena/jellyfish-config": "^1.0.6",
     "@balena/jellyfish-core": "^3.0.27",
     "@balena/jellyfish-environment": "^4.1.34",
