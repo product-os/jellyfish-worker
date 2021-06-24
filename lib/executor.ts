@@ -20,11 +20,12 @@ import { getLogger } from '@balena/jellyfish-logger';
 import { Operation } from 'fast-json-patch';
 import {
 	LogContext,
-	JellyfishKernel,
 	EnqueueOptions,
 	WorkerTriggerObjectInput,
+	WorkerContext,
 } from './types';
 import { core, worker } from '@balena/jellyfish-types';
+import { Kernel } from '@balena/jellyfish-core/build/kernel';
 
 const logger = getLogger('worker');
 
@@ -61,7 +62,7 @@ const INSERT_CONCURRENCY = 3;
  */
 const getInputCard = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	identifier: string,
 ): Promise<core.Contract | null> => {
@@ -89,7 +90,7 @@ const getInputCard = async (
 // TS-TODO: Improve the tpyings for the `options` parameter
 const commit = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	typeCard: core.TypeContract,
 	current: core.Contract | null,
@@ -604,7 +605,7 @@ const commit = async (
  */
 export const insertCard = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	typeCard: core.TypeContract,
 	// TS-TODO: correctly type this
@@ -668,7 +669,7 @@ export const insertCard = async (
 
 export const replaceCard = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	typeCard: core.TypeContract,
 	// TS-TODO: correctly type this options object
@@ -737,7 +738,7 @@ export const replaceCard = async (
 
 export const patchCard = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	typeCard: core.TypeContract,
 	// TS-TODO: correctly type this options object
@@ -820,10 +821,9 @@ export const patchCard = async (
  * console.log(result)
  */
 export const run = async (
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
-	// TS-TODO: type the context
-	context: any,
+	context: WorkerContext,
 	// TS-TODO: type the action library
 	library: { [x: string]: { handler: any } },
 	// TS-TODO: type request param
@@ -836,6 +836,7 @@ export const run = async (
 		timestamp: any;
 		epoch?: any;
 		type: string;
+		originator?: string;
 	},
 ) => {
 	const cards = await Bluebird.props({
@@ -929,7 +930,7 @@ async function getObjectWithLinks<
 	TData extends core.ContractData,
 >(
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	card: PContract,
 	typeCard: core.TypeContract,

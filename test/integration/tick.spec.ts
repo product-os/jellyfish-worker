@@ -5,16 +5,17 @@
  */
 
 import * as _ from 'lodash';
+import { strict as assert } from 'assert';
 import * as helpers from './helpers';
 
-let context: any;
+let context: helpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	context = await helpers.worker.before();
+	context = await helpers.before();
 });
 
 afterAll(() => {
-	return helpers.worker.after(context);
+	return helpers.after(context);
 });
 
 describe('.tick()', () => {
@@ -81,14 +82,15 @@ describe('.tick()', () => {
 			context.session,
 			'action-create-card@latest',
 		);
+
+		assert(actionCard !== null);
+
 		context.worker.setTriggers(context.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: `${actionCard.slug}@${actionCard.version}`,
-				type: 'card@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				context: context.context,
 				interval: 'PT1D',
 				startDate: '2018-08-05T12:00:00.000Z',
 				arguments: {
@@ -109,7 +111,8 @@ describe('.tick()', () => {
 			currentDate: new Date('2018-08-06T12:00:00.000Z'),
 		});
 
-		const request = await context.dequeue();
+		// TS-TODO: Correctly type this
+		const request: any = await context.dequeue();
 		expect(request.data.arguments.properties.data).toEqual({
 			timestamp: '2018-08-06T12:00:00.000Z',
 		});
@@ -121,14 +124,15 @@ describe('.tick()', () => {
 			context.session,
 			'action-create-card@latest',
 		);
+
+		assert(actionCard !== null);
+
 		context.worker.setTriggers(context.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: `${actionCard.slug}@${actionCard.version}`,
-				type: 'card@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				context: context.context,
 				interval: 'PT1D',
 				startDate: '2018-08-05T12:00:00.000Z',
 				arguments: {
@@ -144,7 +148,8 @@ describe('.tick()', () => {
 			currentDate: new Date('2018-08-06T12:00:00.000Z'),
 		});
 
-		const request = await context.dequeue();
+		// TS-TODO: Correctly type this
+		const request: any = await context.dequeue();
 		expect(request).toEqual(
 			context.jellyfish.defaults({
 				id: request.id,
@@ -180,14 +185,13 @@ describe('.tick()', () => {
 			context.session,
 			'action-create-card@latest',
 		);
+		assert(actionCard !== null);
 		context.worker.setTriggers(context.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: `${actionCard.slug}@${actionCard.version}`,
-				type: 'card@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				context: context.context,
 				interval: 'PT1D',
 				startDate: '2018-08-05T12:00:00.000Z',
 				arguments: {
@@ -203,7 +207,8 @@ describe('.tick()', () => {
 			currentDate: new Date('2018-08-05T12:00:00.000Z'),
 		});
 
-		const request = await context.dequeue();
+		// TS-TODO: Correctly type this
+		const request: any = await context.dequeue();
 		expect(request).toEqual(
 			context.jellyfish.defaults({
 				id: request.id,
@@ -240,14 +245,13 @@ describe('.tick()', () => {
 			context.session,
 			'action-create-card@latest',
 		);
+		assert(actionCard !== null);
 		context.worker.setTriggers(context.context, [
 			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: `${actionCard.slug}@${actionCard.version}`,
-				type: 'card@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				context: context.context,
 				interval: 'PT1H',
 				startDate: '2050-08-05T12:00:00.000Z',
 				arguments: {
@@ -264,6 +268,7 @@ describe('.tick()', () => {
 		});
 
 		const request = await context.dequeue();
+		assert(request !== null);
 		const requestDate = new Date(request.data.timestamp);
 		expect(requestDate.getTime() < Date.now()).toBe(false);
 	});
@@ -275,16 +280,16 @@ describe('.tick()', () => {
 			'action-create-card@latest',
 		);
 
+		assert(actionCard !== null);
+
 		const slug1 = context.generateRandomSlug();
 		const slug2 = context.generateRandomSlug();
 		context.worker.setTriggers(context.context, [
-			context.jellyfish.defaults({
+			{
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: `${actionCard.slug}@${actionCard.version}`,
-				type: 'card@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				context: context.context,
 				interval: 'PT1D',
 				startDate: '2018-08-05T12:00:00.000Z',
 				arguments: {
@@ -294,14 +299,12 @@ describe('.tick()', () => {
 						slug: slug1,
 					},
 				},
-			}),
-			context.jellyfish.defaults({
+			},
+			{
 				id: '673bc300-88f7-4376-92ed-d32543d69429',
 				slug: 'triggered-action-foo-baz',
 				action: `${actionCard.slug}@${actionCard.version}`,
-				type: 'card@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				context: context.context,
 				interval: 'PT2D',
 				startDate: '2018-08-04T12:00:00.000Z',
 				arguments: {
@@ -311,7 +314,7 @@ describe('.tick()', () => {
 						slug: slug2,
 					},
 				},
-			}),
+			},
 		]);
 
 		await context.worker.tick(context.context, context.session, {

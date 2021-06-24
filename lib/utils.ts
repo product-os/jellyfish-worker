@@ -9,7 +9,8 @@ import { v4 as uuidv4 } from 'uuid';
 import * as _ from 'lodash';
 import { getLogger } from '@balena/jellyfish-logger';
 import { JSONSchema, core } from '@balena/jellyfish-types';
-import { LogContext, JellyfishKernel } from './types';
+import { LogContext } from './types';
+import { Kernel } from '@balena/jellyfish-core/build/kernel';
 
 const logger = getLogger('worker');
 
@@ -83,7 +84,7 @@ export const getActionArgumentsSchema = (
  */
 export const hasCard = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	object: Pick<core.Contract, 'slug' | 'version' | 'id'>,
 ): Promise<boolean> => {
@@ -136,10 +137,10 @@ export const durationToMs = (duration: string): number => {
 
 export const getActorKey = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	actorId: string,
-) => {
+): Promise<core.SessionContract> => {
 	const keySlug = `session-action-${actorId}`;
 	const key = await jellyfish.getCardBySlug<core.SessionContract>(
 		context,

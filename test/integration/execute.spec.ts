@@ -4,38 +4,18 @@
  * Proprietary and confidential.
  */
 
-import Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import * as helpers from './helpers';
 import { strict as assert } from 'assert';
-import { Contract } from '@balena/jellyfish-types/build/core';
 
-let ctx: helpers.IntegrationTestContext & {
-	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
-};
+let ctx: helpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.worker.before();
-
-	ctx.waitForMatch = async <T extends Contract>(waitQuery: any, times = 20) => {
-		if (times === 0) {
-			throw new Error('The wait query did not resolve');
-		}
-		const results = await ctx.jellyfish.query<T>(
-			ctx.context,
-			ctx.session,
-			waitQuery,
-		);
-		if (results.length > 0) {
-			return results[0];
-		}
-		await Bluebird.delay(500);
-		return ctx.waitForMatch(waitQuery, times - 1);
-	};
+	ctx = await helpers.before();
 });
 
 afterAll(() => {
-	return helpers.worker.after(ctx);
+	return helpers.after(ctx);
 });
 
 describe('.execute()', () => {
@@ -59,7 +39,7 @@ describe('.execute()', () => {
 				arguments: {
 					reason: null,
 					properties: {
-						slug: ctx.generateRandomSlug(),
+						slug: ctx.generateRandomSlug({ prefix: 'execute-test' }),
 						version: '1.0.0',
 						data: {
 							foo: 'bar',
@@ -131,7 +111,6 @@ describe('.execute()', () => {
 						slug: command,
 					},
 				},
-				schedule: 'sync',
 			},
 		]);
 
@@ -162,18 +141,32 @@ describe('.execute()', () => {
 
 		expect(result.error).toBe(false);
 
+		await ctx.flushAll(ctx.session);
+
 		const card = await ctx.jellyfish.getCardBySlug(
 			ctx.context,
 			ctx.session,
 			`${command}@latest`,
 		);
+
 		expect(card).toBeTruthy();
 
-		const resultCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
-			ctx.session,
-			`${slug}@latest`,
-		);
+		const resultCard = await ctx.waitForMatch({
+			type: 'object',
+			properties: {
+				slug: {
+					const: slug,
+				},
+				data: {
+					type: 'object',
+					properties: {
+						command: {
+							const: command,
+						},
+					},
+				},
+			},
+		});
 
 		assert(resultCard !== null);
 
@@ -445,6 +438,8 @@ describe('.execute()', () => {
 		const result = await ctx.queue.producer.waitResults(ctx.context, request);
 		expect(result.error).toBe(false);
 
+		await ctx.flushAll(ctx.session);
+
 		const card = await ctx.jellyfish.getCardBySlug(
 			ctx.context,
 			ctx.session,
@@ -522,6 +517,7 @@ describe('.execute()', () => {
 	});
 
 	test('should be able to AGGREGATE based on the card timeline', async () => {
+		jest.setTimeout(10 * 1000);
 		const typeType = await ctx.jellyfish.getCardBySlug(
 			ctx.context,
 			ctx.session,
@@ -578,6 +574,7 @@ describe('.execute()', () => {
 			ctx.context,
 			request,
 		);
+
 		expect(typeResult.error).toBe(false);
 
 		const threadRequest = await ctx.queue.producer.enqueue(
@@ -658,7 +655,8 @@ describe('.execute()', () => {
 		expect(messageResult1.error).toBe(false);
 		expect(messageResult2.error).toBe(false);
 
-		// AGGREGATE is asynchronous, so we will need to wait for the actions to be processed
+		await ctx.flushAll(ctx.session);
+
 		const thread = await ctx.waitForMatch({
 			type: 'object',
 			properties: {
@@ -796,6 +794,8 @@ describe('.execute()', () => {
 			messageRequest,
 		);
 		expect(messageResult.error).toBe(false);
+
+		await ctx.flushAll(ctx.session);
 
 		await expect(
 			ctx.waitForMatch({
@@ -937,6 +937,8 @@ describe('.execute()', () => {
 		);
 
 		expect(messageResult.error).toBe(false);
+
+		await ctx.flushAll(ctx.session);
 
 		await expect(
 			ctx.waitForMatch({
@@ -1210,6 +1212,8 @@ describe('.execute()', () => {
 
 		expect(result.error).toBe(false);
 
+		await ctx.flushAll(ctx.session);
+
 		const card = await ctx.jellyfish.getCardBySlug(
 			ctx.context,
 			ctx.session,
@@ -1217,6 +1221,8 @@ describe('.execute()', () => {
 		);
 
 		expect(card).toBeTruthy();
+
+		await ctx.flushAll(ctx.session);
 
 		const resultCard = await ctx.jellyfish.getCardBySlug(
 			ctx.context,
