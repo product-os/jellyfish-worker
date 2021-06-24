@@ -1,4 +1,15 @@
 - commits:
+    - subject: Notifications v2
+      hash: efca92341aeb235bc1a6f8c7dc1b9a27b974f136
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+      author: Kakhaber
+      nested: []
+  version: 6.0.0
+  date: 2021-06-24T18:35:23.482Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.2.19'
       hash: c398dcb4d04bbefcd8a3c238863f34e5b04c5107
       body: ''
