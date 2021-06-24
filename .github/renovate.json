@@ -4,7 +4,10 @@
   ],
   "packageRules": [
     {
-      "depTypeList": ["devDependencies"],
+      "depTypeList": [
+        "devDependencies",
+        "peerDependencies"
+      ],
       "packagePatterns": ["@balena/jellyfish-*"],
       "updateTypes": [
         "minor",
