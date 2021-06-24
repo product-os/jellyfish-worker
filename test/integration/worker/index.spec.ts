@@ -223,6 +223,7 @@ describe('Worker', () => {
 			created_at: card.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
+			loop: null,
 			links: {},
 			tags: [],
 			data: {
@@ -340,6 +341,7 @@ describe('Worker', () => {
 			created_at: card.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
+			loop: null,
 			links: {},
 			tags: [],
 			data: {
@@ -482,6 +484,7 @@ describe('Worker', () => {
 			created_at: card.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
+			loop: null,
 			links: {},
 			tags: [],
 			data: {
@@ -623,6 +626,7 @@ describe('Worker', () => {
 			created_at: card.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
+			loop: null,
 			links: {},
 			tags: [],
 			data: {
@@ -763,6 +767,7 @@ describe('Worker', () => {
 			created_at: card.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
+			loop: null,
 			links: {},
 			tags: [],
 			data: {
@@ -900,6 +905,7 @@ describe('Worker', () => {
 			created_at: card.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
+			loop: null,
 			links: {},
 			tags: [],
 			data: {

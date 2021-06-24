@@ -1510,6 +1510,7 @@ describe('.insertCard()', () => {
 			version: '1.0.0',
 			name: null,
 			active: true,
+			loop: null,
 			links: {},
 			tags: [],
 			markers: [],
