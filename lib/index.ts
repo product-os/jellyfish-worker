@@ -68,8 +68,8 @@ const runExecutor = async (
 		{
 			replace: options.replace,
 			triggers: instance.getTriggers(),
-			subscriptions: instance.getSubscriptions(),
 			transformers: instance.getLatestTransformers(),
+			typeContracts: instance.getTypeContracts(),
 			timestamp: options.timestamp,
 			reason: options.reason,
 			context: instance.getActionContext(context),
@@ -210,9 +210,9 @@ export class Worker {
 	consumer: QueueConsumer;
 	producer: QueueProducer;
 	triggers: WorkerTriggerObjectInput[];
-	subscriptions: core.Contract[];
 	transformers: core.Contract[];
 	latestTransformers: core.Contract[];
+	typeContracts: { [key: string]: core.TypeContract };
 	errors: typeof errors;
 	session: string;
 	// TS-TODO: type these correctly
@@ -271,9 +271,9 @@ export class Worker {
 	) {
 		this.jellyfish = jellyfish;
 		this.triggers = [];
-		this.subscriptions = [];
 		this.transformers = [];
 		this.latestTransformers = [];
+		this.typeContracts = {};
 		this.errors = errors;
 		this.session = session;
 		this.library = actionLibrary;
@@ -662,6 +662,45 @@ export class Worker {
 	}
 
 	/**
+	 * @summary Set type contracts
+	 * @function
+	 * @public
+	 *
+	 * @param {Object} context - execution context
+	 * @param {Object[]} typeContracts - type contracts
+	 *
+	 * @example
+	 * const worker = new Worker({ ... })
+	 * worker.setTypeContracts([ ... ])
+	 */
+	setTypeContracts(context: LogContext, typeContracts: core.TypeContract[]) {
+		logger.info(context, 'Setting type contracts', {
+			count: typeContracts.length,
+		});
+
+		this.typeContracts = typeContracts.reduce((map, typeContract) => {
+			map[`${typeContract.slug}@${typeContract.version}`] = typeContract;
+			return map;
+		}, {});
+	}
+
+	/**
+	 * @summary Get type contracts
+	 * @function
+	 * @public
+	 *
+	 * @returns {Object} type contract map
+	 *
+	 * @example
+	 * const worker = new Worker({ ... })
+	 * const typeContracts = worker.getTypeContracts()
+	 * console.log(typeContracts.length)
+	 */
+	getTypeContracts() {
+		return this.typeContracts;
+	}
+
+	/**
 	 * @summary Upsert a single registered transformer
 	 * @function
 	 * @public
@@ -726,91 +765,6 @@ export class Worker {
 	 */
 	getLatestTransformers() {
 		return this.latestTransformers;
-	}
-
-	/**
-	 * @summary Set all registered subscriptions
-	 * @function
-	 * @public
-	 *
-	 * @param {Object} context - execution context
-	 * @param {Object[]} subscriptions - subscriptions
-	 *
-	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.setSubscriptions([ ... ])
-	 */
-	setSubscriptions(context: LogContext, subscriptions: core.Contract[]) {
-		logger.info(context, 'Setting subscriptions', {
-			count: subscriptions.length,
-		});
-
-		this.subscriptions = subscriptions;
-	}
-
-	/**
-	 * @summary Upsert a single registered subscription
-	 * @function
-	 * @public
-	 * @param {Object} context - execution context
-	 * @param {Object} subscription - subscription card
-	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.upsertSubscription({ ... })
-	 */
-	upsertSubscription(context: LogContext, subscription: core.Contract) {
-		logger.info(context, 'Upserting subscription', {
-			slug: subscription.slug,
-		});
-
-		// Find the index of an existing subscription with the same id
-		const existingSubscriptionIndex = _.findIndex(this.subscriptions, {
-			id: subscription.id,
-		});
-
-		if (existingSubscriptionIndex === -1) {
-			// If an existing subscription is not found, add the subscription
-			this.subscriptions.push(subscription);
-		} else {
-			// If an existing subscription is found, replace it
-			this.subscriptions.splice(existingSubscriptionIndex, 1, subscription);
-		}
-	}
-
-	/**
-	 * @summary Remove a single registered subscription
-	 * @function
-	 * @public
-	 * @param {Object} context - execution context
-	 * @param {Object} id - id of subscription card
-	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.removeSubscription('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
-	 */
-	removeSubscription(context: core.Contract, id: string) {
-		logger.info(context, 'Removing subscription', {
-			id,
-		});
-
-		this.subscriptions = _.reject(this.subscriptions, {
-			id,
-		});
-	}
-
-	/**
-	 * @summary Get all registered subscriptions
-	 * @function
-	 * @public
-	 *
-	 * @returns {Object[]} subscriptions
-	 *
-	 * @example
-	 * const worker = new Worker({ ... })
-	 * const subscriptions = worker.getSubscriptions()
-	 * console.log(subscriptions.length)
-	 */
-	getSubscriptions() {
-		return this.subscriptions;
 	}
 
 	/**

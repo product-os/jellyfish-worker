@@ -92,11 +92,11 @@ export interface JellyfishKernel {
 		patch: Operation[],
 	): Promise<TContract>;
 
-	replaceCard(
+	replaceCard<TContract extends core.Contract = core.Contract>(
 		context: LogContext,
 		session: string,
-		contract: core.ContractDefinition,
-	): Promise<core.Contract>;
+		contract: core.ContractDefinition<TContract['data']>,
+	): Promise<TContract>;
 
 	insertCard(
 		context: LogContext,
@@ -104,9 +104,9 @@ export interface JellyfishKernel {
 		contract: core.ContractDefinition,
 	): Promise<core.Contract>;
 
-	defaults(
-		partialContract: Partial<core.Contract> & Pick<core.Contract, 'type'>,
-	): core.ContractDefinition;
+	defaults<TContract extends core.Contract = core.Contract>(
+		partialContract: Partial<TContract> & Pick<TContract, 'type'>,
+	): core.ContractDefinition<TContract['data']>;
 
 	query<TContract extends core.Contract = core.Contract>(
 		context: LogContext,

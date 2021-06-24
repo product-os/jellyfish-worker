@@ -141,7 +141,7 @@ export const getActorKey = async (
 	actorId: string,
 ) => {
 	const keySlug = `session-action-${actorId}`;
-	const key = await jellyfish.getCardBySlug(
+	const key = await jellyfish.getCardBySlug<core.SessionContract>(
 		context,
 		session,
 		`${keySlug}@1.0.0`,
@@ -156,10 +156,10 @@ export const getActorKey = async (
 		actor: actorId,
 	});
 
-	return jellyfish.replaceCard(
+	return jellyfish.replaceCard<core.SessionContract>(
 		context,
 		session,
-		jellyfish.defaults({
+		jellyfish.defaults<core.SessionContract>({
 			slug: keySlug,
 			version: '1.0.0',
 			type: 'session@1.0.0',

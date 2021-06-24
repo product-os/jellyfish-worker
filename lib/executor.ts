@@ -12,11 +12,11 @@ import * as fastEquals from 'fast-equals';
 import * as utils from './utils';
 import * as errors from './errors';
 import * as transformers from './transformers';
+import * as subscriptions from './subscriptions';
 import * as triggers from './triggers';
 import * as assert from '@balena/jellyfish-assert';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
-import { v4 as uuidv4 } from 'uuid';
 import { Operation } from 'fast-json-patch';
 import {
 	LogContext,
@@ -95,6 +95,7 @@ const commit = async (
 	current: core.Contract | null,
 	options: {
 		transformers: any;
+		typeContracts: { [key: string]: core.TypeContract };
 		context: { privilegedSession: string };
 		executeAction: (arg0: any, arg1: EnqueueOptions) => any;
 		waitResults: (arg0: LogContext, arg1: any) => any;
@@ -185,181 +186,68 @@ const commit = async (
 		});
 	}
 
-	if (options.subscriptions) {
-		Bluebird.map(options.subscriptions, async (subscription) => {
-			try {
-				// TS-TODO: update the links type definition to be an array of contracts
-				const view = _.find(
-					subscription.links!['is attached to'] as core.ViewContract[],
-					{
-						type: 'view@1.0.0',
-					},
-				);
-
-				if (!view) {
-					return;
-				}
-
-				const createCard = _.find(
-					subscription.links![
-						'has attached element'
-					] as worker.CreateContract[],
-					{
-						type: 'create@1.0.0',
-					},
-				);
-
-				if (!createCard) {
-					return;
-				}
-
-				assert.INTERNAL(
-					context,
-					createCard && createCard.data && createCard.data.actor,
-					errors.WorkerNoElement,
-					`Subscription (${subscription.slug}) should have attached create event`,
-				);
-
-				const creatorSession = await utils.getActorKey(
+	subscriptions
+		.evaluate({
+			oldContract: current,
+			newContract: insertedCard,
+			getTypeContract: (type) => {
+				return options.typeContracts[type];
+			},
+			getSession: async (userId: string) => {
+				return utils.getActorKey(
 					context,
 					jellyfish,
-					session,
-					createCard.data.actor,
+					options.context.privilegedSession,
+					userId,
 				);
-
-				// TODO: Improve this gaurd
-				if (!view.data.allOf || !view.data.allOf.length) {
-					return;
-				}
-
-				const targetContract = await jellyfish.getCardById(
-					context,
-					creatorSession.id,
-					insertedCard.id,
-				);
-
-				if (!targetContract) {
-					return;
-				}
-
-				/*
-				 * Retrieve the card using the subscription creators permissions and
-				 * check if it matches the view schema
-				 */
-				const filteredCard = await triggers.matchesCard(
+			},
+			insertContract: async (
+				insertedContractType: core.TypeContract,
+				actorSession: string,
+				object: any,
+			) => {
+				return insertCard(
 					context,
 					jellyfish,
-					creatorSession.id,
-					view.data.allOf[0].schema,
-					targetContract,
-				);
-
-				if (!filteredCard) {
-					return;
-				}
-
-				const notificationTypeCard =
-					await jellyfish.getCardBySlug<core.TypeContract>(
-						context,
-						session,
-						'notification@1.0.0',
-					);
-
-				if (!notificationTypeCard) {
-					return;
-				}
-
-				const notification = await insertCard(
-					context,
-					jellyfish,
-					creatorSession.id,
-					notificationTypeCard,
+					actorSession,
+					insertedContractType,
 					{
 						...options,
 						attachEvents: true,
 						timestamp: Date.now(),
 						replace: false,
 					},
-					{
-						version: '1.0.0',
-						type: 'notification@1.0.0',
-						slug: `notification-${uuidv4()}`,
-						tags: [],
-						links: {},
-						requires: [],
-						capabilities: [],
-						active: true,
-					},
+					object,
 				);
-
-				const linkTypeContract =
-					await jellyfish.getCardBySlug<core.TypeContract>(
-						context,
-						session,
-						'link@1.0.0',
-					);
-
-				if (!linkTypeContract) {
-					return;
-				}
-
-				await insertCard(
+			},
+			query: (querySchema, queryOpts = {}) => {
+				return jellyfish.query(
 					context,
-					jellyfish,
-					creatorSession.id,
-					linkTypeContract,
-					{
-						...options,
-						attachEvents: true,
-						timestamp: Date.now(),
-						replace: false,
-					},
-					{
-						version: '1.0.0',
-						type: 'link@1.0.0',
-						slug: `link-${filteredCard.id}-has-attached-${
-							// TS-TODO: assert notification exists
-							notification!.id
-						}-${uuidv4()}`,
-						tags: [],
-						links: {},
-						requires: [],
-						capabilities: [],
-						active: true,
-						name: 'has attached',
-						data: {
-							inverseName: 'is attached to',
-							from: {
-								id: filteredCard.id,
-								type: filteredCard.type,
-							},
-							to: {
-								// TS-TODO: assert notification exists
-								id: notification!.id,
-								type: notification!.type,
-							},
-						},
-					},
+					options.context.privilegedSession,
+					querySchema,
+					queryOpts,
 				);
-			} catch (error) {
-				const errorObject = errio.toObject(error, {
-					stack: true,
-				});
+			},
+			getContractById: (id: string) => {
+				return jellyfish.getCardById(context, session, id);
+			},
+		})
+		.catch((error) => {
+			const errorObject = errio.toObject(error, {
+				stack: true,
+			});
 
-				const logData = {
-					error: errorObject,
-					input: insertedCard.slug,
-					subscription: subscription.slug,
-				};
+			const logData = {
+				error: errorObject,
+				input: insertedCard.slug,
+			};
 
-				if (error.expected) {
-					logger.warn(context, 'Execute error in subscription', logData);
-				} else {
-					logger.error(context, 'Execute error', logData);
-				}
+			if (error.expected) {
+				logger.warn(context, 'Execute error in subscriptions', logData);
+			} else {
+				logger.error(context, 'Execute error', logData);
 			}
 		});
-	}
 
 	if (options.triggers) {
 		const runTrigger = async (trigger: {
