@@ -6,7 +6,8 @@
 
 import { Worker } from './index';
 import { core } from '@balena/jellyfish-types';
-import { QueueConsumer, QueueProducer, JellyfishKernel } from './types';
+import { QueueConsumer, QueueProducer } from './types';
+import { Kernel } from '@balena/jellyfish-core/build/kernel';
 
 describe('Worker.updateCurrentTransformers()', () => {
 	test('should generate properly filtered list of transformers', async () => {
@@ -40,7 +41,7 @@ describe('Worker.updateCurrentTransformers()', () => {
 
 		// TS-TODO: is there a better way to instantiate a simple Worker?
 		const worker = new Worker(
-			{} as any as JellyfishKernel,
+			{} as any as Kernel,
 			'session-foo',
 			{},
 			{} as any as QueueConsumer,

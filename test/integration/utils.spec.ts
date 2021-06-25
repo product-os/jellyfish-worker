@@ -5,17 +5,17 @@
  */
 
 import * as helpers from './helpers';
-import * as utils from '../../../lib/utils';
+import * as utils from '../../lib/utils';
 import { v4 as uuidv4 } from 'uuid';
 
-let context: any;
+let context: helpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	context = await helpers.jellyfish.before();
+	context = await helpers.before();
 });
 
 afterAll(() => {
-	return helpers.jellyfish.after(context);
+	return helpers.after(context);
 });
 
 describe('.hasCard()', () => {

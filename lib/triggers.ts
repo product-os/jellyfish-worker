@@ -10,8 +10,10 @@ import * as assert from '@balena/jellyfish-assert';
 import { JSONSchema, core, worker } from '@balena/jellyfish-types';
 import * as errors from './errors';
 import * as utils from './utils';
-import { LogContext, JellyfishKernel } from './types';
+import { LogContext } from './types';
 import jsone = require('json-e');
+import { Kernel } from '@balena/jellyfish-core/build/kernel';
+import { Contract } from '@balena/jellyfish-types/build/core';
 
 interface CompileContext {
 	timestamp: string;
@@ -33,11 +35,11 @@ interface GetRequestOptions {
 
 export const matchesCard = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	filter: JSONSchema,
 	card: core.Contract | null,
-) => {
+): Promise<Contract | false | void> => {
 	if (!card) {
 		return false;
 	}
@@ -221,7 +223,7 @@ const compileTrigger = (
  * console.log(request.card)
  */
 export const getRequest = async (
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	trigger: {
 		filter?: any;
 		mode?: any;
@@ -297,7 +299,7 @@ export const getRequest = async (
  */
 export const getTypeTriggers = async (
 	context: LogContext,
-	jellyfish: JellyfishKernel,
+	jellyfish: Kernel,
 	session: string,
 	type: string,
 ): Promise<worker.TriggeredActionContract[]> => {

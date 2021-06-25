@@ -13,13 +13,13 @@ import * as assert from '@balena/jellyfish-assert';
 import { getLogger } from '@balena/jellyfish-logger';
 import * as semver from 'semver';
 import {
-	JellyfishKernel,
 	LogContext,
 	ParsedWorkerTriggerObject,
 	ProducerOptions,
 	QueueConsumer,
 	QueueProducer,
 	WorkerTriggerObjectInput,
+	WorkerContext,
 } from './types';
 import { core } from '@balena/jellyfish-types';
 import * as errors from './errors';
@@ -27,6 +27,7 @@ import * as executor from './executor';
 import * as utils from './utils';
 import * as triggers from './triggers';
 import CARDS from './cards';
+import { Kernel } from '@balena/jellyfish-core/build/kernel';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
@@ -206,7 +207,7 @@ const parseTrigger = (
 };
 
 export class Worker {
-	jellyfish: JellyfishKernel;
+	jellyfish: Kernel;
 	consumer: QueueConsumer;
 	producer: QueueProducer;
 	triggers: WorkerTriggerObjectInput[];
@@ -262,7 +263,7 @@ export class Worker {
 	 */
 	// FIXME worker violates single responsibility principle in that it both handles events and produces tick events
 	constructor(
-		jellyfish: JellyfishKernel,
+		jellyfish: Kernel,
 		session: string,
 		// TS-TODO: type the action library
 		actionLibrary: { [key: string]: any },
@@ -330,7 +331,7 @@ export class Worker {
 	 * @example
 	 * const actionContext = worker.getActionContext({ ... })
 	 */
-	getActionContext(context: LogContext) {
+	getActionContext(context: LogContext): WorkerContext {
 		const self = this;
 		return {
 			errors,
@@ -345,8 +346,8 @@ export class Worker {
 			},
 			query: (
 				lsession: string,
-				schema: Parameters<JellyfishKernel['query']>[2],
-				options: Parameters<JellyfishKernel['query']>[3],
+				schema: Parameters<Kernel['query']>[2],
+				options: Parameters<Kernel['query']>[3],
 			) => {
 				return self.jellyfish.query(context, lsession, schema, options);
 			},
@@ -456,7 +457,7 @@ export class Worker {
 			timestamp: any;
 			reason: any;
 			actor: any;
-			originator: any;
+			originator?: any;
 			attachEvents: any;
 		},
 		card: Partial<core.Contract>,
@@ -503,7 +504,7 @@ export class Worker {
 			timestamp: any;
 			reason: any;
 			actor: any;
-			originator: any;
+			originator?: any;
 			attachEvents: any;
 		},
 		card: Partial<core.Contract<core.ContractData>>,
@@ -884,6 +885,7 @@ export class Worker {
 					timestamp: request.data.timestamp,
 					arguments: request.data.arguments,
 					epoch: request.data.epoch,
+					originator: request.data.originator,
 				},
 			)
 			.then((data) => {
@@ -986,7 +988,7 @@ export class Worker {
 		context: LogContext,
 		session: string,
 		// TS-TODO: Correctly type the options here
-		options: { currentDate: number },
+		options: { currentDate: number | Date },
 	) {
 		const currentTriggers = this.getTriggers();
 

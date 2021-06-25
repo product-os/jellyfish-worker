@@ -3,8 +3,71 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  */
-import { JSONSchema, core, worker, queue } from '@balena/jellyfish-types';
+import { Kernel } from '@balena/jellyfish-core/build/kernel';
+import { core, worker, queue } from '@balena/jellyfish-types';
+import {
+	Contract,
+	ContractData,
+	ContractDefinition,
+} from '@balena/jellyfish-types/build/core';
 import { Operation } from 'fast-json-patch';
+import * as errors from './errors';
+import * as utils from './utils';
+
+export interface WorkerContext {
+	errors: typeof errors;
+	defaults: Kernel['defaults'];
+	sync: any;
+	getEventSlug: typeof utils.getEventSlug;
+	getCardById: (lsession: string, id: string) => Promise<Contract | null>;
+	getCardBySlug: (lsession: string, slug: string) => Promise<Contract | null>;
+	query: (
+		lsession: string,
+		schema: Parameters<Kernel['query']>[2],
+		options: Parameters<Kernel['query']>[3],
+	) => Promise<Contract[]>;
+	privilegedSession: string;
+	insertCard: (
+		lsession: string,
+		typeCard: core.TypeContract,
+		options: {
+			timestamp: any;
+			reason: any;
+			actor: any;
+			originator?: any;
+			attachEvents: any;
+		},
+		card: Partial<Contract>,
+	) => Promise<Contract | null>;
+	replaceCard: (
+		lsession: string,
+		typeCard: core.TypeContract,
+		options: {
+			timestamp: any;
+			reason: any;
+			actor: any;
+			originator?: any;
+			attachEvents: any;
+		},
+		card: Partial<Contract>,
+	) => Promise<Contract | null>;
+	patchCard: (
+		lsession: string,
+		typeCard: core.TypeContract,
+		options: {
+			timestamp: any;
+			reason: any;
+			actor: any;
+			originator?: any;
+			attachEvents: any;
+		},
+		card: Partial<Contract>,
+		patch: Operation[],
+	) => Promise<Contract | null>;
+	cards: {
+		[slug: string]: ContractDefinition<ContractData>;
+	};
+}
 
 // TODO: just handle trigger contracts directly, as having 3 different structs for triggered-actions is super confusing
 // These objects are initially generated in the action server bootstrap code here https://github.com/product-os/jellyfish/blob/de4b77283d78403c861b4d966027cb71e71a8bac/apps/action-server/lib/bootstrap.js#L47
@@ -71,54 +134,6 @@ export interface QueueWaitResult {
 	};
 }
 
-export interface JellyfishKernel {
-	cards: { [slug: string]: core.Contract };
-	getCardById<TContract extends core.Contract = core.Contract>(
-		context: LogContext,
-		session: string,
-		id: string,
-	): Promise<TContract | null>;
-
-	getCardBySlug<TContract = core.Contract>(
-		context: LogContext,
-		session: string,
-		slug: string,
-	): Promise<TContract | null>;
-
-	patchCardBySlug<TContract extends core.Contract = core.Contract>(
-		context: LogContext,
-		session: string,
-		slug: string,
-		patch: Operation[],
-	): Promise<TContract>;
-
-	replaceCard<TContract extends core.Contract = core.Contract>(
-		context: LogContext,
-		session: string,
-		contract: core.ContractDefinition<TContract['data']>,
-	): Promise<TContract>;
-
-	insertCard(
-		context: LogContext,
-		session: string,
-		contract: core.ContractDefinition,
-	): Promise<core.Contract>;
-
-	defaults<TContract extends core.Contract = core.Contract>(
-		partialContract: Partial<TContract> & Pick<TContract, 'type'>,
-	): core.ContractDefinition<TContract['data']>;
-
-	query<TContract extends core.Contract = core.Contract>(
-		context: LogContext,
-		session: string,
-		schema: JSONSchema,
-		options?: {
-			limit?: number;
-			sortBy?: string[] | string;
-			sortDir?: 'asc' | 'desc';
-		},
-	): Promise<TContract[]>;
-}
 export interface ActionPayload {
 	slug: string;
 	data: {

@@ -6,21 +6,20 @@
 
 import * as helpers from './helpers';
 
-let context: any;
+let context: helpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	context = await helpers.worker.before();
+	context = await helpers.before();
 });
 
 afterAll(() => {
-	return helpers.worker.after(context);
+	return helpers.after(context);
 });
 
 describe('.setTriggers()', () => {
 	it('should be able to set a trigger with a start date', () => {
 		context.worker.setTriggers(context.context, [
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -39,7 +38,6 @@ describe('.setTriggers()', () => {
 
 		expect(triggers).toEqual([
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -58,7 +56,6 @@ describe('.setTriggers()', () => {
 	it('should be able to set a trigger with an interval', () => {
 		context.worker.setTriggers(context.context, [
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -74,7 +71,6 @@ describe('.setTriggers()', () => {
 
 		expect(triggers).toEqual([
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -90,7 +86,6 @@ describe('.setTriggers()', () => {
 	it('should be able to set triggers', () => {
 		context.worker.setTriggers(context.context, [
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -103,12 +98,10 @@ describe('.setTriggers()', () => {
 				},
 			},
 			{
-				schedule: 'async',
 				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 				slug: 'triggered-action-foo-baz',
 				action: 'action-foo-bar@1.0.0',
 				target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-				type: 'card@1.0.0',
 				filter: {
 					type: 'object',
 				},
@@ -122,7 +115,6 @@ describe('.setTriggers()', () => {
 
 		expect(triggers).toEqual([
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -135,7 +127,6 @@ describe('.setTriggers()', () => {
 				},
 			},
 			{
-				schedule: 'async',
 				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 				slug: 'triggered-action-foo-baz',
 				action: 'action-foo-bar@1.0.0',
@@ -153,7 +144,6 @@ describe('.setTriggers()', () => {
 	it('should not store extra properties', () => {
 		context.worker.setTriggers(context.context, [
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				foo: 'bar',
@@ -166,14 +156,13 @@ describe('.setTriggers()', () => {
 				arguments: {
 					foo: 'bar',
 				},
-			},
+			} as any,
 		]);
 
 		const triggers = context.worker.getTriggers();
 
 		expect(triggers).toEqual([
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -191,7 +180,6 @@ describe('.setTriggers()', () => {
 	it('should store a mode', () => {
 		context.worker.setTriggers(context.context, [
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				mode: 'update',
@@ -210,7 +198,6 @@ describe('.setTriggers()', () => {
 
 		expect(triggers).toEqual([
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -230,7 +217,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
@@ -248,7 +234,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					action: 'action-foo-bar@1.0.0',
@@ -269,7 +254,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
@@ -291,7 +275,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 					slug: 'triggered-action-foo-bar',
 					action: 'action-create-card@1.0.0',
@@ -302,7 +285,7 @@ describe('.setTriggers()', () => {
 						reason: null,
 						foo: 'bar',
 					},
-				},
+				} as any,
 			]);
 		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
 	});
@@ -311,7 +294,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 					action: 'action-create-card@1.0.0',
@@ -322,7 +304,7 @@ describe('.setTriggers()', () => {
 						reason: null,
 						foo: 'bar',
 					},
-				},
+				} as any,
 			]);
 		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
 	});
@@ -331,7 +313,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 999,
 					slug: 'triggered-action-foo-bar',
 					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
@@ -343,7 +324,7 @@ describe('.setTriggers()', () => {
 						reason: null,
 						foo: 'bar',
 					},
-				},
+				} as any,
 			]);
 		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
 	});
@@ -352,7 +333,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
@@ -371,7 +351,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
@@ -381,7 +360,7 @@ describe('.setTriggers()', () => {
 					arguments: {
 						foo: 'bar',
 					},
-				},
+				} as any,
 			]);
 		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
 	});
@@ -390,7 +369,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					action: 1,
@@ -410,7 +388,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					action: 'action-create-card@1.0.0',
@@ -421,7 +398,7 @@ describe('.setTriggers()', () => {
 						reason: null,
 						foo: 'bar',
 					},
-				},
+				} as any,
 			]);
 		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
 	});
@@ -430,7 +407,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					action: 'action-create-card@1.0.0',
@@ -451,7 +427,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					action: 'action-create-card@1.0.0',
@@ -469,7 +444,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					action: 'action-create-card@1.0.0',
@@ -488,7 +462,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					action: 'action-create-card@1.0.0',
@@ -496,7 +469,7 @@ describe('.setTriggers()', () => {
 					filter: {
 						type: 'object',
 					},
-				},
+				} as any,
 			]);
 		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
 	});
@@ -505,7 +478,6 @@ describe('.setTriggers()', () => {
 		expect(() => {
 			context.worker.setTriggers(context.context, [
 				{
-					schedule: 'async',
 					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 					slug: 'triggered-action-foo-bar',
 					action: 'action-create-card@1.0.0',
@@ -524,7 +496,6 @@ describe('.upsertTrigger()', () => {
 	it('should be able to add a trigger', () => {
 		context.worker.setTriggers(context.context, [
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -539,12 +510,10 @@ describe('.upsertTrigger()', () => {
 		]);
 
 		context.worker.upsertTrigger(context.context, {
-			schedule: 'async',
 			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 			slug: 'triggered-action-foo-baz',
 			action: 'action-foo-bar@1.0.0',
 			target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-			type: 'card@1.0.0',
 			filter: {
 				type: 'object',
 			},
@@ -557,7 +526,6 @@ describe('.upsertTrigger()', () => {
 
 		expect(triggers).toEqual([
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -570,7 +538,6 @@ describe('.upsertTrigger()', () => {
 				},
 			},
 			{
-				schedule: 'async',
 				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 				slug: 'triggered-action-foo-baz',
 				action: 'action-foo-bar@1.0.0',
@@ -588,7 +555,6 @@ describe('.upsertTrigger()', () => {
 	it('should be able to modify an existing trigger', () => {
 		context.worker.setTriggers(context.context, [
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -601,12 +567,10 @@ describe('.upsertTrigger()', () => {
 				},
 			},
 			{
-				schedule: 'async',
 				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 				slug: 'triggered-action-foo-baz',
 				action: 'action-foo-bar@1.0.0',
 				target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-				type: 'card@1.0.0',
 				filter: {
 					type: 'object',
 				},
@@ -617,12 +581,10 @@ describe('.upsertTrigger()', () => {
 		]);
 
 		context.worker.upsertTrigger(context.context, {
-			schedule: 'async',
 			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 			slug: 'triggered-action-foo-baz',
 			action: 'action-foo-bar@1.0.0',
 			target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-			type: 'card@1.0.0',
 			filter: {
 				type: 'object',
 			},
@@ -635,7 +597,6 @@ describe('.upsertTrigger()', () => {
 
 		expect(triggers).toEqual([
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -648,7 +609,6 @@ describe('.upsertTrigger()', () => {
 				},
 			},
 			{
-				schedule: 'async',
 				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 				slug: 'triggered-action-foo-baz',
 				action: 'action-foo-bar@1.0.0',
@@ -668,7 +628,6 @@ describe('.removeTrigger()', () => {
 	it('should be able to remove an existing trigger', () => {
 		const cards = [
 			{
-				schedule: 'async',
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				action: 'action-foo-bar@1.0.0',
@@ -681,7 +640,6 @@ describe('.removeTrigger()', () => {
 				},
 			},
 			{
-				schedule: 'async',
 				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 				slug: 'triggered-action-foo-baz',
 				action: 'action-foo-bar@1.0.0',
