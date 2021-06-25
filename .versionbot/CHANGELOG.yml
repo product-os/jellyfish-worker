@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: da68aebd712306e697bb295c7488aa479818eaac
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 6.0.4
+  date: 2021-06-25T22:54:52.687Z
+- commits:
     - subject: Refactor test cases to make helpers more concise and improve typings
       hash: f6ab387c008b6bde635fded0c5b4c7f6b120d07f
       body: ''
