@@ -1,4 +1,17 @@
 - commits:
+    - subject: Refactor test cases to make helpers more concise and improve typings
+      hash: f6ab387c008b6bde635fded0c5b4c7f6b120d07f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 6.0.3
+  date: 2021-06-25T11:24:52.447Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.2.20'
       hash: f31c2791b5c898bd347a5e6e5b1fbf3264965fdb
       body: ''
