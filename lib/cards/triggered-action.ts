@@ -24,13 +24,6 @@ export default {
 				data: {
 					type: 'object',
 					properties: {
-						schedule: {
-							type: 'string',
-							description:
-								'Indicates whether the triggered action should be executed synchronously, asynchronously or enqueued',
-							enum: ['async', 'sync', 'enqueue'],
-							default: 'async',
-						},
 						mode: {
 							type: 'string',
 							enum: ['insert', 'update'],
