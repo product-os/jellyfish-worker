@@ -1,4 +1,27 @@
 - commits:
+    - subject: Bump node engines specification
+      hash: a5f8fdc0580498830b968a1ec7ce79f46cdd8dca
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Remove package-lock.json
+      hash: 62dbde25fd53ed00176ac8705d568aada54001c1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 7.0.4
+  date: 2021-06-29T23:49:12.769Z
+- commits:
     - subject: 'patch: Update external-major'
       hash: c2603cc668d8880464b0886cd940edd460c91f66
       body: ''
