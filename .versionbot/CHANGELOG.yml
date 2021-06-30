@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 0f3154c776365fc8dccbf42ffa24314c0052d9a2
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.5
+  date: 2021-06-30T03:37:12.139Z
+- commits:
     - subject: Bump node engines specification
       hash: a5f8fdc0580498830b968a1ec7ce79f46cdd8dca
       body: ''
