@@ -1,5 +1,16 @@
 - commits:
     - subject: 'patch: Update internal-patch'
+      hash: ad66e9e95e0df241476a1fc9d885a6a8c4137afb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.20
+  date: 2021-07-05T03:16:13.268Z
+- commits:
+    - subject: 'patch: Update internal-patch'
       hash: bb6dd6043b41cff432e47700ff6a55d199ac4028
       body: ''
       footer:
