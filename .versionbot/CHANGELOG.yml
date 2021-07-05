@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.3.9'
+      hash: 90757acfd13d408e03b68980f28cfa8136c1a0d0
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.22
+  date: 2021-07-05T08:42:39.484Z
+- commits:
     - subject: Increase jest timeout
       hash: 6cef1d7897bc460a2dd0fac4a56274c0cc4d31f2
       body: ''
