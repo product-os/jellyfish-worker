@@ -1,4 +1,36 @@
 - commits:
+    - subject: Increase jest timeout
+      hash: 6cef1d7897bc460a2dd0fac4a56274c0cc4d31f2
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+    - subject: Bump jellyfish dependencies
+      hash: 5117a39e42f79eb32c3c8b64126d25db67e06e71
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-action-library to v15'
+      hash: cee2135da201cc6eafc4e3bdb174e39f8a71e804
+      body: |
+        Update @balena/jellyfish-action-library from 14.0.7 to 15.0.1
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.21
+  date: 2021-07-05T03:37:52.892Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: ad66e9e95e0df241476a1fc9d885a6a8c4137afb
       body: ''
