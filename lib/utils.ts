@@ -148,7 +148,7 @@ export const getActorKey = async (
 		`${keySlug}@1.0.0`,
 	);
 
-	if (key && key.data.actor === actorId) {
+	if (key && key.active && key.data.actor === actorId) {
 		return key;
 	}
 
@@ -157,18 +157,15 @@ export const getActorKey = async (
 		actor: actorId,
 	});
 
-	return jellyfish.replaceCard<core.SessionContract>(
-		context,
-		session,
-		jellyfish.defaults<core.SessionContract>({
-			slug: keySlug,
-			version: '1.0.0',
-			type: 'session@1.0.0',
-			data: {
-				actor: actorId,
-			},
-		}),
-	);
+	return jellyfish.replaceCard<core.SessionContract>(context, session, {
+		slug: keySlug,
+		active: true,
+		version: '1.0.0',
+		type: 'session@1.0.0',
+		data: {
+			actor: actorId,
+		},
+	});
 };
 
 export const getQueryWithOptionalLinks = (
