@@ -1,4 +1,18 @@
 - commits:
+    - subject: Fix bug where worker would use inactive session tokens
+      hash: 0250cbac505328cdb9bc18baf9791023fd087c56
+      body: |
+        If an inactive session is found, reset it to active and continue.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 7.0.26
+  date: 2021-07-08T10:07:14.072Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.43'
       hash: 9a16fd0207c89919526d2b702bb6113d4374e733
       body: ''
