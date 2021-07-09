@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: c81a9aa394c346eef764973fa0fd9817b6810ccf
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.27
+  date: 2021-07-09T03:14:52.707Z
+- commits:
     - subject: Fix bug where worker would use inactive session tokens
       hash: 0250cbac505328cdb9bc18baf9791023fd087c56
       body: |
