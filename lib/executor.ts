@@ -816,6 +816,11 @@ export const run = async (
 		type: 'object',
 	});
 
+	logger.info(context, 'Got card to match against filter', {
+		actionInputCardFilter,
+		inputCard: cards.input,
+	});
+
 	assert.INTERNAL(
 		request.context,
 		// TS-TODO: Remove "any" casting
