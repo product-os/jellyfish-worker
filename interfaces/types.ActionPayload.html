@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>QueueWaitResult | @balena/jellyfish-worker</title>
+	<title>ActionPayload | @balena/jellyfish-worker</title>
 	<meta name="description" content="Documentation for @balena/jellyfish-worker">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -58,10 +58,10 @@
 					<a href="../modules/types.html">types</a>
 				</li>
 				<li>
-					<a href="types.queuewaitresult.html">QueueWaitResult</a>
+					<a href="types.ActionPayload.html">ActionPayload</a>
 				</li>
 			</ul>
-			<h1>Interface QueueWaitResult</h1>
+			<h1>Interface ActionPayload</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">QueueWaitResult</span>
+						<span class="target">ActionPayload</span>
 					</li>
 				</ul>
 			</section>
@@ -83,9 +83,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.queuewaitresult.html#data" class="tsd-kind-icon">data</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.queuewaitresult.html#error" class="tsd-kind-icon">error</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.queuewaitresult.html#timestamp" class="tsd-kind-icon">timestamp</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.ActionPayload.html#data" class="tsd-kind-icon">data</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.ActionPayload.html#slug" class="tsd-kind-icon">slug</a></li>
 							</ul>
 						</section>
 					</div>
@@ -96,47 +95,37 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="data" class="tsd-anchor"></a>
 					<h3>data</h3>
-					<div class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>slug<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>version<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
+					<div class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>action<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>actor<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>originator<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>timestamp<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/4ae2726/lib/types.ts#L127">lib/types.ts:127</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/505fb48/lib/types.ts#L137">lib/types.ts:137</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter">
-								<h5>id<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								<h5>action<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
 							</li>
 							<li class="tsd-parameter">
-								<h5>slug<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								<h5><span class="tsd-flag ts-flagOptional">Optional</span> actor<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5>
 							</li>
 							<li class="tsd-parameter">
-								<h5>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								<h5>originator<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
 							</li>
 							<li class="tsd-parameter">
-								<h5>version<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								<h5>timestamp<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
 							</li>
 						</ul>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="error" class="tsd-anchor"></a>
-					<h3>error</h3>
-					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span></div>
+					<a name="slug" class="tsd-anchor"></a>
+					<h3>slug</h3>
+					<div class="tsd-signature tsd-kind-icon">slug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/4ae2726/lib/types.ts#L125">lib/types.ts:125</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="timestamp" class="tsd-anchor"></a>
-					<h3>timestamp</h3>
-					<div class="tsd-signature tsd-kind-icon">timestamp<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/4ae2726/lib/types.ts#L126">lib/types.ts:126</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/505fb48/lib/types.ts#L136">lib/types.ts:136</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -188,62 +177,59 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.actionpayload.html" class="tsd-kind-icon">Action<wbr>Payload</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.enqueueoptions.html" class="tsd-kind-icon">Enqueue<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.logcontext.html" class="tsd-kind-icon">Log<wbr>Context</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.parsedworkertriggerobject.html" class="tsd-kind-icon">Parsed<wbr>Worker<wbr>Trigger<wbr>Object</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.postoptions.html" class="tsd-kind-icon">Post<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.postresults.html" class="tsd-kind-icon">Post<wbr>Results</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.produceroptions.html" class="tsd-kind-icon">Producer<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.producerresults.html" class="tsd-kind-icon">Producer<wbr>Results</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.queueconsumer.html" class="tsd-kind-icon">Queue<wbr>Consumer</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.queueproducer.html" class="tsd-kind-icon">Queue<wbr>Producer</a>
-					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.queuewaitresult.html" class="tsd-kind-icon">Queue<wbr>Wait<wbr>Result</a>
+						<a href="types.ActionPayload.html" class="tsd-kind-icon">Action<wbr>Payload</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="types.queuewaitresult.html#data" class="tsd-kind-icon">data</a>
+								<a href="types.ActionPayload.html#data" class="tsd-kind-icon">data</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="types.queuewaitresult.html#error" class="tsd-kind-icon">error</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="types.queuewaitresult.html#timestamp" class="tsd-kind-icon">timestamp</a>
+								<a href="types.ActionPayload.html#slug" class="tsd-kind-icon">slug</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.workercontext.html" class="tsd-kind-icon">Worker<wbr>Context</a>
+						<a href="types.EnqueueOptions.html" class="tsd-kind-icon">Enqueue<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.workertriggerobjectinput.html" class="tsd-kind-icon">Worker<wbr>Trigger<wbr>Object<wbr>Input</a>
+						<a href="types.LogContext.html" class="tsd-kind-icon">Log<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.ParsedWorkerTriggerObject.html" class="tsd-kind-icon">Parsed<wbr>Worker<wbr>Trigger<wbr>Object</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.PostOptions.html" class="tsd-kind-icon">Post<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.PostResults.html" class="tsd-kind-icon">Post<wbr>Results</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.ProducerOptions.html" class="tsd-kind-icon">Producer<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.ProducerResults.html" class="tsd-kind-icon">Producer<wbr>Results</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.QueueConsumer.html" class="tsd-kind-icon">Queue<wbr>Consumer</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.QueueProducer.html" class="tsd-kind-icon">Queue<wbr>Producer</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.QueueWaitResult.html" class="tsd-kind-icon">Queue<wbr>Wait<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.WorkerContext.html" class="tsd-kind-icon">Worker<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="types.WorkerTriggerObjectInput.html" class="tsd-kind-icon">Worker<wbr>Trigger<wbr>Object<wbr>Input</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/types.html#onmessageeventhandler" class="tsd-kind-icon">On<wbr>Message<wbr>Event<wbr>Handler</a>
+						<a href="../modules/types.html#OnMessageEventHandler" class="tsd-kind-icon">On<wbr>Message<wbr>Event<wbr>Handler</a>
 					</li>
 				</ul>
 			</nav>

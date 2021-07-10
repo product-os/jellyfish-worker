@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ActionPayload | @balena/jellyfish-worker</title>
+	<title>TransformerData | @balena/jellyfish-worker</title>
 	<meta name="description" content="Documentation for @balena/jellyfish-worker">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,13 +55,13 @@
 					<a href="../modules.html">@balena/jellyfish-worker</a>
 				</li>
 				<li>
-					<a href="../modules/types.html">types</a>
+					<a href="../modules/transformers.html">transformers</a>
 				</li>
 				<li>
-					<a href="types.actionpayload.html">ActionPayload</a>
+					<a href="transformers.TransformerData.html">TransformerData</a>
 				</li>
 			</ul>
-			<h1>Interface ActionPayload</h1>
+			<h1>Interface TransformerData</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">ActionPayload</span>
+						<span class="target">TransformerData</span>
 					</li>
 				</ul>
 			</section>
@@ -83,8 +83,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.actionpayload.html#data" class="tsd-kind-icon">data</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="types.actionpayload.html#slug" class="tsd-kind-icon">slug</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="transformers.TransformerData.html#inputFilter" class="tsd-kind-icon">input<wbr>Filter</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="transformers.TransformerData.html#workerFilter" class="tsd-kind-icon">worker<wbr>Filter</a></li>
 							</ul>
 						</section>
 					</div>
@@ -93,39 +93,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="data" class="tsd-anchor"></a>
-					<h3>data</h3>
-					<div class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>action<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>actor<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>originator<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>timestamp<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></div>
+					<a name="inputFilter" class="tsd-anchor"></a>
+					<h3>input<wbr>Filter</h3>
+					<div class="tsd-signature tsd-kind-icon">input<wbr>Filter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/4ae2726/lib/types.ts#L137">lib/types.ts:137</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/505fb48/lib/transformers.ts#L33">lib/transformers.ts:33</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5>action<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> actor<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5>originator<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5>timestamp<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-							</li>
-						</ul>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="slug" class="tsd-anchor"></a>
-					<h3>slug</h3>
-					<div class="tsd-signature tsd-kind-icon">slug<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="workerFilter" class="tsd-anchor"></a>
+					<h3>worker<wbr>Filter</h3>
+					<div class="tsd-signature tsd-kind-icon">worker<wbr>Filter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/4ae2726/lib/types.ts#L136">lib/types.ts:136</a></li>
+							<li>Defined in <a href="https://github.com/product-os/jellyfish-worker/blob/505fb48/lib/transformers.ts#L34">lib/transformers.ts:34</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -161,13 +144,13 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/subscriptions.html">subscriptions</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="../modules/transformers.html">transformers</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/triggers.html">triggers</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="../modules/types.html">types</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -177,59 +160,26 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="transformers.EvaluateOptions.html" class="tsd-kind-icon">Evaluate<wbr>Options</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.actionpayload.html" class="tsd-kind-icon">Action<wbr>Payload</a>
+						<a href="transformers.TransformerData.html" class="tsd-kind-icon">Transformer<wbr>Data</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="types.actionpayload.html#data" class="tsd-kind-icon">data</a>
+								<a href="transformers.TransformerData.html#inputFilter" class="tsd-kind-icon">input<wbr>Filter</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="types.actionpayload.html#slug" class="tsd-kind-icon">slug</a>
+								<a href="transformers.TransformerData.html#workerFilter" class="tsd-kind-icon">worker<wbr>Filter</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.enqueueoptions.html" class="tsd-kind-icon">Enqueue<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.logcontext.html" class="tsd-kind-icon">Log<wbr>Context</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.parsedworkertriggerobject.html" class="tsd-kind-icon">Parsed<wbr>Worker<wbr>Trigger<wbr>Object</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.postoptions.html" class="tsd-kind-icon">Post<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.postresults.html" class="tsd-kind-icon">Post<wbr>Results</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.produceroptions.html" class="tsd-kind-icon">Producer<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.producerresults.html" class="tsd-kind-icon">Producer<wbr>Results</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.queueconsumer.html" class="tsd-kind-icon">Queue<wbr>Consumer</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.queueproducer.html" class="tsd-kind-icon">Queue<wbr>Producer</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.queuewaitresult.html" class="tsd-kind-icon">Queue<wbr>Wait<wbr>Result</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.workercontext.html" class="tsd-kind-icon">Worker<wbr>Context</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="types.workertriggerobjectinput.html" class="tsd-kind-icon">Worker<wbr>Trigger<wbr>Object<wbr>Input</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
-						<a href="../modules/types.html#onmessageeventhandler" class="tsd-kind-icon">On<wbr>Message<wbr>Event<wbr>Handler</a>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/transformers.html#evaluate" class="tsd-kind-icon">evaluate</a>
 					</li>
 				</ul>
 			</nav>
