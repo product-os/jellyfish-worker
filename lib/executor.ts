@@ -816,11 +816,6 @@ export const run = async (
 		type: 'object',
 	});
 
-	logger.info(context, 'Got card to match against filter', {
-		actionInputCardFilter,
-		inputCard: cards.input,
-	});
-
 	assert.INTERNAL(
 		request.context,
 		// TS-TODO: Remove "any" casting
@@ -828,6 +823,15 @@ export const run = async (
 		errors.WorkerSchemaMismatch,
 		'Input card does not match filter',
 	);
+
+	const results = skhema.match(actionInputCardFilter as any, cards.input);
+	if (!results.valid) {
+		logger.error(context, 'Card schema mismatch!');
+		logger.error(context, JSON.stringify(actionInputCardFilter));
+		for (const error of results.errors) {
+			logger.error(context, error);
+		}
+	}
 
 	// TODO: Action definition bodies are not versioned yet
 	// as they are not part of the action cards.
