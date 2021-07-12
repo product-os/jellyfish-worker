@@ -816,14 +816,6 @@ export const run = async (
 		type: 'object',
 	});
 
-	assert.INTERNAL(
-		request.context,
-		// TS-TODO: Remove "any" casting
-		skhema.isValid(actionInputCardFilter as any, cards.input),
-		errors.WorkerSchemaMismatch,
-		'Input card does not match filter',
-	);
-
 	const results = skhema.match(actionInputCardFilter as any, cards.input);
 	if (!results.valid) {
 		logger.error(context, 'Card schema mismatch!');
@@ -832,6 +824,14 @@ export const run = async (
 			logger.error(context, error);
 		}
 	}
+
+	assert.INTERNAL(
+		request.context,
+		// TS-TODO: Remove "any" casting
+		skhema.isValid(actionInputCardFilter as any, cards.input),
+		errors.WorkerSchemaMismatch,
+		'Input card does not match filter',
+	);
 
 	// TODO: Action definition bodies are not versioned yet
 	// as they are not part of the action cards.
