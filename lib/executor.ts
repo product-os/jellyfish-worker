@@ -816,6 +816,15 @@ export const run = async (
 		type: 'object',
 	});
 
+	const results = skhema.match(actionInputCardFilter as any, cards.input);
+	if (!results.valid) {
+		logger.error(request.context, 'Card schema mismatch!');
+		logger.error(request.context, JSON.stringify(actionInputCardFilter));
+		for (const error of results.errors) {
+			logger.error(request.context, error);
+		}
+	}
+
 	assert.INTERNAL(
 		request.context,
 		// TS-TODO: Remove "any" casting
