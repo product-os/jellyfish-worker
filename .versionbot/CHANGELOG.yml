@@ -1,4 +1,104 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.4.9'
+      hash: d900cf49a8c2069a348fa4da69274e4eab161acb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.36
+  date: 2021-07-11T07:35:23.332Z
+- commits:
+    - subject: 'patch: Update internal-patch'
+      hash: d7e11e7f089d5c0cbe002a7344fc9fe1aa82425b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.35
+  date: 2021-07-11T01:02:13.779Z
+- commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.48'
+      hash: 25c876d1a310562cac611e593049739c3952c2f4
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.34
+  date: 2021-07-10T22:34:19.863Z
+- commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 13c0e7ca3390cdecb2be16f35a1e365dbf729c36
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.33
+  date: 2021-07-10T21:34:18.666Z
+- commits:
+    - subject: 'patch: Update dependency typedoc to ^0.21.3'
+      hash: 2e90dfba44621f8ab09c241903d06558a818fe2f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.32
+  date: 2021-07-10T20:31:12.194Z
+- commits:
+    - subject: 'patch: Update external-non-major'
+      hash: 5a29bf5063b5f1ded821d1f9404fc77510205f78
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.31
+  date: 2021-07-10T09:43:12.406Z
+- commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.46'
+      hash: 810f937244a2bbf74754d5189ca35f4a83858d77
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.30
+  date: 2021-07-10T09:29:50.209Z
+- commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 94891798600107becc063f154d715ec465621353
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.29
+  date: 2021-07-10T02:08:53.186Z
+- commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-plugin-default to v18'
+      hash: 84fb5f125dce239f668bfecea6002a4ad78f3efb
+      body: |
+        Update @balena/jellyfish-plugin-default from 17.0.1 to 18.0.1
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.28
+  date: 2021-07-09T03:27:25.209Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: c81a9aa394c346eef764973fa0fd9817b6810ccf
       body: ''
