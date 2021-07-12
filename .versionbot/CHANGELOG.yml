@@ -1,4 +1,63 @@
 - commits:
+    - subject: Update to request.context
+      hash: fb7a83f2e1a2fe8d19520fdc901363ce73b1f625
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Dan Goodman
+      nested: []
+    - subject: move match
+      hash: c0f1663d3c4411826faae2dfc21bb4652333a472
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Dan Goodman
+      nested: []
+    - subject: move match
+      hash: 8f5c1b7d79ba5688aeb642348bb8961374dc2993
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Dan Goodman
+      nested: []
+    - subject: Updated logging to log only on error
+      hash: 2e50599a075082137bc5c7bd80f9a2e78bce9981
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Dan Goodman
+      nested: []
+    - subject: Updated logging to log only on error
+      hash: 9e21bc86cd9ba5f6c7e6ccd170d0b6bef220d5d7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Dan Goodman
+      nested: []
+    - subject: Add additional logging for card filter
+      hash: 0b6d8ad3bbd8c9fcb3c74188b11372cb763c6bce
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Dan Goodman
+      nested: []
+    - subject: Add additional logging for card filter
+      hash: dbbddf13b4a50481a8588fd87b5f28621175ee25
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Dan Goodman
+      nested: []
+  version: 7.0.37
+  date: 2021-07-12T12:28:41.876Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.4.9'
       hash: d900cf49a8c2069a348fa4da69274e4eab161acb
       body: ''
