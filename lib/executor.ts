@@ -818,10 +818,10 @@ export const run = async (
 
 	const results = skhema.match(actionInputCardFilter as any, cards.input);
 	if (!results.valid) {
-		logger.error(context, 'Card schema mismatch!');
-		logger.error(context, JSON.stringify(actionInputCardFilter));
+		logger.error(request.context, 'Card schema mismatch!');
+		logger.error(request.context, JSON.stringify(actionInputCardFilter));
 		for (const error of results.errors) {
-			logger.error(context, error);
+			logger.error(request.context, error);
 		}
 	}
 
