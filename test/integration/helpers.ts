@@ -33,7 +33,7 @@ import { Actions } from '@balena/jellyfish-plugin-base';
 import { strict as assert } from 'assert';
 import { v4 as uuid } from 'uuid';
 import { cardMixins } from '@balena/jellyfish-core';
-import PluginDefault = require('@balena/jellyfish-plugin-default');
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import ActionLibrary = require('@balena/jellyfish-action-library');
 import { PluginManager } from '@balena/jellyfish-plugin-base';
 import { Kernel as CoreKernel } from '@balena/jellyfish-core/build/kernel';
@@ -45,7 +45,7 @@ const pluginContext = {
 };
 
 const pluginManager = new PluginManager(pluginContext, {
-	plugins: [PluginDefault as any, ActionLibrary as any],
+	plugins: [DefaultPlugin as any, ActionLibrary as any],
 });
 
 export const loadDefaultCards = () => {
