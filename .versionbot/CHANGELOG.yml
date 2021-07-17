@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 8824cfabefd9d3d62462bd9aef7da1a11404707f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.44
+  date: 2021-07-16T23:52:22.386Z
+- commits:
     - subject: Remove whitesource config
       hash: 1e3466f67a00ca9a6d3c5fc7c3b1a5a6056a0d00
       body: ''
