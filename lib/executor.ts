@@ -830,7 +830,7 @@ export const run = async (
 		// TS-TODO: Remove "any" casting
 		skhema.isValid(actionInputCardFilter as any, cards.input),
 		errors.WorkerSchemaMismatch,
-		'Input card does not match filter',
+		`Input card does not match filter. Action:${request.action.slug}, Card:${cards.input?.slug}`,
 	);
 
 	// TODO: Action definition bodies are not versioned yet
