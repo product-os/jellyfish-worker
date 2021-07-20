@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.7.0'
+      hash: 8eaf963f8da93ccc4d17e9f58d72b48a07be4a12
+      body: |
+        Update @balena/jellyfish-jellyscript from 4.6.13 to 4.7.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 7.0.49
+  date: 2021-07-20T21:21:22.453Z
+- commits:
     - subject: make names of Transformer tasks more useful
       hash: 4daaef718540d5e69a6a9e3b82b3d5d3f9e2fd35
       body: ''
