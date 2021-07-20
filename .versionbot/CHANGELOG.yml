@@ -1,4 +1,27 @@
 - commits:
+    - subject: make names of Transformer tasks more useful
+      hash: 4daaef718540d5e69a6a9e3b82b3d5d3f9e2fd35
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: improve action logging
+      hash: 705f1ac687174efb1cf0f8f7c4bb963a1db397f7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 7.0.48
+  date: 2021-07-20T09:08:08.110Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.6.13'
       hash: 9842b51548e25494743ba72a0acbcaec620accb2
       body: ''
