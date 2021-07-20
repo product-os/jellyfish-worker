@@ -98,7 +98,7 @@ export const evaluate = async ({
 			arguments: {
 				reason: null,
 				properties: {
-					name: `Transform ${newCard.id} using transformer ${transformer.id}`,
+					name: `Transform ${newCard.name} using transformer ${transformer.name}`,
 					data: {
 						status: 'pending',
 						input: newCard,
