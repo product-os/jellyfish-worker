@@ -14,11 +14,9 @@ import { getLogger } from '@balena/jellyfish-logger';
 import * as semver from 'semver';
 import {
 	LogContext,
-	ParsedWorkerTriggerObject,
 	ProducerOptions,
 	QueueConsumer,
 	QueueProducer,
-	WorkerTriggerObjectInput,
 	WorkerContext,
 } from './types';
 import { core } from '@balena/jellyfish-types';
@@ -28,6 +26,7 @@ import * as utils from './utils';
 import * as triggers from './triggers';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
@@ -104,112 +103,11 @@ const runExecutor = async (
 	);
 };
 
-// TS-TODO: These asserts are largely useless and can be removed once everything is converted to TS
-const parseTrigger = (
-	context: LogContext,
-	trigger: WorkerTriggerObjectInput,
-): ParsedWorkerTriggerObject => {
-	assert.INTERNAL(
-		context,
-		trigger.slug && _.isString(trigger.slug),
-		errors.WorkerInvalidTrigger,
-		`Invalid slug: ${trigger.slug}`,
-	);
-	assert.INTERNAL(
-		context,
-		trigger.id && _.isString(trigger.id),
-		errors.WorkerInvalidTrigger,
-		`Invalid id: ${trigger.id}`,
-	);
-	assert.INTERNAL(
-		context,
-		trigger.action && _.isString(trigger.action),
-		errors.WorkerInvalidTrigger,
-		`Invalid action: ${trigger.action}`,
-	);
-	assert.INTERNAL(
-		context,
-		!trigger.mode || _.isString(trigger.mode),
-		errors.WorkerInvalidTrigger,
-		`Invalid mode: ${trigger.mode}`,
-	);
-	assert.INTERNAL(
-		context,
-		trigger.target &&
-			(_.isString(trigger.target) ||
-				_.isPlainObject(trigger.target) ||
-				_.isArray(trigger.target)),
-		errors.WorkerInvalidTrigger,
-		`Invalid target: ${trigger.target}`,
-	);
-	if (_.isArray(trigger.target)) {
-		assert.INTERNAL(
-			context,
-			trigger.target.length === _.uniq(trigger.target).length,
-			errors.WorkerInvalidTrigger,
-			'Invalid target: it contains duplicates',
-		);
-	}
-	assert.INTERNAL(
-		context,
-		(trigger.interval || trigger.filter) &&
-			!(trigger.interval && trigger.filter),
-		errors.WorkerInvalidTrigger,
-		'Use either a filter or an interval',
-	);
-	assert.INTERNAL(
-		context,
-		trigger.interval || (trigger.filter && _.isPlainObject(trigger.filter)),
-		errors.WorkerInvalidTrigger,
-		`Invalid filter: ${trigger.filter}`,
-	);
-	assert.INTERNAL(
-		context,
-		trigger.filter || (trigger.interval && _.isString(trigger.interval)),
-		errors.WorkerInvalidTrigger,
-		`Invalid interval: ${trigger.interval}`,
-	);
-	assert.INTERNAL(
-		context,
-		trigger.arguments && _.isPlainObject(trigger.arguments),
-		errors.WorkerInvalidTrigger,
-		`Invalid arguments: ${trigger.arguments}`,
-	);
-
-	const result: ParsedWorkerTriggerObject = {
-		id: trigger.id,
-		slug: trigger.slug,
-		action: trigger.action,
-		target: trigger.target,
-		arguments: trigger.arguments,
-	};
-
-	// TODO: "startDate" is not on the triggered-action type definition.
-	// Investigate to see if and how this field is used
-	if ((trigger as any).startDate) {
-		result.startDate = (trigger as any).startDate;
-	}
-
-	if (trigger.filter) {
-		result.filter = trigger.filter;
-	}
-
-	if (trigger.interval) {
-		result.interval = trigger.interval;
-	}
-
-	if (trigger.mode) {
-		result.mode = trigger.mode;
-	}
-
-	return result;
-};
-
 export class Worker {
 	jellyfish: Kernel;
 	consumer: QueueConsumer;
 	producer: QueueProducer;
-	triggers: WorkerTriggerObjectInput[];
+	triggers: TriggeredActionContract[];
 	transformers: core.Contract[];
 	latestTransformers: core.Contract[];
 	typeContracts: { [key: string]: core.TypeContract };
@@ -537,14 +435,12 @@ export class Worker {
 	 * const worker = new Worker({ ... })
 	 * worker.setTriggers([ ... ])
 	 */
-	setTriggers(context: LogContext, objects: WorkerTriggerObjectInput[]) {
+	setTriggers(context: LogContext, contracts: TriggeredActionContract[]) {
 		logger.info(context, 'Setting triggers', {
-			count: objects.length,
+			count: contracts.length,
 		});
 
-		this.triggers = objects.map((trigger) => {
-			return parseTrigger(context, trigger);
-		});
+		this.triggers = contracts;
 	}
 
 	/**
@@ -552,29 +448,27 @@ export class Worker {
 	 * @function
 	 * @public
 	 * @param {Object} context - execution context
-	 * @param {Object} card - intermediate trigger card struct
+	 * @param {Object} contract - triggered action contract
 	 * @example
 	 * const worker = new Worker({ ... })
 	 * worker.upsertTrigger({ ... })
 	 */
-	upsertTrigger(context: LogContext, card: WorkerTriggerObjectInput) {
+	upsertTrigger(context: LogContext, contract: TriggeredActionContract) {
 		logger.info(context, 'Upserting trigger', {
-			slug: card.slug,
+			slug: contract.slug,
 		});
-
-		const trigger = parseTrigger(context, card);
 
 		// Find the index of an existing trigger with the same id
 		const existingTriggerIndex = _.findIndex(this.triggers, {
-			id: trigger.id,
+			id: contract.id,
 		});
 
 		if (existingTriggerIndex === -1) {
 			// If an existing trigger is not found, add the trigger
-			this.triggers.push(trigger);
+			this.triggers.push(contract);
 		} else {
 			// If an existing trigger is found, replace it
-			this.triggers.splice(existingTriggerIndex, 1, trigger);
+			this.triggers.splice(existingTriggerIndex, 1, contract);
 		}
 	}
 
@@ -1000,7 +894,7 @@ export class Worker {
 			currentTriggers,
 			async (trigger) => {
 				// We don't care about non-time-triggered triggers
-				if (!trigger.interval) {
+				if (!trigger.data.interval) {
 					return null;
 				}
 
@@ -1009,9 +903,7 @@ export class Worker {
 					trigger.id,
 				);
 				const nextExecutionDate = triggers.getNextExecutionDate(
-					{
-						data: trigger as any,
-					},
+					trigger,
 					lastExecutionEvent as any,
 				);
 

@@ -18,14 +18,10 @@ import * as assert from '@balena/jellyfish-assert';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
 import { Operation } from 'fast-json-patch';
-import {
-	LogContext,
-	EnqueueOptions,
-	WorkerTriggerObjectInput,
-	WorkerContext,
-} from './types';
+import { LogContext, EnqueueOptions, WorkerContext } from './types';
 import { core, worker } from '@balena/jellyfish-types';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 const logger = getLogger('worker');
 
@@ -251,24 +247,10 @@ const commit = async (
 		});
 
 	if (options.triggers) {
-		const runTrigger = async (trigger: {
-			slug?: any;
-			filter: any;
-			mode: any;
-			arguments: any;
-			target: any;
-			action: any;
-			id: any;
-		}) => {
+		const runTrigger = async (trigger: TriggeredActionContract) => {
 			// Ignore triggered actions whose start date is in the future
 			if (
-				options.currentTime.getTime() <
-				triggers
-					.getStartDate({
-						// TS-TODO: trigger doesn't have property startDate, which is required by `getStartDate`
-						data: trigger as any,
-					})
-					.getTime()
+				options.currentTime.getTime() < triggers.getStartDate(trigger).getTime()
 			) {
 				return null;
 			}
@@ -321,7 +303,7 @@ const commit = async (
 						// Re-enqueuing an action request expects the "card" option to be an
 						// id, not a full card.
 						card: triggerCard.id,
-						action: request.action,
+						action: request.action!,
 						actor: options.actor,
 						context: request.context,
 						timestamp: request.currentDate.toISOString(),
@@ -484,30 +466,17 @@ const commit = async (
 			async (trigger) => {
 				// We don't want to use the actions queue here
 				// so that watchers are applied right away
-				const insertedTrigger = await jellyfish.replaceCard(
+				const triggeredActionContract = await jellyfish.replaceCard(
 					context,
 					session,
 					trigger,
 				);
 
-				const triggerObject: WorkerTriggerObjectInput = {
-					id: insertedTrigger.id,
-					slug: insertedTrigger.slug,
-					action: trigger.data.action,
-					target: trigger.data.target,
-					filter: trigger.data.filter,
-					arguments: trigger.data.arguments,
-				};
-
-				if (trigger.data.mode) {
-					triggerObject.mode = trigger.data.mode;
-				}
-
 				// Registered the newly created trigger
 				// right away for performance reasons
 				return options.setTriggers(
 					context,
-					options.triggers.concat([triggerObject]),
+					options.triggers.concat([triggeredActionContract]),
 				);
 			},
 			{

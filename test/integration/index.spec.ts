@@ -10,6 +10,7 @@ import Bluebird from 'bluebird';
 import { Worker } from '../../lib/index';
 import { v4 as uuidv4 } from 'uuid';
 import { strict as assert } from 'assert';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 let ctx: helpers.IntegrationTestContext;
 
@@ -1368,42 +1369,45 @@ describe('Worker', () => {
 		});
 
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['cards'],
-							properties: {
-								cards: {
-									type: 'array',
-									items: {
-										type: 'string',
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['cards'],
+								properties: {
+									cards: {
+										type: 'array',
+										items: {
+											type: 'string',
+										},
 									},
 								},
 							},
 						},
 					},
+					action: 'action-update-card@1.0.0',
+					target: {
+						$eval: 'source.data.cards',
+					},
+					arguments: {
+						reason: null,
+						patch: [
+							{
+								op: 'add',
+								path: '/data/updated',
+								value: true,
+							},
+						],
+					},
 				},
-				action: 'action-update-card@1.0.0',
-				target: {
-					$eval: 'source.data.cards',
-				},
-				arguments: {
-					reason: null,
-					patch: [
-						{
-							op: 'add',
-							path: '/data/updated',
-							value: true,
-						},
-					],
-				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		const typeCard = await ctx.jellyfish.getCardBySlug(
@@ -1472,25 +1476,28 @@ describe('Worker', () => {
 		});
 
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['cards'],
-							properties: {
-								cards: {
-									type: 'array',
-									items: {
-										type: 'object',
-										required: ['id'],
-										properties: {
-											id: {
-												type: 'string',
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['cards'],
+								properties: {
+									cards: {
+										type: 'array',
+										items: {
+											type: 'object',
+											required: ['id'],
+											properties: {
+												id: {
+													type: 'string',
+												},
 											},
 										},
 									},
@@ -1498,27 +1505,27 @@ describe('Worker', () => {
 							},
 						},
 					},
-				},
-				action: 'action-update-card@1.0.0',
-				target: {
-					$map: {
-						$eval: 'source.data.cards[0:]',
-					},
-					'each(card)': {
-						$eval: 'card.id',
-					},
-				},
-				arguments: {
-					reason: null,
-					patch: [
-						{
-							op: 'add',
-							path: '/data/updated',
-							value: true,
+					action: 'action-update-card@1.0.0',
+					target: {
+						$map: {
+							$eval: 'source.data.cards[0:]',
 						},
-					],
+						'each(card)': {
+							$eval: 'card.id',
+						},
+					},
+					arguments: {
+						reason: null,
+						patch: [
+							{
+								op: 'add',
+								path: '/data/updated',
+								value: true,
+							},
+						],
+					},
 				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		const typeCard = await ctx.jellyfish.getCardBySlug(
@@ -1613,56 +1620,6 @@ describe('Worker', () => {
 		).rejects.toThrow(ctx.backend.errors.JellyfishSchemaMismatch);
 	});
 
-	it('should fail to set a trigger when the list of card ids contains duplicates', async () => {
-		const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
-			slug: ctx.generateRandomSlug(),
-			type: 'card@1.0.0',
-			version: '1.0.0',
-			data: {
-				id: 'id1',
-			},
-		});
-
-		const triggers = [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: 'foo-bar-baz',
-								},
-							},
-						},
-					},
-				},
-				action: 'action-update-card@1.0.0',
-				target: [card.id, card.id, card.id],
-				arguments: {
-					reason: null,
-					patch: [
-						{
-							op: 'add',
-							path: '/data/updated',
-							value: true,
-						},
-					],
-				},
-			},
-		];
-
-		expect(() => {
-			ctx.worker.setTriggers(ctx.context, triggers);
-		}).toThrow(ctx.worker.errors.WorkerInvalidTrigger);
-	});
-
 	test('trigger should update card if triggered by a user not owning the card', async () => {
 		const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
 			slug: ctx.generateRandomSlug({
@@ -1676,25 +1633,28 @@ describe('Worker', () => {
 		});
 
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['cards'],
-							properties: {
-								cards: {
-									type: 'array',
-									items: {
-										type: 'object',
-										required: ['id'],
-										properties: {
-											id: {
-												type: 'string',
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['cards'],
+								properties: {
+									cards: {
+										type: 'array',
+										items: {
+											type: 'object',
+											required: ['id'],
+											properties: {
+												id: {
+													type: 'string',
+												},
 											},
 										},
 									},
@@ -1702,27 +1662,27 @@ describe('Worker', () => {
 							},
 						},
 					},
-				},
-				action: 'action-update-card@1.0.0',
-				target: {
-					$map: {
-						$eval: 'source.data.cards[0:]',
-					},
-					'each(card)': {
-						$eval: 'card.id',
-					},
-				},
-				arguments: {
-					reason: null,
-					patch: [
-						{
-							op: 'add',
-							path: '/data/updated',
-							value: true,
+					action: 'action-update-card@1.0.0',
+					target: {
+						$map: {
+							$eval: 'source.data.cards[0:]',
 						},
-					],
+						'each(card)': {
+							$eval: 'card.id',
+						},
+					},
+					arguments: {
+						reason: null,
+						patch: [
+							{
+								op: 'add',
+								path: '/data/updated',
+								value: true,
+							},
+						],
+					},
 				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		const typeCard = await ctx.jellyfish.getCardBySlug(
