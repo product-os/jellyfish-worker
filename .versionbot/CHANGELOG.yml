@@ -1,4 +1,22 @@
 - commits:
+    - subject: >-
+        Normalize trigger data format by using triggered-action contracts
+        directly
+      hash: b3e766957061be6606cb50f577d874448b02e22e
+      body: |
+        Instead of having multiple formats for triggers in the system this
+        changes the worker to handle triggered-action contracts directly,
+        dramatically simplifying code.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 8.0.0
+  date: 2021-07-23T14:03:12.191Z
+- commits:
     - subject: "\U0001F504 Synced file(s) with product-os/jellyfish-config"
       hash: d97990bca3306affc7df4fe09e574ca5fbf24bbb
       body: ''
