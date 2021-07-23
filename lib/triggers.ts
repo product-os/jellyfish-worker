@@ -14,6 +14,7 @@ import { LogContext } from './types';
 import jsone = require('json-e');
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import { Contract } from '@balena/jellyfish-types/build/core';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 interface CompileContext {
 	timestamp: string;
@@ -197,11 +198,7 @@ const compileTrigger = (
  * @public
  *
  * @param {Object} jellyfish - jellyfish instance
- * @param {Object} trigger - trigger
- * @param {Object} trigger.filter - filter
- * @param {String} trigger.action - action slug
- * @param {String} trigger.card - card id
- * @param {Object} trigger.arguments - arguments
+ * @param {Object} trigger - triggered action contract
  * @param {Object} card - card
  * @param {Object} options - options
  * @param {String} options.mode - change type
@@ -224,15 +221,7 @@ const compileTrigger = (
  */
 export const getRequest = async (
 	jellyfish: Kernel,
-	trigger: {
-		filter?: any;
-		mode?: any;
-		arguments: any;
-		target: any;
-		action: any;
-		id: any;
-		slug?: any;
-	},
+	trigger: TriggeredActionContract,
 	// If getRequest is called by a time triggered action, then card will be null
 	card: core.Contract | null,
 	options: GetRequestOptions,
@@ -241,14 +230,14 @@ export const getRequest = async (
 		options.context,
 		jellyfish,
 		options.session,
-		trigger.filter,
+		trigger.data.filter!,
 		card,
 	);
 	if (card && !match) {
 		return null;
 	}
 
-	if (trigger.mode && trigger.mode !== options.mode) {
+	if (trigger.data.mode && trigger.data.mode !== options.mode) {
 		return null;
 	}
 
@@ -257,8 +246,8 @@ export const getRequest = async (
 	// the templating engine will be a bit faster
 	const compiledTrigger = compileTrigger(
 		{
-			arguments: trigger.arguments,
-			target: trigger.target,
+			arguments: trigger.data.arguments,
+			target: trigger.data.target,
 		},
 		match || card,
 		options.currentDate,
@@ -269,7 +258,7 @@ export const getRequest = async (
 	}
 
 	return {
-		action: trigger.action,
+		action: trigger.data.action,
 		arguments: compiledTrigger.arguments,
 		originator: trigger.id,
 		context: options.context,
@@ -365,9 +354,7 @@ export const getTypeTriggers = async (
  *
  * console.log(date.toISOString())
  */
-export const getStartDate = (trigger: {
-	data: { startDate?: string | number | Date };
-}): Date => {
+export const getStartDate = (trigger: TriggeredActionContract): Date => {
 	if (trigger && trigger.data && trigger.data.startDate) {
 		const date = new Date(trigger.data.startDate);
 
@@ -396,9 +383,8 @@ export const getStartDate = (trigger: {
  *   console.log(nextExecutionDate.toISOString())
  * }
  */
-// TS-TODO: Detangle all the different structures that triggers can be in
 export const getNextExecutionDate = (
-	trigger: { data: { interval: string; startDate: string | number | Date } },
+	trigger: TriggeredActionContract,
 	lastExecutionDate?: Date,
 ): Date | null => {
 	if (!trigger || !trigger.data || !trigger.data.interval) {

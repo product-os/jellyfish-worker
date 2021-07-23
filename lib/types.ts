@@ -4,7 +4,7 @@
  * Proprietary and confidential.
  */
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
-import { core, worker, queue } from '@balena/jellyfish-types';
+import { core, queue } from '@balena/jellyfish-types';
 import {
 	Contract,
 	ContractData,
@@ -67,36 +67,6 @@ export interface WorkerContext {
 	cards: {
 		[slug: string]: ContractDefinition<ContractData>;
 	};
-}
-
-// TODO: just handle trigger contracts directly, as having 3 different structs for triggered-actions is super confusing
-// These objects are initially generated in the action server bootstrap code here https://github.com/product-os/jellyfish/blob/de4b77283d78403c861b4d966027cb71e71a8bac/apps/action-server/lib/bootstrap.js#L47
-// They also additional get parse by the `parseTrigger` function in index.ts
-export interface WorkerTriggerObjectInput {
-	id: string;
-	slug: string;
-	action: worker.TriggeredActionData2['action'];
-	target: worker.TriggeredActionData2['target'];
-	arguments: worker.TriggeredActionData2['arguments'];
-	interval?: worker.TriggeredActionData2['interval'];
-	filter?: worker.TriggeredActionData2['filter'];
-	mode?: worker.TriggeredActionData2['mode'];
-	// TS-TODO: figure out if startDate is used. This is part of the "tick()" spaghetti mess
-	startDate?: string;
-}
-
-// This is how triggers are stored in the state of the worker instance
-// TODO: Just work with trigger-action contracts directly
-export interface ParsedWorkerTriggerObject {
-	id: string;
-	slug: string;
-	action: worker.TriggeredActionData2['action'];
-	target: worker.TriggeredActionData2['target'];
-	arguments: worker.TriggeredActionData2['arguments'];
-	startDate?: any;
-	filter?: worker.TriggeredActionData2['filter'];
-	interval?: worker.TriggeredActionData2['interval'];
-	mode?: worker.TriggeredActionData2['mode'];
 }
 
 // tslint:disable: jsdoc-format

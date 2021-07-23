@@ -6,7 +6,10 @@
 
 import * as _ from 'lodash';
 import * as helpers from './helpers';
+import { v4 as uuidv4 } from 'uuid';
 import { strict as assert } from 'assert';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import Bluebird from 'bluebird';
 
 let ctx: helpers.IntegrationTestContext;
 
@@ -81,38 +84,42 @@ describe('.execute()', () => {
 		assert(actionCard !== null);
 
 		const command = ctx.generateRandomSlug();
-		ctx.worker.setTriggers(ctx.context, [
-			{
+		ctx.worker.upsertTrigger(
+			ctx.context,
+			ctx.jellyfish.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command,
+									},
 								},
 							},
 						},
 					},
-				},
-				mode: 'insert',
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						version: '1.0.0',
-						slug: command,
+					mode: 'insert',
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							version: '1.0.0',
+							slug: command,
+						},
 					},
 				},
-			},
-		]);
+			}) as TriggeredActionContract,
+		);
 
 		const slug = ctx.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
@@ -189,38 +196,42 @@ describe('.execute()', () => {
 		assert(actionCard !== null);
 
 		const command = ctx.generateRandomSlug();
-		ctx.worker.setTriggers(ctx.context, [
-			{
+		ctx.worker.upsertTrigger(
+			ctx.context,
+			ctx.jellyfish.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command,
+									},
 								},
 							},
 						},
 					},
-				},
-				mode: 'update',
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						version: '1.0.0',
-						slug: command,
+					mode: 'update',
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							version: '1.0.0',
+							slug: command,
+						},
 					},
 				},
-			},
-		]);
+			}) as TriggeredActionContract,
+		);
 
 		const slug = ctx.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
@@ -268,91 +279,6 @@ describe('.execute()', () => {
 		expect(resultCard.data.command).toBe(command);
 	});
 
-	test('should not execute a triggered action with a future start date', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
-			ctx.session,
-			'card@latest',
-		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
-			ctx.session,
-			'action-create-card@latest',
-		);
-
-		assert(typeCard !== null);
-		assert(actionCard !== null);
-
-		const command = ctx.generateRandomSlug();
-		ctx.worker.setTriggers(ctx.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command,
-								},
-							},
-						},
-					},
-				},
-				startDate: '2500-01-01T00:00:00.000Z',
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						version: '1.0.0',
-						slug: command,
-					},
-				},
-			},
-		]);
-
-		const slug = ctx.generateRandomSlug();
-		const request = await ctx.queue.producer.enqueue(
-			ctx.worker.getId(),
-			ctx.session,
-			{
-				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
-				card: typeCard.id,
-				type: typeCard.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug,
-						version: '1.0.0',
-						data: {
-							command,
-						},
-					},
-				},
-			},
-		);
-
-		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(ctx.context, request);
-
-		expect(result.error).toBe(false);
-
-		const card = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
-			ctx.session,
-			`${command}@latest`,
-		);
-
-		expect(card).toBeFalsy();
-	});
-
 	test('should execute a triggered action with a top level anyOf', async () => {
 		const typeCard = await ctx.jellyfish.getCardBySlug(
 			ctx.context,
@@ -369,50 +295,57 @@ describe('.execute()', () => {
 		assert(actionCard !== null);
 
 		const command = ctx.generateRandomSlug();
-		ctx.worker.setTriggers(ctx.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					anyOf: [
-						{
-							properties: {
-								data: {
-									type: 'object',
-									required: ['command'],
-									properties: {
-										command: {
-											type: 'string',
-											const: command,
+		ctx.worker.upsertTrigger(
+			ctx.context,
+			ctx.jellyfish.defaults({
+				id: uuidv4(),
+				slug: `triggered-action-${uuidv4()}`,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						anyOf: [
+							{
+								properties: {
+									data: {
+										type: 'object',
+										required: ['command'],
+										properties: {
+											command: {
+												type: 'string',
+												const: command,
+											},
 										},
 									},
 								},
 							},
-						},
-						{
-							properties: {
-								data: {
-									type: 'string',
+							{
+								properties: {
+									data: {
+										type: 'string',
+									},
 								},
 							},
+						],
+					},
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							version: '1.0.0',
+							slug: command,
 						},
-					],
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						version: '1.0.0',
-						slug: command,
 					},
 				},
-			},
-		]);
+			}) as TriggeredActionContract,
+		);
 
 		const slug = ctx.generateRandomSlug();
+
+		await Bluebird.delay(5000);
+
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
@@ -435,7 +368,9 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
+
 		const result = await ctx.queue.producer.waitResults(ctx.context, request);
+
 		expect(result.error).toBe(false);
 
 		await ctx.flushAll(ctx.session);
@@ -1153,37 +1088,41 @@ describe('.execute()', () => {
 		assert(actionCard !== null);
 
 		const command = ctx.generateRandomSlug();
-		ctx.worker.setTriggers(ctx.context, [
-			{
+		ctx.worker.upsertTrigger(
+			ctx.context,
+			ctx.jellyfish.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						version: '1.0.0',
-						slug: command,
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							version: '1.0.0',
+							slug: command,
+						},
 					},
 				},
-			},
-		]);
+			}) as TriggeredActionContract,
+		);
 
 		const slug = ctx.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(

@@ -4,90 +4,26 @@
  * Proprietary and confidential.
  */
 
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import * as helpers from './helpers';
 
-let context: helpers.IntegrationTestContext;
+let ctx: helpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	context = await helpers.before();
+	ctx = await helpers.before();
 });
 
 afterAll(() => {
-	return helpers.after(context);
+	return helpers.after(ctx);
 });
 
 describe('.setTriggers()', () => {
-	it('should be able to set a trigger with a start date', () => {
-		context.worker.setTriggers(context.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				startDate: '2008-01-01T00:00:00.000Z',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			},
-		]);
-
-		const triggers = context.worker.getTriggers();
-
-		expect(triggers).toEqual([
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				startDate: '2008-01-01T00:00:00.000Z',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			},
-		]);
-	});
-
-	it('should be able to set a trigger with an interval', () => {
-		context.worker.setTriggers(context.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				interval: 'PT1H',
-				arguments: {
-					foo: 'bar',
-				},
-			},
-		]);
-
-		const triggers = context.worker.getTriggers();
-
-		expect(triggers).toEqual([
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				interval: 'PT1H',
-				arguments: {
-					foo: 'bar',
-				},
-			},
-		]);
-	});
-
 	it('should be able to set triggers', () => {
-		context.worker.setTriggers(context.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
+		const trigger1 = ctx.jellyfish.defaults({
+			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
+			slug: 'triggered-action-foo-bar',
+			type: 'triggered-action@1.0.0',
+			data: {
 				action: 'action-foo-bar@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				filter: {
@@ -97,9 +33,13 @@ describe('.setTriggers()', () => {
 					foo: 'bar',
 				},
 			},
-			{
-				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-				slug: 'triggered-action-foo-baz',
+		}) as TriggeredActionContract;
+
+		const trigger2 = ctx.jellyfish.defaults({
+			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
+			slug: 'triggered-action-foo-baz',
+			type: 'triggered-action@1.0.0',
+			data: {
 				action: 'action-foo-bar@1.0.0',
 				target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
 				filter: {
@@ -109,395 +49,23 @@ describe('.setTriggers()', () => {
 					foo: 'baz',
 				},
 			},
-		]);
+		}) as TriggeredActionContract;
 
-		const triggers = context.worker.getTriggers();
+		ctx.worker.setTriggers(ctx.context, [trigger1, trigger2]);
 
-		expect(triggers).toEqual([
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			},
-			{
-				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-				slug: 'triggered-action-foo-baz',
-				action: 'action-foo-bar@1.0.0',
-				target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'baz',
-				},
-			},
-		]);
-	});
+		const triggers = ctx.worker.getTriggers();
 
-	it('should not store extra properties', () => {
-		context.worker.setTriggers(context.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				foo: 'bar',
-				bar: 'baz',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			} as any,
-		]);
-
-		const triggers = context.worker.getTriggers();
-
-		expect(triggers).toEqual([
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			},
-		]);
-	});
-
-	it('should store a mode', () => {
-		context.worker.setTriggers(context.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				mode: 'update',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			},
-		]);
-
-		const triggers = context.worker.getTriggers();
-
-		expect(triggers).toEqual([
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				mode: 'update',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			},
-		]);
-	});
-
-	it('should throw if no interval nor filter', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					action: 'action-create-card@1.0.0',
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if mode is not a string', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					action: 'action-foo-bar@1.0.0',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					mode: 1,
-					filter: {
-						type: 'object',
-					},
-					arguments: {
-						foo: 'bar',
-					},
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if both interval and filter', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					interval: 'PT1H',
-					filter: {
-						type: 'object',
-					},
-					action: 'action-create-card@1.0.0',
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if no id', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					slug: 'triggered-action-foo-bar',
-					action: 'action-create-card@1.0.0',
-					filter: {
-						type: 'object',
-					},
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				} as any,
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if no slug', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					action: 'action-create-card@1.0.0',
-					filter: {
-						type: 'object',
-					},
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				} as any,
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if id is not a string', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 999,
-					slug: 'triggered-action-foo-bar',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					action: 'action-create-card@1.0.0',
-					filter: {
-						type: 'object',
-					},
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				} as any,
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if interval is not a string', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					action: 'action-create-card@1.0.0',
-					interval: 999,
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if no action', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					filter: {
-						type: 'object',
-					},
-					arguments: {
-						foo: 'bar',
-					},
-				} as any,
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if action is not a string', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					action: 1,
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					filter: {
-						type: 'object',
-					},
-					arguments: {
-						foo: 'bar',
-					},
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if no target', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					action: 'action-create-card@1.0.0',
-					filter: {
-						type: 'object',
-					},
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				} as any,
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if target is not a string', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					action: 'action-create-card@1.0.0',
-					target: 1,
-					filter: {
-						type: 'object',
-					},
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if no filter', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					action: 'action-create-card@1.0.0',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if filter is not an object', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					action: 'action-create-card@1.0.0',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					filter: 'foo',
-					arguments: {
-						reason: null,
-						foo: 'bar',
-					},
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if no arguments', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					action: 'action-create-card@1.0.0',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					filter: {
-						type: 'object',
-					},
-				} as any,
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
-	});
-
-	it('should throw if arguments is not an object', () => {
-		expect(() => {
-			context.worker.setTriggers(context.context, [
-				{
-					id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-					slug: 'triggered-action-foo-bar',
-					action: 'action-create-card@1.0.0',
-					target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-					filter: {
-						type: 'object',
-					},
-					arguments: 1,
-				},
-			]);
-		}).toThrow(context.worker.errors.WorkerInvalidTrigger);
+		expect(triggers).toEqual([trigger1, trigger2]);
 	});
 });
 
 describe('.upsertTrigger()', () => {
 	it('should be able to add a trigger', () => {
-		context.worker.setTriggers(context.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
+		const trigger1 = ctx.jellyfish.defaults({
+			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
+			slug: 'triggered-action-foo-bar',
+			type: 'triggered-action@1.0.0',
+			data: {
 				action: 'action-foo-bar@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				filter: {
@@ -507,39 +75,13 @@ describe('.upsertTrigger()', () => {
 					foo: 'bar',
 				},
 			},
-		]);
+		}) as TriggeredActionContract;
 
-		context.worker.upsertTrigger(context.context, {
+		const trigger2 = ctx.jellyfish.defaults({
 			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
 			slug: 'triggered-action-foo-baz',
-			action: 'action-foo-bar@1.0.0',
-			target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-			filter: {
-				type: 'object',
-			},
-			arguments: {
-				foo: 'baz',
-			},
-		});
-
-		const triggers = context.worker.getTriggers();
-
-		expect(triggers).toEqual([
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			},
-			{
-				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-				slug: 'triggered-action-foo-baz',
+			type: 'triggered-action@1.0.0',
+			data: {
 				action: 'action-foo-bar@1.0.0',
 				target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
 				filter: {
@@ -549,14 +91,23 @@ describe('.upsertTrigger()', () => {
 					foo: 'baz',
 				},
 			},
-		]);
+		}) as TriggeredActionContract;
+
+		ctx.worker.setTriggers(ctx.context, [trigger1]);
+
+		ctx.worker.upsertTrigger(ctx.context, trigger2);
+
+		const triggers = ctx.worker.getTriggers();
+
+		expect(triggers).toEqual([trigger1, trigger2]);
 	});
 
 	it('should be able to modify an existing trigger', () => {
-		context.worker.setTriggers(context.context, [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
+		const trigger1 = ctx.jellyfish.defaults({
+			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
+			slug: 'triggered-action-foo-bar',
+			type: 'triggered-action@1.0.0',
+			data: {
 				action: 'action-foo-bar@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				filter: {
@@ -566,9 +117,13 @@ describe('.upsertTrigger()', () => {
 					foo: 'bar',
 				},
 			},
-			{
-				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-				slug: 'triggered-action-foo-baz',
+		}) as TriggeredActionContract;
+
+		const trigger2 = ctx.jellyfish.defaults({
+			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
+			slug: 'triggered-action-foo-baz',
+			type: 'triggered-action@1.0.0',
+			data: {
 				action: 'action-foo-bar@1.0.0',
 				target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
 				filter: {
@@ -578,46 +133,31 @@ describe('.upsertTrigger()', () => {
 					foo: 'baz',
 				},
 			},
-		]);
+		}) as TriggeredActionContract;
 
-		context.worker.upsertTrigger(context.context, {
-			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-			slug: 'triggered-action-foo-baz',
-			action: 'action-foo-bar@1.0.0',
-			target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-			filter: {
-				type: 'object',
-			},
-			arguments: {
-				baz: 'buzz',
+		ctx.worker.setTriggers(ctx.context, [trigger1, trigger2]);
+
+		const newArguments = {
+			baz: 'buzz',
+		};
+
+		ctx.worker.upsertTrigger(ctx.context, {
+			...trigger2,
+			data: {
+				...trigger2.data,
+				arguments: newArguments,
 			},
 		});
 
-		const triggers = context.worker.getTriggers();
+		const triggers = ctx.worker.getTriggers();
 
 		expect(triggers).toEqual([
+			trigger1,
 			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
-				action: 'action-foo-bar@1.0.0',
-				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					foo: 'bar',
-				},
-			},
-			{
-				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-				slug: 'triggered-action-foo-baz',
-				action: 'action-foo-bar@1.0.0',
-				target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-				filter: {
-					type: 'object',
-				},
-				arguments: {
-					baz: 'buzz',
+				...trigger2,
+				data: {
+					...trigger2.data,
+					arguments: newArguments,
 				},
 			},
 		]);
@@ -626,10 +166,11 @@ describe('.upsertTrigger()', () => {
 
 describe('.removeTrigger()', () => {
 	it('should be able to remove an existing trigger', () => {
-		const cards = [
-			{
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
+		const trigger1 = ctx.jellyfish.defaults({
+			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
+			slug: 'triggered-action-foo-bar',
+			type: 'triggered-action@1.0.0',
+			data: {
 				action: 'action-foo-bar@1.0.0',
 				target: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				filter: {
@@ -639,12 +180,15 @@ describe('.removeTrigger()', () => {
 					foo: 'bar',
 				},
 			},
-			{
-				id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-				slug: 'triggered-action-foo-baz',
+		}) as TriggeredActionContract;
+
+		const trigger2 = ctx.jellyfish.defaults({
+			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
+			slug: 'triggered-action-foo-baz',
+			type: 'triggered-action@1.0.0',
+			data: {
 				action: 'action-foo-bar@1.0.0',
 				target: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
-				type: 'card@1.0.0',
 				filter: {
 					type: 'object',
 				},
@@ -652,14 +196,14 @@ describe('.removeTrigger()', () => {
 					foo: 'baz',
 				},
 			},
-		];
+		}) as TriggeredActionContract;
 
-		context.worker.setTriggers(context.context, cards);
+		ctx.worker.setTriggers(ctx.context, [trigger1, trigger2]);
 
-		context.worker.removeTrigger(context.context, cards[1].id);
+		ctx.worker.removeTrigger(ctx.context, trigger1.id);
 
-		const triggers = context.worker.getTriggers();
+		const triggers = ctx.worker.getTriggers();
 
-		expect(triggers).toEqual([cards[0]]);
+		expect(triggers).toEqual([trigger2]);
 	});
 });

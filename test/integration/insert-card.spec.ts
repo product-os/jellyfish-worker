@@ -10,6 +10,7 @@ import { strict as assert } from 'assert';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { v4 as uuid } from 'uuid';
 import _ from 'lodash';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 let ctx: helpers.IntegrationTestContext;
 
@@ -35,35 +36,38 @@ describe('.insertCard()', () => {
 		const id = uuid();
 
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id,
+				type: 'triggered-action@1.0.0',
 				slug: 'triggered-action-xr3523c5',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command,
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-test-originator@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: command,
-						version: '1.0.0',
+					action: 'action-test-originator@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							slug: command,
+							version: '1.0.0',
+						},
 					},
 				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		await ctx.worker.insertCard(
@@ -109,34 +113,37 @@ describe('.insertCard()', () => {
 		const command = ctx.generateRandomSlug();
 		const id = uuid();
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id,
 				slug: `triggered-action-foo-bar-${id.substr(0, 7)}`,
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-test-originator@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: command,
+					action: 'action-test-originator@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							slug: command,
+						},
 					},
 				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		const originatorId = uuid();
@@ -183,34 +190,37 @@ describe('.insertCard()', () => {
 
 		const command = ctx.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: command,
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							slug: command,
+						},
 					},
 				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		const result = await ctx.worker.insertCard(
@@ -278,33 +288,36 @@ describe('.insertCard()', () => {
 
 		const command = ctx.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id: 'xb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar-xb3523c5',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					properties: {
-						slug: command,
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						properties: {
+							slug: command,
+						},
 					},
 				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		await ctx.worker.insertCard(
@@ -350,62 +363,68 @@ describe('.insertCard()', () => {
 		const command1 = ctx.generateRandomSlug({ prefix });
 		const command2 = ctx.generateRandomSlug({ prefix });
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id: uuid(),
 				slug: 'trigger-action-ib3523c5',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command1,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command1,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: command1,
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							slug: command1,
+						},
 					},
 				},
-			},
-			{
+			}) as TriggeredActionContract,
+			ctx.jellyfish.defaults({
 				id: uuid(),
 				slug: 'triggered-action-d67acdef',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command1,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command1,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: command2,
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							slug: command2,
+						},
 					},
 				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		await ctx.worker.insertCard(
@@ -457,62 +476,68 @@ describe('.insertCard()', () => {
 		const command1 = ctx.generateRandomSlug();
 		const command2 = ctx.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.context, [
-			{
+			ctx.jellyfish.defaults({
 				id: uuid(),
 				slug: 'triggered-action-cx3523c5',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command1,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command1,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: command1,
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							slug: command1,
+						},
 					},
 				},
-			},
-			{
+			}) as TriggeredActionContract,
+			ctx.jellyfish.defaults({
 				id: uuid(),
 				slug: 'triggered-action-d68acdef',
-				filter: {
-					type: 'object',
-					required: ['data'],
-					properties: {
-						data: {
-							type: 'object',
-							required: ['command'],
-							properties: {
-								command: {
-									type: 'string',
-									const: command2,
+				type: 'triggered-action@1.0.0',
+				data: {
+					filter: {
+						type: 'object',
+						required: ['data'],
+						properties: {
+							data: {
+								type: 'object',
+								required: ['command'],
+								properties: {
+									command: {
+										type: 'string',
+										const: command2,
+									},
 								},
 							},
 						},
 					},
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: command2,
+					action: 'action-create-card@1.0.0',
+					target: typeCard.id,
+					arguments: {
+						reason: null,
+						properties: {
+							slug: command2,
+						},
 					},
 				},
-			},
+			}) as TriggeredActionContract,
 		]);
 
 		await ctx.worker.insertCard(
@@ -890,6 +915,7 @@ describe('.insertCard()', () => {
 		const generatedTrigger = ctx.worker.getTriggers().find((trigger) => {
 			return (
 				_.get(trigger, [
+					'data',
 					'filter',
 					'$$links',
 					'is attached to',
@@ -900,25 +926,7 @@ describe('.insertCard()', () => {
 			);
 		});
 
-		expect(generatedTrigger).toEqual({
-			id: generatedTrigger!.id,
-			slug: `triggered-action-${slug}-data-mentions`,
-			action: 'action-set-add@1.0.0',
-			target: {
-				$eval: "source.links['is attached to'][0].id",
-			},
-			filter: generatedTrigger!.filter,
-			arguments: {
-				property: 'data.mentions',
-				value: {
-					$if: 'source.data.payload.mentions',
-					then: {
-						$eval: 'source.data.payload.mentions',
-					},
-					else: [],
-				},
-			},
-		});
+		expect(generatedTrigger).toBeTruthy();
 	});
 
 	test('should update pre-registered triggered actions if removing an AGGREGATE', async () => {
