@@ -1,4 +1,15 @@
 - commits:
+    - subject: "\U0001F504 Synced file(s) with product-os/jellyfish-config"
+      hash: d97990bca3306affc7df4fe09e574ca5fbf24bbb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: jellyfish-bot
+      nested: []
+  version: 7.0.51
+  date: 2021-07-23T04:11:52.136Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.7.1'
       hash: bd21cb2b831c7ae4b02a96396ea5aeb1790251f0
       body: ''
