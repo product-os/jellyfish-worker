@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: f289bbf6fc6a8ddbfe5369b03ce87f8f2b1e3b2e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.0.1
+  date: 2021-07-24T00:26:23.053Z
+- commits:
     - subject: >-
         Normalize trigger data format by using triggered-action contracts
         directly
