@@ -277,7 +277,8 @@ describe('Worker', () => {
 										},
 										fruitSalad: {
 											type: 'number',
-											$$formula: 'SUM([this.data.apples, this.data.oranges])',
+											$$formula:
+												'SUM([contract.data.apples, contract.data.oranges])',
 										},
 									},
 									additionalProperties: true,
