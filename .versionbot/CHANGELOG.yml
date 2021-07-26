@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.8.0'
+      hash: aa2435145798781acf16e6cd00fff2fbd182225d
+      body: |
+        Update @balena/jellyfish-jellyscript from 4.7.1 to 4.8.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.0.3
+  date: 2021-07-26T12:57:02.489Z
+- commits:
     - subject: 'patch: Update dependency lint-staged to ^11.1.1'
       hash: ba2b610115b797219fc853918b44cefea2601fb6
       body: ''
