@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update jellyfish-jellyscript dependency
+      hash: baaa4e12a6c42141ce657ad59877a084e15a091a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Graham McCulloch <graham@balena.io>
+        signed-off-by: Graham McCulloch <graham@balena.io>
+      author: Graham McCulloch
+      nested: []
+  version: 8.0.7
+  date: 2021-07-28T08:48:12.437Z
+- commits:
     - subject: Update test code to use 'contract' expression variable instead of 'this'
       hash: cb2f03f1e183025ca0961c8413e5b15351912a11
       body: ''
