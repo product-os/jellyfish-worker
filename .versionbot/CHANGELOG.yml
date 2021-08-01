@@ -1,4 +1,15 @@
 - commits:
+    - subject: "\U0001F504 Synced file(s) with product-os/jellyfish-config"
+      hash: 8b30259a2564f54568a4a13edb807f5af0066aeb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: jellyfish-bot
+      nested: []
+  version: 8.0.13
+  date: 2021-08-01T12:20:30.072Z
+- commits:
     - subject: 'patch: Update dependency typedoc to ^0.21.5'
       hash: c109a93d1009bbe72c1d1526750d99056f1f918b
       body: ''
