@@ -10,11 +10,11 @@ import * as _ from 'lodash';
 import { Operation } from 'fast-json-patch';
 import { v4 as uuidv4 } from 'uuid';
 import * as assert from '@balena/jellyfish-assert';
+import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
 import * as semver from 'semver';
 import {
 	LogContext,
-	ProducerOptions,
 	QueueConsumer,
 	QueueProducer,
 	WorkerContext,
@@ -26,6 +26,7 @@ import * as utils from './utils';
 import * as triggers from './triggers';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
+import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 // TODO: use a single logger instance for the worker
@@ -234,27 +235,58 @@ export class Worker {
 	 *
 	 * @returns {Object} inserted card
 	 */
-	insertCard(
+	async insertCard(
 		context: LogContext,
 		insertSession: string,
 		typeCard: core.TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
-			timestamp: any;
-			reason: any;
-			actor: any;
+			timestamp?: any;
+			reason?: any;
+			actor?: any;
 			originator?: any;
-			attachEvents: any;
+			attachEvents?: any;
 		},
-		card: Partial<core.Contract>,
+		_card: Partial<core.Contract>,
 	) {
 		const instance = this;
-		return executor.insertCard(
+		const jellyfish = instance.jellyfish;
+		const object = _card;
+
+		logger.debug(context, 'Inserting card', {
+			slug: object.slug,
+			type: typeCard.slug,
+			attachEvents: options.attachEvents,
+		});
+
+		object.type = `${typeCard.slug}@${typeCard.version}`;
+
+		let card: core.Contract | null = null;
+		if (object.slug) {
+			card = await jellyfish.getCardBySlug(
+				context,
+				insertSession,
+				`${object.slug}@${object.version || 'latest'}`,
+			);
+		}
+
+		if (!card && object.id) {
+			card = await jellyfish.getCardById(context, insertSession, object.id);
+		}
+
+		if (typeof object.name !== 'string') {
+			Reflect.deleteProperty(object, 'name');
+		}
+
+		return executor.commit(
 			context,
-			instance.jellyfish,
+			jellyfish,
 			insertSession,
 			typeCard,
+			card,
 			{
+				eventPayload: _.omit(object, ['id']),
+				eventType: 'create',
 				triggers: instance.getTriggers(),
 				transformers: instance.getLatestTransformers(),
 				typeContracts: instance.getTypeContracts(),
@@ -283,7 +315,21 @@ export class Worker {
 					return instance.producer.waitResults(requestContext, actionRequest);
 				},
 			},
-			card,
+			async () => {
+				// TS-TODO: Fix these "any" castings
+				const objectWithLinks = await executor.getObjectWithLinks(
+					context,
+					jellyfish,
+					insertSession,
+					object,
+					typeCard,
+				);
+				const result = jellyscript.evaluateObject(
+					typeCard.data.schema,
+					objectWithLinks as any,
+				);
+				return jellyfish.insertCard(context, insertSession, result as any);
+			},
 		);
 	}
 
@@ -308,22 +354,43 @@ export class Worker {
 		typeCard: core.TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
-			timestamp: any;
-			reason: any;
-			actor: any;
+			timestamp?: any;
+			reason?: any;
+			actor?: any;
 			originator?: any;
-			attachEvents: any;
+			attachEvents?: any;
 		},
 		card: Partial<core.Contract>,
 		patch: Operation[],
 	) {
 		const instance = this;
-		return executor.patchCard(
+		const jellyfish = instance.jellyfish;
+		const session = insertSession;
+		const object = card;
+		assert.INTERNAL(
 			context,
-			instance.jellyfish,
-			insertSession,
+			object.version,
+			errors.WorkerInvalidVersion,
+			`Can't update without a version for: ${object.slug}`,
+		);
+
+		logger.debug(context, 'Patching card', {
+			slug: object.slug,
+			version: object.version,
+			type: typeCard.slug,
+			attachEvents: options.attachEvents,
+			operations: patch.length,
+		});
+
+		return executor.commit(
+			context,
+			jellyfish,
+			session,
 			typeCard,
+			object as core.Contract,
 			{
+				eventPayload: patch,
+				eventType: 'update',
 				triggers: instance.getTriggers(),
 				transformers: instance.getLatestTransformers(),
 				typeContracts: instance.getTypeContracts(),
@@ -352,10 +419,27 @@ export class Worker {
 					return instance.producer.waitResults(requestContext, actionRequest);
 				},
 			},
-			// TS-TODO: Sometimes execute functions expect full contracts and sometimes they don't, fix the typings here!
-			card as core.Contract,
-			// TS-TODO: Patch is this extra function arg that is only used when fn is "patchCard"
-			patch as any,
+			async () => {
+				// TS-TODO: Remove these any castings
+				const objectWithLinks = await executor.getObjectWithLinks(
+					context,
+					jellyfish,
+					session,
+					object,
+					typeCard,
+				);
+				const newPatch = jellyscript.evaluatePatch(
+					typeCard.data.schema,
+					objectWithLinks as any,
+					patch,
+				);
+				return jellyfish.patchCardBySlug(
+					context,
+					session,
+					`${object.slug}@${object.version}`,
+					newPatch,
+				);
+			},
 		);
 	}
 
@@ -373,27 +457,58 @@ export class Worker {
 	 *
 	 * @returns {Object} replaced card
 	 */
-	replaceCard(
+	async replaceCard(
 		context: LogContext,
 		insertSession: string,
 		typeCard: core.TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
-			timestamp: any;
-			reason: any;
-			actor: any;
+			timestamp?: any;
+			reason?: any;
+			actor?: any;
 			originator?: any;
-			attachEvents: any;
+			attachEvents?: any;
 		},
-		card: Partial<core.Contract<core.ContractData>>,
+		_card: Partial<core.Contract<core.ContractData>>,
 	) {
 		const instance = this;
-		return executor.replaceCard(
+		const jellyfish = instance.jellyfish;
+		const object = _card;
+		logger.debug(context, 'Replacing card', {
+			slug: object.slug,
+			type: typeCard.slug,
+			attachEvents: options.attachEvents,
+		});
+
+		object.type = `${typeCard.slug}@${typeCard.version}`;
+
+		let card: core.Contract | null = null;
+
+		if (object.slug) {
+			card = await jellyfish.getCardBySlug(
+				context,
+				insertSession,
+				`${object.slug}@${object.version}`,
+			);
+		}
+		if (!card && object.id) {
+			card = await jellyfish.getCardById(context, insertSession, object.id);
+		}
+
+		if (typeof object.name !== 'string') {
+			Reflect.deleteProperty(object, 'name');
+		}
+
+		return executor.commit(
 			context,
-			instance.jellyfish,
+			jellyfish,
 			insertSession,
 			typeCard,
+			card,
 			{
+				attachEvents: !card,
+				eventPayload: !!card ? null : _.omit(object, ['id']),
+				eventType: !!card ? null : 'create',
 				triggers: instance.getTriggers(),
 				transformers: instance.getLatestTransformers(),
 				typeContracts: instance.getTypeContracts(),
@@ -403,7 +518,6 @@ export class Worker {
 				actor: options.actor,
 				library: instance.library,
 				originator: options.originator,
-				attachEvents: options.attachEvents,
 				setTriggers: instance.setTriggers.bind(instance),
 				executeAction: async (
 					executeSession: string,
@@ -422,7 +536,22 @@ export class Worker {
 					return instance.producer.waitResults(requestContext, actionRequest);
 				},
 			},
-			card,
+			async () => {
+				const objectWithLinks = await executor.getObjectWithLinks(
+					context,
+					jellyfish,
+					insertSession,
+					object,
+					typeCard,
+				);
+
+				// TS-TODO: Remove these `any` castings
+				const result = jellyscript.evaluateObject(
+					typeCard.data.schema,
+					objectWithLinks as any,
+				);
+				return jellyfish.replaceCard(context, insertSession, result as any);
+			},
 		);
 	}
 

@@ -11,6 +11,7 @@ import { Worker } from '../../lib/index';
 import { v4 as uuidv4 } from 'uuid';
 import { strict as assert } from 'assert';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import { core } from '@balena/jellyfish-types';
 
 let ctx: helpers.IntegrationTestContext;
 
@@ -1775,5 +1776,802 @@ describe('.getTriggers()', () => {
 		expect(triggers).toEqual([]);
 
 		await helpers.after(newContext);
+	});
+});
+
+describe('.replaceCard()', () => {
+	test('updating a card must have the correct tail', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const result1 = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: true,
+				actor: ctx.actor.id,
+			},
+			{
+				slug,
+				version: '1.0.0',
+				data: {
+					foo: 1,
+				},
+			},
+		);
+
+		await ctx.worker.replaceCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: true,
+				actor: ctx.actor.id,
+			},
+			{
+				slug,
+				version: '1.0.0',
+				data: {
+					foo: 2,
+				},
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result1!.id,
+		);
+
+		assert(card !== null);
+		assert(result1! !== null);
+
+		expect(card).toEqual(
+			ctx.jellyfish.defaults({
+				created_at: result1.created_at,
+				updated_at: card.updated_at,
+				linked_at: card.linked_at,
+				id: result1!.id,
+				name: null,
+				slug,
+				type: 'card@1.0.0',
+				data: {
+					foo: 2,
+				},
+			}),
+		);
+
+		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+			type: 'object',
+			additionalProperties: true,
+			required: ['type', 'data'],
+			properties: {
+				type: {
+					type: 'string',
+					enum: ['create@1.0.0', 'update@1.0.0'],
+				},
+				data: {
+					type: 'object',
+					required: ['target'],
+					properties: {
+						target: {
+							type: 'string',
+							const: result1!.id,
+						},
+					},
+				},
+			},
+		});
+
+		// "Replace" is an operation that will go away once the database
+		// becomes fully immutable, so we don't attempt to calculate a
+		// JSON Patch update for it, as we treat it as an exception
+		expect(tail.length).toBe(1);
+		expect(tail[0].type).toBe('create@1.0.0');
+		expect(tail[0].data.payload).toEqual(
+			_.pick(result1, ['data', 'slug', 'type', 'version']),
+		);
+	});
+});
+
+describe('.insertCard()', () => {
+	test('should insert a card', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug,
+				data: {
+					foo: 1,
+				},
+			},
+		);
+
+		assert(result !== null);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result.id,
+		);
+
+		expect(card).toEqual(
+			ctx.jellyfish.defaults({
+				created_at: result!.created_at,
+				id: result!.id,
+				name: null,
+				slug,
+				type: 'card@1.0.0',
+				data: {
+					foo: 1,
+				},
+			}),
+		);
+	});
+
+	test('should ignore an explicit type property', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				active: true,
+				slug,
+				type: `${slug}@1.0.0`,
+				version: '1.0.0',
+				links: {},
+				tags: [],
+				markers: [],
+				requires: [],
+				capabilities: [],
+				data: {
+					foo: 1,
+				},
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result!.id,
+		);
+
+		assert(card !== null);
+
+		expect(card.type).toBe('card@1.0.0');
+	});
+
+	test('should default active to true', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug: ctx.generateRandomSlug(),
+				version: '1.0.0',
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result!.id,
+		);
+		assert(card !== null);
+		expect(card.active).toBe(true);
+	});
+
+	test('should be able to set active to false', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug: ctx.generateRandomSlug(),
+				version: '1.0.0',
+				active: false,
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result!.id,
+		);
+		assert(card !== null);
+		expect(card.active).toBe(false);
+	});
+
+	test('should provide sane defaults for links', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug: ctx.generateRandomSlug(),
+				version: '1.0.0',
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result!.id,
+		);
+		assert(card !== null);
+		expect(card.links).toEqual({});
+	});
+
+	test('should provide sane defaults for tags', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug: ctx.generateRandomSlug(),
+				version: '1.0.0',
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result!.id,
+		);
+		assert(card !== null);
+		expect(card.tags).toEqual([]);
+	});
+
+	test('should provide sane defaults for data', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug: ctx.generateRandomSlug(),
+				version: '1.0.0',
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result!.id,
+		);
+		assert(card !== null);
+		expect(card.data).toEqual({});
+	});
+
+	test('should be able to set a slug', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug,
+				version: '1.0.0',
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result!.id,
+		);
+		assert(card !== null);
+		expect(card.slug).toBe(slug);
+	});
+
+	test('should be able to set a name', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug: ctx.generateRandomSlug(),
+				version: '1.0.0',
+				name: 'Hello',
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result!.id,
+		);
+		assert(card !== null);
+		expect(card.name).toBe('Hello');
+	});
+
+	test('throw if card already exists and override is false', async () => {
+		const slug = ctx.generateRandomSlug();
+		await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+			slug,
+			type: 'card@1.0.0',
+			version: '1.0.0',
+		});
+
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		await expect(
+			ctx.worker.insertCard(
+				ctx.context,
+				ctx.session,
+				typeCard,
+				{
+					attachEvents: false,
+					actor: ctx.actor.id,
+				},
+				{
+					version: '1.0.0',
+					slug,
+					active: false,
+				},
+			),
+		).rejects.toThrow(ctx.jellyfish.errors.JellyfishElementAlreadyExists);
+	});
+
+	test('should add a create event if attachEvents is true', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		const result = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: true,
+				actor: ctx.actor.id,
+			},
+			{
+				version: '1.0.0',
+				slug: ctx.generateRandomSlug(),
+			},
+		);
+
+		assert(result !== null);
+
+		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+			type: 'object',
+			additionalProperties: true,
+			required: ['type', 'data'],
+			properties: {
+				type: {
+					type: 'string',
+					const: 'create@1.0.0',
+				},
+				data: {
+					type: 'object',
+					required: ['target'],
+					properties: {
+						target: {
+							type: 'string',
+							const: result.id,
+						},
+					},
+				},
+			},
+		});
+
+		expect(tail.length).toBe(1);
+	});
+});
+
+describe('.patchCard()', () => {
+	test('should ignore pointless updates', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+		const result1 = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: true,
+				actor: ctx.actor.id,
+			},
+			{
+				slug: ctx.generateRandomSlug(),
+				version: '1.0.0',
+				active: true,
+			},
+		);
+
+		assert(result1 !== null);
+
+		const result2 = await ctx.worker.patchCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				actor: ctx.actor.id,
+			},
+			result1,
+			[],
+		);
+
+		const result3 = await ctx.worker.patchCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				actor: ctx.actor.id,
+			},
+			result1,
+			[
+				{
+					op: 'replace',
+					path: '/active',
+					value: true,
+				},
+			],
+		);
+
+		expect(result1).toBeTruthy();
+		expect(result2).toBeFalsy();
+		expect(result3).toBeFalsy();
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result1.id,
+		);
+		assert(card !== null);
+		expect(card.created_at).toBe(result1!.created_at);
+	});
+
+	test('should not upsert if no changes were made', async () => {
+		const element = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+			slug: ctx.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+		});
+
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		await ctx.worker.patchCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				actor: ctx.actor.id,
+			},
+			element,
+			[],
+		);
+	});
+
+	test('should set a card to inactive', async () => {
+		const previousCard = await ctx.jellyfish.insertCard(
+			ctx.context,
+			ctx.session,
+			{
+				slug: ctx.generateRandomSlug(),
+				type: 'card@1.0.0',
+				version: '1.0.0',
+			},
+		);
+
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		await ctx.worker.patchCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				actor: ctx.actor.id,
+			},
+			previousCard,
+			[
+				{
+					op: 'replace',
+					path: '/active',
+					value: false,
+				},
+			],
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			previousCard.id,
+		);
+		assert(card !== null);
+		expect(card.active).toBe(false);
+	});
+
+	test('should add an update event if attachEvents is true', async () => {
+		const element = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+			slug: ctx.generateRandomSlug(),
+			type: 'card@1.0.0',
+			version: '1.0.0',
+		});
+
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		const result = await ctx.worker.patchCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: true,
+				actor: ctx.actor.id,
+			},
+			element,
+			[
+				{
+					op: 'replace',
+					path: '/active',
+					value: false,
+				},
+			],
+		);
+
+		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+			type: 'object',
+			additionalProperties: true,
+			required: ['type', 'data'],
+			properties: {
+				type: {
+					type: 'string',
+					const: 'update@1.0.0',
+				},
+				data: {
+					type: 'object',
+					required: ['target'],
+					properties: {
+						target: {
+							type: 'string',
+							const: result!.id,
+						},
+					},
+				},
+			},
+		});
+
+		expect(tail.length).toBe(1);
+	});
+
+	test('should remove previously inserted type triggered actions if deactivating a type', async () => {
+		const slug = ctx.generateRandomSlug();
+		const type = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+			type: 'type@1.0.0',
+			version: '1.0.0',
+			slug,
+			data: {
+				schema: {
+					type: 'object',
+				},
+			},
+		});
+
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+		await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+			type: 'triggered-action@1.0.0',
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
+			version: '1.0.0',
+			data: {
+				type: `${slug}@1.0.0`,
+				filter: {
+					type: 'object',
+					required: ['data'],
+					properties: {
+						data: {
+							type: 'object',
+							required: ['command'],
+							properties: {
+								command: {
+									type: 'string',
+									const: 'foo-bar-baz',
+								},
+							},
+						},
+					},
+				},
+				action: 'action-create-card@1.0.0',
+				target: typeCard.id,
+				arguments: {
+					properties: {
+						slug: {
+							$eval: 'source.data.slug',
+						},
+						data: {
+							number: {
+								$eval: 'source.data.number',
+							},
+						},
+					},
+				},
+			},
+		});
+
+		const typeTypeContract =
+			await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+				ctx.context,
+				ctx.session,
+				'type@latest',
+			);
+		assert(typeTypeContract !== null);
+		await ctx.worker.patchCard(
+			ctx.context,
+			ctx.session,
+			typeTypeContract,
+			{
+				actor: ctx.actor.id,
+			},
+			type,
+			[
+				{
+					op: 'replace',
+					path: '/active',
+					value: false,
+				},
+			],
+		);
+
+		const triggers = await ctx.jellyfish.query(ctx.context, ctx.session, {
+			type: 'object',
+			additionalProperties: true,
+			required: ['active', 'type'],
+			properties: {
+				active: {
+					type: 'boolean',
+					const: true,
+				},
+				type: {
+					type: 'string',
+					const: 'triggered-action@1.0.0',
+				},
+				data: {
+					type: 'object',
+					required: ['type'],
+					properties: {
+						type: {
+							type: 'string',
+							const: `${slug}@1.0.0`,
+						},
+					},
+				},
+			},
+		});
+
+		expect(triggers).toEqual([]);
 	});
 });

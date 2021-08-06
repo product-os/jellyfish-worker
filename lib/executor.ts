@@ -17,10 +17,10 @@ import * as triggers from './triggers';
 import * as assert from '@balena/jellyfish-assert';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
-import { Operation } from 'fast-json-patch';
-import { LogContext, EnqueueOptions, WorkerContext } from './types';
+import { LogContext, WorkerContext } from './types';
 import { core, worker } from '@balena/jellyfish-types';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
+import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 const logger = getLogger('worker');
@@ -84,7 +84,7 @@ const getInputCard = async (
  * @param {Function} fn - an asynchronous function that will perform the operation
  */
 // TS-TODO: Improve the tpyings for the `options` parameter
-const commit = async (
+export const commit = async (
 	context: LogContext,
 	jellyfish: Kernel,
 	session: string,
@@ -93,10 +93,9 @@ const commit = async (
 	options: {
 		transformers: any;
 		typeContracts: { [key: string]: core.TypeContract };
-		context: { privilegedSession: string };
-		executeAction: (arg0: any, arg1: EnqueueOptions) => any;
+		context: WorkerContext;
+		executeAction: (execSession: string, actionRequest: ProducerOptions) => any;
 		waitResults: (arg0: LogContext, arg1: any) => any;
-		subscriptions: core.Contract[];
 		triggers: any[];
 		actor: any;
 		originator: any;
@@ -174,7 +173,7 @@ const commit = async (
 				actionRequest.context = context;
 				const req = await options.executeAction(
 					options.context.privilegedSession,
-					actionRequest,
+					actionRequest as ProducerOptions,
 				);
 
 				const result = await options.waitResults(context, req);
@@ -204,9 +203,7 @@ const commit = async (
 				actorSession: string,
 				object: any,
 			) => {
-				return insertCard(
-					context,
-					jellyfish,
+				return options.context.insertCard(
 					actorSession,
 					insertedContractType,
 					{
@@ -249,7 +246,7 @@ const commit = async (
 	if (options.triggers) {
 		const runTrigger = async (trigger: TriggeredActionContract) => {
 			// Ignore triggered actions whose start date is in the future
-			if (currentTime.getTime() < triggers.getStartDate(trigger).getTime()) {
+			if (currentTime < triggers.getStartDate(trigger)) {
 				return null;
 			}
 
@@ -323,7 +320,8 @@ const commit = async (
 						},
 					);
 
-					return options.executeAction(session, actionRequest);
+					// TS-TODO: remove any casting
+					return options.executeAction(session, actionRequest as any);
 				}),
 			);
 		};
@@ -495,237 +493,6 @@ const commit = async (
 };
 
 /**
- * @summary Insert a card in the system
- * @function
- * @public
- *
- * @param {Object} context - worker execution context
- * @param {Object} jellyfish - jellyfish instance
- * @param {String} session - session id
- * @param {Object} typeCard - type card
- * @param {Object} options - options
- * @param {Date} [options.timestamp] - Upsert timestamp
- * @param {Boolean} options.attachEvents - attach create/update events
- * @param {Function} options.executeAction - execute action function (session, request)
- * @param {Object[]} [options.triggers] - known triggered action
- * @param {Object} object - card properties
- * @returns {Object} inserted card
- *
- * @example
- * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- * const typeCard = await jellyfish.getCardBySlug(session, 'card')
- *
- * const result = await executor.insertCard({ ... }, jellyfish, session, typeCard, {
- *   attachEvents: true,
- *   triggers: [ ... ],
- *   executeAction: async (session, request) => {
- *     ...
- *   }
- * }, {
- *   slug: 'foo',
- *   data: {
- *     bar: 'baz'
- *   }
- * })
- *
- * console.log(result.id)
- */
-export const insertCard = async (
-	context: LogContext,
-	jellyfish: Kernel,
-	session: string,
-	typeCard: core.TypeContract,
-	// TS-TODO: correctly type this
-	options: any,
-	object: Partial<core.Contract>,
-) => {
-	options.triggers = options.triggers || [];
-
-	logger.debug(context, 'Inserting card', {
-		slug: object.slug,
-		type: typeCard.slug,
-		attachEvents: options.attachEvents,
-		triggers: options.triggers.length,
-	});
-
-	object.type = `${typeCard.slug}@${typeCard.version}`;
-
-	let card: core.Contract | null = null;
-	if (object.slug) {
-		card = await jellyfish.getCardBySlug(
-			context,
-			session,
-			`${object.slug}@${object.version || 'latest'}`,
-		);
-	}
-	if (!card && object.id) {
-		card = await jellyfish.getCardById(context, session, object.id);
-	}
-
-	if (typeof object.name !== 'string') {
-		Reflect.deleteProperty(object, 'name');
-	}
-
-	options.eventPayload = _.omit(object, ['id']);
-	options.eventType = 'create';
-
-	return commit(
-		context,
-		jellyfish,
-		session,
-		typeCard,
-		card,
-		options,
-		async () => {
-			// TS-TODO: Fix these "any" castings
-			const objectWithLinks = await getObjectWithLinks(
-				context,
-				jellyfish,
-				session,
-				object,
-				typeCard,
-			);
-			const result = jellyscript.evaluateObject(
-				typeCard.data.schema,
-				objectWithLinks as any,
-			);
-			return jellyfish.insertCard(context, session, result as any);
-		},
-	);
-};
-
-export const replaceCard = async (
-	context: LogContext,
-	jellyfish: Kernel,
-	session: string,
-	typeCard: core.TypeContract,
-	// TS-TODO: correctly type this options object
-	options: any,
-	object: Partial<core.Contract>,
-): Promise<core.Contract | null> => {
-	options.triggers = options.triggers || [];
-
-	logger.debug(context, 'Replacing card', {
-		slug: object.slug,
-		type: typeCard.slug,
-		attachEvents: options.attachEvents,
-		triggers: options.triggers.length,
-	});
-
-	object.type = `${typeCard.slug}@${typeCard.version}`;
-
-	let card: core.Contract | null = null;
-	if (object.slug) {
-		card = await jellyfish.getCardBySlug(
-			context,
-			session,
-			`${object.slug}@${object.version}`,
-		);
-	}
-	if (!card && object.id) {
-		card = await jellyfish.getCardById(context, session, object.id);
-	}
-
-	if (typeof object.name !== 'string') {
-		Reflect.deleteProperty(object, 'name');
-	}
-
-	if (card) {
-		options.attachEvents = false;
-	} else {
-		options.eventPayload = _.omit(object, ['id']);
-		options.eventType = 'create';
-	}
-
-	return commit(
-		context,
-		jellyfish,
-		session,
-		typeCard,
-		card,
-		options,
-		async () => {
-			// TS-TODO: Remove these `any` castings
-			const objectWithLinks = await getObjectWithLinks(
-				context,
-				jellyfish,
-				session,
-				object,
-				typeCard,
-			);
-
-			const result = jellyscript.evaluateObject(
-				typeCard.data.schema,
-				objectWithLinks as any,
-			);
-			return jellyfish.replaceCard(context, session, result as any);
-		},
-	);
-};
-
-export const patchCard = async (
-	context: LogContext,
-	jellyfish: Kernel,
-	session: string,
-	typeCard: core.TypeContract,
-	// TS-TODO: correctly type this options object
-	options: any,
-	object: core.Contract,
-	patch: Operation[],
-) => {
-	assert.INTERNAL(
-		context,
-		object.version,
-		errors.WorkerInvalidVersion,
-		`Can't update without a version for: ${object.slug}`,
-	);
-
-	options.triggers = options.triggers || [];
-
-	logger.debug(context, 'Patching card', {
-		slug: object.slug,
-		version: object.version,
-		type: typeCard.slug,
-		attachEvents: options.attachEvents,
-		operations: patch.length,
-		triggers: options.triggers.length,
-	});
-
-	options.eventPayload = patch;
-	options.eventType = 'update';
-
-	return commit(
-		context,
-		jellyfish,
-		session,
-		typeCard,
-		object,
-		options,
-		async () => {
-			// TS-TODO: Remove these any castings
-			const objectWithLinks = await getObjectWithLinks(
-				context,
-				jellyfish,
-				session,
-				object,
-				typeCard,
-			);
-			const newPatch = jellyscript.evaluatePatch(
-				typeCard.data.schema,
-				objectWithLinks as any,
-				patch,
-			);
-			return jellyfish.patchCardBySlug(
-				context,
-				session,
-				`${object.slug}@${object.version}`,
-				newPatch,
-			);
-		},
-	);
-};
-
-/**
  * @summary Execute an action request
  * @function
  * @protected
@@ -861,7 +628,7 @@ export const run = async (
  * @returns {Object} - the card with any links referenced in the evaluated fields
  * of it's type card's schema.
  */
-async function getObjectWithLinks<
+export async function getObjectWithLinks<
 	PContract extends Partial<TContract> | TContract,
 	TContract extends core.Contract<TData>,
 	TData extends core.ContractData,
