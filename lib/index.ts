@@ -38,71 +38,6 @@ export { triggers, errors, executor, CARDS, utils };
  *
  * @module worker
  */
-
-const runExecutor = async (
-	fn:
-		| typeof executor.insertCard
-		| typeof executor.patchCard
-		| typeof executor.replaceCard,
-	instance: Worker,
-	context: LogContext,
-	session: string,
-	typeCard: core.TypeContract,
-	card: Partial<core.Contract>,
-	// TS-TODO: Find out the correct types for this options object
-	options: {
-		timestamp: string;
-		reason: null | string;
-		actor: string;
-		originator: string;
-		attachEvents: boolean;
-		replace?: any;
-	},
-	patch?: Operation[],
-): Promise<core.Contract | null> => {
-	return fn(
-		context,
-		instance.jellyfish,
-		session,
-		typeCard,
-		{
-			replace: options.replace,
-			triggers: instance.getTriggers(),
-			transformers: instance.getLatestTransformers(),
-			typeContracts: instance.getTypeContracts(),
-			timestamp: options.timestamp,
-			reason: options.reason,
-			context: instance.getActionContext(context),
-			actor: options.actor,
-			library: instance.library,
-			currentTime: new Date(),
-			originator: options.originator,
-			attachEvents: options.attachEvents,
-			setTriggers: instance.setTriggers.bind(instance),
-			executeAction: async (
-				executeSession: string,
-				actionRequest: ProducerOptions,
-			) => {
-				return instance.producer.enqueue(
-					instance.getId(),
-					executeSession,
-					actionRequest,
-				);
-			},
-			waitResults: async (
-				requestContext: LogContext,
-				actionRequest: core.ActionRequestContract,
-			) => {
-				return instance.producer.waitResults(requestContext, actionRequest);
-			},
-		},
-		// TS-TODO: Sometimes execute functions expect full contracts and sometimes they don't, fix the typings here!
-		card as core.Contract,
-		// TS-TODO: Patch is this extra function arg that is only used when fn is "patchCard"
-		patch as any,
-	);
-};
-
 export class Worker {
 	jellyfish: Kernel;
 	consumer: QueueConsumer;
@@ -191,7 +126,7 @@ export class Worker {
 	 * const id = worker.getId()
 	 * console.log(id)
 	 */
-	getId() {
+	getId(): string {
 		return this.id;
 	}
 
@@ -313,20 +248,43 @@ export class Worker {
 		},
 		card: Partial<core.Contract>,
 	) {
-		return runExecutor(
-			executor.insertCard,
-			this,
+		const instance = this;
+		return executor.insertCard(
 			context,
+			instance.jellyfish,
 			insertSession,
 			typeCard,
-			card,
 			{
+				triggers: instance.getTriggers(),
+				transformers: instance.getLatestTransformers(),
+				typeContracts: instance.getTypeContracts(),
 				timestamp: options.timestamp,
 				reason: options.reason,
+				context: instance.getActionContext(context),
 				actor: options.actor,
+				library: instance.library,
+				currentTime: new Date(),
 				originator: options.originator,
 				attachEvents: options.attachEvents,
+				setTriggers: instance.setTriggers.bind(instance),
+				executeAction: async (
+					executeSession: string,
+					actionRequest: ProducerOptions,
+				) => {
+					return instance.producer.enqueue(
+						instance.getId(),
+						executeSession,
+						actionRequest,
+					);
+				},
+				waitResults: async (
+					requestContext: LogContext,
+					actionRequest: core.ActionRequestContract,
+				) => {
+					return instance.producer.waitResults(requestContext, actionRequest);
+				},
 			},
+			card,
 		);
 	}
 
@@ -360,21 +318,46 @@ export class Worker {
 		card: Partial<core.Contract>,
 		patch: Operation[],
 	) {
-		return runExecutor(
-			executor.patchCard,
-			this,
+		const instance = this;
+		return executor.patchCard(
 			context,
+			instance.jellyfish,
 			insertSession,
 			typeCard,
-			card,
 			{
+				triggers: instance.getTriggers(),
+				transformers: instance.getLatestTransformers(),
+				typeContracts: instance.getTypeContracts(),
 				timestamp: options.timestamp,
 				reason: options.reason,
+				context: instance.getActionContext(context),
 				actor: options.actor,
+				library: instance.library,
+				currentTime: new Date(),
 				originator: options.originator,
 				attachEvents: options.attachEvents,
+				setTriggers: instance.setTriggers.bind(instance),
+				executeAction: async (
+					executeSession: string,
+					actionRequest: ProducerOptions,
+				) => {
+					return instance.producer.enqueue(
+						instance.getId(),
+						executeSession,
+						actionRequest,
+					);
+				},
+				waitResults: async (
+					requestContext: LogContext,
+					actionRequest: core.ActionRequestContract,
+				) => {
+					return instance.producer.waitResults(requestContext, actionRequest);
+				},
 			},
-			patch,
+			// TS-TODO: Sometimes execute functions expect full contracts and sometimes they don't, fix the typings here!
+			card as core.Contract,
+			// TS-TODO: Patch is this extra function arg that is only used when fn is "patchCard"
+			patch as any,
 		);
 	}
 
@@ -406,20 +389,43 @@ export class Worker {
 		},
 		card: Partial<core.Contract<core.ContractData>>,
 	) {
-		return runExecutor(
-			executor.replaceCard,
-			this,
+		const instance = this;
+		return executor.replaceCard(
 			context,
+			instance.jellyfish,
 			insertSession,
 			typeCard,
-			card,
 			{
+				triggers: instance.getTriggers(),
+				transformers: instance.getLatestTransformers(),
+				typeContracts: instance.getTypeContracts(),
 				timestamp: options.timestamp,
 				reason: options.reason,
+				context: instance.getActionContext(context),
 				actor: options.actor,
+				library: instance.library,
+				currentTime: new Date(),
 				originator: options.originator,
 				attachEvents: options.attachEvents,
+				setTriggers: instance.setTriggers.bind(instance),
+				executeAction: async (
+					executeSession: string,
+					actionRequest: ProducerOptions,
+				) => {
+					return instance.producer.enqueue(
+						instance.getId(),
+						executeSession,
+						actionRequest,
+					);
+				},
+				waitResults: async (
+					requestContext: LogContext,
+					actionRequest: core.ActionRequestContract,
+				) => {
+					return instance.producer.waitResults(requestContext, actionRequest);
+				},
 			},
+			card,
 		);
 	}
 

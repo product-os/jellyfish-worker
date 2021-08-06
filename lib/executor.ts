@@ -212,7 +212,6 @@ const commit = async (
 						...options,
 						attachEvents: true,
 						timestamp: Date.now(),
-						replace: false,
 					},
 					object,
 				);
@@ -508,7 +507,6 @@ const commit = async (
  * @param {String} session - session id
  * @param {Object} typeCard - type card
  * @param {Object} options - options
- * @param {Boolean} options.replace - perform a replace
  * @param {Date} options.currentTime - current time
  * @param {Date} [options.timestamp] - Upsert timestamp
  * @param {Boolean} options.attachEvents - attach create/update events
