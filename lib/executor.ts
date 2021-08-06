@@ -315,6 +315,16 @@ const commit = async (
 						originator: options.originator || request.originator,
 					};
 
+					logger.info(
+						context,
+						'Enqueing new action request due to triggered-action',
+						{
+							trigger: trigger.slug,
+							contract: triggerCard.id,
+							arguments: request.arguments,
+						},
+					);
+
 					return options.executeAction(session, actionRequest);
 				}),
 			);
