@@ -98,7 +98,6 @@ const commit = async (
 		waitResults: (arg0: LogContext, arg1: any) => any;
 		subscriptions: core.Contract[];
 		triggers: any[];
-		currentTime: Date;
 		actor: any;
 		originator: any;
 		library: {
@@ -135,6 +134,8 @@ const commit = async (
 		errors.WorkerNoElement,
 		`Invalid type: ${typeCard}`,
 	);
+
+	const currentTime = new Date();
 
 	const insertedCard = await fn();
 	if (!insertedCard) {
@@ -248,9 +249,7 @@ const commit = async (
 	if (options.triggers) {
 		const runTrigger = async (trigger: TriggeredActionContract) => {
 			// Ignore triggered actions whose start date is in the future
-			if (
-				options.currentTime.getTime() < triggers.getStartDate(trigger).getTime()
-			) {
+			if (currentTime.getTime() < triggers.getStartDate(trigger).getTime()) {
 				return null;
 			}
 
@@ -355,9 +354,7 @@ const commit = async (
 	}
 
 	if (options.attachEvents) {
-		const time = options.timestamp
-			? new Date(options.timestamp)
-			: options.currentTime;
+		const time = options.timestamp ? new Date(options.timestamp) : currentTime;
 
 		const request = {
 			action: 'action-create-event@1.0.0',
@@ -507,7 +504,6 @@ const commit = async (
  * @param {String} session - session id
  * @param {Object} typeCard - type card
  * @param {Object} options - options
- * @param {Date} options.currentTime - current time
  * @param {Date} [options.timestamp] - Upsert timestamp
  * @param {Boolean} options.attachEvents - attach create/update events
  * @param {Function} options.executeAction - execute action function (session, request)
@@ -521,7 +517,6 @@ const commit = async (
  *
  * const result = await executor.insertCard({ ... }, jellyfish, session, typeCard, {
  *   attachEvents: true,
- *   currentTime: new Date(),
  *   triggers: [ ... ],
  *   executeAction: async (session, request) => {
  *     ...
