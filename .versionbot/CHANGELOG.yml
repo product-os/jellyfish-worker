@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add logs for when a trigger generates a new action request
+      hash: 8af6e782c71dafc9afd0649dd47aba35e38c6c01
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 8.0.24
+  date: 2021-08-06T16:32:02.063Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: b196dde2fddbfc7010afeadca2efb0cfbaa3e4c6
       body: ''
