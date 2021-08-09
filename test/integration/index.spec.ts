@@ -1879,6 +1879,58 @@ describe('.replaceCard()', () => {
 			_.pick(result1, ['data', 'slug', 'type', 'version']),
 		);
 	});
+
+	test('should be able to disable event creation', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const slug = ctx.generateRandomSlug();
+
+		const result = await ctx.worker.replaceCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: false,
+				actor: ctx.actor.id,
+			},
+			{
+				slug,
+				version: '1.0.0',
+			},
+		);
+
+		assert(result !== null);
+
+		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+			type: 'object',
+			additionalProperties: true,
+			required: ['type', 'data'],
+			properties: {
+				type: {
+					type: 'string',
+					enum: ['create@1.0.0', 'update@1.0.0'],
+				},
+				data: {
+					type: 'object',
+					required: ['target'],
+					properties: {
+						target: {
+							type: 'string',
+							const: result.id,
+						},
+					},
+				},
+			},
+		});
+
+		expect(tail.length).toBe(0);
+	});
 });
 
 describe('.insertCard()', () => {
