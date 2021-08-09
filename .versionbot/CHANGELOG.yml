@@ -1,4 +1,43 @@
 - commits:
+    - subject: 'Hoist the replace, insert and patch methods into the worker class'
+      hash: fbe060ca68b177c082db4d76e29eec4686eebf76
+      body: |
+        This change removes the indirection of having replace, insert and patch
+        methods in the executor and the Worker. Now the methods are directly in
+        the worker and are tested at that level as well.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Refactor currentTime option into a local variable
+      hash: 734c196f823759c1f56990af29b58a6113a840f2
+      body: |
+        Having the currentTime option as an option is unnecessary as it is
+        always set to `new Date()`. Switching it to a local variable reduces
+        complexity.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Remove run utility and unused "replace" option
+      hash: 6159a4df58bfc3499976ba083a0421e5b18a754c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 8.0.30
+  date: 2021-08-08T17:51:31.861Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.15'
       hash: 64a5a9a6ff27fd74c4d2c1c10f8dcea85d89e8ba
       body: ''
