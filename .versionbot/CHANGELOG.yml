@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: b6192d2df4cd876b3f98dec62ab9f31a77729255
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.0.31
+  date: 2021-08-09T10:49:07.893Z
+- commits:
     - subject: 'Hoist the replace, insert and patch methods into the worker class'
       hash: fbe060ca68b177c082db4d76e29eec4686eebf76
       body: |
