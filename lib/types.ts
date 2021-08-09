@@ -10,6 +10,7 @@ import {
 	ContractData,
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
+import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
 import { Operation } from 'fast-json-patch';
 import * as errors from './errors';
 import * as utils from './utils';
@@ -148,16 +149,6 @@ export interface QueueConsumer {
 		actionRequest: core.ActionRequestContract,
 		results: PostResults,
 	) => Promise<queue.ExecuteContract>;
-}
-
-export interface ProducerOptions {
-	context: LogContext;
-	action: string;
-	card: string;
-	type: string;
-	arguments: core.ContractData;
-	currentDate?: Date;
-	originator?: string;
 }
 
 export interface ProducerResults {
