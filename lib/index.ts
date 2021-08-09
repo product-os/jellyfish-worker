@@ -9,30 +9,59 @@ import * as errio from 'errio';
 import * as _ from 'lodash';
 import { Operation } from 'fast-json-patch';
 import { v4 as uuidv4 } from 'uuid';
+import * as skhema from 'skhema';
 import * as assert from '@balena/jellyfish-assert';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
 import * as semver from 'semver';
-import {
-	LogContext,
-	QueueConsumer,
-	QueueProducer,
-	WorkerContext,
-} from './types';
-import { core } from '@balena/jellyfish-types';
+import { ActionLibrary, LogContext } from './types';
+import { core, JSONSchema } from '@balena/jellyfish-types';
 import * as errors from './errors';
 import * as executor from './executor';
 import * as utils from './utils';
 import * as triggers from './triggers';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
+import * as queue from '@balena/jellyfish-queue';
 import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import {
+	TriggeredActionContract,
+	WorkerContext,
+} from '@balena/jellyfish-types/build/worker';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
 
 export { triggers, errors, executor, CARDS, utils };
+
+/**
+ * @summary Get the request input card
+ * @function
+ * @private
+ *
+ * @param {Object} context - execution context
+ * @param {Object} jellyfish - jellyfish instance
+ * @param {String} session - session id
+ * @param {String} identifier - id or slug
+ * @returns {(Object|Null)}
+ *
+ * @example
+ * const card = await getInputCard({ ... }, jellyfish, session, 'foo-bar')
+ * if (card) {
+ *   console.log(card)
+ * }
+ */
+const getInputCard = async (
+	context: LogContext,
+	jellyfish: Kernel,
+	session: string,
+	identifier: string,
+): Promise<core.Contract | null> => {
+	if (identifier.includes('@')) {
+		return jellyfish.getCardBySlug(context, session, identifier);
+	}
+	return jellyfish.getCardById(context, session, identifier);
+};
 
 /**
  * Jellyfish worker library module.
@@ -41,35 +70,15 @@ export { triggers, errors, executor, CARDS, utils };
  */
 export class Worker {
 	jellyfish: Kernel;
-	consumer: QueueConsumer;
-	producer: QueueProducer;
+	consumer: queue.Consumer;
+	producer: queue.Producer;
 	triggers: TriggeredActionContract[];
 	transformers: core.Contract[];
 	latestTransformers: core.Contract[];
 	typeContracts: { [key: string]: core.TypeContract };
 	errors: typeof errors;
 	session: string;
-	// TS-TODO: type these correctly
-	library: {
-		[key: string]: {
-			handler: (
-				session: string,
-				// Worker context?
-				context: any,
-				contract: core.Contract<core.ContractData>,
-				request: {
-					action: string;
-					card: core.Contract<core.ContractData>;
-					actor: string;
-					context: LogContext;
-					timestamp: any;
-					epoch: any;
-					arguments: { name: any; type: any; payload: any; tags: never[] };
-				},
-			) => any;
-			pre: (session: string, context: any, request: any) => any;
-		};
-	};
+	library: ActionLibrary;
 	id: string = '0';
 	// TS-TODO: use correct sync typings
 	sync: any;
@@ -98,10 +107,9 @@ export class Worker {
 	constructor(
 		jellyfish: Kernel,
 		session: string,
-		// TS-TODO: type the action library
-		actionLibrary: { [key: string]: any },
-		consumer: QueueConsumer,
-		producer: QueueProducer,
+		actionLibrary: ActionLibrary,
+		consumer: queue.Consumer,
+		producer: queue.Producer,
 	) {
 		this.jellyfish = jellyfish;
 		this.triggers = [];
@@ -167,8 +175,10 @@ export class Worker {
 	getActionContext(context: LogContext): WorkerContext {
 		const self = this;
 		return {
-			errors,
-			defaults: this.jellyfish.defaults,
+			// TS-TODO: remove this cast
+			errors: errors as any,
+			// TS-TODO: remove this cast
+			defaults: this.jellyfish.defaults as any,
 			sync: this.sync,
 			getEventSlug: utils.getEventSlug,
 			getCardById: (lsession: string, id: string) => {
@@ -868,8 +878,7 @@ export class Worker {
 	 * console.log(result.error)
 	 * console.log(result.data)
 	 */
-	// TS-TODO: Correctly type the "request" parameter
-	async execute(session: string, request: any) {
+	async execute(session: string, request: core.ActionRequestContract) {
 		logger.info(request.data.context, 'Executing request', {
 			request: {
 				id: request.id,
@@ -880,14 +889,17 @@ export class Worker {
 			},
 		});
 
+		// TS-TODO: correctly type request context on action request contract
+		const requestContext = request.data.context as any as LogContext;
+
 		const actionCard = await this.jellyfish.getCardBySlug<core.ActionContract>(
-			request.data.context,
+			requestContext,
 			session,
 			request.data.action,
 		);
 
 		assert.USER(
-			request.context,
+			requestContext,
 			actionCard,
 			errors.WorkerInvalidAction,
 			`No such action: ${request.data.action}`,
@@ -902,71 +914,149 @@ export class Worker {
 		}
 
 		const startDate = new Date();
-		const result = await executor
-			.run(
-				this.jellyfish,
-				session,
-				this.getActionContext(request.data.context),
-				this.library,
-				{
-					context: request.data.context,
-					card: request.data.input.id,
-					type: request.data.input.type,
-					actor: request.data.actor,
-					action: actionCard,
-					timestamp: request.data.timestamp,
-					arguments: request.data.arguments,
-					epoch: request.data.epoch,
-					originator: request.data.originator,
-				},
-			)
-			.then((data) => {
-				const endDate = new Date();
-				logger.info(request.data.context, 'Execute success', {
-					data,
-					input: request.data.input,
-					action: actionCard.slug,
-					time: endDate.getTime() - startDate.getTime(),
-				});
 
-				return {
-					error: false,
-					data,
-				};
-			})
-			.catch((error) => {
-				const endDate = new Date();
-				const errorObject = errio.toObject(error, {
-					stack: true,
-				});
+		let result;
 
-				const logData = {
-					error: errorObject,
-					input: request.data.input,
-					action: actionCard.slug,
-					time: endDate.getTime() - startDate.getTime(),
-				};
+		try {
+			const cards = await Bluebird.props({
+				input: getInputCard(
+					requestContext,
+					this.jellyfish,
+					session,
+					request.data.input.id,
+				),
+				actor: this.jellyfish.getCardById(
+					requestContext,
+					session,
+					request.data.actor,
+				),
+			});
 
-				if (error.expected) {
-					logger.warn(request.data.context, 'Execute error', logData);
-				} else {
-					logger.error(request.data.context, 'Execute error', logData);
+			assert.USER(
+				requestContext,
+				cards.input,
+				errors.WorkerNoElement,
+				`No such input card: ${request.data.input.id}`,
+			);
+			assert.INTERNAL(
+				requestContext,
+				cards.actor,
+				errors.WorkerNoElement,
+				`No such actor: ${request.data.actor}`,
+			);
+
+			const actionInputCardFilter = _.get(actionCard, ['data', 'filter'], {
+				type: 'object',
+			});
+
+			const results = skhema.match(actionInputCardFilter as any, cards.input);
+			if (!results.valid) {
+				logger.error(requestContext, 'Card schema mismatch!');
+				logger.error(requestContext, JSON.stringify(actionInputCardFilter));
+				for (const error of results.errors) {
+					logger.error(requestContext, error);
 				}
 
-				return {
-					error: true,
-					data: errorObject,
-				};
+				throw new errors.WorkerSchemaMismatch(
+					`Input card does not match filter. Action:${actionCard.slug}, Card:${cards.input?.slug}`,
+				);
+			}
+
+			// TODO: Action definition bodies are not versioned yet
+			// as they are not part of the action cards.
+			const actionName = actionCard.slug.split('@')[0];
+
+			const argumentsSchema = utils.getActionArgumentsSchema(actionCard);
+
+			assert.USER(
+				requestContext,
+				// TS-TODO: remove any casting
+				skhema.isValid(argumentsSchema as any, request.data.arguments),
+				errors.WorkerSchemaMismatch,
+				() => {
+					return `Arguments do not match for action ${actionName}: ${JSON.stringify(
+						request.data.arguments,
+						null,
+						2,
+					)}`;
+				},
+			);
+
+			const actionFunction =
+				this.library[actionName] && this.library[actionName].handler;
+
+			assert.INTERNAL(
+				requestContext,
+				actionFunction,
+				errors.WorkerInvalidAction,
+				`Unknown action function: ${actionName}`,
+			);
+
+			// Generate an interface object for the action function to use.
+			// This ensures that any CRUD operations performed by the action
+			// function are mediates by the worker instance, ensuring that
+			// things like triggers, transformers etc are always processed correctly.
+			const actionContext = this.getActionContext(requestContext);
+
+			// TS-TODO: `cards.input` gets verified as non-null by a jellyfish-assert
+			// call above, but Typescript doesn't understand this.
+			const data = await actionFunction(session, actionContext, cards.input!, {
+				action: actionCard,
+				card: request.data.input.id,
+				actor: request.data.actor,
+				context: requestContext,
+				timestamp: request.data.timestamp,
+				epoch: request.data.epoch,
+				// TS-TODO: correctly type arguments object on action request contract
+				arguments: request.data.arguments as { [arg: string]: JSONSchema },
+				originator: request.data.originator,
 			});
+
+			const endDate = new Date();
+			logger.info(request.data.context, 'Execute success', {
+				data,
+				input: request.data.input,
+				action: actionCard.slug,
+				time: endDate.getTime() - startDate.getTime(),
+			});
+
+			result = {
+				error: false,
+				data,
+			};
+		} catch (error) {
+			const endDate = new Date();
+			const errorObject = errio.toObject(error, {
+				stack: true,
+			});
+
+			const logData = {
+				error: errorObject,
+				input: request.data.input,
+				action: actionCard.slug,
+				time: endDate.getTime() - startDate.getTime(),
+			};
+
+			if (error.expected) {
+				logger.warn(request.data.context, 'Execute error', logData);
+			} else {
+				logger.error(request.data.context, 'Execute error', logData);
+			}
+
+			result = {
+				error: true,
+				data: errorObject,
+			};
+		}
 
 		const event = await this.consumer.postResults(
 			this.getId(),
-			request.data.context,
+			requestContext,
 			request,
 			result,
 		);
 		assert.INTERNAL(
-			request.context,
+			requestContext,
 			event,
 			errors.WorkerNoExecuteEvent,
 			`Could not create execute event for request: ${request.id}`,

@@ -7,7 +7,6 @@
 import Bluebird from 'bluebird';
 import * as errio from 'errio';
 import * as _ from 'lodash';
-import * as skhema from 'skhema';
 import * as fastEquals from 'fast-equals';
 import * as utils from './utils';
 import * as errors from './errors';
@@ -17,7 +16,7 @@ import * as triggers from './triggers';
 import * as assert from '@balena/jellyfish-assert';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
-import { LogContext, WorkerContext } from './types';
+import { ActionLibrary, LogContext } from './types';
 import { core, worker } from '@balena/jellyfish-types';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
@@ -93,31 +92,13 @@ export const commit = async (
 	options: {
 		transformers: any;
 		typeContracts: { [key: string]: core.TypeContract };
-		context: WorkerContext;
+		context: worker.WorkerContext;
 		executeAction: (execSession: string, actionRequest: ProducerOptions) => any;
 		waitResults: (arg0: LogContext, arg1: any) => any;
 		triggers: any[];
 		actor: any;
 		originator: any;
-		library: {
-			[x: string]: {
-				handler: (
-					session: string,
-					// Worker context?
-					context: any,
-					contract: core.Contract<core.ContractData>,
-					request: {
-						action: string;
-						card: core.Contract<core.ContractData>;
-						actor: string;
-						context: LogContext;
-						timestamp: any;
-						epoch: any;
-						arguments: { name: any; type: any; payload: any; tags: never[] };
-					},
-				) => any;
-			};
-		};
+		library: ActionLibrary;
 		attachEvents: any;
 		timestamp: string | number | Date;
 		reason: any;
@@ -490,126 +471,6 @@ export const commit = async (
 	}
 
 	return insertedCard;
-};
-
-/**
- * @summary Execute an action request
- * @function
- * @protected
- *
- * @param {Object} jellyfish - jellyfish instance
- * @param {String} session - session id
- * @param {Object} context - execution context
- * @param {Object} library - actions library
- * @param {Object} request - request
- * @param {String} request.actor - actor id
- * @param {Object} request.action - action card
- * @param {String} request.timestamp - action timestamp
- * @param {String} request.card - action input card id or slug
- * @param {Object} request.arguments - action arguments
- * @returns {Any} action result
- *
- * @example
- * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- * const result = await executor.run(jellyfish, session, { ... }, { ... }, { ... })
- * console.log(result)
- */
-export const run = async (
-	jellyfish: Kernel,
-	session: string,
-	context: WorkerContext,
-	// TS-TODO: type the action library
-	library: { [x: string]: { handler: any } },
-	// TS-TODO: type request param
-	request: {
-		context: LogContext;
-		card: string;
-		actor: string;
-		action: core.ActionContract;
-		arguments: any;
-		timestamp: any;
-		epoch?: any;
-		type: string;
-		originator?: string;
-	},
-) => {
-	const cards = await Bluebird.props({
-		input: getInputCard(request.context, jellyfish, session, request.card),
-		actor: jellyfish.getCardById(request.context, session, request.actor),
-	});
-
-	assert.USER(
-		request.context,
-		cards.input,
-		errors.WorkerNoElement,
-		`No such input card: ${request.card}`,
-	);
-	assert.INTERNAL(
-		request.context,
-		cards.actor,
-		errors.WorkerNoElement,
-		`No such actor: ${request.actor}`,
-	);
-
-	const actionInputCardFilter = _.get(request.action, ['data', 'filter'], {
-		type: 'object',
-	});
-
-	const results = skhema.match(actionInputCardFilter as any, cards.input);
-	if (!results.valid) {
-		logger.error(request.context, 'Card schema mismatch!');
-		logger.error(request.context, JSON.stringify(actionInputCardFilter));
-		for (const error of results.errors) {
-			logger.error(request.context, error);
-		}
-	}
-
-	assert.INTERNAL(
-		request.context,
-		// TS-TODO: Remove "any" casting
-		skhema.isValid(actionInputCardFilter as any, cards.input),
-		errors.WorkerSchemaMismatch,
-		`Input card does not match filter. Action:${request.action.slug}, Card:${cards.input?.slug}`,
-	);
-
-	// TODO: Action definition bodies are not versioned yet
-	// as they are not part of the action cards.
-	const actionName = request.action.slug.split('@')[0];
-
-	const argumentsSchema = utils.getActionArgumentsSchema(request.action);
-
-	assert.USER(
-		request.context,
-		// TS-TODO: remove any casting
-		skhema.isValid(argumentsSchema as any, request.arguments),
-		errors.WorkerSchemaMismatch,
-		() => {
-			return `Arguments do not match for action ${actionName}: ${JSON.stringify(
-				request.arguments,
-				null,
-				2,
-			)}`;
-		},
-	);
-
-	const actionFunction = library[actionName] && library[actionName].handler;
-	assert.INTERNAL(
-		request.context,
-		actionFunction,
-		errors.WorkerInvalidAction,
-		`Unknown action function: ${actionName}`,
-	);
-
-	return actionFunction(session, context, cards.input, {
-		action: request.action,
-		card: request.card,
-		actor: request.actor,
-		context: request.context,
-		timestamp: request.timestamp,
-		epoch: request.epoch,
-		arguments: request.arguments,
-		originator: request.originator,
-	});
 };
 
 /**

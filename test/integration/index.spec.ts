@@ -1054,6 +1054,8 @@ describe('Worker', () => {
 
 		const enqueuedRequest1 = await ctx.dequeue();
 
+		assert(enqueuedRequest1 !== null);
+
 		await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
 			slug: 'foo',
 			type: 'card@1.0.0',
