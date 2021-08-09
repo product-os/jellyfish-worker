@@ -247,11 +247,10 @@ export class Worker {
 			originator?: any;
 			attachEvents?: any;
 		},
-		_card: Partial<core.Contract>,
+		object: Partial<core.Contract>,
 	) {
 		const instance = this;
 		const jellyfish = instance.jellyfish;
-		const object = _card;
 
 		logger.debug(context, 'Inserting card', {
 			slug: object.slug,
@@ -457,6 +456,8 @@ export class Worker {
 	 *
 	 * @returns {Object} replaced card
 	 */
+	// FIXME: This entire method should be replaced and all operations should
+	// be an insert or update.
 	async replaceCard(
 		context: LogContext,
 		insertSession: string,
@@ -467,13 +468,12 @@ export class Worker {
 			reason?: any;
 			actor?: any;
 			originator?: any;
-			attachEvents?: any;
+			attachEvents?: boolean;
 		},
-		_card: Partial<core.Contract<core.ContractData>>,
+		object: Partial<core.Contract<core.ContractData>>,
 	) {
 		const instance = this;
 		const jellyfish = instance.jellyfish;
-		const object = _card;
 		logger.debug(context, 'Replacing card', {
 			slug: object.slug,
 			type: typeCard.slug,
@@ -495,6 +495,13 @@ export class Worker {
 			card = await jellyfish.getCardById(context, insertSession, object.id);
 		}
 
+		let attachEvents = options.attachEvents;
+
+		// If a contract already exists don't attach events
+		if (card) {
+			attachEvents = false;
+		}
+
 		if (typeof object.name !== 'string') {
 			Reflect.deleteProperty(object, 'name');
 		}
@@ -506,7 +513,7 @@ export class Worker {
 			typeCard,
 			card,
 			{
-				attachEvents: !card,
+				attachEvents,
 				eventPayload: !!card ? null : _.omit(object, ['id']),
 				eventType: !!card ? null : 'create',
 				triggers: instance.getTriggers(),
