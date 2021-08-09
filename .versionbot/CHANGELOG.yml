@@ -1,4 +1,31 @@
 - commits:
+    - subject: 'Revert change to behaviour in replaceCard when attachEvents:false'
+      hash: b696148f7964b5d27c53039f32c64a5c47ffcf56
+      body: >
+        The behaviour of `Worker.replaceCard` is to always set `attachEvents` to
+        false unless,
+
+        `options.attachEvents` is true AND there is no pre-existing contract.
+
+        The previous refactor incorrectly changed the behaviour to always ignore
+
+        `options.attachEvents`, which has now been fixed.
+
+        Long-term I really want to remove this method as it causes a bunch of
+
+        headaches in the core kernel and is a bit of a hack that appears to be
+
+        only used to bootstrap the stack.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 8.0.33
+  date: 2021-08-09T18:47:32.200Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.17'
       hash: f6766aa5d461328f5dc71d2e7218d5c940be612f
       body: ''
