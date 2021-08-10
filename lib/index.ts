@@ -1372,61 +1372,48 @@ export class Worker {
 				// trigger.target might result in multiple cards in a single action request
 				const identifiers = _.uniq(_.castArray(request.card));
 
-				const triggerCards = await Bluebird.map(
-					identifiers,
-					async (identifier) => {
-						const triggerCard = await getInputCard(
-							context,
-							jellyfish,
-							session,
-							identifier,
-						);
-						assert.INTERNAL(
-							context,
-							triggerCard,
-							errors.WorkerNoElement,
+				await Bluebird.map(identifiers, async (identifier) => {
+					const triggerCard = await getInputCard(
+						context,
+						jellyfish,
+						session,
+						identifier,
+					);
+
+					if (!triggerCard) {
+						throw new errors.WorkerNoElement(
 							`No such input card for trigger ${trigger.slug}: ${identifier}`,
 						);
-						return triggerCard;
-					},
-				);
+					}
+					const actionRequest = {
+						// Re-enqueuing an action request expects the "card" option to be an
+						// id, not a full card.
+						card: triggerCard.id,
+						action: request.action!,
+						actor: options.actor,
+						context: request.context,
+						timestamp: request.currentDate.toISOString(),
+						epoch: request.currentDate.valueOf(),
+						arguments: request.arguments,
 
-				return Promise.all(
-					triggerCards.map((triggerCard) => {
-						// TODO: improve this gaurd
-						if (!triggerCard) {
-							return;
-						}
-						const actionRequest = {
-							// Re-enqueuing an action request expects the "card" option to be an
-							// id, not a full card.
-							card: triggerCard.id,
-							action: request.action!,
-							actor: options.actor,
-							context: request.context,
-							timestamp: request.currentDate.toISOString(),
-							epoch: request.currentDate.valueOf(),
+						// Carry the old originator if present so we
+						// don't break the chain
+						originator: options.originator || request.originator,
+					};
+
+					logger.info(
+						context,
+						'Enqueing new action request due to triggered-action',
+						{
+							trigger: trigger.slug,
+							contract: triggerCard.id,
 							arguments: request.arguments,
+						},
+					);
 
-							// Carry the old originator if present so we
-							// don't break the chain
-							originator: options.originator || request.originator,
-						};
-
-						logger.info(
-							context,
-							'Enqueing new action request due to triggered-action',
-							{
-								trigger: trigger.slug,
-								contract: triggerCard.id,
-								arguments: request.arguments,
-							},
-						);
-
-						// TS-TODO: remove any casting
-						return this.enqueueAction(session, actionRequest as any);
-					}),
-				);
+					// TS-TODO: remove any casting
+					return this.enqueueAction(session, actionRequest as any);
+				});
 			} catch (error) {
 				const errorObject = errio.toObject(error, {
 					stack: true,
