@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.19'
+      hash: b7a4b853dd75ebdfc27b99be2d7a1031179476fb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.0.36
+  date: 2021-08-10T14:45:31.406Z
+- commits:
     - subject: Reduce indirection by removing executor.run function
       hash: b9ca8cf662094e5ef29f1551ecf1dce75eb11112
       body: |
