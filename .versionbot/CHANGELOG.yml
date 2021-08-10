@@ -1,4 +1,18 @@
 - commits:
+    - subject: Reduce indirection by removing executor.run function
+      hash: b9ca8cf662094e5ef29f1551ecf1dce75eb11112
+      body: |
+        Action functions are now run directly from the Worker class
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 8.0.35
+  date: 2021-08-10T14:31:21.606Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.18'
       hash: 3ccb09536c5e29731ddce058bdd97dbba8e26377
       body: ''
