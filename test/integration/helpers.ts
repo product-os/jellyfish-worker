@@ -9,16 +9,12 @@ import * as errio from 'errio';
 import Bluebird from 'bluebird';
 import { v4 as uuidv4 } from 'uuid';
 import {
+	ActionRequestContract,
 	Context,
 	Contract,
 	SessionContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
-import {
-	ActionPayload,
-	QueueConsumer,
-	QueueProducer,
-} from '@balena/jellyfish-types/build/queue';
 import * as queue from '@balena/jellyfish-queue';
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import {
@@ -29,7 +25,6 @@ import {
 } from '@balena/jellyfish-core';
 import { Cache as JellyfishCache } from '@balena/jellyfish-core/build/cache';
 import { PostgresBackend } from '@balena/jellyfish-core/build/backend/postgres';
-import { Actions } from '@balena/jellyfish-plugin-base';
 import { strict as assert } from 'assert';
 import { v4 as uuid } from 'uuid';
 import { cardMixins } from '@balena/jellyfish-core';
@@ -38,6 +33,7 @@ import ActionLibrary = require('@balena/jellyfish-action-library');
 import { PluginManager } from '@balena/jellyfish-plugin-base';
 import { Kernel as CoreKernel } from '@balena/jellyfish-core/build/kernel';
 import CARDS from '../../lib/cards';
+import { ActionLibrary as IActionLibrary } from '../../lib/types';
 import { Worker } from '../../lib/index';
 
 const pluginContext = {
@@ -102,10 +98,10 @@ export interface IntegrationTestContext {
 	backend: PostgresBackend;
 	session: string;
 	actor: UserContract;
-	dequeue: (times?: number) => Promise<ActionPayload | null>;
+	dequeue: (times?: number) => Promise<ActionRequestContract | null>;
 	queue: {
-		consumer: QueueConsumer;
-		producer: QueueProducer;
+		consumer: queue.Consumer;
+		producer: queue.Producer;
 	};
 	jellyfish: CoreKernel;
 	worker: InstanceType<typeof Worker>;
@@ -124,7 +120,7 @@ export interface IntegrationTestContext {
 	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
 	generateRandomSlug: typeof generateRandomSlug;
 	generateRandomID: typeof generateRandomID;
-	actionLibrary: Actions;
+	actionLibrary: IActionLibrary;
 }
 
 export interface BackendTestOptions {

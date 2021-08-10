@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import * as helpers from './helpers';
 import { v4 as uuidv4 } from 'uuid';
 import { strict as assert } from 'assert';
+import { core } from '@balena/jellyfish-types';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import Bluebird from 'bluebird';
 
@@ -1172,5 +1173,266 @@ describe('.execute()', () => {
 		assert(resultCard !== null);
 
 		expect(resultCard.data.command).toBe(command);
+	});
+
+	test('should create a card', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const actionRequest =
+			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
+				ctx.context,
+				ctx.session,
+				{
+					slug: `action-request-${uuidv4()}`,
+					type: 'action-request@1.0.0',
+					data: {
+						actor: ctx.actor.id,
+						context: ctx.context,
+						action: 'action-create-card@1.0.0',
+						epoch: 1530663772247,
+						timestamp: '2018-07-04T00:22:52.247Z',
+						input: {
+							id: typeCard.id,
+							type: typeCard.type,
+						},
+						arguments: {
+							reason: null,
+							properties: {
+								slug,
+								version: '1.0.0',
+							},
+						},
+					},
+				},
+			);
+
+		const result = await ctx.worker.execute(ctx.session, actionRequest);
+
+		expect(result.data).toEqual({
+			id: result.data.id,
+			type: 'card@1.0.0',
+			version: '1.0.0',
+			slug,
+		});
+	});
+
+	test('should throw if the input card does not exist', async () => {
+		const actionRequest =
+			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
+				ctx.context,
+				ctx.session,
+				{
+					slug: `action-request-${uuidv4()}`,
+					type: 'action-request@1.0.0',
+					data: {
+						actor: ctx.actor.id,
+						context: ctx.context,
+						action: 'action-create-card@1.0.0',
+						epoch: 1530663772247,
+						timestamp: '2018-07-04T00:22:52.247Z',
+						input: {
+							// Make up a new UUID that doesn't correspond to any contract
+							id: uuidv4(),
+							type: 'card@1.0.0',
+						},
+						arguments: {
+							reason: null,
+							properties: {
+								slug: ctx.generateRandomSlug(),
+								version: '1.0.0',
+							},
+						},
+					},
+				},
+			);
+
+		const result = await ctx.worker.execute(ctx.session, actionRequest);
+		expect(result.error).toBe(true);
+		expect(result.data.name).toBe('WorkerNoElement');
+	});
+
+	test('should throw if the actor does not exist', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const actionRequest =
+			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
+				ctx.context,
+				ctx.session,
+				{
+					slug: `action-request-${uuidv4()}`,
+					type: 'action-request@1.0.0',
+					data: {
+						actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+						context: ctx.context,
+						action: 'action-create-card@1.0.0',
+						epoch: 1530663772247,
+						timestamp: '2018-07-04T00:22:52.247Z',
+						input: {
+							id: typeCard.id,
+							type: typeCard.type,
+						},
+						arguments: {
+							reason: null,
+							properties: {
+								slug: ctx.generateRandomSlug(),
+								version: '1.0.0',
+							},
+						},
+					},
+				},
+			);
+
+		const result = await ctx.worker.execute(ctx.session, actionRequest);
+		expect(result.error).toBe(true);
+		expect(result.data.name).toBe('WorkerNoElement');
+	});
+
+	test('should throw if input card does not match the action filter', async () => {
+		const actionCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
+			'action-create-card@latest',
+		);
+
+		assert(actionCard !== null);
+
+		const actionRequest =
+			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
+				ctx.context,
+				ctx.session,
+				{
+					slug: `action-request-${uuidv4()}`,
+					type: 'action-request@1.0.0',
+					data: {
+						actor: ctx.actor.id,
+						context: ctx.context,
+						action: 'action-create-card@1.0.0',
+						epoch: 1530663772247,
+						timestamp: '2018-07-04T00:22:52.247Z',
+						input: {
+							id: actionCard.id,
+							type: actionCard.type,
+						},
+						arguments: {
+							reason: null,
+							properties: {
+								slug: ctx.generateRandomSlug(),
+								version: '1.0.0',
+							},
+						},
+					},
+				},
+			);
+
+		// The input filter on action-create-card checks that the input contracts has
+		// a type of "type". If it doesn't, the action request is rejected.
+		const result = await ctx.worker.execute(ctx.session, actionRequest);
+		expect(result.error).toBe(true);
+		expect(result.data.name).toBe('WorkerSchemaMismatch');
+	});
+
+	test('should return an error if the arguments do not match the action', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const actionRequest =
+			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
+				ctx.context,
+				ctx.session,
+				{
+					slug: `action-request-${uuidv4()}`,
+					type: 'action-request@1.0.0',
+					data: {
+						actor: ctx.actor.id,
+						context: ctx.context,
+						action: 'action-create-card@1.0.0',
+						epoch: 1530663772247,
+						timestamp: '2018-07-04T00:22:52.247Z',
+						input: {
+							id: typeCard.id,
+							type: typeCard.type,
+						},
+						arguments: {
+							foo: 'bar',
+							bar: 'baz',
+						},
+					},
+				},
+			);
+
+		const result = await ctx.worker.execute(ctx.session, actionRequest);
+		expect(result.error).toBe(true);
+		expect(result.data.name).toBe('WorkerSchemaMismatch');
+	});
+
+	test('should return an error if the action has no corresponding implementation', async () => {
+		const localCtx = await helpers.before();
+
+		const action = 'action-create-card@1.0.0';
+
+		// Remove the library function from the worker instance
+		Reflect.deleteProperty(localCtx.worker.library, action.split('@')[0]);
+
+		const typeCard = await localCtx.jellyfish.getCardBySlug(
+			localCtx.context,
+			localCtx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+
+		const actionRequest =
+			await localCtx.jellyfish.insertCard<core.ActionRequestContract>(
+				localCtx.context,
+				localCtx.session,
+				{
+					slug: `action-request-${uuidv4()}`,
+					type: 'action-request@1.0.0',
+					data: {
+						actor: localCtx.actor.id,
+						context: localCtx.context,
+						action,
+						epoch: 1530663772247,
+						timestamp: '2018-07-04T00:22:52.247Z',
+						input: {
+							id: typeCard.id,
+							type: typeCard.type,
+						},
+						arguments: {
+							reason: null,
+							properties: {
+								slug: ctx.generateRandomSlug(),
+								version: '1.0.0',
+							},
+						},
+					},
+				},
+			);
+
+		const result = await localCtx.worker.execute(
+			localCtx.session,
+			actionRequest,
+		);
+		expect(result.error).toBe(true);
+		expect(result.data.name).toBe('WorkerInvalidAction');
+
+		await helpers.after(localCtx);
 	});
 });
