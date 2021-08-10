@@ -9,10 +9,7 @@
         "peerDependencies"
       ],
       "packagePatterns": ["@balena/jellyfish-*"],
-      "updateTypes": [
-        "minor",
-        "patch"
-      ],
+      "updateTypes": ["patch"],
       "enabled": false
     }
   ]
