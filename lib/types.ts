@@ -27,17 +27,6 @@ export interface LogContext {
 	api?: string;
 }
 
-export interface QueueWaitResult {
-	error: false | string;
-	timestamp: string;
-	data: {
-		id: string;
-		slug: string;
-		type: string;
-		version: string;
-	};
-}
-
 export interface ActionLibrary {
 	[key: string]: Action;
 }

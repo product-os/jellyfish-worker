@@ -7,6 +7,7 @@
 import Bluebird from 'bluebird';
 import * as errio from 'errio';
 import * as _ from 'lodash';
+import * as fastEquals from 'fast-equals';
 import { Operation } from 'fast-json-patch';
 import { v4 as uuidv4 } from 'uuid';
 import * as skhema from 'skhema';
@@ -17,9 +18,10 @@ import * as semver from 'semver';
 import { ActionLibrary, LogContext } from './types';
 import { core, JSONSchema } from '@balena/jellyfish-types';
 import * as errors from './errors';
-import * as executor from './executor';
 import * as utils from './utils';
-import * as triggers from './triggers';
+import * as triggersLib from './triggers';
+import * as transformerLib from './transformers';
+import * as subscriptions from './subscriptions';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import * as queue from '@balena/jellyfish-queue';
@@ -32,7 +34,21 @@ import {
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
 
-export { triggers, errors, executor, CARDS, utils };
+export { triggersLib, errors, CARDS, utils };
+
+/**
+ * @summary The "type" card type
+ * @type {String}
+ * @private
+ */
+const CARD_TYPE_TYPE = 'type@1.0.0';
+
+/**
+ * @summary Default insert concurrency
+ * @type {Number}
+ * @private
+ */
+const INSERT_CONCURRENCY = 3;
 
 /**
  * @summary Get the request input card
@@ -64,6 +80,54 @@ const getInputCard = async (
 };
 
 /**
+ * Returns an object that will include all links referenced in evaluated fields
+ * in the type card's schema.
+ *
+ * If no links are referenced in evaluated fields, the original object is returned
+ * immediately.
+ *
+ * @param {Object} context - execution context
+ * @param {Object} jellyfish - jellyfish instance
+ * @param {String} session - session id
+ * @param {Object} card - card to fill with links
+ * @param {Object} typeCard - type card
+ *
+ * @returns {Object} - the card with any links referenced in the evaluated fields
+ * of it's type card's schema.
+ */
+export async function getObjectWithLinks<
+	PContract extends Partial<TContract> | TContract,
+	TContract extends core.Contract<TData>,
+	TData extends core.ContractData,
+>(
+	context: LogContext,
+	jellyfish: Kernel,
+	session: string,
+	card: PContract,
+	typeCard: core.TypeContract,
+): Promise<PContract> {
+	const linkVerbs = jellyscript.getReferencedLinkVerbs(typeCard);
+	if (!linkVerbs.length) {
+		return card;
+	}
+	let queriedCard: TContract | null = null;
+	if ((card.slug && card.version) || card.id) {
+		const query = utils.getQueryWithOptionalLinks(card, linkVerbs);
+		[queriedCard] = await jellyfish.query<TContract>(context, session, query);
+	}
+	const cardWithLinks = queriedCard || card;
+
+	// Optional links may not be populated so explicitly set to an empty array here
+	linkVerbs.forEach((linkVerb) => {
+		if (!_.has(cardWithLinks, ['links', linkVerb])) {
+			_.set(cardWithLinks, ['links', linkVerb], []);
+		}
+	});
+
+	return cardWithLinks as PContract;
+}
+
+/**
  * Jellyfish worker library module.
  *
  * @module worker
@@ -73,8 +137,8 @@ export class Worker {
 	consumer: queue.Consumer;
 	producer: queue.Producer;
 	triggers: TriggeredActionContract[];
-	transformers: core.Contract[];
-	latestTransformers: core.Contract[];
+	transformers: transformerLib.Transformer[];
+	latestTransformers: transformerLib.Transformer[];
 	typeContracts: { [key: string]: core.TypeContract };
 	errors: typeof errors;
 	session: string;
@@ -232,6 +296,21 @@ export class Worker {
 	}
 
 	/**
+	 * @summary Enqueus an action request
+	 * @function
+	 * @public
+	 *
+	 * @param {Object} session - The session with which to enqueue the action
+	 * @param {Object} actionRequest - request values to be enqueued
+	 * @param {Object} card - The card that should be inserted
+	 *
+	 * @returns {Object} The stored action request contract
+	 */
+	async enqueueAction(session: string, actionRequest: ProducerOptions) {
+		return this.producer.enqueue(this.getId(), session, actionRequest);
+	}
+
+	/**
 	 * @summary Insert a card
 	 * @function
 	 * @public
@@ -287,46 +366,23 @@ export class Worker {
 			Reflect.deleteProperty(object, 'name');
 		}
 
-		return executor.commit(
+		return this.commit(
 			context,
-			jellyfish,
 			insertSession,
 			typeCard,
 			card,
 			{
 				eventPayload: _.omit(object, ['id']),
 				eventType: 'create',
-				triggers: instance.getTriggers(),
-				transformers: instance.getLatestTransformers(),
-				typeContracts: instance.getTypeContracts(),
 				timestamp: options.timestamp,
 				reason: options.reason,
-				context: instance.getActionContext(context),
 				actor: options.actor,
-				library: instance.library,
 				originator: options.originator,
 				attachEvents: options.attachEvents,
-				setTriggers: instance.setTriggers.bind(instance),
-				executeAction: async (
-					executeSession: string,
-					actionRequest: ProducerOptions,
-				) => {
-					return instance.producer.enqueue(
-						instance.getId(),
-						executeSession,
-						actionRequest,
-					);
-				},
-				waitResults: async (
-					requestContext: LogContext,
-					actionRequest: core.ActionRequestContract,
-				) => {
-					return instance.producer.waitResults(requestContext, actionRequest);
-				},
 			},
 			async () => {
 				// TS-TODO: Fix these "any" castings
-				const objectWithLinks = await executor.getObjectWithLinks(
+				const objectWithLinks = await getObjectWithLinks(
 					context,
 					jellyfish,
 					insertSession,
@@ -391,46 +447,23 @@ export class Worker {
 			operations: patch.length,
 		});
 
-		return executor.commit(
+		return this.commit(
 			context,
-			jellyfish,
 			session,
 			typeCard,
 			object as core.Contract,
 			{
 				eventPayload: patch,
 				eventType: 'update',
-				triggers: instance.getTriggers(),
-				transformers: instance.getLatestTransformers(),
-				typeContracts: instance.getTypeContracts(),
 				timestamp: options.timestamp,
 				reason: options.reason,
-				context: instance.getActionContext(context),
 				actor: options.actor,
-				library: instance.library,
 				originator: options.originator,
 				attachEvents: options.attachEvents,
-				setTriggers: instance.setTriggers.bind(instance),
-				executeAction: async (
-					executeSession: string,
-					actionRequest: ProducerOptions,
-				) => {
-					return instance.producer.enqueue(
-						instance.getId(),
-						executeSession,
-						actionRequest,
-					);
-				},
-				waitResults: async (
-					requestContext: LogContext,
-					actionRequest: core.ActionRequestContract,
-				) => {
-					return instance.producer.waitResults(requestContext, actionRequest);
-				},
 			},
 			async () => {
 				// TS-TODO: Remove these any castings
-				const objectWithLinks = await executor.getObjectWithLinks(
+				const objectWithLinks = await getObjectWithLinks(
 					context,
 					jellyfish,
 					session,
@@ -516,9 +549,8 @@ export class Worker {
 			Reflect.deleteProperty(object, 'name');
 		}
 
-		return executor.commit(
+		return this.commit(
 			context,
-			jellyfish,
 			insertSession,
 			typeCard,
 			card,
@@ -526,35 +558,13 @@ export class Worker {
 				attachEvents,
 				eventPayload: !!card ? null : _.omit(object, ['id']),
 				eventType: !!card ? null : 'create',
-				triggers: instance.getTriggers(),
-				transformers: instance.getLatestTransformers(),
-				typeContracts: instance.getTypeContracts(),
 				timestamp: options.timestamp,
 				reason: options.reason,
-				context: instance.getActionContext(context),
 				actor: options.actor,
-				library: instance.library,
 				originator: options.originator,
-				setTriggers: instance.setTriggers.bind(instance),
-				executeAction: async (
-					executeSession: string,
-					actionRequest: ProducerOptions,
-				) => {
-					return instance.producer.enqueue(
-						instance.getId(),
-						executeSession,
-						actionRequest,
-					);
-				},
-				waitResults: async (
-					requestContext: LogContext,
-					actionRequest: core.ActionRequestContract,
-				) => {
-					return instance.producer.waitResults(requestContext, actionRequest);
-				},
 			},
 			async () => {
-				const objectWithLinks = await executor.getObjectWithLinks(
+				const objectWithLinks = await getObjectWithLinks(
 					context,
 					jellyfish,
 					insertSession,
@@ -666,20 +676,20 @@ export class Worker {
 	 * this.updateLatestTransformers()
 	 */
 	updateLatestTransformers() {
-		const transformers: { [slug: string]: core.Contract } = {};
+		const transformersMap: { [slug: string]: transformerLib.Transformer } = {};
 		this.transformers.forEach((tf) => {
 			const slugMajV = `${tf.slug}@${semver.major(tf.version)}`;
 			const prerelease = semver.prerelease(tf.version);
 			if (
 				!prerelease &&
-				(!transformers[slugMajV] ||
-					semver.gt(tf.version, transformers[slugMajV].version))
+				(!transformersMap[slugMajV] ||
+					semver.gt(tf.version, transformersMap[slugMajV].version))
 			) {
-				transformers[slugMajV] = tf;
+				transformersMap[slugMajV] = tf;
 			}
 		});
 
-		this.latestTransformers = Object.values(transformers);
+		this.latestTransformers = Object.values(transformersMap);
 	}
 
 	/**
@@ -695,12 +705,15 @@ export class Worker {
 	 * worker.settransformers([ ... ])
 	 */
 	// TS-TODO: Make transformers a core cotnract and type them correctly here
-	setTransformers(context: LogContext, transformers: core.Contract[]) {
+	setTransformers(
+		context: LogContext,
+		transformerContracts: transformerLib.Transformer[],
+	) {
 		logger.info(context, 'Setting transformers', {
-			count: transformers.length,
+			count: transformerContracts.length,
 		});
 
-		this.transformers = transformers;
+		this.transformers = transformerContracts;
 		this.updateLatestTransformers();
 	}
 
@@ -753,7 +766,10 @@ export class Worker {
 	 * const worker = new Worker({ ... })
 	 * worker.upserttransformer({ ... })
 	 */
-	upsertTransformer(context: LogContext, transformer: core.Contract) {
+	upsertTransformer(
+		context: LogContext,
+		transformer: transformerLib.Transformer,
+	) {
 		logger.info(context, 'Upserting transformer', {
 			slug: transformer.slug,
 		});
@@ -1131,7 +1147,7 @@ export class Worker {
 					context,
 					trigger.id,
 				);
-				const nextExecutionDate = triggers.getNextExecutionDate(
+				const nextExecutionDate = triggersLib.getNextExecutionDate(
 					trigger,
 					lastExecutionEvent as any,
 				);
@@ -1148,7 +1164,7 @@ export class Worker {
 				// is no input card that caused the trigger.
 				const inputCard = null;
 
-				const request = await triggers.getRequest(
+				const request = await triggersLib.getRequest(
 					this.jellyfish,
 					trigger,
 					inputCard,
@@ -1171,5 +1187,416 @@ export class Worker {
 				concurrency: 5,
 			},
 		);
+	}
+
+	/**
+	 * @summary A pipeline function that runs standard logic for all contract
+	 * operations ran through the worker
+	 * @function
+	 * @private
+	 *
+	 * @param {Object} context - execution context
+	 * @param {Object} jellyfish - jellyfish kernel instance
+	 * @param {String} session - session id
+	 * @param {Object} typeCard - The full type contract for the card being
+	 * inserted or updated
+	 * @param {Object} current - The full contract prior to being updated, if it exists
+	 * @param {Object} options - Options object
+	 * @param {Function} fn - an asynchronous function that will perform the operation
+	 */
+	// TS-TODO: Improve the tpyings for the `options` parameter
+	private async commit(
+		context: LogContext,
+		session: string,
+		typeCard: core.TypeContract,
+		current: core.Contract | null,
+		options: {
+			actor: any;
+			originator: any;
+			attachEvents: any;
+			timestamp: string | number | Date;
+			reason: any;
+			eventType: any;
+			eventPayload: any;
+		},
+		fn: () => Promise<core.Contract>,
+	) {
+		assert.INTERNAL(
+			context,
+			typeCard && typeCard.data && typeCard.data.schema,
+			errors.WorkerNoElement,
+			`Invalid type: ${typeCard}`,
+		);
+
+		const currentTime = new Date();
+		const jellyfish = this.jellyfish;
+		const triggers = this.getTriggers();
+		const transformers = this.getLatestTransformers();
+		const typeContracts = this.getTypeContracts();
+		const workerContext = this.getActionContext(context);
+		const library = this.library;
+
+		const insertedCard = await fn();
+		if (!insertedCard) {
+			return null;
+		}
+
+		if (
+			current !== null &&
+			fastEquals.deepEqual(
+				_.omit(insertedCard, [
+					'created_at',
+					'updated_at',
+					'linked_at',
+					'links',
+				]),
+				_.omit(current, ['created_at', 'updated_at', 'linked_at', 'links']),
+			)
+		) {
+			logger.debug(context, 'Omitting pointless insertion', {
+				slug: current.slug,
+			});
+
+			return null;
+		}
+
+		if (transformers) {
+			transformerLib.evaluate({
+				transformers,
+				oldCard: current,
+				newCard: insertedCard,
+				context,
+				query: (querySchema, queryOpts) => {
+					return jellyfish.query(
+						context,
+						workerContext.privilegedSession,
+						querySchema,
+						queryOpts,
+					);
+				},
+				executeAndAwaitAction: async (actionRequest) => {
+					actionRequest.context = context;
+					const req = await this.enqueueAction(
+						workerContext.privilegedSession,
+						actionRequest as ProducerOptions,
+					);
+
+					const result = await this.producer.waitResults(context, req);
+
+					return result;
+				},
+			});
+		}
+
+		subscriptions
+			.evaluate({
+				oldContract: current,
+				newContract: insertedCard,
+				getTypeContract: (type) => {
+					return typeContracts[type];
+				},
+				getSession: async (userId: string) => {
+					return utils.getActorKey(
+						context,
+						jellyfish,
+						workerContext.privilegedSession,
+						userId,
+					);
+				},
+				insertContract: async (
+					insertedContractType: core.TypeContract,
+					actorSession: string,
+					object: any,
+				) => {
+					return workerContext.insertCard(
+						actorSession,
+						insertedContractType,
+						{
+							...options,
+							attachEvents: true,
+							timestamp: Date.now(),
+						},
+						object,
+					);
+				},
+				query: (querySchema, queryOpts = {}) => {
+					return jellyfish.query(
+						context,
+						workerContext.privilegedSession,
+						querySchema,
+						queryOpts,
+					);
+				},
+				getContractById: (id: string) => {
+					return jellyfish.getCardById(context, session, id);
+				},
+			})
+			.catch((error) => {
+				const errorObject = errio.toObject(error, {
+					stack: true,
+				});
+
+				const logData = {
+					error: errorObject,
+					input: insertedCard.slug,
+				};
+
+				if (error.expected) {
+					logger.warn(context, 'Execute error in subscriptions', logData);
+				} else {
+					logger.error(context, 'Execute error', logData);
+				}
+			});
+
+		if (triggers) {
+			const runTrigger = async (trigger: TriggeredActionContract) => {
+				// Ignore triggered actions whose start date is in the future
+				if (currentTime < triggersLib.getStartDate(trigger)) {
+					return null;
+				}
+
+				const request = await triggersLib.getRequest(
+					jellyfish,
+					trigger,
+					insertedCard,
+					{
+						currentDate: new Date(),
+						mode: current ? 'update' : 'insert',
+						context,
+						session,
+					},
+				);
+
+				if (!request) {
+					return null;
+				}
+
+				// trigger.target might result in multiple cards in a single action request
+				const identifiers = _.uniq(_.castArray(request.card));
+
+				const triggerCards = await Bluebird.map(
+					identifiers,
+					async (identifier) => {
+						const triggerCard = await getInputCard(
+							context,
+							jellyfish,
+							session,
+							identifier,
+						);
+						assert.INTERNAL(
+							context,
+							triggerCard,
+							errors.WorkerNoElement,
+							`No such input card for trigger ${trigger.slug}: ${identifier}`,
+						);
+						return triggerCard;
+					},
+				);
+
+				return Promise.all(
+					triggerCards.map((triggerCard) => {
+						// TODO: improve this gaurd
+						if (!triggerCard) {
+							return;
+						}
+						const actionRequest = {
+							// Re-enqueuing an action request expects the "card" option to be an
+							// id, not a full card.
+							card: triggerCard.id,
+							action: request.action!,
+							actor: options.actor,
+							context: request.context,
+							timestamp: request.currentDate.toISOString(),
+							epoch: request.currentDate.valueOf(),
+							arguments: request.arguments,
+
+							// Carry the old originator if present so we
+							// don't break the chain
+							originator: options.originator || request.originator,
+						};
+
+						logger.info(
+							context,
+							'Enqueing new action request due to triggered-action',
+							{
+								trigger: trigger.slug,
+								contract: triggerCard.id,
+								arguments: request.arguments,
+							},
+						);
+
+						// TS-TODO: remove any casting
+						return this.enqueueAction(session, actionRequest as any);
+					}),
+				);
+			};
+
+			await Bluebird.map(triggers, (trigger) => {
+				return runTrigger(trigger).catch((error) => {
+					const errorObject = errio.toObject(error, {
+						stack: true,
+					});
+
+					const logData = {
+						error: errorObject,
+						input: insertedCard.slug,
+						trigger: trigger.slug,
+					};
+
+					if (error.expected) {
+						logger.warn(
+							context,
+							'Execute error in asynchronous trigger',
+							logData,
+						);
+					} else {
+						logger.error(context, 'Execute error', logData);
+					}
+				});
+			});
+		}
+
+		if (options.attachEvents) {
+			const time = options.timestamp
+				? new Date(options.timestamp)
+				: currentTime;
+
+			const request = {
+				action: 'action-create-event@1.0.0',
+				card: insertedCard,
+				actor: options.actor,
+				context,
+				timestamp: time.toISOString(),
+				epoch: time.valueOf(),
+				arguments: {
+					name: options.reason,
+					type: options.eventType,
+					payload: options.eventPayload,
+					tags: [],
+				},
+			};
+
+			await library[request.action.split('@')[0]].handler(
+				session,
+				workerContext,
+				insertedCard,
+				request as any,
+			);
+		}
+
+		// If the card markers have changed then update the timeline of the card
+		if (
+			current &&
+			!fastEquals.deepEqual(current.markers, insertedCard.markers)
+		) {
+			const timeline = await jellyfish.query(context, session, {
+				$$links: {
+					'is attached to': {
+						type: 'object',
+						required: ['slug', 'type'],
+						properties: {
+							slug: {
+								type: 'string',
+								const: insertedCard.slug,
+							},
+							type: {
+								type: 'string',
+								const: insertedCard.type,
+							},
+						},
+					},
+				},
+				type: 'object',
+				required: ['slug', 'version', 'type'],
+				properties: {
+					slug: {
+						type: 'string',
+					},
+					version: {
+						type: 'string',
+					},
+					type: {
+						type: 'string',
+					},
+				},
+			});
+
+			for (const event of timeline) {
+				if (!fastEquals.deepEqual(event.markers, insertedCard.markers)) {
+					await jellyfish.patchCardBySlug(
+						context,
+						session,
+						`${event.slug}@${event.version}`,
+						[
+							{
+								op: 'replace',
+								path: '/markers',
+								value: insertedCard.markers,
+							},
+						],
+					);
+				}
+			}
+		}
+
+		if (insertedCard.type === CARD_TYPE_TYPE) {
+			// Remove any previously attached trigger for this type
+			const typeTriggers = await triggersLib.getTypeTriggers(
+				context,
+				jellyfish,
+				session,
+				`${insertedCard.slug}@${insertedCard.version}`,
+			);
+			await Bluebird.map(
+				typeTriggers,
+				async (trigger) => {
+					await jellyfish.patchCardBySlug(
+						context,
+						session,
+						`${trigger.slug}@${trigger.version}`,
+						[
+							{
+								op: 'replace',
+								path: '/active',
+								value: false,
+							},
+						],
+					);
+
+					// Also from the locally cached triggers
+					_.remove(triggers, {
+						id: trigger.id,
+					});
+				},
+				{
+					concurrency: INSERT_CONCURRENCY,
+				},
+			);
+
+			await Bluebird.map(
+				jellyscript.getTypeTriggers(insertedCard) as TriggeredActionContract[],
+				async (trigger) => {
+					// We don't want to use the actions queue here
+					// so that watchers are applied right away
+					const triggeredActionContract = await jellyfish.replaceCard(
+						context,
+						session,
+						trigger,
+					);
+
+					// Registered the newly created trigger
+					// right away for performance reasons
+					return this.setTriggers(
+						context,
+						triggers.concat([triggeredActionContract]),
+					);
+				},
+				{
+					concurrency: INSERT_CONCURRENCY,
+				},
+			);
+		}
+
+		return insertedCard;
 	}
 }

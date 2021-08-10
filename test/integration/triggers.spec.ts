@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Bluebird from 'bluebird';
 import { strict as assert } from 'assert';
 import * as helpers from './helpers';
-import { triggers, errors } from '../../lib/index';
+import { triggersLib as triggers, errors } from '../../lib/index';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
