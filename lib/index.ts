@@ -1346,113 +1346,111 @@ export class Worker {
 				}
 			});
 
-		if (triggers) {
-			const runTrigger = async (trigger: TriggeredActionContract) => {
-				// Ignore triggered actions whose start date is in the future
-				if (currentTime < triggersLib.getStartDate(trigger)) {
-					return null;
-				}
+		const runTrigger = async (trigger: TriggeredActionContract) => {
+			// Ignore triggered actions whose start date is in the future
+			if (currentTime < triggersLib.getStartDate(trigger)) {
+				return null;
+			}
 
-				const request = await triggersLib.getRequest(
-					jellyfish,
-					trigger,
-					insertedCard,
-					{
-						currentDate: new Date(),
-						mode: current ? 'update' : 'insert',
+			const request = await triggersLib.getRequest(
+				jellyfish,
+				trigger,
+				insertedCard,
+				{
+					currentDate: new Date(),
+					mode: current ? 'update' : 'insert',
+					context,
+					session,
+				},
+			);
+
+			if (!request) {
+				return null;
+			}
+
+			// trigger.target might result in multiple cards in a single action request
+			const identifiers = _.uniq(_.castArray(request.card));
+
+			const triggerCards = await Bluebird.map(
+				identifiers,
+				async (identifier) => {
+					const triggerCard = await getInputCard(
 						context,
+						jellyfish,
 						session,
-					},
-				);
+						identifier,
+					);
+					assert.INTERNAL(
+						context,
+						triggerCard,
+						errors.WorkerNoElement,
+						`No such input card for trigger ${trigger.slug}: ${identifier}`,
+					);
+					return triggerCard;
+				},
+			);
 
-				if (!request) {
-					return null;
-				}
+			return Promise.all(
+				triggerCards.map((triggerCard) => {
+					// TODO: improve this gaurd
+					if (!triggerCard) {
+						return;
+					}
+					const actionRequest = {
+						// Re-enqueuing an action request expects the "card" option to be an
+						// id, not a full card.
+						card: triggerCard.id,
+						action: request.action!,
+						actor: options.actor,
+						context: request.context,
+						timestamp: request.currentDate.toISOString(),
+						epoch: request.currentDate.valueOf(),
+						arguments: request.arguments,
 
-				// trigger.target might result in multiple cards in a single action request
-				const identifiers = _.uniq(_.castArray(request.card));
-
-				const triggerCards = await Bluebird.map(
-					identifiers,
-					async (identifier) => {
-						const triggerCard = await getInputCard(
-							context,
-							jellyfish,
-							session,
-							identifier,
-						);
-						assert.INTERNAL(
-							context,
-							triggerCard,
-							errors.WorkerNoElement,
-							`No such input card for trigger ${trigger.slug}: ${identifier}`,
-						);
-						return triggerCard;
-					},
-				);
-
-				return Promise.all(
-					triggerCards.map((triggerCard) => {
-						// TODO: improve this gaurd
-						if (!triggerCard) {
-							return;
-						}
-						const actionRequest = {
-							// Re-enqueuing an action request expects the "card" option to be an
-							// id, not a full card.
-							card: triggerCard.id,
-							action: request.action!,
-							actor: options.actor,
-							context: request.context,
-							timestamp: request.currentDate.toISOString(),
-							epoch: request.currentDate.valueOf(),
-							arguments: request.arguments,
-
-							// Carry the old originator if present so we
-							// don't break the chain
-							originator: options.originator || request.originator,
-						};
-
-						logger.info(
-							context,
-							'Enqueing new action request due to triggered-action',
-							{
-								trigger: trigger.slug,
-								contract: triggerCard.id,
-								arguments: request.arguments,
-							},
-						);
-
-						// TS-TODO: remove any casting
-						return this.enqueueAction(session, actionRequest as any);
-					}),
-				);
-			};
-
-			await Bluebird.map(triggers, (trigger) => {
-				return runTrigger(trigger).catch((error) => {
-					const errorObject = errio.toObject(error, {
-						stack: true,
-					});
-
-					const logData = {
-						error: errorObject,
-						input: insertedCard.slug,
-						trigger: trigger.slug,
+						// Carry the old originator if present so we
+						// don't break the chain
+						originator: options.originator || request.originator,
 					};
 
-					if (error.expected) {
-						logger.warn(
-							context,
-							'Execute error in asynchronous trigger',
-							logData,
-						);
-					} else {
-						logger.error(context, 'Execute error', logData);
-					}
+					logger.info(
+						context,
+						'Enqueing new action request due to triggered-action',
+						{
+							trigger: trigger.slug,
+							contract: triggerCard.id,
+							arguments: request.arguments,
+						},
+					);
+
+					// TS-TODO: remove any casting
+					return this.enqueueAction(session, actionRequest as any);
+				}),
+			);
+		};
+
+		await Bluebird.map(triggers, (trigger) => {
+			return runTrigger(trigger).catch((error) => {
+				const errorObject = errio.toObject(error, {
+					stack: true,
 				});
+
+				const logData = {
+					error: errorObject,
+					input: insertedCard.slug,
+					trigger: trigger.slug,
+				};
+
+				if (error.expected) {
+					logger.warn(
+						context,
+						'Execute error in asynchronous trigger',
+						logData,
+					);
+				} else {
+					logger.error(context, 'Execute error', logData);
+				}
 			});
-		}
+		});
 
 		if (options.attachEvents) {
 			const time = options.timestamp
