@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.18'
+      hash: 3ccb09536c5e29731ddce058bdd97dbba8e26377
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.0.34
+  date: 2021-08-10T12:32:48.428Z
+- commits:
     - subject: 'Revert change to behaviour in replaceCard when attachEvents:false'
       hash: b696148f7964b5d27c53039f32c64a5c47ffcf56
       body: >
