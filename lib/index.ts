@@ -1260,33 +1260,31 @@ export class Worker {
 			return null;
 		}
 
-		if (transformers) {
-			transformerLib.evaluate({
-				transformers,
-				oldCard: current,
-				newCard: insertedCard,
-				context,
-				query: (querySchema, queryOpts) => {
-					return jellyfish.query(
-						context,
-						workerContext.privilegedSession,
-						querySchema,
-						queryOpts,
-					);
-				},
-				executeAndAwaitAction: async (actionRequest) => {
-					actionRequest.context = context;
-					const req = await this.enqueueAction(
-						workerContext.privilegedSession,
-						actionRequest as ProducerOptions,
-					);
+		transformerLib.evaluate({
+			transformers,
+			oldCard: current,
+			newCard: insertedCard,
+			context,
+			query: (querySchema, queryOpts) => {
+				return jellyfish.query(
+					context,
+					workerContext.privilegedSession,
+					querySchema,
+					queryOpts,
+				);
+			},
+			executeAndAwaitAction: async (actionRequest) => {
+				actionRequest.context = context;
+				const req = await this.enqueueAction(
+					workerContext.privilegedSession,
+					actionRequest as ProducerOptions,
+				);
 
-					const result = await this.producer.waitResults(context, req);
+				const result = await this.producer.waitResults(context, req);
 
-					return result;
-				},
-			});
-		}
+				return result;
+			},
+		});
 
 		subscriptions
 			.evaluate({
