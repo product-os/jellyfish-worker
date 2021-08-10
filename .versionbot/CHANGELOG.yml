@@ -1,4 +1,17 @@
 - commits:
+    - subject: Only disable internal patch bumps
+      hash: 62c61d14c0bc0d65095a0c0813e876d45ab1087a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 8.0.37
+  date: 2021-08-10T23:31:02.055Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.19'
       hash: b7a4b853dd75ebdfc27b99be2d7a1031179476fb
       body: ''
