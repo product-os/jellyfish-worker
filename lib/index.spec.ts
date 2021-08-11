@@ -5,7 +5,7 @@
  */
 
 import { Worker } from './index';
-import { core } from '@balena/jellyfish-types';
+import { Transformer } from './transformers';
 import * as queue from '@balena/jellyfish-queue';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 
@@ -37,7 +37,7 @@ describe('Worker.updateCurrentTransformers()', () => {
 				slug: 'b-transformer',
 				version: '1.0.0',
 			},
-		] as core.Contract[];
+		] as Transformer[];
 
 		// TS-TODO: is there a better way to instantiate a simple Worker?
 		const worker = new Worker(
