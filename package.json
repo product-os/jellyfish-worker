@@ -69,7 +69,7 @@
     "@balena/jellyfish-core": "^5.1.16",
     "@balena/jellyfish-environment": "^4.3.10",
     "@balena/jellyfish-plugin-base": "^2.1.222",
-    "@balena/jellyfish-plugin-default": "^19.0.1",
+    "@balena/jellyfish-plugin-default": "^19.6.1",
     "@balena/jellyfish-queue": "^1.0.241",
     "@balena/jellyfish-types": "^0.9.4",
     "@balena/lint": "^6.1.1",
@@ -95,7 +95,7 @@
     "@balena/jellyfish-core": "^5.1.16",
     "@balena/jellyfish-environment": "^4.3.10",
     "@balena/jellyfish-plugin-base": "^2.1.184",
-    "@balena/jellyfish-plugin-default": "^19.0.1",
+    "@balena/jellyfish-plugin-default": "^19.6.1",
     "@balena/jellyfish-queue": "^1.0.241"
   },
   "simple-git-hooks": {
