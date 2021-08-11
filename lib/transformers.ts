@@ -10,7 +10,8 @@ import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
 import { getLogger } from '@balena/jellyfish-logger';
 import { JSONSchema, core } from '@balena/jellyfish-types';
-import { LogContext, QueueWaitResult, EnqueueOptions } from './types';
+import { LogContext, EnqueueOptions } from './types';
+import { ProducerResults } from '@balena/jellyfish-types/build/queue';
 
 const logger = getLogger('worker');
 
@@ -26,14 +27,14 @@ export interface EvaluateOptions {
 	// TS-TODO: Make slug optional in core model
 	executeAndAwaitAction: (
 		actionRequest: EnqueueOptions,
-	) => Promise<QueueWaitResult>;
+	) => Promise<ProducerResults>;
 }
 
 export interface TransformerData {
 	inputFilter: any;
 	workerFilter: any;
 }
-type Transformer = core.Contract<TransformerData>;
+export type Transformer = core.Contract<TransformerData>;
 
 // TS-TODO: Transformers should be a default model and included in this module
 export const evaluate = async ({
@@ -90,7 +91,7 @@ export const evaluate = async ({
 
 		// Re enqueue an action request to call the matchmaking function
 		// TODO: link task to origin transformer
-		const result = await executeAndAwaitAction({
+		const result: any = await executeAndAwaitAction({
 			card: 'task@1.0.0',
 			type: 'type',
 			action: 'action-create-card@1.0.0',
