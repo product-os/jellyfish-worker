@@ -21,7 +21,7 @@ import * as errors from './errors';
 import * as utils from './utils';
 import * as triggersLib from './triggers';
 import * as transformerLib from './transformers';
-import * as subscriptions from './subscriptions';
+import * as subscriptionsLib from './subscriptions';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import * as queue from '@balena/jellyfish-queue';
@@ -1229,12 +1229,10 @@ export class Worker {
 		);
 
 		const currentTime = new Date();
-		const jellyfish = this.jellyfish;
 		const triggers = this.getTriggers();
 		const transformers = this.getLatestTransformers();
 		const typeContracts = this.getTypeContracts();
 		const workerContext = this.getActionContext(context);
-		const library = this.library;
 
 		const insertedCard = await fn();
 		if (!insertedCard) {
@@ -1266,7 +1264,7 @@ export class Worker {
 			newCard: insertedCard,
 			context,
 			query: (querySchema, queryOpts) => {
-				return jellyfish.query(
+				return this.jellyfish.query(
 					context,
 					workerContext.privilegedSession,
 					querySchema,
@@ -1286,7 +1284,7 @@ export class Worker {
 			},
 		});
 
-		subscriptions
+		subscriptionsLib
 			.evaluate({
 				oldContract: current,
 				newContract: insertedCard,
@@ -1296,7 +1294,7 @@ export class Worker {
 				getSession: async (userId: string) => {
 					return utils.getActorKey(
 						context,
-						jellyfish,
+						this.jellyfish,
 						workerContext.privilegedSession,
 						userId,
 					);
@@ -1318,7 +1316,7 @@ export class Worker {
 					);
 				},
 				query: (querySchema, queryOpts = {}) => {
-					return jellyfish.query(
+					return this.jellyfish.query(
 						context,
 						workerContext.privilegedSession,
 						querySchema,
@@ -1326,7 +1324,7 @@ export class Worker {
 					);
 				},
 				getContractById: (id: string) => {
-					return jellyfish.getCardById(context, session, id);
+					return this.jellyfish.getCardById(context, session, id);
 				},
 			})
 			.catch((error) => {
@@ -1354,7 +1352,7 @@ export class Worker {
 				}
 
 				const request = await triggersLib.getRequest(
-					jellyfish,
+					this.jellyfish,
 					trigger,
 					insertedCard,
 					{
@@ -1375,7 +1373,7 @@ export class Worker {
 				await Bluebird.map(identifiers, async (identifier) => {
 					const triggerCard = await getInputCard(
 						context,
-						jellyfish,
+						this.jellyfish,
 						session,
 						identifier,
 					);
@@ -1457,7 +1455,7 @@ export class Worker {
 				},
 			};
 
-			await library[request.action.split('@')[0]].handler(
+			await this.library[request.action.split('@')[0]].handler(
 				session,
 				workerContext,
 				insertedCard,
@@ -1470,7 +1468,7 @@ export class Worker {
 			current &&
 			!fastEquals.deepEqual(current.markers, insertedCard.markers)
 		) {
-			const timeline = await jellyfish.query(context, session, {
+			const timeline = await this.jellyfish.query(context, session, {
 				$$links: {
 					'is attached to': {
 						type: 'object',
@@ -1504,7 +1502,7 @@ export class Worker {
 
 			for (const event of timeline) {
 				if (!fastEquals.deepEqual(event.markers, insertedCard.markers)) {
-					await jellyfish.patchCardBySlug(
+					await this.jellyfish.patchCardBySlug(
 						context,
 						session,
 						`${event.slug}@${event.version}`,
@@ -1524,14 +1522,14 @@ export class Worker {
 			// Remove any previously attached trigger for this type
 			const typeTriggers = await triggersLib.getTypeTriggers(
 				context,
-				jellyfish,
+				this.jellyfish,
 				session,
 				`${insertedCard.slug}@${insertedCard.version}`,
 			);
 			await Bluebird.map(
 				typeTriggers,
 				async (trigger) => {
-					await jellyfish.patchCardBySlug(
+					await this.jellyfish.patchCardBySlug(
 						context,
 						session,
 						`${trigger.slug}@${trigger.version}`,
@@ -1559,7 +1557,7 @@ export class Worker {
 				async (trigger) => {
 					// We don't want to use the actions queue here
 					// so that watchers are applied right away
-					const triggeredActionContract = await jellyfish.replaceCard(
+					const triggeredActionContract = await this.jellyfish.replaceCard(
 						context,
 						session,
 						trigger,
