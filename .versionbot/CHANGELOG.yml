@@ -1,4 +1,61 @@
 - commits:
+    - subject: Refactor unneeded looping in trigger evaluation code
+      hash: 7802ddd3398214b7902ba96b6a2621a76a37b852
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Refactor trigger evaluation so that it has lower indirection
+      hash: 1b9ec14ef1979af1e87cb0a10e305f4b2d6918dc
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Remove unnecessary if statement around trigger evaluation
+      hash: b987da5d2ad72edb0ef8078f320113a99ff6a4d9
+      body: |
+        This if statement always evaluates to true, because even an empty array
+        is still truthy in an if statement.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Remove unnecessary if statement around transformer evaluation
+      hash: 69f064d179dd4e71795d13e137c62d77fd5962d7
+      body: |
+        This if statement always evaluates to true, because even an empty array
+        is still truthy in an if statement.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Refactor commit functionality into a private Worker method
+      hash: 6453f15fb5be512b240714639415c40297d77b4a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 8.0.40
+  date: 2021-08-11T13:49:07.111Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-plugin-default to ^19.6.1'
       hash: b71cda39d45c1dba637d9f348702204ac4a1fba1
       body: |
