@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-environment to ^4.4.0'
+      hash: f89e0ae145ebf750a6b8a1d6cbeb7ea54d8d218f
+      body: |
+        Update @balena/jellyfish-environment from 4.3.10 to 4.4.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.0.41
+  date: 2021-08-15T01:42:22.898Z
+- commits:
     - subject: Refactor unneeded looping in trigger evaluation code
       hash: 7802ddd3398214b7902ba96b6a2621a76a37b852
       body: ''
