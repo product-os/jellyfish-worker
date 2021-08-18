@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.27'
+      hash: 281e53917574c2fd48debabbd4170236b4f997f7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 8.0.52
+  date: 2021-08-18T13:16:34.601Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.25'
       hash: eac04419d46d05810b57d829baf4907b98fa1fa5
       body: ''
