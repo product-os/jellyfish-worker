@@ -167,7 +167,6 @@ export class Worker {
 	 *   producer
 	 * )
 	 */
-	// FIXME worker violates single responsibility principle in that it both handles events and produces tick events
 	constructor(
 		jellyfish: Kernel,
 		session: string,
@@ -1093,102 +1092,6 @@ export class Worker {
 		});
 
 		return result;
-	}
-
-	/**
-	 * @summary Execute a worker tick
-	 * @function
-	 * @public
-	 *
-	 * @description
-	 * A tick is necessary to dispatch time-triggered actions and potentially
-	 * any other logic that depends on the concept of time.
-	 *
-	 * Applications should "tick" on a certain interval. Shorter intervals
-	 * increase the accuracy of time-related actions, but introduces more
-	 * overhead.
-	 *
-	 * The tick operation may enqueue new actions but will not execute them
-	 * right away.
-	 *
-	 * @param {Object} context - execution context
-	 * @param {String} session - session id
-	 * @param {Object} options - options
-	 * @param {Date} options.currentDate - current date
-	 *
-	 * @example
-	 * const worker = new Worker({ ... })
-	 * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
-	 *
-	 * await worker.tick({ ... }, session, {
-	 *   currentDate: new Date()
-	 * })
-	 */
-	async tick(
-		context: LogContext,
-		session: string,
-		// TS-TODO: Correctly type the options here
-		options: { currentDate: number | Date },
-	) {
-		const currentTriggers = this.getTriggers();
-
-		logger.debug(context, 'Processing tick request', {
-			triggers: currentTriggers.length,
-		});
-
-		// TS-TODO: This code is pretty abominated and needs to be reviewed and straightened out
-		await Bluebird.map(
-			currentTriggers,
-			async (trigger) => {
-				// We don't care about non-time-triggered triggers
-				if (!trigger.data.interval) {
-					return null;
-				}
-
-				const lastExecutionEvent = await this.producer.getLastExecutionEvent(
-					context,
-					trigger.id,
-				);
-				const nextExecutionDate = triggersLib.getNextExecutionDate(
-					trigger,
-					lastExecutionEvent as any,
-				);
-
-				// Ignore the trigger if its not time to execute it yet
-				if (
-					!nextExecutionDate ||
-					(options.currentDate as any) < (nextExecutionDate as any)
-				) {
-					return null;
-				}
-
-				// This is a time triggered action, so there
-				// is no input card that caused the trigger.
-				const inputCard = null;
-
-				const request = await triggersLib.getRequest(
-					this.jellyfish,
-					trigger,
-					inputCard,
-					{
-						currentDate: options.currentDate as any,
-						context,
-						session,
-					},
-				);
-
-				// This can happen if the trigger contains
-				// an invalid template interpolation
-				if (!request) {
-					return null;
-				}
-
-				return this.producer.enqueue(this.getId(), session, request as any);
-			},
-			{
-				concurrency: 5,
-			},
-		);
 	}
 
 	/**
