@@ -1,4 +1,27 @@
 - commits:
+    - subject: Fix bug where replaceCard doesn't update contracts correctly
+      hash: 098d1d1093b058590c58adb3319c572a1e1fceaf
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Add test for updating type schema with replaceCard
+      hash: 1ba266905f9fee67bdfec48abd7b0de2d473f16a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 8.0.57
+  date: 2021-08-19T16:25:01.640Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-environment to v5'
       hash: d6ad6a1523eac9ad7cee02fe96ec057c662c3fc2
       body: |
