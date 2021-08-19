@@ -1,4 +1,20 @@
 - commits:
+    - subject: Remove tick related code
+      hash: 47b4c62b7cff46488a215cb7f1abb66f62fad184
+      body: >
+        We have removed the tick server from our backend, so removing related
+        code from the worker as well:
+        https://github.com/product-os/jellyfish/pull/7096
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 9.0.0
+  date: 2021-08-19T20:50:29.063Z
+- commits:
     - subject: Fix bug where replaceCard doesn't update contracts correctly
       hash: 098d1d1093b058590c58adb3319c572a1e1fceaf
       body: ''
