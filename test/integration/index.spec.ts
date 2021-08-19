@@ -1782,6 +1782,76 @@ describe('.getTriggers()', () => {
 });
 
 describe('.replaceCard()', () => {
+	test('should update type contract schema', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			'type@latest',
+		);
+
+		assert(typeCard !== null);
+
+		const slug = ctx.generateRandomSlug();
+		const result1 = await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: true,
+				actor: ctx.actor.id,
+			},
+			{
+				slug,
+				version: '1.0.0',
+				data: {
+					schema: {
+						data: {
+							foo: {
+								title: 'Foobar',
+								type: 'string',
+							},
+						},
+					},
+				},
+			},
+		);
+
+		await ctx.worker.replaceCard(
+			ctx.context,
+			ctx.session,
+			typeCard,
+			{
+				attachEvents: true,
+				actor: ctx.actor.id,
+			},
+			{
+				slug,
+				version: '1.0.0',
+				data: {
+					schema: {
+						data: {
+							foo: {
+								title: 'Foobar2',
+								type: 'string',
+							},
+						},
+					},
+				},
+			},
+		);
+
+		const card = await ctx.jellyfish.getCardById(
+			ctx.context,
+			ctx.session,
+			result1!.id,
+		);
+
+		assert(card !== null);
+		assert(result1! !== null);
+
+		expect((card.data.schema as any).data.foo.title).toEqual('Foobar2');
+	});
+
 	test('updating a card must have the correct tail', async () => {
 		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
 			ctx.context,

@@ -564,7 +564,7 @@ export class Worker {
 				originator: options.originator,
 			},
 			async () => {
-				const objectWithLinks = await getObjectWithLinks(
+				const { links } = await getObjectWithLinks(
 					context,
 					jellyfish,
 					insertSession,
@@ -572,11 +572,13 @@ export class Worker {
 					typeCard,
 				);
 
+				// Add the expanded links to the new contract object being inserted
+				const result = jellyscript.evaluateObject(typeCard.data.schema, {
+					...object,
+					links: links || {},
+				});
+
 				// TS-TODO: Remove these `any` castings
-				const result = jellyscript.evaluateObject(
-					typeCard.data.schema,
-					objectWithLinks as any,
-				);
 				return jellyfish.replaceCard(context, insertSession, result as any);
 			},
 		);
