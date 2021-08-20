@@ -1,4 +1,29 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-plugin-default to ^19.9.0'
+      hash: 99d7bb0f0058d0acd6453040c69a4fe770dce0e7
+      body: |
+        Update @balena/jellyfish-plugin-default from 19.7.5 to 19.9.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Include versioned type contracts in action context object
+      hash: 08108e0fa03e60c1af26ef66f8cec07c533a275b
+      body: |
+        Include the cache of versioned type contracts in the action context
+        provided to action functions. This change allows us to utilise cache
+        instead of having action functions load type contracts themselves.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 9.1.0
+  date: 2021-08-20T16:07:21.272Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.31'
       hash: 245fe286c19c5c2d7e71c3d301cf75b857ff6779
       body: ''
