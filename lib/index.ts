@@ -290,7 +290,10 @@ export class Worker {
 					patch,
 				);
 			},
-			cards: this.jellyfish.cards,
+			cards: {
+				...this.jellyfish.cards,
+				...self.getTypeContracts(),
+			},
 		};
 	}
 

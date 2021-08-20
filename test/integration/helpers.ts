@@ -13,6 +13,7 @@ import {
 	Context,
 	Contract,
 	SessionContract,
+	TypeContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
 import * as queue from '@balena/jellyfish-queue';
@@ -241,6 +242,20 @@ export const before = async (
 		testQueue.producer,
 	);
 	await testWorker.initialize(context);
+
+	const types = await jellyfish.query<TypeContract>(
+		context,
+		adminSessionToken,
+		{
+			type: 'object',
+			properties: {
+				type: {
+					const: 'type@1.0.0',
+				},
+			},
+		},
+	);
+	testWorker.setTypeContracts(context, types);
 
 	// The flush method gives us a way of manually executing enqueued action requests,
 	// allowing fine grained control in test scenarios. In a production setting, the
