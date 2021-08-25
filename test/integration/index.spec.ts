@@ -1768,6 +1768,88 @@ describe('Worker', () => {
 		expect(result).toBeTruthy();
 		expect(result.data.updated).toBe(true);
 	});
+
+	it('should attempt to enqueue subsequent iterations of a recurring scheduled action', async () => {
+		const typeCard = await ctx.jellyfish.getCardBySlug(
+			ctx.context,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeCard !== null);
+
+		const scheduledAction = await ctx.jellyfish.insertCard(
+			ctx.context,
+			ctx.session,
+			{
+				type: 'scheduled-action@1.0.0',
+				slug: ctx.generateRandomSlug({
+					prefix: 'scheduled-action',
+				}),
+				data: {
+					options: {
+						context: ctx.context,
+						action: 'action-create-card@1.0.0',
+						card: ctx.generateRandomID(),
+						type: 'type',
+						arguments: {},
+					},
+					schedule: {
+						recurring: {
+							start: new Date(
+								new Date().setDate(new Date().getDate() - 1),
+							).toISOString(),
+							end: new Date(
+								new Date().setDate(new Date().getDate() + 2),
+							).toISOString(),
+							interval: '* * * * *',
+						},
+					},
+				},
+			},
+		);
+
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			{
+				action: 'action-create-card@1.0.0',
+				context: ctx.context,
+				card: typeCard.id,
+				type: typeCard.type,
+				arguments: {
+					reason: null,
+					properties: {
+						slug: ctx.generateRandomSlug(),
+						version: '1.0.0',
+						data: {
+							foo: 'bar',
+						},
+					},
+				},
+				schedule: scheduledAction.id,
+			},
+		);
+
+		// Check that a job with run_at set exists
+		const jobs1 = await ctx.backend.any({
+			text: `SELECT id,run_at from graphile_worker.jobs where key=$1;`,
+			values: [scheduledAction.id],
+		});
+		expect(jobs1.length).toEqual(1);
+		expect(jobs1[0]['run_at']).not.toEqual('');
+
+		// Execute request
+		await ctx.worker.execute(ctx.session, request);
+
+		// Check that a new job with the same key exists but with a different ID
+		const jobs2 = await ctx.backend.any({
+			text: `SELECT id,run_at from graphile_worker.jobs where key=$1;`,
+			values: [scheduledAction.id],
+		});
+		expect(jobs2.length).toEqual(1);
+		expect(jobs2[0]['run_at']).not.toEqual('');
+		expect(jobs2[0].id).not.toEqual(jobs1[0].id);
+	});
 });
 
 describe('.getTriggers()', () => {

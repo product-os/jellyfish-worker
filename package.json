@@ -70,7 +70,7 @@
     "@balena/jellyfish-environment": "^5.0.1",
     "@balena/jellyfish-plugin-base": "^2.1.222",
     "@balena/jellyfish-plugin-default": "^20.0.1",
-    "@balena/jellyfish-queue": "^1.0.241",
+    "@balena/jellyfish-queue": "1.1.0-add-scheduled-actions-c844a0a57eb5d5e023f995f3378c14d9650dc534",
     "@balena/jellyfish-types": "^1.1.0",
     "@balena/lint": "^6.1.1",
     "@types/bluebird": "^3.5.36",
@@ -97,7 +97,7 @@
     "@balena/jellyfish-environment": "^5.0.1",
     "@balena/jellyfish-plugin-base": "^2.1.184",
     "@balena/jellyfish-plugin-default": "^20.0.1",
-    "@balena/jellyfish-queue": "^1.0.241"
+    "@balena/jellyfish-queue": "1.1.0-add-scheduled-actions-c844a0a57eb5d5e023f995f3378c14d9650dc534"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"

@@ -1070,6 +1070,23 @@ export class Worker {
 				error: true,
 				data: errorObject,
 			};
+		} finally {
+			// Schedule next iteration of recurring scheduled actions
+			if (request.data.schedule) {
+				const enqueueArguments = _.clone(request.data.arguments);
+				enqueueArguments.properties = _.omit(
+					(request.data as any).arguments.properties,
+					['slug', 'type'],
+				);
+				this.enqueueAction(session, {
+					context: requestContext,
+					action: request.data.action,
+					card: request.data.card as string,
+					type: request.data.type as string,
+					arguments: enqueueArguments,
+					schedule: request.data.schedule as string,
+				});
+			}
 		}
 
 		const event = await this.consumer.postResults(
