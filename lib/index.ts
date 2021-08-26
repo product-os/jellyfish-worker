@@ -290,6 +290,9 @@ export class Worker {
 					patch,
 				);
 			},
+			enqueueAction: (...args) => {
+				return this.enqueueAction(...args);
+			},
 			cards: {
 				...this.jellyfish.cards,
 				...self.getTypeContracts(),
