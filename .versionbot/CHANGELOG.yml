@@ -1,4 +1,17 @@
 - commits:
+    - subject: Fix error type unknown errors
+      hash: 2e1336ca7eb678611e1a90f4c0ee83e067c498c4
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 9.1.6
+  date: 2021-08-27T01:59:01.675Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.35'
       hash: 8cdd77dcc3de4ac1abf04d1f4b862c4a51b32739
       body: ''
