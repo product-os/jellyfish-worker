@@ -183,7 +183,7 @@ const compileTrigger = (
 
 	try {
 		return jsone(trigger, context);
-	} catch (error) {
+	} catch (error: any) {
 		if (error.name === 'InterpreterError') {
 			return null;
 		}

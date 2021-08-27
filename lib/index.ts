@@ -1044,7 +1044,7 @@ export class Worker {
 				error: false,
 				data,
 			};
-		} catch (error) {
+		} catch (error: any) {
 			const endDate = new Date();
 			const errorObject = errio.toObject(error, {
 				stack: true,
@@ -1320,7 +1320,7 @@ export class Worker {
 					// TS-TODO: remove any casting
 					return this.enqueueAction(session, actionRequest as any);
 				});
-			} catch (error) {
+			} catch (error: any) {
 				const errorObject = errio.toObject(error, {
 					stack: true,
 				});
