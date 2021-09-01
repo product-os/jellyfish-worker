@@ -1,4 +1,25 @@
 - commits:
+    - subject: Update files to use secrets
+      hash: 0631d7fb82e14e800b8e559a4f2eccf034cc366d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: "\U0001F504 Synced file(s) with product-os/secrets"
+      hash: 1b7da672e4fbcb9a3873044756b987ee5dbc6de9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 9.1.12
+  date: 2021-09-01T00:40:51.684Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.39'
       hash: d5303e9485bd0ee2273025e58da8dbfccd68f64e
       body: ''
