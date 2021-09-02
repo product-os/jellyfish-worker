@@ -1,4 +1,15 @@
 - commits:
+    - subject: Add enqueueAction to action context
+      hash: 6f39e3cd06abaffb2aa1a99040e2d3a61d2987f4
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: karaxuna
+      nested: []
+  version: 9.2.0
+  date: 2021-09-02T01:07:47.408Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 7fd1e77d6cdc50667c3f7a272b0b531b553986ad
       body: ''
