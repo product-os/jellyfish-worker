@@ -2698,34 +2698,31 @@ describe('.patchCard()', () => {
 
 		expect(triggers).toEqual([]);
 	});
+});
 
-	describe('.getActionContext()', () => {
-		it('should include a map of type contracts', async () => {
-			const types = await ctx.jellyfish.query<core.TypeContract>(
-				ctx.context,
-				ctx.session,
-				{
-					type: 'object',
-					properties: {
-						type: {
-							const: 'type@1.0.0',
-						},
+describe('.getActionContext()', () => {
+	it('should include a map of type contracts', async () => {
+		const types = await ctx.jellyfish.query<core.TypeContract>(
+			ctx.context,
+			ctx.session,
+			{
+				type: 'object',
+				properties: {
+					type: {
+						const: 'type@1.0.0',
 					},
 				},
-			);
+			},
+		);
 
-			ctx.worker.setTypeContracts(ctx.context, types);
+		ctx.worker.setTypeContracts(ctx.context, types);
 
-			const actionContext = ctx.worker.getActionContext(ctx.context);
+		const actionContext = ctx.worker.getActionContext(ctx.context);
 
-			const hasAllTypes = _.every(types, (contract) => {
-				return _.has(
-					actionContext.cards,
-					`${contract.slug}@${contract.version}`,
-				);
-			});
-
-			expect(hasAllTypes).toBeTruthy();
+		const hasAllTypes = _.every(types, (contract) => {
+			return _.has(actionContext.cards, `${contract.slug}@${contract.version}`);
 		});
+
+		expect(hasAllTypes).toBeTruthy();
 	});
 });
