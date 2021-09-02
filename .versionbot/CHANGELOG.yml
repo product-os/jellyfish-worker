@@ -1,4 +1,26 @@
 - commits:
+    - subject: Transform esm modules when testing with jest
+      hash: b58b4fca133ecb1b0c5ecd8ce53074cd84793f21
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-core to ^5.4.0'
+      hash: 5d534306d81d134093d41b42d4978df945e75abf
+      body: |
+        Update @balena/jellyfish-core from 5.3.2 to 5.4.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 9.2.1
+  date: 2021-09-02T11:46:12.035Z
+- commits:
     - subject: Add enqueueAction to action context
       hash: 6f39e3cd06abaffb2aa1a99040e2d3a61d2987f4
       body: ''
