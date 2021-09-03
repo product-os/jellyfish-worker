@@ -5,21 +5,22 @@
  */
 
 import Bluebird from 'bluebird';
-import * as helpers from './helpers';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { strict as assert } from 'assert';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { v4 as uuid } from 'uuid';
 import _ from 'lodash';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import CARDS from '../../lib/cards';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await integrationHelpers.before(CARDS);
 });
 
 afterAll(() => {
-	return helpers.after(ctx);
+	return integrationHelpers.after(ctx);
 });
 
 describe('.insertCard()', () => {

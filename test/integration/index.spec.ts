@@ -4,7 +4,7 @@
  * Proprietary and confidential.
  */
 
-import * as helpers from './helpers';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import * as _ from 'lodash';
 import Bluebird from 'bluebird';
 import { Worker } from '../../lib/index';
@@ -12,15 +12,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { strict as assert } from 'assert';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { core } from '@balena/jellyfish-types';
+import CARDS from '../../lib/cards';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await integrationHelpers.before(CARDS);
 });
 
 afterAll(async () => {
-	return helpers.after(ctx);
+	return integrationHelpers.after(ctx);
 });
 
 describe('.getId()', () => {
@@ -1772,12 +1773,12 @@ describe('Worker', () => {
 
 describe('.getTriggers()', () => {
 	it('should initially be an empty array', async () => {
-		const newContext = await helpers.before();
+		const newContext = await integrationHelpers.before(CARDS);
 
 		const triggers = newContext.worker.getTriggers();
 		expect(triggers).toEqual([]);
 
-		await helpers.after(newContext);
+		await integrationHelpers.after(newContext);
 	});
 });
 

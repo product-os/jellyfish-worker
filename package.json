@@ -71,6 +71,7 @@
     "@balena/jellyfish-plugin-base": "^2.1.222",
     "@balena/jellyfish-plugin-default": "^20.0.1",
     "@balena/jellyfish-queue": "^1.0.241",
+    "@balena/jellyfish-test-harness": "6.2.0-add-backend-setup-98a1a1a6c6d924f12bd7861e4048dd0a13008354",
     "@balena/jellyfish-types": "^1.0.0",
     "@balena/lint": "^6.1.1",
     "@types/bluebird": "^3.5.36",

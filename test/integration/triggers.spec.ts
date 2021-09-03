@@ -7,16 +7,17 @@
 import { v4 as uuidv4 } from 'uuid';
 import Bluebird from 'bluebird';
 import { strict as assert } from 'assert';
-import * as helpers from './helpers';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { triggersLib as triggers, errors } from '../../lib/index';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import CARDS from '../../lib/cards';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 let typeCard: TypeContract;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await integrationHelpers.before(CARDS);
 
 	const contract = (await ctx.jellyfish.getCardBySlug(
 		ctx.context,
@@ -69,7 +70,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	return helpers.after(ctx);
+	return integrationHelpers.after(ctx);
 });
 
 describe('.getRequest()', () => {

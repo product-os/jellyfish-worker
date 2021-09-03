@@ -5,16 +5,17 @@
  */
 
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import * as helpers from './helpers';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
+import CARDS from '../../lib/cards';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await integrationHelpers.before(CARDS);
 });
 
 afterAll(() => {
-	return helpers.after(ctx);
+	return integrationHelpers.after(ctx);
 });
 
 describe('.setTriggers()', () => {

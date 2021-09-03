@@ -4,18 +4,19 @@
  * Proprietary and confidential.
  */
 
-import * as helpers from './helpers';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import * as utils from '../../lib/utils';
 import { v4 as uuidv4 } from 'uuid';
+import CARDS from '../../lib/cards';
 
-let context: helpers.IntegrationTestContext;
+let context: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	context = await helpers.before();
+	context = await integrationHelpers.before(CARDS);
 });
 
 afterAll(() => {
-	return helpers.after(context);
+	return integrationHelpers.after(context);
 });
 
 describe('.hasCard()', () => {
