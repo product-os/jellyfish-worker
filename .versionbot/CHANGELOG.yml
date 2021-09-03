@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-core to ^5.5.1'
+      hash: 4e0ccaae2346a30f208f86e02b5ccc2670bcf12a
+      body: |
+        Update @balena/jellyfish-core from 5.4.0 to 5.5.1
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 9.2.3
+  date: 2021-09-03T15:53:01.889Z
+- commits:
     - subject: Remove unused backend-helpers file
       hash: d3b64079cc32c5a3d0f504a3566e0a6d5fe269b4
       body: ''
