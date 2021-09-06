@@ -33,6 +33,7 @@ export interface EvaluateOptions {
 export interface TransformerData {
 	inputFilter: any;
 	workerFilter: any;
+	[key: string]: unknown;
 }
 export type Transformer = core.Contract<TransformerData>;
 
