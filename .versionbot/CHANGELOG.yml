@@ -1,4 +1,17 @@
 - commits:
+    - subject: extend Transformer contract to allow additional data
+      hash: 0f202dfc980ac64e5d97e13ca000d90d9b25c2fb
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 9.2.8
+  date: 2021-09-06T09:00:21.709Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-types to ^1.1.0'
       hash: 180f8425bb7e1d4552306299af9cef8fbab9b86f
       body: |
