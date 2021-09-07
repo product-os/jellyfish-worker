@@ -25,11 +25,15 @@ import * as subscriptionsLib from './subscriptions';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import * as queue from '@balena/jellyfish-queue';
-import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
+import {
+	ProducerOptions,
+	ProducerOptionsSchedule,
+} from '@balena/jellyfish-types/build/queue';
 import {
 	TriggeredActionContract,
 	WorkerContext,
 } from '@balena/jellyfish-types/build/worker';
+import { parseExpression } from 'cron-parser';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
@@ -902,6 +906,7 @@ export class Worker {
 	 * console.log(result.data)
 	 */
 	async execute(session: string, request: core.ActionRequestContract) {
+		console.log('execute request:', JSON.stringify(request, null, 4));
 		logger.info(request.data.context, 'Executing request', {
 			request: {
 				id: request.id,
@@ -1047,6 +1052,9 @@ export class Worker {
 				error: false,
 				data,
 			};
+
+			// Check if is scheduled action, schedule specified action if so
+			console.log('execute-1:', JSON.stringify(request, null, 4));
 		} catch (error: any) {
 			const endDate = new Date();
 			const errorObject = errio.toObject(error, {
@@ -1073,22 +1081,30 @@ export class Worker {
 		} finally {
 			// Schedule next iteration of recurring scheduled actions
 			if (request.data.schedule) {
-				const requestArguments: any = _.clone(request.data.arguments);
-				if (requestArguments.properties) {
-					requestArguments.propertes = _.omit(requestArguments.properties, [
-						'slug',
-						'type',
-					]);
-				}
+				const schedule = request.data.schedule as ProducerOptionsSchedule;
+				const runAt = await this.getNextExecutionDateTime(
+					requestContext,
+					session,
+					schedule.card,
+				);
+				if (runAt) {
+					const requestArguments: any = _.clone(request.data.arguments);
+					if (requestArguments.properties) {
+						requestArguments.propertes = _.omit(requestArguments.properties, [
+							'slug',
+							'type',
+						]);
+					}
 
-				this.enqueueAction(session, {
-					context: requestContext,
-					action: request.data.action,
-					card: request.data.card as string,
-					type: request.data.type as string,
-					arguments: requestArguments,
-					schedule: request.data.schedule as string,
-				});
+					this.enqueueAction(session, {
+						context: requestContext,
+						action: request.data.action,
+						card: request.data.card as string,
+						type: request.data.type as string,
+						arguments: requestArguments,
+						schedule,
+					});
+				}
 			}
 		}
 
@@ -1508,5 +1524,44 @@ export class Worker {
 		}
 
 		return insertedCard;
+	}
+
+	/**
+	 * @summary Get the next execute date-time for a scheduled action
+	 *
+	 * @param schedule - ProducerOptions.schedule object
+	 * @returns next execution date iso string, or null if no more execution dates are found
+	 */
+	async getNextExecutionDateTime(
+		context: LogContext,
+		session: string,
+		scheduledActionId: string,
+	): Promise<string | null> {
+		const scheduledAction =
+			await this.jellyfish.getCardById<core.ScheduledActionContract>(
+				context,
+				session,
+				scheduledActionId,
+			);
+		const now = new Date();
+		if (scheduledAction && scheduledAction.active) {
+			if (scheduledAction.data.schedule.once) {
+				const next = new Date(scheduledAction.data.schedule.once.date);
+				if (next > now) {
+					return scheduledAction.data.schedule.once.date;
+				}
+			} else if (scheduledAction.data.schedule.recurring) {
+				const start = new Date(scheduledAction.data.schedule.recurring.start);
+				const end = new Date(scheduledAction.data.schedule.recurring.end);
+				const next = parseExpression(
+					scheduledAction.data.schedule.recurring.interval,
+				).next();
+				if (start < now && end > now && next.toDate() < end) {
+					return next.toISOString();
+				}
+			}
+		}
+
+		return null;
 	}
 }

@@ -51,6 +51,7 @@
     "@balena/jellyfish-jellyscript": "^4.9.43",
     "@balena/jellyfish-logger": "^3.0.67",
     "bluebird": "^3.7.2",
+    "cron-parser": "^3.5.0",
     "errio": "^1.2.2",
     "fast-equals": "^2.0.3",
     "fast-json-patch": "^3.1.0",
@@ -70,8 +71,8 @@
     "@balena/jellyfish-environment": "^5.0.1",
     "@balena/jellyfish-plugin-base": "^2.1.222",
     "@balena/jellyfish-plugin-default": "^20.0.1",
-    "@balena/jellyfish-queue": "1.1.0-add-scheduled-actions-c844a0a57eb5d5e023f995f3378c14d9650dc534",
-    "@balena/jellyfish-types": "^1.1.0",
+    "@balena/jellyfish-queue": "1.1.0-add-scheduled-actions-40d01bcd05eaaaf876017b4c49659c599c06ccae",
+    "@balena/jellyfish-types": "2.0.0-update-worker-queue-c993fece5998eaa276b7b332aa69a420028ba493",
     "@balena/lint": "^6.1.1",
     "@types/bluebird": "^3.5.36",
     "@types/jest": "^27.0.1",
@@ -97,7 +98,7 @@
     "@balena/jellyfish-environment": "^5.0.1",
     "@balena/jellyfish-plugin-base": "^2.1.184",
     "@balena/jellyfish-plugin-default": "^20.0.1",
-    "@balena/jellyfish-queue": "1.1.0-add-scheduled-actions-c844a0a57eb5d5e023f995f3378c14d9650dc534"
+    "@balena/jellyfish-queue": "1.1.0-add-scheduled-actions-40d01bcd05eaaaf876017b4c49659c599c06ccae"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
