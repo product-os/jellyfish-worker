@@ -193,51 +193,52 @@ const compileTrigger = (
 };
 
 /**
- * @summary Get a request from a trigger
+ * @summary Create an action request from a trigger, if it matches, it didn't match before
+ * 					or one of its fields listed in triggerPaths was changed
  * @function
  * @public
  *
- * @param {Object} jellyfish - jellyfish instance
+ * @param {Object} jellyfish - jellyfish kernel instance
  * @param {Object} trigger - triggered action contract
- * @param {Object} card - card
+ * @param {Object} oldContract - contract before the change was applied (null if contract is new)
+ * @param {Object} newContract - contract after the change was applied
  * @param {Object} options - options
  * @param {String} options.mode - change type
  * @param {String} options.session - session
  * @param {Date} options.currentDate - current date
  * @param {Object} options.context - execution context
- * @returns {(Object|Null)} request, or null if error
+ * @returns {(Object|Null)} action request, or null if the trigger doesn't match
  *
- * @example
- * const request = await triggers.getRequest(jellyfish, { ... }, { ... }, {
- *   currentDate: new Date(),
- *   mode: 'update',
- *   session: '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- * }
- *
- * console.log(request.action)
- * console.log(request.arguments)
- * console.log(request.originator)
- * console.log(request.card)
  */
 export const getRequest = async (
 	jellyfish: Kernel,
 	trigger: TriggeredActionContract,
 	// If getRequest is called by a time triggered action, then card will be null
-	card: core.Contract | null,
+	oldContract: core.Contract | null,
+	newContract: core.Contract,
 	options: GetRequestOptions,
 ) => {
-	const match = await matchesCard(
+	if (trigger.data.mode && trigger.data.mode !== options.mode) {
+		return null;
+	}
+	const newContractMatches = await matchesCard(
 		options.context,
 		jellyfish,
 		options.session,
 		trigger.data.filter!,
-		card,
+		newContract,
 	);
-	if (card && !match) {
+	if (!newContractMatches) {
 		return null;
 	}
 
-	if (trigger.data.mode && trigger.data.mode !== options.mode) {
+	const triggerPaths = findUsedPropertyPaths(trigger.data.filter!);
+	const triggerPathsChanged = triggerPaths.reduce(
+		(r, p) => r || !_.isEqual(_.get(oldContract, p), _.get(newContract, p)),
+		false,
+	);
+
+	if (!triggerPathsChanged) {
 		return null;
 	}
 
@@ -249,7 +250,7 @@ export const getRequest = async (
 			arguments: trigger.data.arguments,
 			target: trigger.data.target,
 		},
-		match || card,
+		newContractMatches || newContract,
 		options.currentDate,
 	);
 
@@ -416,3 +417,39 @@ export const getNextExecutionDate = (
 		lastExecutionDate >= startDate || intervals === 0 ? intervals + 1 : 0;
 	return new Date(startDate.getTime() + duration * times);
 };
+
+/**
+ * Parses a JSON schema object for all properties which might be accessed as part of a match
+ *
+ * @param schema JSON schema object to parse
+ * @returns the list of referenced property paths
+ */
+export function findUsedPropertyPaths(schema: any): string[] {
+	const result: string[] = [];
+	if (typeof schema === 'object') {
+		for (const key of Object.keys(schema)) {
+			if (key === '$$links') {
+				continue;
+			}
+			if (key === 'properties') {
+				result.push(
+					...Object.keys(schema.properties)
+						.map((p) => ({
+							prop: p,
+							paths: findUsedPropertyPaths(schema.properties[p]),
+						}))
+						.flatMap(({ prop, paths }) =>
+							paths.length > 0 ? paths.map((p) => `${prop}.${p}`) : prop,
+						),
+				);
+			} else if (typeof schema[key] === 'object') {
+				result.push(
+					...Object.keys(schema[key])
+						.flatMap((p) => findUsedPropertyPaths(schema[key][p]))
+						.filter((p) => !!p),
+				);
+			}
+		}
+	}
+	return result;
+}
