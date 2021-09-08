@@ -1330,7 +1330,7 @@ export class Worker {
 							`No such input card for trigger ${trigger.slug}: ${identifier}`,
 						);
 					}
-					const actionRequest = {
+					let actionRequest = {
 						// Re-enqueuing an action request expects the "card" option to be an
 						// id, not a full card.
 						card: triggerCard.id,
@@ -1345,6 +1345,21 @@ export class Worker {
 						// don't break the chain
 						originator: options.originator || request.originator,
 					};
+
+					// Update action request for those triggered by scheduled actions
+					if (triggerCard.type.split('@')[0] === 'scheduled-action') {
+						const runAt = await this.getNextExecutionDateTime(
+							context,
+							session,
+							triggerCard.id,
+						);
+						actionRequest = await this.getScheduledActionRequest(
+							context,
+							session,
+							triggerCard as core.ScheduledActionContract,
+							actionRequest,
+						);
+					}
 
 					logger.info(
 						context,
@@ -1563,5 +1578,39 @@ export class Worker {
 		}
 
 		return null;
+	}
+
+	/**
+	 * @summary Prepare action request for actions triggered by scheduled actions
+	 *
+	 * @param context - execution context
+	 * @param session - session id
+	 * @param card - trigger card
+	 * @param request - action request
+	 * @returns action request based on scheduled action configuration
+	 */
+	async getScheduledActionRequest(
+		context: LogContext,
+		session: string,
+		card: core.ScheduledActionContract,
+		request: any,
+	): Promise<any> {
+		const typeCard = await this.jellyfish.getCardBySlug(
+			context,
+			session,
+			card.data.options.card,
+		);
+		assert.INTERNAL(
+			context,
+			typeCard && typeCard.data && typeCard.data.schema,
+			errors.WorkerNoElement,
+			`Invalid type: ${typeCard}`,
+		);
+
+		return Object.assign({}, request, {
+			card: typeCard!.id,
+			action: card.data.options.action,
+			arguments: card.data.options.arguments,
+		});
 	}
 }
