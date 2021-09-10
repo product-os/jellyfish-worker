@@ -1265,6 +1265,7 @@ export class Worker {
 				const request = await triggersLib.getRequest(
 					this.jellyfish,
 					trigger,
+					current,
 					insertedCard,
 					{
 						currentDate: new Date(),

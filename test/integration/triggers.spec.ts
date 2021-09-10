@@ -11,6 +11,7 @@ import * as helpers from './helpers';
 import { triggersLib as triggers, errors } from '../../lib/index';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import _ from 'lodash';
 
 let ctx: helpers.IntegrationTestContext;
 let typeCard: TypeContract;
@@ -117,6 +118,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: new Date(),
@@ -175,6 +177,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: date,
@@ -198,7 +201,66 @@ describe('.getRequest()', () => {
 		});
 	});
 
-	it('should return a request if the input card is null', async () => {
+	it('should return null if there is no relevant from the old contract state', async () => {
+		const trigger = ctx.jellyfish.defaults({
+			type: 'triggered-action@1.0.0',
+			data: {
+				mode: 'insert',
+				filter: {
+					type: 'object',
+					required: ['type'],
+					properties: {
+						type: {
+							type: 'string',
+							const: 'foo@1.0.0',
+						},
+					},
+				},
+				action: 'action-create-card@1.0.0',
+				card: typeCard.id,
+				arguments: {
+					properties: {
+						slug: 'foo-bar-baz',
+					},
+				},
+			},
+		}) as TriggeredActionContract;
+
+		const insertedCard = await ctx.jellyfish.insertCard(
+			ctx.context,
+			ctx.session,
+			{
+				type: 'card@1.0.0',
+				version: '1.0.0',
+				slug: uuidv4(),
+				active: true,
+				links: {},
+				tags: [],
+				markers: [],
+				data: {},
+			},
+		);
+		const oldCard = _.cloneDeep(insertedCard);
+		oldCard.data.randomField = 42;
+
+		// TS-TODO: fix cast to any
+		const request = await triggers.getRequest(
+			ctx.jellyfish,
+			trigger,
+			oldCard,
+			insertedCard,
+			{
+				currentDate: new Date(),
+				mode: 'insert',
+				context: ctx.context,
+				session: ctx.session,
+			},
+		);
+
+		expect(request).toBeFalsy();
+	});
+
+	it('should return a request if a relevant field did change', async () => {
 		const trigger = ctx.jellyfish.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
@@ -211,6 +273,10 @@ describe('.getRequest()', () => {
 						type: {
 							type: 'string',
 							const: 'foo@1.0.0',
+						},
+						name: {
+							type: 'string',
+							pattern: 'x',
 						},
 					},
 				},
@@ -226,12 +292,36 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const request = await triggers.getRequest(ctx.jellyfish, trigger, null, {
-			currentDate: date,
-			mode: 'insert',
-			context: ctx.context,
-			session: ctx.session,
-		});
+		const insertedCard = await ctx.jellyfish.insertCard(
+			ctx.context,
+			ctx.session,
+			{
+				name: 'x2',
+				type: 'foo@1.0.0',
+				version: '1.0.0',
+				slug: uuidv4(),
+				active: true,
+				links: {},
+				tags: [],
+				markers: [],
+				data: {},
+			},
+		);
+		const oldCard = _.cloneDeep(insertedCard);
+		oldCard.name = 'x1';
+
+		const request = await triggers.getRequest(
+			ctx.jellyfish,
+			trigger,
+			oldCard,
+			insertedCard,
+			{
+				currentDate: date,
+				mode: 'insert',
+				context: ctx.context,
+				session: ctx.session,
+			},
+		);
 
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
@@ -245,44 +335,6 @@ describe('.getRequest()', () => {
 				},
 			},
 		});
-	});
-
-	it('should return null if referencing source when no input card', async () => {
-		const trigger = ctx.jellyfish.defaults({
-			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-			type: 'triggered-action@1.0.0',
-			data: {
-				mode: 'insert',
-				filter: {
-					type: 'object',
-					required: ['type'],
-					properties: {
-						type: {
-							type: 'string',
-							const: 'foo@1.0.0',
-						},
-					},
-				},
-				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
-				arguments: {
-					properties: {
-						slug: {
-							$eval: 'source.type',
-						},
-					},
-				},
-			},
-		}) as TriggeredActionContract;
-
-		const request = await triggers.getRequest(ctx.jellyfish, trigger, null, {
-			currentDate: new Date(),
-			mode: 'insert',
-			context: ctx.context,
-			session: ctx.session,
-		});
-
-		expect(request).toBe(null);
 	});
 
 	it('should return a request given a complex matching filter', async () => {
@@ -342,6 +394,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: date,
@@ -420,6 +473,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: new Date(),
@@ -495,6 +549,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: date,
@@ -584,6 +639,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: date,
@@ -673,6 +729,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: date,
@@ -762,6 +819,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: date,
@@ -782,6 +840,10 @@ describe('.getRequest()', () => {
 				mode: 'insert',
 				filter: {
 					type: 'object',
+					required: ['type'],
+					properties: {
+						type: { const: 'card@1.0.0' },
+					},
 				},
 				action: 'action-create-card@1.0.0',
 				target: typeCard.id,
@@ -821,6 +883,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate,
@@ -907,6 +970,7 @@ describe('.getRequest()', () => {
 		const request = await triggers.getRequest(
 			ctx.jellyfish,
 			trigger,
+			null,
 			insertedCard,
 			{
 				currentDate: new Date(),
