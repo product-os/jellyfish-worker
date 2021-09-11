@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-plugin-default to v21'
+      hash: 26bb914edb6cf330daf00954a54aecc4c495c683
+      body: |
+        Update @balena/jellyfish-plugin-default from 20.0.1 to 21.0.5
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.1
+  date: 2021-09-11T09:04:12.457Z
+- commits:
     - subject: >-
         make triggered actions only run if it's a fresh match or an important
         field changed
