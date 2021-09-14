@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-core to ^6.1.1'
+      hash: 50e89c25c888d4cd567016540b60388a9d892fd0
+      body: |
+        Update @balena/jellyfish-core from 6.0.0 to 6.1.1
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.7
+  date: 2021-09-14T08:58:21.863Z
+- commits:
     - subject: Add typedoc to depcheck ignore list
       hash: 5885dc61c8849f467c36b951f7b22c3dfc608e27
       body: ''
