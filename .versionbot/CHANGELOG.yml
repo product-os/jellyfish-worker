@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add subscription integration test
+      hash: c5ffa6cca5a994f348beaff27b51abf8aa1d8e27
+      body: |
+        Bring in subscription integration test from the main repo.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 10.0.10
+  date: 2021-09-16T06:26:41.989Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-plugin-default to ^21.1.0'
       hash: baaab65ae6331db15574a6ae6a62c2ef9160208d
       body: |
