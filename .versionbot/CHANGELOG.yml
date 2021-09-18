@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @types/lodash to ^4.14.173'
+      hash: 55ab10d918f860806289f71e8c9338298af4a241
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.11
+  date: 2021-09-18T01:02:22.199Z
+- commits:
     - subject: Add subscription integration test
       hash: c5ffa6cca5a994f348beaff27b51abf8aa1d8e27
       body: |
