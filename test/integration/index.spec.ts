@@ -4,23 +4,30 @@
  * Proprietary and confidential.
  */
 
-import * as helpers from './helpers';
-import * as _ from 'lodash';
-import Bluebird from 'bluebird';
-import { Worker } from '../../lib/index';
-import { v4 as uuidv4 } from 'uuid';
-import { strict as assert } from 'assert';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import ActionLibrary from '@balena/jellyfish-action-library';
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
+import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { core } from '@balena/jellyfish-types';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import { strict as assert } from 'assert';
+import Bluebird from 'bluebird';
+import * as _ from 'lodash';
+import { Worker } from '../../lib/index';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await integrationHelpers.before(
+		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		{
+			worker: Worker,
+		},
+	);
 });
 
-afterAll(async () => {
-	return helpers.after(ctx);
+afterAll(() => {
+	return integrationHelpers.after(ctx);
 });
 
 describe('.getId()', () => {
@@ -103,13 +110,13 @@ describe('Worker', () => {
 		assert(enqueuedRequest1 !== null);
 
 		await ctx.queue.consumer.postResults(
-			uuidv4(),
+			ctx.generateRandomID(),
 			ctx.context,
 			enqueuedRequest1 as any,
 			{
 				error: false,
 				data: {
-					id: uuidv4(),
+					id: ctx.generateRandomID(),
 					type: 'card@1.0.0',
 					slug,
 				},
@@ -1066,13 +1073,13 @@ describe('Worker', () => {
 		});
 
 		await ctx.queue.consumer.postResults(
-			uuidv4(),
+			ctx.generateRandomID(),
 			ctx.context,
 			enqueuedRequest1 as any,
 			{
 				error: false,
 				data: {
-					id: uuidv4(),
+					id: ctx.generateRandomID(),
 					type: 'card@1.0.0',
 					slug: 'foo',
 				},
@@ -1116,7 +1123,7 @@ describe('Worker', () => {
 			request1,
 		);
 
-		await ctx.flush(ctx.session);
+		await ctx.flushAll(ctx.session);
 		const signupResult: any = await ctx.queue.producer.waitResults(
 			ctx.context,
 			createUserRequest,
@@ -1139,7 +1146,7 @@ describe('Worker', () => {
 			request2,
 		);
 
-		await ctx.flush(ctx.session);
+		await ctx.flushAll(ctx.session);
 		const loginResult: any = await ctx.queue.producer.waitResults(
 			ctx.context,
 			loginRequest,
@@ -1374,8 +1381,10 @@ describe('Worker', () => {
 
 		ctx.worker.setTriggers(ctx.context, [
 			ctx.jellyfish.defaults({
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
+				id: ctx.generateRandomID(),
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -1447,7 +1456,7 @@ describe('Worker', () => {
 			},
 		);
 
-		await ctx.flush(ctx.session);
+		await ctx.flushAll(ctx.session);
 		const result = await ctx.queue.producer.waitResults(ctx.context, request);
 		expect(result.error).toBe(false);
 
@@ -1638,8 +1647,10 @@ describe('Worker', () => {
 
 		ctx.worker.setTriggers(ctx.context, [
 			ctx.jellyfish.defaults({
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
+				id: ctx.generateRandomID(),
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -1771,13 +1782,9 @@ describe('Worker', () => {
 });
 
 describe('.getTriggers()', () => {
-	it('should initially be an empty array', async () => {
-		const newContext = await helpers.before();
-
-		const triggers = newContext.worker.getTriggers();
-		expect(triggers).toEqual([]);
-
-		await helpers.after(newContext);
+	it('should return a list of triggers', async () => {
+		const triggers = ctx.worker.getTriggers();
+		expect(triggers[0].type.split('@')[0]).toEqual('triggered-action');
 	});
 });
 

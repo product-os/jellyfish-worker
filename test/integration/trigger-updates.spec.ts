@@ -4,24 +4,35 @@
  * Proprietary and confidential.
  */
 
+import ActionLibrary from '@balena/jellyfish-action-library';
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
+import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import * as helpers from './helpers';
+import { Worker } from '../../lib';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await integrationHelpers.before(
+		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		{
+			worker: Worker,
+		},
+	);
 });
 
 afterAll(() => {
-	return helpers.after(ctx);
+	return integrationHelpers.after(ctx);
 });
 
 describe('.setTriggers()', () => {
 	it('should be able to set triggers', () => {
 		const trigger1 = ctx.jellyfish.defaults({
-			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-			slug: 'triggered-action-foo-bar',
+			id: ctx.generateRandomID(),
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
 			type: 'triggered-action@1.0.0',
 			data: {
 				action: 'action-foo-bar@1.0.0',
@@ -36,8 +47,10 @@ describe('.setTriggers()', () => {
 		}) as TriggeredActionContract;
 
 		const trigger2 = ctx.jellyfish.defaults({
-			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-			slug: 'triggered-action-foo-baz',
+			id: ctx.generateRandomID(),
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
 			type: 'triggered-action@1.0.0',
 			data: {
 				action: 'action-foo-bar@1.0.0',
@@ -62,8 +75,10 @@ describe('.setTriggers()', () => {
 describe('.upsertTrigger()', () => {
 	it('should be able to add a trigger', () => {
 		const trigger1 = ctx.jellyfish.defaults({
-			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-			slug: 'triggered-action-foo-bar',
+			id: ctx.generateRandomID(),
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
 			type: 'triggered-action@1.0.0',
 			data: {
 				action: 'action-foo-bar@1.0.0',
@@ -78,8 +93,10 @@ describe('.upsertTrigger()', () => {
 		}) as TriggeredActionContract;
 
 		const trigger2 = ctx.jellyfish.defaults({
-			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-			slug: 'triggered-action-foo-baz',
+			id: ctx.generateRandomID(),
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
 			type: 'triggered-action@1.0.0',
 			data: {
 				action: 'action-foo-bar@1.0.0',
@@ -104,8 +121,10 @@ describe('.upsertTrigger()', () => {
 
 	it('should be able to modify an existing trigger', () => {
 		const trigger1 = ctx.jellyfish.defaults({
-			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-			slug: 'triggered-action-foo-bar',
+			id: ctx.generateRandomID(),
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
 			type: 'triggered-action@1.0.0',
 			data: {
 				action: 'action-foo-bar@1.0.0',
@@ -120,8 +139,10 @@ describe('.upsertTrigger()', () => {
 		}) as TriggeredActionContract;
 
 		const trigger2 = ctx.jellyfish.defaults({
-			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-			slug: 'triggered-action-foo-baz',
+			id: ctx.generateRandomID(),
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
 			type: 'triggered-action@1.0.0',
 			data: {
 				action: 'action-foo-bar@1.0.0',
@@ -167,8 +188,10 @@ describe('.upsertTrigger()', () => {
 describe('.removeTrigger()', () => {
 	it('should be able to remove an existing trigger', () => {
 		const trigger1 = ctx.jellyfish.defaults({
-			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-			slug: 'triggered-action-foo-bar',
+			id: ctx.generateRandomID(),
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
 			type: 'triggered-action@1.0.0',
 			data: {
 				action: 'action-foo-bar@1.0.0',
@@ -183,8 +206,10 @@ describe('.removeTrigger()', () => {
 		}) as TriggeredActionContract;
 
 		const trigger2 = ctx.jellyfish.defaults({
-			id: 'd6cacdef-f53b-4b5b-8aa2-8476e48248a4',
-			slug: 'triggered-action-foo-baz',
+			id: ctx.generateRandomID(),
+			slug: ctx.generateRandomSlug({
+				prefix: 'triggered-action',
+			}),
 			type: 'triggered-action@1.0.0',
 			data: {
 				action: 'action-foo-bar@1.0.0',

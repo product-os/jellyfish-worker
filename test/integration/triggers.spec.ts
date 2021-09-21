@@ -4,20 +4,28 @@
  * Proprietary and confidential.
  */
 
-import { v4 as uuidv4 } from 'uuid';
-import Bluebird from 'bluebird';
-import { strict as assert } from 'assert';
-import * as helpers from './helpers';
-import { triggersLib as triggers, errors } from '../../lib/index';
+import ActionLibrary from '@balena/jellyfish-action-library';
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
+import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import { strict as assert } from 'assert';
+import Bluebird from 'bluebird';
 import _ from 'lodash';
+import { Worker } from '../../lib';
+import { errors, triggersLib as triggers } from '../../lib/index';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 let typeCard: TypeContract;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await integrationHelpers.before(
+		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		{
+			worker: Worker,
+		},
+	);
 
 	const contract = (await ctx.jellyfish.getCardBySlug(
 		ctx.context,
@@ -70,7 +78,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	return helpers.after(ctx);
+	return integrationHelpers.after(ctx);
 });
 
 describe('.getRequest()', () => {
@@ -105,7 +113,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -165,7 +173,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'foo@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -232,7 +240,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -299,7 +307,7 @@ describe('.getRequest()', () => {
 				name: 'x2',
 				type: 'foo@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -380,7 +388,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'foo@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -458,7 +466,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'foo@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -533,7 +541,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -623,7 +631,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -713,7 +721,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				active: true,
 				links: {},
 				tags: [],
@@ -801,7 +809,7 @@ describe('.getRequest()', () => {
 			ctx.context,
 			ctx.session,
 			{
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				active: true,
@@ -865,7 +873,7 @@ describe('.getRequest()', () => {
 			ctx.context,
 			ctx.session,
 			{
-				slug: uuidv4(),
+				slug: ctx.generateRandomID(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				active: true,
@@ -953,7 +961,7 @@ describe('.getRequest()', () => {
 			ctx.context,
 			ctx.session,
 			{
-				slug: uuidv4(),
+				slug: ctx.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				active: true,
