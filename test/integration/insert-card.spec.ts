@@ -4,22 +4,58 @@
  * Proprietary and confidential.
  */
 
-import Bluebird from 'bluebird';
-import * as helpers from './helpers';
-import { strict as assert } from 'assert';
+import ActionLibrary from '@balena/jellyfish-action-library';
+import { actionCreateCard } from '@balena/jellyfish-action-library/build/actions/action-create-card';
+import type { ActionFile } from '@balena/jellyfish-plugin-base';
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
+import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
-import { v4 as uuid } from 'uuid';
-import _ from 'lodash';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import { strict as assert } from 'assert';
+import Bluebird from 'bluebird';
+import _ from 'lodash';
+import { Worker } from '../../lib';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	const actionTestOriginator: ActionFile = {
+		handler: async (
+			session: string,
+			handlerCtx: any,
+			card: any,
+			request: any,
+		) => {
+			request.arguments.properties.data =
+				request.arguments.properties.data || {};
+			request.arguments.properties.data.originator = request.originator;
+			return actionCreateCard.handler(session, handlerCtx, card, request);
+		},
+		card: {
+			slug: 'action-test-originator',
+			type: actionCreateCard.card.type,
+			name: actionCreateCard.card.name,
+			data: actionCreateCard.card.data,
+		},
+	};
+
+	ctx = await integrationHelpers.before(
+		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		{
+			worker: Worker,
+			actions: [actionTestOriginator],
+			cards: [
+				Object.assign({}, actionCreateCard.card, {
+					slug: 'action-test-originator',
+				}),
+			],
+		},
+	);
 });
 
 afterAll(() => {
-	return helpers.after(ctx);
+	return integrationHelpers.after(ctx);
 });
 
 describe('.insertCard()', () => {
@@ -33,13 +69,16 @@ describe('.insertCard()', () => {
 		assert(typeCard !== null);
 
 		const command = ctx.generateRandomSlug({ prefix: 'originator-test' });
-		const id = uuid();
+		const id = ctx.generateRandomID();
 
 		ctx.worker.setTriggers(ctx.context, [
+			...ctx.worker.getTriggers(),
 			ctx.jellyfish.defaults({
 				id,
 				type: 'triggered-action@1.0.0',
-				slug: 'triggered-action-xr3523c5',
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				data: {
 					filter: {
 						type: 'object',
@@ -111,11 +150,14 @@ describe('.insertCard()', () => {
 		assert(typeCard !== null);
 
 		const command = ctx.generateRandomSlug();
-		const id = uuid();
+		const id = ctx.generateRandomID();
 		ctx.worker.setTriggers(ctx.context, [
+			...ctx.worker.getTriggers(),
 			ctx.jellyfish.defaults({
 				id,
-				slug: `triggered-action-foo-bar-${id.substr(0, 7)}`,
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -146,7 +188,7 @@ describe('.insertCard()', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const originatorId = uuid();
+		const originatorId = ctx.generateRandomID();
 
 		await ctx.worker.insertCard(
 			ctx.context,
@@ -190,9 +232,12 @@ describe('.insertCard()', () => {
 
 		const command = ctx.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.context, [
+			...ctx.worker.getTriggers(),
 			ctx.jellyfish.defaults({
-				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar',
+				id: ctx.generateRandomID(),
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -289,8 +334,10 @@ describe('.insertCard()', () => {
 		const command = ctx.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.context, [
 			ctx.jellyfish.defaults({
-				id: 'xb3523c5-b37d-41c8-ae32-9e7cc9309165',
-				slug: 'triggered-action-foo-bar-xb3523c5',
+				id: ctx.generateRandomID(),
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -364,8 +411,10 @@ describe('.insertCard()', () => {
 		const command2 = ctx.generateRandomSlug({ prefix });
 		ctx.worker.setTriggers(ctx.context, [
 			ctx.jellyfish.defaults({
-				id: uuid(),
-				slug: 'trigger-action-ib3523c5',
+				id: ctx.generateRandomID(),
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -395,8 +444,10 @@ describe('.insertCard()', () => {
 				},
 			}) as TriggeredActionContract,
 			ctx.jellyfish.defaults({
-				id: uuid(),
-				slug: 'triggered-action-d67acdef',
+				id: ctx.generateRandomID(),
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -477,8 +528,10 @@ describe('.insertCard()', () => {
 		const command2 = ctx.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.context, [
 			ctx.jellyfish.defaults({
-				id: uuid(),
-				slug: 'triggered-action-cx3523c5',
+				id: ctx.generateRandomID(),
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -508,8 +561,10 @@ describe('.insertCard()', () => {
 				},
 			}) as TriggeredActionContract,
 			ctx.jellyfish.defaults({
-				id: uuid(),
-				slug: 'triggered-action-d68acdef',
+				id: ctx.generateRandomID(),
+				slug: ctx.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {

@@ -4,11 +4,11 @@
  * Proprietary and confidential.
  */
 
-import * as _ from 'lodash';
 import ActionLibrary from '@balena/jellyfish-action-library';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import { integrationHelpers } from '@balena/jellyfish-test-harness';
+import * as _ from 'lodash';
 import { Worker } from '../../lib';
 
 let ctx: integrationHelpers.IntegrationTestContext;
@@ -18,7 +18,6 @@ let userSession: string = '';
 beforeAll(async () => {
 	ctx = await integrationHelpers.before(
 		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		[],
 		{
 			worker: Worker,
 		},
@@ -88,7 +87,7 @@ test('Should generate a notification if message is added to subscribed thread', 
 					},
 				},
 			},
-			5,
+			3,
 		),
 	).rejects.toThrowError(new Error('The wait query did not resolve'));
 

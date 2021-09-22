@@ -4,22 +4,30 @@
  * Proprietary and confidential.
  */
 
-import * as _ from 'lodash';
-import * as helpers from './helpers';
-import { v4 as uuidv4 } from 'uuid';
-import { strict as assert } from 'assert';
+import ActionLibrary from '@balena/jellyfish-action-library';
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
+import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { core } from '@balena/jellyfish-types';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import { strict as assert } from 'assert';
 import Bluebird from 'bluebird';
+import * as _ from 'lodash';
+import { Worker } from '../../lib';
 
-let ctx: helpers.IntegrationTestContext;
+let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await helpers.before();
+	ctx = await integrationHelpers.before(
+		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		{
+			worker: Worker,
+		},
+	);
 });
 
 afterAll(() => {
-	return helpers.after(ctx);
+	return integrationHelpers.after(ctx);
 });
 
 describe('.execute()', () => {
@@ -299,8 +307,8 @@ describe('.execute()', () => {
 		ctx.worker.upsertTrigger(
 			ctx.context,
 			ctx.jellyfish.defaults({
-				id: uuidv4(),
-				slug: `triggered-action-${uuidv4()}`,
+				id: ctx.generateRandomID(),
+				slug: `triggered-action-${ctx.generateRandomID()}`,
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -1190,7 +1198,7 @@ describe('.execute()', () => {
 				ctx.context,
 				ctx.session,
 				{
-					slug: `action-request-${uuidv4()}`,
+					slug: `action-request-${ctx.generateRandomID()}`,
 					type: 'action-request@1.0.0',
 					data: {
 						actor: ctx.actor.id,
@@ -1229,7 +1237,7 @@ describe('.execute()', () => {
 				ctx.context,
 				ctx.session,
 				{
-					slug: `action-request-${uuidv4()}`,
+					slug: `action-request-${ctx.generateRandomID()}`,
 					type: 'action-request@1.0.0',
 					data: {
 						actor: ctx.actor.id,
@@ -1239,7 +1247,7 @@ describe('.execute()', () => {
 						timestamp: '2018-07-04T00:22:52.247Z',
 						input: {
 							// Make up a new UUID that doesn't correspond to any contract
-							id: uuidv4(),
+							id: ctx.generateRandomID(),
 							type: 'card@1.0.0',
 						},
 						arguments: {
@@ -1272,7 +1280,7 @@ describe('.execute()', () => {
 				ctx.context,
 				ctx.session,
 				{
-					slug: `action-request-${uuidv4()}`,
+					slug: `action-request-${ctx.generateRandomID()}`,
 					type: 'action-request@1.0.0',
 					data: {
 						actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
@@ -1314,7 +1322,7 @@ describe('.execute()', () => {
 				ctx.context,
 				ctx.session,
 				{
-					slug: `action-request-${uuidv4()}`,
+					slug: `action-request-${ctx.generateRandomID()}`,
 					type: 'action-request@1.0.0',
 					data: {
 						actor: ctx.actor.id,
@@ -1358,7 +1366,7 @@ describe('.execute()', () => {
 				ctx.context,
 				ctx.session,
 				{
-					slug: `action-request-${uuidv4()}`,
+					slug: `action-request-${ctx.generateRandomID()}`,
 					type: 'action-request@1.0.0',
 					data: {
 						actor: ctx.actor.id,
@@ -1384,7 +1392,12 @@ describe('.execute()', () => {
 	});
 
 	test('should return an error if the action has no corresponding implementation', async () => {
-		const localCtx = await helpers.before();
+		const localCtx = await integrationHelpers.before(
+			[DefaultPlugin, ActionLibrary, ProductOsPlugin],
+			{
+				worker: Worker,
+			},
+		);
 
 		const action = 'action-create-card@1.0.0';
 
@@ -1403,7 +1416,7 @@ describe('.execute()', () => {
 				localCtx.context,
 				localCtx.session,
 				{
-					slug: `action-request-${uuidv4()}`,
+					slug: `action-request-${ctx.generateRandomID()}`,
 					type: 'action-request@1.0.0',
 					data: {
 						actor: localCtx.actor.id,
@@ -1433,6 +1446,6 @@ describe('.execute()', () => {
 		expect(result.error).toBe(true);
 		expect(result.data.name).toBe('WorkerInvalidAction');
 
-		await helpers.after(localCtx);
+		await integrationHelpers.after(localCtx);
 	});
 });

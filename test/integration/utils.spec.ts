@@ -4,18 +4,26 @@
  * Proprietary and confidential.
  */
 
-import * as helpers from './helpers';
+import ActionLibrary from '@balena/jellyfish-action-library';
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
+import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { integrationHelpers } from '@balena/jellyfish-test-harness';
+import { Worker } from '../../lib';
 import * as utils from '../../lib/utils';
-import { v4 as uuidv4 } from 'uuid';
 
-let context: helpers.IntegrationTestContext;
+let context: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	context = await helpers.before();
+	context = await integrationHelpers.before(
+		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		{
+			worker: Worker,
+		},
+	);
 });
 
 afterAll(() => {
-	return helpers.after(context);
+	return integrationHelpers.after(context);
 });
 
 describe('.hasCard()', () => {
@@ -72,7 +80,7 @@ describe('.hasCard()', () => {
 
 		expect(
 			await utils.hasCard(context.context, context.jellyfish, context.session, {
-				id: uuidv4(),
+				id: context.generateRandomID(),
 				version: '1.0.0',
 				slug: card.slug,
 			}),
@@ -82,7 +90,7 @@ describe('.hasCard()', () => {
 	test('id = yes (not exist), slug = yes (not exist)', async () => {
 		expect(
 			await utils.hasCard(context.context, context.jellyfish, context.session, {
-				id: uuidv4(),
+				id: context.generateRandomID(),
 				version: '1.0.0',
 				slug: context.generateRandomSlug(),
 			}),
