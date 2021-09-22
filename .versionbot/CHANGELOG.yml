@@ -1,4 +1,17 @@
 - commits:
+    - subject: Use helpers from test-harness
+      hash: eb8f9db36ca0fbb1c3e19ad58fc0108f18f43997
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 10.0.18
+  date: 2021-09-22T02:43:03.056Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.47'
       hash: d296d8959ce37802c942d5ac59d164afa387a4ed
       body: ''
