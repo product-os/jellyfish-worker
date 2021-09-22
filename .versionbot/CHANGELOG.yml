@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.48'
+      hash: 2f57138259c2180d9af457a43b1534395f7d876a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.19
+  date: 2021-09-22T07:57:12.194Z
+- commits:
     - subject: Use helpers from test-harness
       hash: eb8f9db36ca0fbb1c3e19ad58fc0108f18f43997
       body: ''
