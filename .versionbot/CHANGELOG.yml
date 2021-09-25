@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 733ad331c5d557e40ed544cb0a6222406b1c333b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.26
+  date: 2021-09-25T11:24:21.820Z
+- commits:
     - subject: Add new secrets to .gitignore
       hash: 2623d8cfe3cd174aef4c707a32e31642d6c1c17c
       body: ''
