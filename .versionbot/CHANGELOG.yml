@@ -1,4 +1,25 @@
 - commits:
+    - subject: Add new secrets to .gitignore
+      hash: 2623d8cfe3cd174aef4c707a32e31642d6c1c17c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: "\U0001F504 Synced file(s) with product-os/secrets"
+      hash: e3eb758ef07a8f8bb5601fbc91b287f47ac8fc25
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 10.0.25
+  date: 2021-09-25T10:47:45.042Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.50'
       hash: f139b1942c8e08517de04f2c06143b13f361c3d1
       body: ''
