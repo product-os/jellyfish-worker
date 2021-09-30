@@ -128,26 +128,32 @@ export const evaluate = async ({
 
 		// Ignore if subscriber is the one who created a message
 		if (!creatorId || creatorId === message.data.actor) {
+			console.log('subscriber is the same as creator, ignoring');
 			return;
 		}
 
 		const creator = await getContractById(creatorId);
 
 		if (!creator) {
+			console.log('cannot retrieve creator, ignoring');
 			return;
 		}
 
 		const creatorSession = await getSession(creatorId);
 
 		if (!creatorSession) {
+			console.log('cannot retrieve creator session, ignoring');
 			return;
 		}
 
 		const notificationTypeContract = getTypeContract('notification@1.0.0');
 
 		if (!notificationTypeContract) {
+			console.log('cannot retrieve notification type, ignoring');
 			return;
 		}
+
+		console.log('inserting notification');
 
 		const notification = await insertContract(
 			notificationTypeContract,
@@ -164,6 +170,8 @@ export const evaluate = async ({
 				active: true,
 			},
 		);
+
+		console.log('notification inserted', notification);
 
 		if (!notification) {
 			return;
