@@ -50,10 +50,10 @@ export const evaluate = async ({
 		return null;
 	}
 
-	// Only run transformers with cards with a valid artifact (`data.$transformer.artifactReady` is truthy)
+	// Only run transformers with cards with a valid artifact or which do not have artifacts at all
 	// and their input filter matches now, but didn't match before (or artifact wasn't ready)
 	const readyNow = newCard.data?.$transformer?.artifactReady;
-	if (!readyNow) {
+	if (readyNow === false) {
 		return null;
 	}
 	const artifactReadyChanged =
