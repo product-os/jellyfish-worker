@@ -51,6 +51,8 @@ export const evaluate = async ({
 	getContractById,
 	query,
 }: EvaluateOptions) => {
+	console.log('1. New contract type', newContract.type);
+
 	if (
 		oldContract ||
 		newContract.type !== 'link@1.0.0' ||
@@ -116,6 +118,9 @@ export const evaluate = async ({
 		},
 	});
 
+	console.log('2. Message:');
+	console.dir(message, { depth: 10 });
+
 	if (!message) {
 		return;
 	}
@@ -123,8 +128,10 @@ export const evaluate = async ({
 	const thread = message.links!['is attached to'][0];
 	const subscriptions = thread.links!['has attached'];
 
-	await Bluebird.map(subscriptions, async (subscription) => {
+	await Bluebird.map(subscriptions, async (subscription, index) => {
 		const creatorId = getCreatorId(subscription);
+
+		console.log(`3.${index}.1. Creator id:`, creatorId);
 
 		// Ignore if subscriber is the one who created a message
 		if (!creatorId || creatorId === message.data.actor) {
@@ -133,17 +140,25 @@ export const evaluate = async ({
 
 		const creator = await getContractById(creatorId);
 
+		console.log(`3.${index}.2. Creator:`);
+		console.dir(creator, { depth: 10 });
+
 		if (!creator) {
 			return;
 		}
 
 		const creatorSession = await getSession(creatorId);
+		console.log(`3.${index}.3. Creator session:`, creatorSession);
 
 		if (!creatorSession) {
 			return;
 		}
 
 		const notificationTypeContract = getTypeContract('notification@1.0.0');
+		console.log(
+			`3.${index}.4. Notification type contract:`,
+			notificationTypeContract,
+		);
 
 		if (!notificationTypeContract) {
 			return;
@@ -165,11 +180,15 @@ export const evaluate = async ({
 			},
 		);
 
+		console.log(`3.${index}.5. Notification:`, notification);
+
 		if (!notification) {
 			return;
 		}
 
 		const linkTypeContract = getTypeContract('link@1.0.0');
+
+		console.log(`3.${index}.6. Link type contract:`, linkTypeContract);
 
 		if (!linkTypeContract) {
 			return;
@@ -197,5 +216,7 @@ export const evaluate = async ({
 				},
 			},
 		});
+
+		console.log(`3.${index}.7. Success!`);
 	});
 };
