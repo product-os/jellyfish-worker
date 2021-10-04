@@ -1,4 +1,20 @@
 - commits:
+    - subject: Allow task creation when artifactReady is missing
+      hash: 5000962f48693bd4a0a6a31d72efd109a93a73de
+      body: >
+        We only skip task creation if artifactReady is explicitely false, which
+        means it is not ready yet. When missing, it means there is no need for
+        it anyway and thus we do create it.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Stathis Moraitidis <stathis@balena.io>
+        signed-off-by: Stathis Moraitidis <stathis@balena.io>
+      author: Stathis
+      nested: []
+  version: 10.0.38
+  date: 2021-10-04T12:58:36.018Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.59'
       hash: a3284c74aa11b0e652e57eb3ecb06ce9c54f3e59
       body: ''
