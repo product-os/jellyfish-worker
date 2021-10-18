@@ -1,4 +1,15 @@
 - commits:
+    - subject: "\U0001F504 Synced file(s) with product-os/secrets"
+      hash: be50af693b9e85fa1fc1ca28487fdbb8ff273b73
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 10.0.39
+  date: 2021-10-17T23:41:28.863Z
+- commits:
     - subject: Allow task creation when artifactReady is missing
       hash: 5000962f48693bd4a0a6a31d72efd109a93a73de
       body: >
