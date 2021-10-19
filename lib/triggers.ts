@@ -15,6 +15,9 @@ import jsone = require('json-e');
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import { Contract } from '@balena/jellyfish-types/build/core';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import { getLogger } from '@balena/jellyfish-logger';
+
+const logger = getLogger('worker-triggers');
 
 interface CompileContext {
 	timestamp: string;
@@ -239,6 +242,12 @@ export const getRequest = async (
 	);
 
 	if (!triggerPathsChanged) {
+		const { id, slug, version } = newContract;
+		logger.info(
+			options.context,
+			'Ignoring matching trigger because match-state did not change',
+			{ id, slug, version },
+		);
 		return null;
 	}
 
