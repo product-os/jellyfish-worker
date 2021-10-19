@@ -224,6 +224,7 @@ export const getRequest = async (
 	if (trigger.data.mode && trigger.data.mode !== options.mode) {
 		return null;
 	}
+
 	const newContractMatches = await matchesCard(
 		options.context,
 		jellyfish,
@@ -231,24 +232,26 @@ export const getRequest = async (
 		trigger.data.filter!,
 		newContract,
 	);
+
 	if (!newContractMatches) {
 		return null;
 	}
 
-	const triggerPaths = findUsedPropertyPaths(trigger.data.filter!);
-	const triggerPathsChanged = triggerPaths.reduce(
-		(r, p) => r || !_.isEqual(_.get(oldContract, p), _.get(newContract, p)),
-		false,
-	);
-
-	if (!triggerPathsChanged) {
-		const { id, slug, version } = newContract;
-		logger.info(
-			options.context,
-			'Ignoring matching trigger because match-state did not change',
-			{ id, slug, version },
+	if (oldContract) {
+		const triggerPaths = findUsedPropertyPaths(trigger.data.filter!);
+		const triggerPathsChanged = triggerPaths.some(
+			(p) => !_.isEqual(_.get(oldContract, p), _.get(newContract, p)),
 		);
-		return null;
+
+		if (!triggerPathsChanged) {
+			const { id, slug, version } = newContract;
+			logger.info(
+				options.context,
+				'Ignoring matching trigger because match-state did not change',
+				{ id, slug, version, triggerPaths },
+			);
+			return null;
+		}
 	}
 
 	// We are not interested in compiling the rest of
@@ -434,29 +437,24 @@ export const getNextExecutionDate = (
  * @returns the list of referenced property paths
  */
 export function findUsedPropertyPaths(schema: any): string[] {
+	if (typeof schema !== 'object') {
+		return [];
+	}
 	const result: string[] = [];
-	if (typeof schema === 'object') {
-		for (const key of Object.keys(schema)) {
-			if (key === '$$links') {
-				continue;
-			}
-			if (key === 'properties') {
-				result.push(
-					...Object.keys(schema.properties)
-						.map((p) => ({
-							prop: p,
-							paths: findUsedPropertyPaths(schema.properties[p]),
-						}))
-						.flatMap(({ prop, paths }) =>
-							paths.length > 0 ? paths.map((p) => `${prop}.${p}`) : prop,
-						),
-				);
-			} else if (typeof schema[key] === 'object') {
-				result.push(
-					...Object.keys(schema[key])
-						.flatMap((p) => findUsedPropertyPaths(schema[key][p]))
-						.filter((p) => !!p),
-				);
+	for (const key of Object.keys(schema)) {
+		if (key === '$$links') {
+			continue;
+		}
+		if (key !== 'properties') {
+			result.push(...findUsedPropertyPaths(schema[key]));
+			continue;
+		}
+		for (const prop of Object.keys(schema.properties)) {
+			const paths = findUsedPropertyPaths(schema.properties[prop]);
+			if (paths.length > 0) {
+				result.push(...paths.map((p) => `${prop}.${p}`));
+			} else {
+				result.push(prop);
 			}
 		}
 	}
