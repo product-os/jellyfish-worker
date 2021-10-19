@@ -1,4 +1,17 @@
 - commits:
+    - subject: add logging for skipped triggers
+      hash: e064bb3a8b0e32a51969e1b0f51653c0af28de4f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 10.0.43
+  date: 2021-10-19T13:41:09.063Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.61'
       hash: bc44882d6b1964aa2dc8cf0b302fe4886a9b469f
       body: ''
