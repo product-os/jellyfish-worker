@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: e05943967027cc0ab49a5481df33cc28ba9640ce
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.45
+  date: 2021-10-20T08:44:29.909Z
+- commits:
     - subject: simplify trigger path-check code
       hash: 6379889037ff1f58eee8d75cd63f08536e7b2385
       body: ''
