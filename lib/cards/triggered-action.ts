@@ -30,7 +30,7 @@ export default {
 						},
 						type: {
 							type: 'string',
-							pattern: '^[a-z0-9-]+@\\d+(\\.\\d+)?(\\.\\d+)?$',
+							pattern: '^[a-z0-9-]+@\\d+(\\.\\d+)?(\\.\\d+)?',
 						},
 						startDate: {
 							type: 'string',
