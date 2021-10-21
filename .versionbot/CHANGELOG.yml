@@ -1,4 +1,17 @@
 - commits:
+    - subject: Relax data.type regex validation so that it accepts draft versions
+      hash: 654ebc1d58bc87263e00329ad6195b94d3593962
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Stathis Moraitidis <stathis@balena.io>
+        signed-off-by: Stathis Moraitidis <stathis@balena.io>
+      author: Stathis
+      nested: []
+  version: 10.0.48
+  date: 2021-10-21T22:13:07.779Z
+- commits:
     - subject: update harness and types to fix type compatibility
       hash: b7bef31b5e9e1de3692a46bb17ec95e338355eb3
       body: ''
