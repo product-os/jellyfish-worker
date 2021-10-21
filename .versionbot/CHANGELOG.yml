@@ -1,4 +1,26 @@
 - commits:
+    - subject: update harness and types to fix type compatibility
+      hash: b7bef31b5e9e1de3692a46bb17ec95e338355eb3
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-core to v7'
+      hash: 88568ee94d953c1da5b490622e56096448f7c5e2
+      body: |
+        Update @balena/jellyfish-core from 6.2.8 to 7.0.2
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.47
+  date: 2021-10-21T15:32:28.954Z
+- commits:
     - subject: add test for formula based triggers
       hash: f28100c49538da02b2aea1af42a144ba51189014
       body: ''
