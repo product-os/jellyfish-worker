@@ -1205,4 +1205,249 @@ describe('.insertCard()', () => {
 		*/
 		expect(triggers).toHaveLength(1);
 	});
+
+	test('should execute a triggered action given a type with an contract.links["..."] formula', async () => {
+		// This test
+		// * creates a new type with a link formula
+		// * creates two contracts of this type
+		// * links the two contracts
+		// * updates the contract that was linked from
+		// * checks if formula in linked to contract was updated
+		// (and lots of sanity checks in the middle)
+
+		const typeType = await ctx.jellyfish.getCardBySlug<TypeContract>(
+			ctx.context,
+			ctx.session,
+			'type@latest',
+		);
+		const linkType = (await ctx.jellyfish.getCardBySlug<TypeContract>(
+			ctx.context,
+			ctx.session,
+			'link@latest',
+		))!;
+
+		assert(typeType !== null);
+
+		const typeSlug = ctx.generateRandomSlug();
+		const initialValue = 1;
+		const propValueBeforeUpdate = 2;
+		const magicNumber = 3;
+
+		const newType = (await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			typeType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.actor.id,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				slug: typeSlug,
+				version: '1.0.0',
+				data: {
+					schema: {
+						type: 'object',
+						properties: {
+							type: {
+								type: 'string',
+								const: `${typeSlug}@1.0.0`,
+							},
+							data: {
+								type: 'object',
+								properties: {
+									linkedProperty: {
+										type: 'number',
+										$$formula:
+											'contract.links["was built from"].length && contract.links["was built from"][0].data.prop',
+									},
+								},
+								additionalProperties: true,
+							},
+						},
+						additionalProperties: true,
+						required: ['type', 'data'],
+					},
+				},
+			},
+		))! as TypeContract;
+
+		const triggeredAction = await ctx.waitForMatch({
+			type: 'object',
+			additionalProperties: true,
+			required: ['active', 'type'],
+			properties: {
+				active: {
+					type: 'boolean',
+					const: true,
+				},
+				type: {
+					type: 'string',
+					const: 'triggered-action@1.0.0',
+				},
+				data: {
+					type: 'object',
+					required: ['type'],
+					properties: {
+						type: {
+							type: 'string',
+							const: `${typeSlug}@1.0.0`,
+						},
+					},
+				},
+			},
+		});
+		// console.log('TRIGGERED ACTION', JSON.stringify(triggeredAction, null, 2));
+
+		const testContract = (await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			newType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.actor.id,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				data: {
+					otherProp: 42,
+					linkedProperty: initialValue, // should get overwritten immediately
+				},
+			},
+		))!;
+
+		const linkedContract = (await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			newType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.actor.id,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				data: {
+					otherProp: 23,
+					prop: propValueBeforeUpdate,
+				},
+			},
+		))!;
+
+		await ctx.worker.insertCard(
+			ctx.context,
+			ctx.session,
+			linkType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.actor.id,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				name: 'was built into',
+				data: {
+					inverseName: 'was built from',
+					from: {
+						id: linkedContract.id,
+						slug: linkedContract.slug,
+						type: linkedContract.type,
+					},
+					to: {
+						id: testContract.id,
+						slug: testContract.slug,
+						type: testContract.type,
+					},
+				},
+			},
+		);
+
+		// sanity check that link and filter work as expected
+		const triggerMatch = await ctx.waitForMatch(triggeredAction.data.filter);
+		expect(triggerMatch.id).toEqual(linkedContract.id);
+
+		// first test if linked formula works in when invoked directly
+		await ctx.worker.patchCard(
+			ctx.context,
+			ctx.session,
+			newType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.actor.id,
+				attachEvents: false,
+				reason: 'random change that should trigger formula re-eval',
+			},
+			testContract,
+			[{ op: 'add', path: '/data/randomChange', value: 1 }],
+		);
+
+		const testContractAfterBogusUpdate = await ctx.waitForMatch({
+			type: 'object',
+			additionalProperties: true,
+			required: ['id'],
+			properties: {
+				id: {
+					type: 'string',
+					const: testContract.id,
+				},
+				data: {
+					type: 'object',
+					required: ['linkedProperty'],
+					properties: {
+						linkedProperty: {
+							type: 'number',
+							const: propValueBeforeUpdate,
+						},
+					},
+				},
+			},
+		});
+
+		expect(testContractAfterBogusUpdate.data.linkedProperty).toEqual(
+			propValueBeforeUpdate,
+		);
+
+		// force an update as linking doesn't seem to be enough
+		await ctx.worker.patchCard(
+			ctx.context,
+			ctx.session,
+			newType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.actor.id,
+				attachEvents: false,
+				reason: 'random change that should cause triggered action to run',
+			},
+			linkedContract,
+			[{ op: 'replace', path: '/data/prop', value: magicNumber }],
+		);
+
+		await ctx.flush(ctx.session);
+
+		const testContractAfterUpdate = await ctx.waitForMatch({
+			type: 'object',
+			additionalProperties: true,
+			required: ['id'],
+			properties: {
+				id: {
+					type: 'string',
+					const: testContract.id,
+				},
+				data: {
+					type: 'object',
+					required: ['linkedProperty'],
+					properties: {
+						linkedProperty: {
+							type: 'number',
+							const: magicNumber,
+						},
+					},
+				},
+			},
+		});
+
+		expect(testContractAfterUpdate.data.linkedProperty).toEqual(magicNumber);
+	});
 });
