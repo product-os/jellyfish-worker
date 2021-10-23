@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: a6b6c1edb11d5eb0522a0369b5e22b0c67dad795
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.49
+  date: 2021-10-23T01:20:30.974Z
+- commits:
     - subject: Relax data.type regex validation so that it accepts draft versions
       hash: 654ebc1d58bc87263e00329ad6195b94d3593962
       body: ''
