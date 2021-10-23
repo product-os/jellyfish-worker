@@ -1,4 +1,15 @@
 - commits:
+    - subject: "\U0001F504 Synced file(s) with product-os/jellyfish-config"
+      hash: 0a52dfad776b0d6af52413ddc8533ee14371a4e4
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 10.0.52
+  date: 2021-10-23T06:29:20.380Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.65'
       hash: 70e6fa22e5bab491d686bf6ddc0533ae676241b0
       body: ''
