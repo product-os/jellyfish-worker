@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.78'
+      hash: b9e3551162a1fff8782114d37e9ed5ce8b15049b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.71
+  date: 2021-10-31T21:20:09.604Z
+- commits:
     - subject: "\U0001F504 Synced file(s) with product-os/secrets"
       hash: 725407dea93058b61dff090738b20c4d2582b171
       body: ''
