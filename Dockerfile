@@ -2,14 +2,12 @@
 
 # This file is auto-synced from product-os/jellyfish-config/sync/Dockerfile
 # and should only be edited there!
-FROM resinci/jellyfish-test:v1.4.10
+FROM resinci/jellyfish-test:v1.4.11
 
 WORKDIR /usr/src/jellyfish
 
 COPY package.json .npmrc ./
-RUN --mount=type=secret,id=npmrc set -eux \
-	&& ln -s /run/secrets/npmrc ~/.npmrc \
-	&& npm i && rm ~/.npmrc
+RUN npm install
 
 COPY . ./
 
