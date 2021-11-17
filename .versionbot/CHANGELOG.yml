@@ -1,4 +1,17 @@
 - commits:
+    - subject: Set license
+      hash: b557ba81b3917ba418122167653ac19a9bfaf914
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 10.0.89
+  date: 2021-11-17T01:16:07.153Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: fa03e16d1b29aae5d79214bc7c2d0d31d536e435
       body: ''
