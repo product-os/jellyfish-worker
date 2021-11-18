@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency lint-staged to v12'
+      hash: f0a6d688f267d68dd4aef0c8242e202d25890f14
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.91
+  date: 2021-11-17T08:17:31.349Z
+- commits:
     - subject: Remove test.env
       hash: 780ced203f7cc9bbff1ba8124290042e79310ae8
       body: ''
