@@ -4,13 +4,17 @@
   ],
   "packageRules": [
     {
-      "depTypeList": [
+      "matchDepTypes": [
         "devDependencies",
         "peerDependencies"
       ],
-      "packagePatterns": ["@balena/jellyfish-*"],
-      "updateTypes": ["patch"],
+      "matchPackagePatterns": ["@balena/jellyfish-*"],
+      "matchUpdateTypes": ["patch"],
       "enabled": false
+    },
+    {
+      "matchPackageNames": ["resinci/jellyfish-test"],
+      "groupName": "jellyfish-test-image"
     }
   ]
 }
