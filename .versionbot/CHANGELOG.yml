@@ -1,4 +1,25 @@
 - commits:
+    - subject: 'Renovate: Add resinci/jellyfish-test group'
+      hash: 8815aa3353e336ab1909d21a103109142e6d85a8
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'patch: Update internal-patch'
+      hash: 2ce35bc1abeb37bbb8411b49595e611bc752e4d1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.92
+  date: 2021-11-18T06:41:36.412Z
+- commits:
     - subject: 'patch: Update dependency lint-staged to v12'
       hash: f0a6d688f267d68dd4aef0c8242e202d25890f14
       body: ''
