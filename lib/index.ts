@@ -1140,9 +1140,6 @@ export class Worker {
 		);
 
 		const currentTime = new Date();
-		const triggers = this.getTriggers();
-		const transformers = this.getLatestTransformers();
-		const typeContracts = this.getTypeContracts();
 		const workerContext = this.getActionContext(context);
 
 		const insertedCard = await fn();
@@ -1170,7 +1167,7 @@ export class Worker {
 		}
 
 		transformerLib.evaluate({
-			transformers,
+			transformers: this.latestTransformers,
 			oldCard: current,
 			newCard: insertedCard,
 			context,
@@ -1200,7 +1197,7 @@ export class Worker {
 				oldContract: current,
 				newContract: insertedCard,
 				getTypeContract: (type) => {
-					return typeContracts[type];
+					return this.typeContracts[type];
 				},
 				getSession: async (userId: string) => {
 					return utils.getActorKey(
@@ -1255,97 +1252,100 @@ export class Worker {
 				}
 			});
 
-		await Bluebird.map(triggers, async (trigger: TriggeredActionContract) => {
-			try {
-				// Ignore triggered actions whose start date is in the future
-				if (currentTime < triggersLib.getStartDate(trigger)) {
-					return null;
-				}
-
-				const request = await triggersLib.getRequest(
-					this.jellyfish,
-					trigger,
-					current,
-					insertedCard,
-					{
-						currentDate: new Date(),
-						mode: current ? 'update' : 'insert',
-						context,
-						session,
-					},
-				);
-
-				if (!request) {
-					return null;
-				}
-
-				// trigger.target might result in multiple cards in a single action request
-				const identifiers = _.uniq(_.castArray(request.card));
-
-				await Bluebird.map(identifiers, async (identifier) => {
-					const triggerCard = await getInputCard(
-						context,
-						this.jellyfish,
-						session,
-						identifier,
-					);
-
-					if (!triggerCard) {
-						throw new errors.WorkerNoElement(
-							`No such input card for trigger ${trigger.slug}: ${identifier}`,
-						);
+		await Bluebird.map(
+			this.triggers,
+			async (trigger: TriggeredActionContract) => {
+				try {
+					// Ignore triggered actions whose start date is in the future
+					if (currentTime < triggersLib.getStartDate(trigger)) {
+						return null;
 					}
-					const actionRequest = {
-						// Re-enqueuing an action request expects the "card" option to be an
-						// id, not a full card.
-						card: triggerCard.id,
-						action: request.action!,
-						actor: options.actor,
-						context: request.context,
-						timestamp: request.currentDate.toISOString(),
-						epoch: request.currentDate.valueOf(),
-						arguments: request.arguments,
 
-						// Carry the old originator if present so we
-						// don't break the chain
-						originator: options.originator || request.originator,
-					};
-
-					logger.info(
-						context,
-						'Enqueing new action request due to triggered-action',
+					const request = await triggersLib.getRequest(
+						this.jellyfish,
+						trigger,
+						current,
+						insertedCard,
 						{
-							trigger: trigger.slug,
-							contract: triggerCard.id,
-							arguments: request.arguments,
+							currentDate: new Date(),
+							mode: current ? 'update' : 'insert',
+							context,
+							session,
 						},
 					);
 
-					// TS-TODO: remove any casting
-					return this.enqueueAction(session, actionRequest as any);
-				});
-			} catch (error: any) {
-				const errorObject = errio.toObject(error, {
-					stack: true,
-				});
+					if (!request) {
+						return null;
+					}
 
-				const logData = {
-					error: errorObject,
-					input: insertedCard.slug,
-					trigger: trigger.slug,
-				};
+					// trigger.target might result in multiple cards in a single action request
+					const identifiers = _.uniq(_.castArray(request.card));
 
-				if (error.expected) {
-					logger.warn(
-						context,
-						'Execute error in asynchronous trigger',
-						logData,
-					);
-				} else {
-					logger.error(context, 'Execute error', logData);
+					await Bluebird.map(identifiers, async (identifier) => {
+						const triggerCard = await getInputCard(
+							context,
+							this.jellyfish,
+							session,
+							identifier,
+						);
+
+						if (!triggerCard) {
+							throw new errors.WorkerNoElement(
+								`No such input card for trigger ${trigger.slug}: ${identifier}`,
+							);
+						}
+						const actionRequest = {
+							// Re-enqueuing an action request expects the "card" option to be an
+							// id, not a full card.
+							card: triggerCard.id,
+							action: request.action!,
+							actor: options.actor,
+							context: request.context,
+							timestamp: request.currentDate.toISOString(),
+							epoch: request.currentDate.valueOf(),
+							arguments: request.arguments,
+
+							// Carry the old originator if present so we
+							// don't break the chain
+							originator: options.originator || request.originator,
+						};
+
+						logger.info(
+							context,
+							'Enqueing new action request due to triggered-action',
+							{
+								trigger: trigger.slug,
+								contract: triggerCard.id,
+								arguments: request.arguments,
+							},
+						);
+
+						// TS-TODO: remove any casting
+						return this.enqueueAction(session, actionRequest as any);
+					});
+				} catch (error: any) {
+					const errorObject = errio.toObject(error, {
+						stack: true,
+					});
+
+					const logData = {
+						error: errorObject,
+						input: insertedCard.slug,
+						trigger: trigger.slug,
+					};
+
+					if (error.expected) {
+						logger.warn(
+							context,
+							'Execute error in asynchronous trigger',
+							logData,
+						);
+					} else {
+						logger.error(context, 'Execute error', logData);
+					}
 				}
-			}
-		});
+			},
+		);
 
 		if (options.attachEvents) {
 			const time = options.timestamp
@@ -1455,7 +1455,7 @@ export class Worker {
 					);
 
 					// Also from the locally cached triggers
-					_.remove(triggers, {
+					_.remove(this.triggers, {
 						id: trigger.id,
 					});
 				},
@@ -1479,7 +1479,7 @@ export class Worker {
 					// right away for performance reasons
 					return this.setTriggers(
 						context,
-						triggers.concat([triggeredActionContract]),
+						this.triggers.concat([triggeredActionContract]),
 					);
 				},
 				{
