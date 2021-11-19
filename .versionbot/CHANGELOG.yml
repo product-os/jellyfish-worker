@@ -1,4 +1,19 @@
 - commits:
+    - subject: fix race-condition when inserting worker types
+      hash: b6918e2d37721e25afc09a3b01f54f000bb1f63c
+      body: |
+        due to async/await using variables to cache these is not safe and
+        can lead to loss of those when inserting many in paralel
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Martin Rauscher <martin@balena.io>
+        signed-off-by: Martin Rauscher <martin@balena.io>
+      author: Martin Rauscher
+      nested: []
+  version: 10.0.95
+  date: 2021-11-19T14:11:16.487Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.125'
       hash: f93637f129e7e3f842d1e67e6eb2ceb175bea51f
       body: ''
