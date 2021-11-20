@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: bbdcca5c0fb3c217f9fbe395dc7aa85005bbd975
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.96
+  date: 2021-11-20T07:43:51.707Z
+- commits:
     - subject: fix race-condition when inserting worker types
       hash: b6918e2d37721e25afc09a3b01f54f000bb1f63c
       body: |
