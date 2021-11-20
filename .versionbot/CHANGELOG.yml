@@ -1,4 +1,34 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: e728af96b045cf60b508b2f46dfb8d58f1529ad9
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: 'patch: Update dependency @balena/jellyfish-core to ^8.1.0'
+      hash: 2ebb23db89e8b6049d17a1d5a3b0b0b5303df015
+      body: |
+        Update @balena/jellyfish-core from 8.0.3 to 8.1.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Remove license headers
+      hash: 8785249158ccf474cfe241c2dbc025b439ed9bfa
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 10.0.99
+  date: 2021-11-20T12:48:11.713Z
+- commits:
     - subject: 'patch: Update external-non-major'
       hash: d1b160c2c2683f7bc397afc6ebe132d91db0af97
       body: ''
