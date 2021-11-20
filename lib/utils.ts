@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 import iso8601Duration from 'iso8601-duration';
 import { v4 as uuidv4 } from 'uuid';
 import * as _ from 'lodash';

@@ -1,9 +1,3 @@
-/*
- * Copyright (C) Balena.io - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- */
-
 import ActionLibrary from '@balena/jellyfish-action-library';
 import { actionCreateCard } from '@balena/jellyfish-action-library/build/actions/action-create-card';
 import type { ActionFile } from '@balena/jellyfish-plugin-base';
