@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: d1b160c2c2683f7bc397afc6ebe132d91db0af97
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.98
+  date: 2021-11-20T08:08:14.781Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellycheck to v1'
       hash: eca0a6a1f2e19bc274e725b3aba4988d1833e4fd
       body: |
