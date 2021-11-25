@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove npm token step from docs action
+      hash: 87bf50a720d15da7d13ba9f308f0ba938138bba5
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 10.0.109
+  date: 2021-11-25T00:31:07.391Z
+- commits:
     - subject: 'patch: Update internal-patch'
       hash: 3924c05abd1d590714a79bb32cc195ac6d08f808
       body: ''
