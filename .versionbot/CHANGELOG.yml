@@ -1,4 +1,17 @@
 - commits:
+    - subject: Use product-os/renovate-config
+      hash: f863ed2f11544548c7766ca4722aac96449c27b2
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 10.0.113
+  date: 2021-11-26T04:09:07.390Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-plugin-product-os to ^2.8.0'
       hash: 690ae692c6816ef852ce30c7ca6c436cf52ccf92
       body: |
