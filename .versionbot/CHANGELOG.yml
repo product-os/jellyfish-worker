@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.140'
+      hash: e656d3076e8b42868a8debfe4f520894748d9f13
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.121
+  date: 2021-11-27T19:19:53.847Z
+- commits:
     - subject: 'patch: Update external-non-major'
       hash: 313d8efbe1b0e8a0da369e8c959c0451e6b15584
       body: ''
