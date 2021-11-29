@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: a7ac34977098c0be16381d4d7042faf5b2e4ac66
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.124
+  date: 2021-11-29T07:34:29.668Z
+- commits:
     - subject: Remove old sync comments
       hash: 73d7487d0b3a85934bb1edb5a91a2dca43ddb494
       body: ''
