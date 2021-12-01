@@ -679,7 +679,8 @@ export class Worker {
 	updateLatestTransformers() {
 		const transformersMap: { [slug: string]: transformerLib.Transformer } = {};
 		this.transformers.forEach((tf) => {
-			const slugMajV = `${tf.slug}@${semver.major(tf.version)}`;
+			const majorV = semver.major(tf.version) || 1; // we treat 0.x.y versions as "drafts" of 1.x.y versions
+			const slugMajV = `${tf.slug}@${majorV}`;
 			const prerelease = semver.prerelease(tf.version);
 			if (
 				!prerelease &&

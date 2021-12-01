@@ -31,6 +31,11 @@ describe('Worker.updateCurrentTransformers()', () => {
 				slug: 'b-transformer',
 				version: '1.0.0',
 			},
+			{
+				id: 'b0.0.1',
+				slug: 'b-transformer',
+				version: '0.0.1',
+			},
 		] as Transformer[];
 
 		// TS-TODO: is there a better way to instantiate a simple Worker?
