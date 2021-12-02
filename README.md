@@ -36,16 +36,15 @@ Visit the website for complete documentation: https://product-os.github.io/jelly
 Unit tests can be easily run with the command `npm test`. This will run all unit tests (found in the `/lib` folder).
 
 The integration tests require Postgres and Redis instances. The simplest way to run the tests locally is with `docker-compose`.
-You may need to export an `NPM_TOKEN` and values for the environment variables defined in `test.env` before running the command below.
 
 ```
-npm run test:compose
+$ npm run test:compose
 ```
 
 You can also run tests locally against Postgres and Redis instances running in `docker-compose`:
 ```
 $ npm run compose
-$ POSTGRES_USER=docker POSTGRES_PASSWORD=docker npx jest test/integration/example.spec.ts
+$ REDIS_HOST=localhost POSTGRES_HOST=localhost POSTGRES_USER=docker POSTGRES_PASSWORD=docker npx jest test/integration/example.spec.ts
 ```
 
 You can also access these Postgres and Redis instances:
