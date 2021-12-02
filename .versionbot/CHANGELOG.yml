@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update readme
+      hash: 7bdc83c1e3fa172e05a339bdc879847e29e2a45e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 10.0.132
+  date: 2021-12-02T01:34:53.187Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.143'
       hash: 1fa94f1662941290f45a875526942ea4f766a1a8
       body: ''
