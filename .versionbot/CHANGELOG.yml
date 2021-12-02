@@ -1,4 +1,17 @@
 - commits:
+    - subject: Remove unused secrets
+      hash: a817b0dee23f6a29990e8b0fd0070c6968c83683
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 10.0.133
+  date: 2021-12-02T03:28:49.432Z
+- commits:
     - subject: Update readme
       hash: 7bdc83c1e3fa172e05a339bdc879847e29e2a45e
       body: ''
