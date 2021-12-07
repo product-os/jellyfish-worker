@@ -1,4 +1,15 @@
 - commits:
+    - subject: Use native promise when evaluating triggers
+      hash: 957c488aad2e374f6d2f9dbc4514ca7c2c48934d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: karaxuna
+      nested: []
+  version: 10.0.145
+  date: 2021-12-07T10:53:59.667Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-logger to ^3.0.162'
       hash: 4fea4130ce6d3c31ccdd647d0cce4ef8a76e3373
       body: ''
