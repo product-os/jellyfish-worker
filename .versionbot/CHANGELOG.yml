@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: bc68fc6c95bc3b060d4904e7f625754f9a82d607
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.0.146
+  date: 2021-12-07T11:08:13.358Z
+- commits:
     - subject: Use native promise when evaluating triggers
       hash: 957c488aad2e374f6d2f9dbc4514ca7c2c48934d
       body: ''
