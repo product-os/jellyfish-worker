@@ -5,7 +5,6 @@ import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { core } from '@balena/jellyfish-types';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { strict as assert } from 'assert';
-import Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { Worker } from '../../lib';
 
@@ -347,7 +346,9 @@ describe('.execute()', () => {
 
 		const slug = ctx.generateRandomSlug();
 
-		await Bluebird.delay(5000);
+		await new Promise((resolve) => {
+			setTimeout(resolve, 5000);
+		});
 
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),

@@ -1,4 +1,3 @@
-import Bluebird from 'bluebird';
 import * as errio from 'errio';
 import * as _ from 'lodash';
 import * as fastEquals from 'fast-equals';
@@ -213,9 +212,11 @@ export class Worker {
 		this.sync = context.sync;
 
 		// Insert worker specific cards
-		await Bluebird.map(Object.values(CARDS), async (card) => {
-			return this.jellyfish.replaceCard(context, this.session, card);
-		});
+		await Promise.all(
+			Object.values(CARDS).map(async (card) => {
+				return this.jellyfish.replaceCard(context, this.session, card);
+			}),
+		);
 	}
 
 	/**
@@ -936,29 +937,25 @@ export class Worker {
 		let result;
 
 		try {
-			const cards = await Bluebird.props({
-				input: getInputCard(
+			const [input, actor] = await Promise.all([
+				getInputCard(
 					requestContext,
 					this.jellyfish,
 					session,
 					request.data.input.id,
 				),
-				actor: this.jellyfish.getCardById(
-					requestContext,
-					session,
-					request.data.actor,
-				),
-			});
+				this.jellyfish.getCardById(requestContext, session, request.data.actor),
+			]);
 
 			assert.USER(
 				requestContext,
-				cards.input,
+				input,
 				errors.WorkerNoElement,
 				`No such input card: ${request.data.input.id}`,
 			);
 			assert.INTERNAL(
 				requestContext,
-				cards.actor,
+				actor,
 				errors.WorkerNoElement,
 				`No such actor: ${request.data.actor}`,
 			);
@@ -967,7 +964,7 @@ export class Worker {
 				type: 'object',
 			});
 
-			const results = skhema.match(actionInputCardFilter as any, cards.input);
+			const results = skhema.match(actionInputCardFilter as any, input);
 			if (!results.valid) {
 				logger.error(requestContext, 'Card schema mismatch!');
 				logger.error(requestContext, JSON.stringify(actionInputCardFilter));
@@ -976,7 +973,7 @@ export class Worker {
 				}
 
 				throw new errors.WorkerSchemaMismatch(
-					`Input card does not match filter. Action:${actionCard.slug}, Card:${cards.input?.slug}`,
+					`Input card does not match filter. Action:${actionCard.slug}, Card:${input?.slug}`,
 				);
 			}
 
@@ -1016,9 +1013,9 @@ export class Worker {
 			// things like triggers, transformers etc are always processed correctly.
 			const actionContext = this.getActionContext(requestContext);
 
-			// TS-TODO: `cards.input` gets verified as non-null by a jellyfish-assert
+			// TS-TODO: `input` gets verified as non-null by a jellyfish-assert
 			// call above, but Typescript doesn't understand this.
-			const data = await actionFunction(session, actionContext, cards.input!, {
+			const data = await actionFunction(session, actionContext, input!, {
 				action: actionCard,
 				card: request.data.input.id,
 				actor: request.data.actor,
@@ -1434,53 +1431,57 @@ export class Worker {
 				session,
 				`${insertedCard.slug}@${insertedCard.version}`,
 			);
-			await Bluebird.map(
-				typeTriggers,
-				async (trigger) => {
-					await this.jellyfish.patchCardBySlug(
-						context,
-						session,
-						`${trigger.slug}@${trigger.version}`,
-						[
-							{
-								op: 'replace',
-								path: '/active',
-								value: false,
-							},
-						],
-					);
+			await Promise.all(
+				typeTriggers.map(
+					async (trigger) => {
+						await this.jellyfish.patchCardBySlug(
+							context,
+							session,
+							`${trigger.slug}@${trigger.version}`,
+							[
+								{
+									op: 'replace',
+									path: '/active',
+									value: false,
+								},
+							],
+						);
 
-					// Also from the locally cached triggers
-					_.remove(this.triggers, {
-						id: trigger.id,
-					});
-				},
-				{
-					concurrency: INSERT_CONCURRENCY,
-				},
+						// Also from the locally cached triggers
+						_.remove(this.triggers, {
+							id: trigger.id,
+						});
+					},
+					{
+						concurrency: INSERT_CONCURRENCY,
+					},
+				),
 			);
 
-			await Bluebird.map(
-				jellyscript.getTypeTriggers(insertedCard) as TriggeredActionContract[],
-				async (trigger) => {
-					// We don't want to use the actions queue here
-					// so that watchers are applied right away
-					const triggeredActionContract = await this.jellyfish.replaceCard(
-						context,
-						session,
-						trigger,
-					);
+			await Promise.all(
+				(
+					jellyscript.getTypeTriggers(insertedCard) as TriggeredActionContract[]
+				).map(
+					async (trigger) => {
+						// We don't want to use the actions queue here
+						// so that watchers are applied right away
+						const triggeredActionContract = await this.jellyfish.replaceCard(
+							context,
+							session,
+							trigger,
+						);
 
-					// Registered the newly created trigger
-					// right away for performance reasons
-					return this.setTriggers(
-						context,
-						this.triggers.concat([triggeredActionContract]),
-					);
-				},
-				{
-					concurrency: INSERT_CONCURRENCY,
-				},
+						// Registered the newly created trigger
+						// right away for performance reasons
+						return this.setTriggers(
+							context,
+							this.triggers.concat([triggeredActionContract]),
+						);
+					},
+					{
+						concurrency: INSERT_CONCURRENCY,
+					},
+				),
 			);
 		}
 
