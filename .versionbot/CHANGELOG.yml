@@ -1,4 +1,15 @@
 - commits:
+    - subject: Remove Bluebird library
+      hash: 4d061189301d0e822a6f73c684bfc1dd93224da9
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: karaxuna
+      nested: []
+  version: 10.1.0
+  date: 2021-12-07T20:03:30.052Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-plugin-product-os to ^2.9.0'
       hash: 20ee807ee5943e5098fd9e4bdd1c4548991b2d0b
       body: |
