@@ -5,7 +5,6 @@ import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { strict as assert } from 'assert';
-import Bluebird from 'bluebird';
 import _ from 'lodash';
 import { Worker } from '../../lib';
 import { errors, triggersLib as triggers } from '../../lib/index';
@@ -1031,13 +1030,15 @@ describe('.getTypeTriggers()', () => {
 			},
 		].map(ctx.jellyfish.defaults);
 
-		const insertedCards = await Bluebird.map(cards, (card) => {
-			return ctx.jellyfish.insertCard(
-				ctx.context,
-				ctx.session,
-				card as Contract,
-			);
-		});
+		const insertedCards = await Promise.all(
+			cards.map((card) => {
+				return ctx.jellyfish.insertCard(
+					ctx.context,
+					ctx.session,
+					card as Contract,
+				);
+			}),
+		);
 
 		const updatedCard = await ctx.jellyfish.getCardById(
 			ctx.context,
@@ -1208,13 +1209,15 @@ describe('.getTypeTriggers()', () => {
 			},
 		].map(ctx.jellyfish.defaults);
 
-		const insertedCards = await Bluebird.map(cards, (card) => {
-			return ctx.jellyfish.insertCard(
-				ctx.context,
-				ctx.session,
-				card as Contract,
-			);
-		});
+		const insertedCards = await Promise.all(
+			cards.map((card) => {
+				return ctx.jellyfish.insertCard(
+					ctx.context,
+					ctx.session,
+					card as Contract,
+				);
+			}),
+		);
 
 		const result = await triggers.getTypeTriggers(
 			ctx.context,
@@ -1321,13 +1324,15 @@ describe('.getTypeTriggers()', () => {
 			},
 		].map(ctx.jellyfish.defaults);
 
-		const insertedCards = await Bluebird.map(cards, (card) => {
-			return ctx.jellyfish.insertCard(
-				ctx.context,
-				ctx.session,
-				card as Contract,
-			);
-		});
+		const insertedCards = await Promise.all(
+			cards.map((card) => {
+				return ctx.jellyfish.insertCard(
+					ctx.context,
+					ctx.session,
+					card as Contract,
+				);
+			}),
+		);
 
 		const result = await triggers.getTypeTriggers(
 			ctx.context,

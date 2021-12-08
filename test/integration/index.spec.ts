@@ -5,7 +5,6 @@ import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { core } from '@balena/jellyfish-types';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { strict as assert } from 'assert';
-import Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { Worker } from '../../lib/index';
 
@@ -1361,17 +1360,19 @@ describe('Worker', () => {
 	it('a triggered action can update a dynamic list of cards (ids as array of strings)', async () => {
 		const cardIds: string[] = [];
 		const slug = ctx.generateRandomSlug();
-		await Bluebird.each([1, 2, 3], async (idx) => {
-			const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
-				slug: `${slug}${idx}`,
-				type: 'card@1.0.0',
-				version: '1.0.0',
-				data: {
-					id: `id${idx}`,
-				},
-			});
-			cardIds.push(card.id);
-		});
+		await Promise.all(
+			[1, 2, 3].map(async (idx) => {
+				const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+					slug: `${slug}${idx}`,
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						id: `id${idx}`,
+					},
+				});
+				cardIds.push(card.id);
+			}),
+		);
 
 		ctx.worker.setTriggers(ctx.context, [
 			ctx.jellyfish.defaults({
@@ -1456,31 +1457,35 @@ describe('Worker', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		await Bluebird.each([1, 2, 3], async (idx) => {
-			const card = await ctx.jellyfish.getCardBySlug(
-				ctx.context,
-				ctx.session,
-				`${slug}${idx}@latest`,
-			);
-			assert(card !== null);
-			expect(card.data.updated).toBe(true);
-		});
+		await Promise.all(
+			[1, 2, 3].map(async (idx) => {
+				const card = await ctx.jellyfish.getCardBySlug(
+					ctx.context,
+					ctx.session,
+					`${slug}${idx}@latest`,
+				);
+				assert(card !== null);
+				expect(card.data.updated).toBe(true);
+			}),
+		);
 	});
 
 	test('a triggered action can update a dynamic list of cards (ids as array of objects with field id)', async () => {
 		const cardsWithId: Array<{ [id: string]: string }> = [];
 		const slug = ctx.generateRandomSlug();
-		await Bluebird.each([1, 2, 3], async (idx) => {
-			const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
-				slug: `${slug}${idx}`,
-				type: 'card@1.0.0',
-				version: '1.0.0',
-				data: {
-					id: `id${idx}`,
-				},
-			});
-			cardsWithId.push({ id: card.id });
-		});
+		await Promise.all(
+			[1, 2, 3].map(async (idx) => {
+				const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+					slug: `${slug}${idx}`,
+					type: 'card@1.0.0',
+					version: '1.0.0',
+					data: {
+						id: `id${idx}`,
+					},
+				});
+				cardsWithId.push({ id: card.id });
+			}),
+		);
 
 		ctx.worker.setTriggers(ctx.context, [
 			ctx.jellyfish.defaults({
@@ -1574,15 +1579,17 @@ describe('Worker', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		await Bluebird.each([1, 2, 3], async (idx) => {
-			const card = await ctx.jellyfish.getCardBySlug(
-				ctx.context,
-				ctx.session,
-				`${slug}${idx}@latest`,
-			);
-			assert(card !== null);
-			expect(card.data.updated).toBe(true);
-		});
+		await Promise.all(
+			[1, 2, 3].map(async (idx) => {
+				const card = await ctx.jellyfish.getCardBySlug(
+					ctx.context,
+					ctx.session,
+					`${slug}${idx}@latest`,
+				);
+				assert(card !== null);
+				expect(card.data.updated).toBe(true);
+			}),
+		);
 	});
 
 	it('should fail when attempting to insert a triggered-action card with duplicate targets', async () => {

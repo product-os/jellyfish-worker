@@ -7,7 +7,6 @@ import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { strict as assert } from 'assert';
-import Bluebird from 'bluebird';
 import _ from 'lodash';
 import { Worker } from '../../lib';
 
@@ -728,13 +727,15 @@ describe('.insertCard()', () => {
 			},
 		].map(ctx.jellyfish.defaults);
 
-		const insertedCards = await Bluebird.map(cards, (card) => {
-			return ctx.jellyfish.insertCard(
-				ctx.context,
-				ctx.session,
-				card as Contract,
-			);
-		});
+		const insertedCards = await Promise.all(
+			cards.map((card) => {
+				return ctx.jellyfish.insertCard(
+					ctx.context,
+					ctx.session,
+					card as Contract,
+				);
+			}),
+		);
 
 		await ctx.flushAll(ctx.session);
 

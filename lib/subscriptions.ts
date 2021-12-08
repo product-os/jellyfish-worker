@@ -1,4 +1,3 @@
-import Bluebird from 'bluebird';
 import find from 'lodash/find';
 import { core, JSONSchema, worker } from '@balena/jellyfish-types';
 
@@ -123,79 +122,81 @@ export const evaluate = async ({
 	const thread = message.links!['is attached to'][0];
 	const subscriptions = thread.links!['has attached'];
 
-	await Bluebird.map(subscriptions, async (subscription) => {
-		const creatorId = getCreatorId(subscription);
+	await Promise.all(
+		subscriptions.map(async (subscription) => {
+			const creatorId = getCreatorId(subscription);
 
-		// Ignore if subscriber is the one who created a message
-		if (!creatorId || creatorId === message.data.actor) {
-			return;
-		}
+			// Ignore if subscriber is the one who created a message
+			if (!creatorId || creatorId === message.data.actor) {
+				return;
+			}
 
-		const creator = await getContractById(creatorId);
+			const creator = await getContractById(creatorId);
 
-		if (!creator) {
-			return;
-		}
+			if (!creator) {
+				return;
+			}
 
-		const creatorSession = await getSession(creatorId);
+			const creatorSession = await getSession(creatorId);
 
-		if (!creatorSession) {
-			return;
-		}
+			if (!creatorSession) {
+				return;
+			}
 
-		const notificationTypeContract = getTypeContract('notification@1.0.0');
+			const notificationTypeContract = getTypeContract('notification@1.0.0');
 
-		if (!notificationTypeContract) {
-			return;
-		}
+			if (!notificationTypeContract) {
+				return;
+			}
 
-		const notification = await insertContract(
-			notificationTypeContract,
-			creatorSession.id,
-			{
+			const notification = await insertContract(
+				notificationTypeContract,
+				creatorSession.id,
+				{
+					version: '1.0.0',
+					type: 'notification@1.0.0',
+					markers: [creator.slug],
+					slug: `notification-${creator.id}-${message.id}`,
+					tags: [],
+					links: {},
+					requires: [],
+					capabilities: [],
+					active: true,
+				},
+			);
+
+			if (!notification) {
+				return;
+			}
+
+			const linkTypeContract = getTypeContract('link@1.0.0');
+
+			if (!linkTypeContract) {
+				return;
+			}
+
+			await insertContract(linkTypeContract, creatorSession.id, {
 				version: '1.0.0',
-				type: 'notification@1.0.0',
-				markers: [creator.slug],
-				slug: `notification-${creator.id}-${message.id}`,
+				type: 'link@1.0.0',
+				slug: `link-${message.id}-has-attached-${notification.id}`,
 				tags: [],
 				links: {},
 				requires: [],
 				capabilities: [],
 				active: true,
-			},
-		);
-
-		if (!notification) {
-			return;
-		}
-
-		const linkTypeContract = getTypeContract('link@1.0.0');
-
-		if (!linkTypeContract) {
-			return;
-		}
-
-		await insertContract(linkTypeContract, creatorSession.id, {
-			version: '1.0.0',
-			type: 'link@1.0.0',
-			slug: `link-${message.id}-has-attached-${notification.id}`,
-			tags: [],
-			links: {},
-			requires: [],
-			capabilities: [],
-			active: true,
-			name: 'has attached',
-			data: {
-				inverseName: 'is attached to',
-				from: {
-					id: message.id,
-					type: message.type,
+				name: 'has attached',
+				data: {
+					inverseName: 'is attached to',
+					from: {
+						id: message.id,
+						type: message.type,
+					},
+					to: {
+						id: notification.id,
+						type: notification.type,
+					},
 				},
-				to: {
-					id: notification.id,
-					type: notification.type,
-				},
-			},
-		});
-	});
+			});
+		}),
+	);
 };
