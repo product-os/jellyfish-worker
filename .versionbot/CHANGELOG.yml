@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: c7f28d83a4aeb36e4ea049fdb2fa570cd54df4d7
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.1.8
+  date: 2021-12-14T08:49:01.754Z
+- commits:
     - subject: 'Drop depcheck, bump typescript'
       hash: 4daaad35c1e9e6fb12dd2db662af64f9d5287c4a
       body: ''
