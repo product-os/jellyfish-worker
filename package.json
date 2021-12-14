@@ -65,7 +65,7 @@
     "@balena/jellyfish-config": "^2.0.2",
     "@balena/jellyfish-core": "^8.1.49",
     "@balena/jellyfish-environment": "^6.0.1",
-    "@balena/jellyfish-plugin-base": "^2.1.321",
+    "@balena/jellyfish-plugin-base": "^2.2.1",
     "@balena/jellyfish-plugin-default": "^21.1.147",
     "@balena/jellyfish-plugin-product-os": "^2.9.4",
     "@balena/jellyfish-queue": "^1.0.385",
@@ -92,7 +92,7 @@
     "@balena/jellyfish-action-library": "^15.1.188",
     "@balena/jellyfish-core": "^8.1.49",
     "@balena/jellyfish-environment": "^6.0.1",
-    "@balena/jellyfish-plugin-base": "^2.1.321",
+    "@balena/jellyfish-plugin-base": "^2.2.1",
     "@balena/jellyfish-plugin-default": "^21.1.147",
     "@balena/jellyfish-queue": "^1.0.385"
   },
