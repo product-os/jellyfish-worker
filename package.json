@@ -47,7 +47,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.2",
-    "@balena/jellyfish-jellyscript": "^4.9.164",
+    "@balena/jellyfish-jellyscript": "^4.9.165",
     "@balena/jellyfish-logger": "^3.1.0",
     "errio": "^1.2.2",
     "fast-equals": "^2.0.4",
