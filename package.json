@@ -63,7 +63,7 @@
   "devDependencies": {
     "@balena/jellyfish-action-library": "^15.1.188",
     "@balena/jellyfish-config": "^2.0.2",
-    "@balena/jellyfish-core": "^8.2.0",
+    "@balena/jellyfish-core": "^9.0.0",
     "@balena/jellyfish-environment": "^6.0.1",
     "@balena/jellyfish-plugin-base": "^2.2.1",
     "@balena/jellyfish-plugin-default": "^21.1.147",
@@ -90,7 +90,7 @@
   },
   "peerDependencies": {
     "@balena/jellyfish-action-library": "^15.1.188",
-    "@balena/jellyfish-core": "^8.2.0",
+    "@balena/jellyfish-core": "^9.0.0",
     "@balena/jellyfish-environment": "^6.0.1",
     "@balena/jellyfish-plugin-base": "^2.2.1",
     "@balena/jellyfish-plugin-default": "^21.1.147",
