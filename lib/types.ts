@@ -168,11 +168,11 @@ export interface ScheduledActionData {
 	options: ProducerOptions;
 	schedule: {
 		once?: {
-			date: string;
+			date: Date;
 		};
 		recurring?: {
-			start: string;
-			end: string;
+			start: Date;
+			end: Date;
 			interval: string;
 		};
 	};

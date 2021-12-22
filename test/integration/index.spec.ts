@@ -1,10 +1,13 @@
 import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import type { ProducerOptions } from '@balena/jellyfish-queue';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
 import {
 	errors,
+	getNextExecutionDate,
 	testUtils,
+	ScheduledActionData,
 	TriggeredActionContract,
 	TriggeredActionData,
 	Worker,
@@ -20,6 +23,52 @@ beforeAll(async () => {
 afterAll(() => {
 	return testUtils.destroyContext(ctx);
 });
+
+/**
+ * @summary Build an action request to create a scheduled action contract
+ * @function
+ *
+ * @param {ScheduledActionData['schedule']} schedule - schedule configuration
+ * @param {String} foo - data.foo for contract(s) created by scheduled action
+ * @returns {ProducerOptions} options object used to enqueue action request
+ */
+function getScheduledActionRequest(
+	schedule: ScheduledActionData['schedule'],
+	foo: string = coreTestUtils.generateRandomId(),
+): ProducerOptions {
+	return {
+		action: 'action-create-card@1.0.0',
+		logContext: ctx.logContext,
+		card: ctx.worker.typeContracts['scheduled-action@1.0.0'].id,
+		type: ctx.worker.typeContracts['scheduled-action@1.0.0'].type,
+		arguments: {
+			reason: null,
+			properties: {
+				slug: coreTestUtils.generateRandomSlug({
+					prefix: 'scheduled-action',
+				}),
+				version: '1.0.0',
+				data: {
+					options: {
+						context: ctx.logContext,
+						action: 'action-create-card@1.0.0',
+						card: ctx.worker.typeContracts['card@1.0.0'].id,
+						type: 'type',
+						arguments: {
+							reason: null,
+							properties: {
+								data: {
+									foo,
+								},
+							},
+						},
+					},
+					schedule,
+				},
+			},
+		},
+	};
+}
 
 describe('.getId()', () => {
 	test('should preserve the same id during its lifetime', async () => {
@@ -2745,5 +2794,421 @@ describe('.getActionContext()', () => {
 		});
 
 		expect(hasAllTypes).toBeTruthy();
+	});
+});
+
+describe('scheduled actions', () => {
+	test('a one-time scheduled action with a past schedule should not enqueue a job', async () => {
+		// Execute request to create new scheduled action
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			getScheduledActionRequest({
+				once: {
+					date: new Date(new Date().setDate(new Date().getDate() - 1)),
+				},
+			}),
+		);
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
+		assert(result && result.data && result.data.id);
+
+		// Check that no job was enqueued
+		const job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows).toEqual([]);
+	});
+
+	test('a one-time scheduled action with a future schedule should enqueue a job', async () => {
+		// Execute request to create new scheduled action
+		const schedule = {
+			once: {
+				date: new Date(new Date().setDate(new Date().getDate() + 1)),
+			},
+		};
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			getScheduledActionRequest(schedule),
+		);
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
+		assert(result && result.data && result.data.id);
+
+		// Check that the expected job was enqueued
+		const job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows.length).toEqual(1);
+		expect(job.rows[0]['run_at']).toEqual(getNextExecutionDate(schedule));
+		expect(job.rows[0].payload.data.action).toEqual(request.data.action);
+		expect(job.rows[0].payload.data.arguments).toEqual(
+			(request.data.arguments as any).properties.data.options.arguments,
+		);
+		expect(job.rows[0].payload.data.schedule).toEqual(result.data.id);
+	});
+
+	test('a recurring scheduled action with past schedule should not enqueue a job', async () => {
+		// Execute request to create new scheduled action
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			getScheduledActionRequest({
+				recurring: {
+					start: new Date(new Date().setDate(new Date().getDate() - 10)),
+					end: new Date(new Date().setDate(new Date().getDate() - 5)),
+					interval: '* * * * *',
+				},
+			}),
+		);
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
+		assert(result && result.data && result.data.id);
+
+		// Check that no job was enqueued
+		const job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows).toEqual([]);
+	});
+
+	test('a recurring scheduled action with future schedule should enqueue a job', async () => {
+		// Execute request to create new scheduled action
+		const schedule = {
+			recurring: {
+				start: new Date(new Date().setDate(new Date().getDate() - 1)),
+				end: new Date(new Date().setDate(new Date().getDate() + 2)),
+				interval: '* * * * *',
+			},
+		};
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			getScheduledActionRequest(schedule),
+		);
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
+		assert(result && result.data && result.data.id);
+
+		// Check that the expected job was enqueued
+		const job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows.length).toEqual(1);
+		expect(job.rows[0]['run_at']).toEqual(getNextExecutionDate(schedule));
+		expect(job.rows[0].payload.data.action).toEqual(request.data.action);
+		expect(job.rows[0].payload.data.arguments).toEqual(
+			(request.data.arguments as any).properties.data.options.arguments,
+		);
+		expect(job.rows[0].payload.data.schedule).toEqual(result.data.id);
+	});
+
+	test('updating a scheduled action should update its task in the queue', async () => {
+		// Execute request to create new scheduled action
+		let schedule: ScheduledActionData['schedule'] = {
+			once: {
+				date: new Date(new Date().setDate(new Date().getDate() + 10)),
+			},
+		};
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			getScheduledActionRequest(schedule),
+		);
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
+		assert(result && result.data && result.data.id);
+
+		// Check that the expected job was enqueued
+		let job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows.length).toEqual(1);
+		expect(job.rows[0]['run_at']).toEqual(getNextExecutionDate(schedule));
+		expect(job.rows[0].payload.data.action).toEqual(request.data.action);
+		expect(job.rows[0].payload.data.arguments).toEqual(
+			(request.data.arguments as any).properties.data.options.arguments,
+		);
+		expect(job.rows[0].payload.data.schedule).toEqual(result.data.id);
+
+		// Execute a request to update the schedule
+		schedule = {
+			recurring: {
+				start: new Date(new Date().setDate(new Date().getDate() - 1)),
+				end: new Date(new Date().setDate(new Date().getDate() + 2)),
+				interval: '* * * * *',
+			},
+		};
+		const updateRequest = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			{
+				action: 'action-update-card@1.0.0',
+				logContext: ctx.logContext,
+				card: result.data.id,
+				type: ctx.worker.typeContracts['scheduled-action@1.0.0'].type,
+				arguments: {
+					reason: null,
+					patch: [
+						{
+							op: 'replace',
+							path: '/data/schedule',
+							value: schedule,
+						},
+					],
+				},
+			},
+		);
+		await ctx.flush(ctx.session);
+		await ctx.queue.producer.waitResults(ctx.logContext, updateRequest);
+
+		// Check that the expected job was updated
+		job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows.length).toEqual(1);
+		expect(job.rows[0]['run_at']).toEqual(getNextExecutionDate(schedule));
+		expect(job.rows[0].payload.data.action).toEqual(request.data.action);
+		expect(job.rows[0].payload.data.arguments).toEqual(
+			(request.data.arguments as any).properties.data.options.arguments,
+		);
+		expect(job.rows[0].payload.data.schedule).toEqual(result.data.id);
+	});
+
+	test('deleting a scheduled action should remove its task from the queue', async () => {
+		// Execute request to create new scheduled action
+		let request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			getScheduledActionRequest({
+				once: {
+					date: new Date(new Date().setDate(new Date().getDate() + 10)),
+				},
+			}),
+		);
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
+		assert(result && result.data && result.data.id);
+
+		// Check that the expected job was enqueued
+		let job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows.length).toEqual(1);
+
+		// Execute a request to soft delete the scheduled action
+		request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			{
+				action: 'action-update-card@1.0.0',
+				logContext: ctx.logContext,
+				card: result.data.id,
+				type: ctx.worker.typeContracts['scheduled-action@1.0.0'].type,
+				arguments: {
+					reason: null,
+					patch: [
+						{
+							op: 'replace',
+							path: '/active',
+							value: false,
+						},
+					],
+				},
+			},
+		);
+		await ctx.flush(ctx.session);
+		await ctx.queue.producer.waitResults(ctx.logContext, request);
+
+		// Check that no job is enqueued for the deleted scheduled action
+		job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows.length).toEqual(0);
+	});
+
+	test('scheduled actions should execute on specified date', async () => {
+		// Execute request to create new scheduled action
+		const foo = coreTestUtils.generateRandomId();
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			getScheduledActionRequest(
+				{
+					once: {
+						date: new Date(Date.now() + 3000),
+					},
+				},
+				foo,
+			),
+		);
+		await ctx.flush(ctx.session);
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
+		assert(result && result.data && result.data.id);
+
+		// Wait 3 seconds for scheduled job to execute
+		await new Promise((resolve) => {
+			setTimeout(resolve, 3000);
+		});
+		await ctx.flush(ctx.session);
+
+		// Check that the expected contract was created
+		await ctx.waitForMatch({
+			type: 'object',
+			required: ['data'],
+			properties: {
+				data: {
+					type: 'object',
+					required: ['foo'],
+					properties: {
+						foo: {
+							type: 'string',
+							const: foo,
+						},
+					},
+				},
+			},
+		});
+
+		// Check that no new job is enqueued
+		const job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [result.data.id],
+		});
+		expect(job.rows.length).toEqual(0);
+	});
+
+	test('should enqueue subsequent iterations for recurring scheduled actions', async () => {
+		// Add a new scheduled action contract into the system
+		const schedule = {
+			recurring: {
+				start: new Date(Date.now() - 1000),
+				end: new Date(new Date().setHours(new Date().getHours() + 6)),
+				interval: '*/30 * * * *',
+			},
+		};
+		const foo = coreTestUtils.generateRandomId();
+		const scheduledAction = await ctx.kernel.insertContract(
+			ctx.logContext,
+			ctx.session,
+			{
+				type: 'scheduled-action@1.0.0',
+				slug: coreTestUtils.generateRandomSlug({
+					prefix: 'scheduled-action',
+				}),
+				data: {
+					options: {
+						context: ctx.logContext,
+						action: 'action-create-card@1.0.0',
+						card: coreTestUtils.generateRandomId(),
+						type: 'type',
+						arguments: {
+							reason: null,
+							properties: {
+								data: {
+									foo,
+								},
+							},
+						},
+					},
+					schedule: {
+						recurring: {
+							start: schedule.recurring.start.toISOString(),
+							end: schedule.recurring.end.toISOString(),
+							interval: schedule.recurring.interval,
+						},
+					},
+				},
+			},
+		);
+
+		// Execute a request tied to this recurring scheduled action
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			{
+				action: 'action-create-card@1.0.0',
+				logContext: ctx.logContext,
+				card: ctx.worker.typeContracts['card@1.0.0'].id,
+				type: 'type',
+				arguments: {
+					reason: null,
+					properties: {
+						data: {
+							foo,
+						},
+					},
+				},
+				schedule: {
+					contract: scheduledAction.id,
+					runAt: new Date(Date.now()),
+				},
+			},
+		);
+		await ctx.flush(ctx.session);
+
+		// Check that the expected contract was created
+		await ctx.waitForMatch({
+			type: 'object',
+			required: ['data'],
+			properties: {
+				data: {
+					type: 'object',
+					required: ['foo'],
+					properties: {
+						foo: {
+							type: 'string',
+							const: foo,
+						},
+					},
+				},
+			},
+		});
+
+		// Wait a second
+		await new Promise((resolve) => {
+			setTimeout(resolve, 1000);
+		});
+
+		// Check that the next iteration was enqueued
+		const job = await ctx.pool.query({
+			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
+			values: [scheduledAction.id],
+		});
+		expect(job.rows.length).toEqual(1);
+		expect(job.rows[0]['run_at']).toEqual(getNextExecutionDate(schedule));
+		expect(job.rows[0].payload.data.action).toEqual(request.data.action);
+		expect(job.rows[0].payload.data.arguments).toEqual(request.data.arguments);
+		expect(job.rows[0].payload.data.schedule).toEqual(scheduledAction.id);
 	});
 });
