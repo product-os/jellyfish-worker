@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove dev-only peer dependencies
+      hash: d52d095794346654048ea902f7a074d7c1fc787e
+      body: |
+        See https://github.com/product-os/jellyfish-plugin-default/pull/869.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 10.1.20
+  date: 2021-12-22T19:24:17.922Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-plugin-default to ^21.2.0'
       hash: 8368f83e265d583738e78f56b7cdac0592749fab
       body: |
