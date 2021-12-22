@@ -1,4 +1,17 @@
 - commits:
+    - subject: Missed one peer-dependency from the last PR
+      hash: f7a9e039461b93af7947bf2eea9bd414e90cd12f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 10.1.21
+  date: 2021-12-22T20:00:43.360Z
+- commits:
     - subject: Remove dev-only peer dependencies
       hash: d52d095794346654048ea902f7a074d7c1fc787e
       body: |
