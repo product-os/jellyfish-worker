@@ -1,6 +1,6 @@
 import { Worker } from './index';
 import { Transformer } from './transformers';
-import * as queue from '@balena/jellyfish-queue';
+import { Consumer, Producer } from '@balena/jellyfish-queue';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 
 describe('Worker.updateCurrentTransformers()', () => {
@@ -43,8 +43,8 @@ describe('Worker.updateCurrentTransformers()', () => {
 			{} as any as Kernel,
 			'session-foo',
 			{},
-			{} as any as queue.Consumer,
-			{} as any as queue.Producer,
+			{} as any as Consumer,
+			{} as any as Producer,
 		);
 		worker.transformers = transformers;
 		worker.updateLatestTransformers();

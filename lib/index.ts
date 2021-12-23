@@ -17,8 +17,7 @@ import * as transformerLib from './transformers';
 import * as subscriptionsLib from './subscriptions';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
-import * as queue from '@balena/jellyfish-queue';
-import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
+import { Consumer, Producer, ProducerOptions } from '@balena/jellyfish-queue';
 import {
 	TriggeredActionContract,
 	WorkerContext,
@@ -127,8 +126,8 @@ export async function getObjectWithLinks<
  */
 export class Worker {
 	jellyfish: Kernel;
-	consumer: queue.Consumer;
-	producer: queue.Producer;
+	consumer: Consumer;
+	producer: Producer;
 	triggers: TriggeredActionContract[];
 	transformers: transformerLib.Transformer[];
 	latestTransformers: transformerLib.Transformer[];
@@ -164,8 +163,8 @@ export class Worker {
 		jellyfish: Kernel,
 		session: string,
 		actionLibrary: ActionLibrary,
-		consumer: queue.Consumer,
-		producer: queue.Producer,
+		consumer: Consumer,
+		producer: Producer,
 	) {
 		this.jellyfish = jellyfish;
 		this.triggers = [];
