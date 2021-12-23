@@ -8,7 +8,7 @@ import * as assert from '@balena/jellyfish-assert';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger } from '@balena/jellyfish-logger';
 import * as semver from 'semver';
-import { ActionLibrary, LogContext } from './types';
+import { ActionLibrary, LogContext, WorkerContext } from './types';
 import { core, JSONSchema } from '@balena/jellyfish-types';
 import * as errors from './errors';
 import * as utils from './utils';
@@ -18,10 +18,7 @@ import * as subscriptionsLib from './subscriptions';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import { Consumer, Producer, ProducerOptions } from '@balena/jellyfish-queue';
-import {
-	TriggeredActionContract,
-	WorkerContext,
-} from '@balena/jellyfish-types/build/worker';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
