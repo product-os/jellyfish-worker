@@ -1,22 +1,21 @@
-import ActionLibrary from '@balena/jellyfish-action-library';
+import { strict as assert } from 'assert';
+import { ActionLibrary } from '@balena/jellyfish-action-library';
+import { coreErrors } from '@balena/jellyfish-core';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import { integrationHelpers } from '@balena/jellyfish-test-harness';
-import { core } from '@balena/jellyfish-types';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import { strict as assert } from 'assert';
-import * as _ from 'lodash';
+import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import _ from 'lodash';
 import { Worker } from '../../lib/index';
 
 let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await integrationHelpers.before(
-		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		{
-			worker: Worker,
-		},
-	);
+	ctx = await integrationHelpers.before({
+		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		worker: Worker,
+	});
 });
 
 afterAll(() => {
@@ -39,30 +38,30 @@ describe('.getId()', () => {
 
 	test('different workers should get different ids', async () => {
 		const worker1 = new Worker(
-			ctx.jellyfish as any,
+			ctx.kernel as any,
 			ctx.session,
 			ctx.actionLibrary,
 			ctx.queue.consumer,
 			ctx.queue.producer,
 		);
 		const worker2 = new Worker(
-			ctx.jellyfish,
+			ctx.kernel,
 			ctx.session,
 			ctx.actionLibrary,
 			ctx.queue.consumer,
 			ctx.queue.producer,
 		);
 		const worker3 = new Worker(
-			ctx.jellyfish,
+			ctx.kernel,
 			ctx.session,
 			ctx.actionLibrary,
 			ctx.queue.consumer,
 			ctx.queue.producer,
 		);
 
-		await worker1.initialize(ctx.context);
-		await worker2.initialize(ctx.context);
-		await worker3.initialize(ctx.context);
+		await worker1.initialize(ctx.logContext);
+		await worker2.initialize(ctx.logContext);
+		await worker3.initialize(ctx.logContext);
 
 		expect(worker1.getId()).not.toBe(worker2.getId());
 		expect(worker1.getId()).not.toBe(worker3.getId());
@@ -72,8 +71,8 @@ describe('.getId()', () => {
 
 describe('Worker', () => {
 	it('should not re-enqueue requests after duplicated execute events', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -83,7 +82,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		await ctx.queue.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -104,7 +103,7 @@ describe('Worker', () => {
 
 		await ctx.queue.consumer.postResults(
 			ctx.generateRandomID(),
-			ctx.context,
+			ctx.logContext,
 			enqueuedRequest1 as any,
 			{
 				error: false,
@@ -118,15 +117,15 @@ describe('Worker', () => {
 
 		await expect(
 			ctx.worker.execute(ctx.session, enqueuedRequest1),
-		).rejects.toThrow(ctx.jellyfish.errors.JellyfishElementAlreadyExists);
+		).rejects.toThrow(ctx.kernel.errors.JellyfishElementAlreadyExists);
 
 		const enqueuedRequest2 = await ctx.dequeue();
 		expect(enqueuedRequest2).toBeFalsy();
 	});
 
 	it('should evaluate a simple computed property on insertion', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -136,7 +135,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -177,7 +176,7 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			typeRequest,
 		);
 
@@ -187,7 +186,7 @@ describe('Worker', () => {
 
 		const insertAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeResult.data.id,
 			type: typeResult.data.type,
 			arguments: {
@@ -207,13 +206,13 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const insertResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			insertRequest,
 		);
 		expect(insertResult.error).toBe(false);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			insertResult.data.id,
 		);
@@ -243,8 +242,8 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple SUM property on a insertAction', async () => {
-		const typeCard: any = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard: any = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -252,7 +251,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -300,14 +299,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			typeRequest,
 		);
 		expect(typeResult.error).toBe(false);
 
 		const insertAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeResult.data.id,
 			type: typeResult.data.type,
 			arguments: {
@@ -328,13 +327,13 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const insertResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			insertRequest,
 		);
 		expect(insertResult.error).toBe(false);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			insertResult.data.id,
 		);
@@ -366,8 +365,8 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch move', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -377,7 +376,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -418,14 +417,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			typeRequest,
 		);
 		expect(typeResult.error).toBe(false);
 
 		const insertAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeResult.data.id,
 			type: typeResult.data.type,
 			arguments: {
@@ -446,14 +445,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const insertResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			insertRequest,
 		);
 		expect(insertResult.error).toBe(false);
 
 		const updateAction = {
 			action: 'action-update-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: insertResult.data.id,
 			type: insertResult.data.type,
 			arguments: {
@@ -475,13 +474,13 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const updateResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			updateRequest,
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
 		);
@@ -512,8 +511,8 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch copy', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -523,7 +522,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -564,14 +563,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			typeRequest,
 		);
 		expect(typeResult.error).toBe(false);
 
 		const insertAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeResult.data.id,
 			type: typeResult.data.type,
 			arguments: {
@@ -592,14 +591,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const insertResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			insertRequest,
 		);
 		expect(insertResult.error).toBe(false);
 
 		const updateAction = {
 			action: 'action-update-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: insertResult.data.id,
 			type: insertResult.data.type,
 			arguments: {
@@ -621,13 +620,13 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const updateResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			updateRequest,
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
 		);
@@ -658,8 +657,8 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch replace', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -669,7 +668,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -710,14 +709,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			typeRequest,
 		);
 		expect(typeResult.error).toBe(false);
 
 		const insertAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeResult.data.id,
 			type: typeResult.data.type,
 			arguments: {
@@ -737,14 +736,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const insertResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			insertRequest,
 		);
 		expect(insertResult.error).toBe(false);
 
 		const updateAction = {
 			action: 'action-update-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: insertResult.data.id,
 			type: insertResult.data.type,
 			arguments: {
@@ -766,13 +765,13 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const updateResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			updateRequest,
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
 		);
@@ -802,8 +801,8 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch addition', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -813,7 +812,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -854,14 +853,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			typeRequest,
 		);
 		expect(typeResult.error).toBe(false);
 
 		const insertAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeResult.data.id,
 			type: typeResult.data.type,
 			arguments: {
@@ -879,14 +878,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const insertResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			insertRequest,
 		);
 		expect(insertResult.error).toBe(false);
 
 		const updateAction = {
 			action: 'action-update-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: insertResult.data.id,
 			type: insertResult.data.type,
 			arguments: {
@@ -908,13 +907,13 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const updateResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			updateRequest,
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
 		);
@@ -944,8 +943,8 @@ describe('Worker', () => {
 	});
 
 	it('should throw if the result of the formula is incompatible with the given type', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -955,7 +954,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -996,14 +995,14 @@ describe('Worker', () => {
 		);
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			typeRequest,
 		);
 		expect(typeResult.error).toBe(false);
 
 		const insertAction = {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeResult.data.id,
 			type: typeResult.data.type,
 			arguments: {
@@ -1022,13 +1021,13 @@ describe('Worker', () => {
 			insertAction,
 		);
 		await expect(ctx.flush(ctx.session)).rejects.toThrow(
-			ctx.jellyfish.errors.JellyfishSchemaMismatch,
+			ctx.kernel.errors.JellyfishSchemaMismatch,
 		);
 	});
 
 	it('should not re-enqueue requests after execute failure', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -1037,7 +1036,7 @@ describe('Worker', () => {
 
 		await ctx.queue.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-card@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -1056,7 +1055,7 @@ describe('Worker', () => {
 
 		assert(enqueuedRequest1 !== null);
 
-		await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			slug: 'foo',
 			type: 'card@1.0.0',
 			version: '1.0.0',
@@ -1067,7 +1066,7 @@ describe('Worker', () => {
 
 		await ctx.queue.consumer.postResults(
 			ctx.generateRandomID(),
-			ctx.context,
+			ctx.logContext,
 			enqueuedRequest1 as any,
 			{
 				error: false,
@@ -1081,25 +1080,25 @@ describe('Worker', () => {
 
 		await expect(
 			ctx.worker.execute(ctx.session, enqueuedRequest1),
-		).rejects.toThrow(ctx.jellyfish.errors.JellyfishElementAlreadyExists);
+		).rejects.toThrow(ctx.kernel.errors.JellyfishElementAlreadyExists);
 
 		const enqueuedRequest2 = await ctx.dequeue();
 		expect(enqueuedRequest2).toBeFalsy();
 	});
 
 	it('should be able to login as a user with a password', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'user@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const request1 = await ctx.worker.pre(ctx.session, {
+		const request1 = (await ctx.worker.pre(ctx.session, {
 			action: 'action-create-user@1.0.0',
 			card: typeCard.id,
-			context: ctx.context,
+			context: ctx.logContext,
 			type: typeCard.type,
 			arguments: {
 				email: 'johndoe@example.com',
@@ -1108,7 +1107,8 @@ describe('Worker', () => {
 				}),
 				password: 'foobarbaz',
 			},
-		});
+		})) as any;
+		request1.logContext = request1.context;
 
 		const createUserRequest = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
@@ -1118,20 +1118,21 @@ describe('Worker', () => {
 
 		await ctx.flushAll(ctx.session);
 		const signupResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			createUserRequest,
 		);
 		expect(signupResult.error).toBe(false);
 
-		const request2 = await ctx.worker.pre(ctx.session, {
+		const request2 = (await ctx.worker.pre(ctx.session, {
 			action: 'action-create-session@1.0.0',
 			card: signupResult.data.id,
-			context: ctx.context,
+			context: ctx.logContext,
 			type: signupResult.data.type,
 			arguments: {
 				password: 'foobarbaz',
 			},
-		});
+		})) as any;
+		request2.logContext = request2.context;
 
 		const loginRequest = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
@@ -1141,13 +1142,13 @@ describe('Worker', () => {
 
 		await ctx.flushAll(ctx.session);
 		const loginResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			loginRequest,
 		);
 		expect(loginResult.error).toBe(false);
 
-		const session = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const session = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			loginResult.data.id,
 		);
@@ -1155,7 +1156,7 @@ describe('Worker', () => {
 		assert(session !== null);
 
 		expect(session).toEqual(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				created_at: session.created_at,
 				linked_at: session.linked_at,
 				name: null,
@@ -1177,7 +1178,7 @@ describe('Worker', () => {
 	});
 
 	it('should not be able to login as a password-less user', async () => {
-		const user = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		const user = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			type: 'user@1.0.0',
 			version: '1.0.0',
 			slug: ctx.generateRandomSlug({
@@ -1192,7 +1193,7 @@ describe('Worker', () => {
 
 		await ctx.queue.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-session@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: user.id,
 			type: user.type,
 			arguments: {},
@@ -1204,7 +1205,7 @@ describe('Worker', () => {
 	});
 
 	it('should not be able to login as a password-less user given a random password', async () => {
-		const user = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		const user = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			type: 'user@1.0.0',
 			version: '1.0.0',
 			slug: ctx.generateRandomSlug({
@@ -1220,7 +1221,7 @@ describe('Worker', () => {
 		await expect(
 			ctx.worker.pre(ctx.session, {
 				action: 'action-create-session@1.0.0',
-				context: ctx.context,
+				context: ctx.logContext,
 				card: user.id,
 				type: user.type,
 				arguments: {
@@ -1231,7 +1232,7 @@ describe('Worker', () => {
 	});
 
 	it('should not be able to login as a password-less non-disallowed user', async () => {
-		const user = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		const user = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			type: 'user@1.0.0',
 			version: '1.0.0',
 			slug: ctx.generateRandomSlug({
@@ -1247,7 +1248,7 @@ describe('Worker', () => {
 
 		await ctx.queue.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-session@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: user.id,
 			type: user.type,
 			arguments: {},
@@ -1259,7 +1260,7 @@ describe('Worker', () => {
 	});
 
 	it('should not be able to login as a password-less disallowed user', async () => {
-		const user = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		const user = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			type: 'user@1.0.0',
 			version: '1.0.0',
 			slug: ctx.generateRandomSlug({
@@ -1275,7 +1276,7 @@ describe('Worker', () => {
 
 		await ctx.queue.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-session@1.0.0',
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: user.id,
 			type: user.type,
 			arguments: {},
@@ -1287,17 +1288,17 @@ describe('Worker', () => {
 	});
 
 	it('should fail if signing up with the wrong password', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'user@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const request1 = await ctx.worker.pre(ctx.session, {
+		const request1 = (await ctx.worker.pre(ctx.session, {
 			action: 'action-create-user@1.0.0',
-			context: ctx.context,
+			context: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -1307,7 +1308,8 @@ describe('Worker', () => {
 				}),
 				password: 'xxxxxxxxxxxx',
 			},
-		});
+		})) as any;
+		request1.logContext = request1.context;
 
 		const createUserRequest = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
@@ -1317,7 +1319,7 @@ describe('Worker', () => {
 
 		await ctx.flush(ctx.session);
 		const signupResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			createUserRequest,
 		);
 		expect(signupResult.error).toBe(false);
@@ -1325,7 +1327,7 @@ describe('Worker', () => {
 		await expect(
 			ctx.worker.pre(ctx.session, {
 				action: 'action-create-session@1.0.0',
-				context: ctx.context,
+				context: ctx.logContext,
 				card: signupResult.data.id,
 				type: signupResult.data.type,
 				arguments: {
@@ -1336,8 +1338,8 @@ describe('Worker', () => {
 	});
 
 	it('should post an error execute event if logging in as a disallowed user', async () => {
-		const adminCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const adminCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'user-admin@latest',
 		);
@@ -1347,7 +1349,7 @@ describe('Worker', () => {
 		await expect(
 			ctx.worker.pre(ctx.session, {
 				action: 'action-create-session@1.0.0',
-				context: ctx.context,
+				context: ctx.logContext,
 				card: adminCard.id,
 				type: adminCard.type,
 				arguments: {
@@ -1362,7 +1364,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+				const card = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 					slug: `${slug}${idx}`,
 					type: 'card@1.0.0',
 					version: '1.0.0',
@@ -1374,8 +1376,8 @@ describe('Worker', () => {
 			}),
 		);
 
-		ctx.worker.setTriggers(ctx.context, [
-			ctx.jellyfish.defaults({
+		ctx.worker.setTriggers(ctx.logContext, [
+			ctx.kernel.defaults({
 				id: ctx.generateRandomID(),
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1418,13 +1420,13 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
@@ -1437,7 +1439,7 @@ describe('Worker', () => {
 			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -1452,15 +1454,18 @@ describe('Worker', () => {
 		);
 
 		await ctx.flushAll(ctx.session);
-		const result = await ctx.queue.producer.waitResults(ctx.context, request);
+		const result = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
 		expect(result.error).toBe(false);
 
 		await ctx.flushAll(ctx.session);
 
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.jellyfish.getCardBySlug(
-					ctx.context,
+				const card = await ctx.kernel.getCardBySlug(
+					ctx.logContext,
 					ctx.session,
 					`${slug}${idx}@latest`,
 				);
@@ -1475,7 +1480,7 @@ describe('Worker', () => {
 		const slug = ctx.generateRandomSlug();
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+				const card = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 					slug: `${slug}${idx}`,
 					type: 'card@1.0.0',
 					version: '1.0.0',
@@ -1487,8 +1492,8 @@ describe('Worker', () => {
 			}),
 		);
 
-		ctx.worker.setTriggers(ctx.context, [
-			ctx.jellyfish.defaults({
+		ctx.worker.setTriggers(ctx.logContext, [
+			ctx.kernel.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -1540,13 +1545,13 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
@@ -1559,7 +1564,7 @@ describe('Worker', () => {
 			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -1574,15 +1579,18 @@ describe('Worker', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(ctx.context, request);
+		const result = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
 		expect(result.error).toBe(false);
 
 		await ctx.flushAll(ctx.session);
 
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.jellyfish.getCardBySlug(
-					ctx.context,
+				const card = await ctx.kernel.getCardBySlug(
+					ctx.logContext,
 					ctx.session,
 					`${slug}${idx}@latest`,
 				);
@@ -1630,12 +1638,12 @@ describe('Worker', () => {
 		};
 
 		await expect(
-			ctx.jellyfish.insertCard(ctx.context, ctx.session, trigger),
-		).rejects.toThrow(ctx.backend.errors.JellyfishSchemaMismatch);
+			ctx.kernel.insertCard(ctx.logContext, ctx.session, trigger),
+		).rejects.toThrow(coreErrors.JellyfishSchemaMismatch);
 	});
 
 	test('trigger should update card if triggered by a user not owning the card', async () => {
-		const card = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		const card = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			slug: ctx.generateRandomSlug({
 				prefix: 'user',
 			}),
@@ -1646,8 +1654,8 @@ describe('Worker', () => {
 			},
 		});
 
-		ctx.worker.setTriggers(ctx.context, [
-			ctx.jellyfish.defaults({
+		ctx.worker.setTriggers(ctx.logContext, [
+			ctx.kernel.defaults({
 				id: ctx.generateRandomID(),
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1701,13 +1709,13 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
@@ -1715,8 +1723,8 @@ describe('Worker', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const userJohnDoe = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const userJohnDoe = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'user@1.0.0',
@@ -1732,8 +1740,8 @@ describe('Worker', () => {
 			},
 		);
 
-		const sessionOfJohnDoe = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const sessionOfJohnDoe = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'session@1.0.0',
@@ -1748,7 +1756,7 @@ describe('Worker', () => {
 
 		await ctx.queue.producer.enqueue(ctx.worker.getId(), sessionIdOfJohnDoe, {
 			action: `${actionCard.slug}@${actionCard.version}`,
-			context: ctx.context,
+			logContext: ctx.logContext,
 			card: typeCard.id,
 			type: typeCard.type,
 			arguments: {
@@ -1771,8 +1779,8 @@ describe('Worker', () => {
 		// Now flush any remaining jobs that have been generated by triggers
 		await ctx.flushAll(ctx.session);
 
-		const result = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const result = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			card.id,
 		);
@@ -1791,8 +1799,8 @@ describe('.getTriggers()', () => {
 
 describe('.replaceCard()', () => {
 	test('should update type contract schema', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -1801,7 +1809,7 @@ describe('.replaceCard()', () => {
 
 		const slug = ctx.generateRandomSlug();
 		const result1 = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -1825,7 +1833,7 @@ describe('.replaceCard()', () => {
 		);
 
 		await ctx.worker.replaceCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -1848,8 +1856,8 @@ describe('.replaceCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result1!.id,
 		);
@@ -1861,8 +1869,8 @@ describe('.replaceCard()', () => {
 	});
 
 	test('updating a card must have the correct tail', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -1871,7 +1879,7 @@ describe('.replaceCard()', () => {
 
 		const slug = ctx.generateRandomSlug();
 		const result1 = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -1888,7 +1896,7 @@ describe('.replaceCard()', () => {
 		);
 
 		await ctx.worker.replaceCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -1904,8 +1912,8 @@ describe('.replaceCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result1!.id,
 		);
@@ -1914,7 +1922,7 @@ describe('.replaceCard()', () => {
 		assert(result1! !== null);
 
 		expect(card).toEqual(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				created_at: result1.created_at,
 				updated_at: card.updated_at,
 				linked_at: card.linked_at,
@@ -1928,7 +1936,7 @@ describe('.replaceCard()', () => {
 			}),
 		);
 
-		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const tail = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['type', 'data'],
@@ -1961,8 +1969,8 @@ describe('.replaceCard()', () => {
 	});
 
 	test('should be able to disable event creation', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -1972,7 +1980,7 @@ describe('.replaceCard()', () => {
 		const slug = ctx.generateRandomSlug();
 
 		const result = await ctx.worker.replaceCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -1987,7 +1995,7 @@ describe('.replaceCard()', () => {
 
 		assert(result !== null);
 
-		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const tail = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['type', 'data'],
@@ -2015,8 +2023,8 @@ describe('.replaceCard()', () => {
 
 describe('.insertCard()', () => {
 	test('should insert a card', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -2025,7 +2033,7 @@ describe('.insertCard()', () => {
 
 		const slug = ctx.generateRandomSlug();
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2042,14 +2050,14 @@ describe('.insertCard()', () => {
 
 		assert(result !== null);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result.id,
 		);
 
 		expect(card).toEqual(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				created_at: result!.created_at,
 				id: result!.id,
 				name: null,
@@ -2063,8 +2071,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should ignore an explicit type property', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -2073,7 +2081,7 @@ describe('.insertCard()', () => {
 
 		const slug = ctx.generateRandomSlug();
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2096,8 +2104,8 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
@@ -2108,14 +2116,14 @@ describe('.insertCard()', () => {
 	});
 
 	test('should default active to true', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2128,8 +2136,8 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
@@ -2138,14 +2146,14 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set active to false', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2159,8 +2167,8 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
@@ -2169,14 +2177,14 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for links', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2189,8 +2197,8 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
@@ -2199,14 +2207,14 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for tags', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2219,8 +2227,8 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
@@ -2229,14 +2237,14 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for data', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2249,8 +2257,8 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
@@ -2259,8 +2267,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set a slug', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -2269,7 +2277,7 @@ describe('.insertCard()', () => {
 
 		const slug = ctx.generateRandomSlug();
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2282,8 +2290,8 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
@@ -2292,14 +2300,14 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set a name', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2313,8 +2321,8 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
@@ -2324,21 +2332,21 @@ describe('.insertCard()', () => {
 
 	test('throw if card already exists and override is false', async () => {
 		const slug = ctx.generateRandomSlug();
-		await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			slug,
 			type: 'card@1.0.0',
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		await expect(
 			ctx.worker.insertCard(
-				ctx.context,
+				ctx.logContext,
 				ctx.session,
 				typeCard,
 				{
@@ -2351,18 +2359,18 @@ describe('.insertCard()', () => {
 					active: false,
 				},
 			),
-		).rejects.toThrow(ctx.jellyfish.errors.JellyfishElementAlreadyExists);
+		).rejects.toThrow(ctx.kernel.errors.JellyfishElementAlreadyExists);
 	});
 
 	test('should add a create event if attachEvents is true', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2377,7 +2385,7 @@ describe('.insertCard()', () => {
 
 		assert(result !== null);
 
-		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const tail = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['type', 'data'],
@@ -2405,15 +2413,15 @@ describe('.insertCard()', () => {
 
 describe('.patchCard()', () => {
 	test('should ignore pointless updates', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 		const result1 = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2430,7 +2438,7 @@ describe('.patchCard()', () => {
 		assert(result1 !== null);
 
 		const result2 = await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2441,7 +2449,7 @@ describe('.patchCard()', () => {
 		);
 
 		const result3 = await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2461,8 +2469,8 @@ describe('.patchCard()', () => {
 		expect(result2).toBeFalsy();
 		expect(result3).toBeFalsy();
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result1.id,
 		);
@@ -2471,20 +2479,20 @@ describe('.patchCard()', () => {
 	});
 
 	test('should not upsert if no changes were made', async () => {
-		const element = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		const element = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			slug: ctx.generateRandomSlug(),
 			type: 'card@1.0.0',
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2496,8 +2504,8 @@ describe('.patchCard()', () => {
 	});
 
 	test('should set a card to inactive', async () => {
-		const previousCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const previousCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				slug: ctx.generateRandomSlug(),
@@ -2506,14 +2514,14 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2529,8 +2537,8 @@ describe('.patchCard()', () => {
 			],
 		);
 
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			previousCard.id,
 		);
@@ -2539,20 +2547,20 @@ describe('.patchCard()', () => {
 	});
 
 	test('should add an update event if attachEvents is true', async () => {
-		const element = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		const element = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			slug: ctx.generateRandomSlug(),
 			type: 'card@1.0.0',
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 		const result = await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
@@ -2569,7 +2577,7 @@ describe('.patchCard()', () => {
 			],
 		);
 
-		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const tail = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['type', 'data'],
@@ -2596,7 +2604,7 @@ describe('.patchCard()', () => {
 
 	test('should remove previously inserted type triggered actions if deactivating a type', async () => {
 		const slug = ctx.generateRandomSlug();
-		const type = await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		const type = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			type: 'type@1.0.0',
 			version: '1.0.0',
 			slug,
@@ -2607,13 +2615,13 @@ describe('.patchCard()', () => {
 			},
 		});
 
-		const typeCard = await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
-		await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+		await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 			type: 'triggered-action@1.0.0',
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -2654,15 +2662,14 @@ describe('.patchCard()', () => {
 			},
 		});
 
-		const typeTypeContract =
-			await ctx.jellyfish.getCardBySlug<core.TypeContract>(
-				ctx.context,
-				ctx.session,
-				'type@latest',
-			);
+		const typeTypeContract = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			'type@latest',
+		);
 		assert(typeTypeContract !== null);
 		await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeTypeContract,
 			{
@@ -2678,7 +2685,7 @@ describe('.patchCard()', () => {
 			],
 		);
 
-		const triggers = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const triggers = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['active', 'type'],
@@ -2710,8 +2717,8 @@ describe('.patchCard()', () => {
 
 describe('.getActionContext()', () => {
 	it('should include a map of type contracts', async () => {
-		const types = await ctx.jellyfish.query<core.TypeContract>(
-			ctx.context,
+		const types = await ctx.kernel.query<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'object',
@@ -2723,9 +2730,9 @@ describe('.getActionContext()', () => {
 			},
 		);
 
-		ctx.worker.setTypeContracts(ctx.context, types);
+		ctx.worker.setTypeContracts(ctx.logContext, types);
 
-		const actionContext = ctx.worker.getActionContext(ctx.context);
+		const actionContext = ctx.worker.getActionContext(ctx.logContext);
 
 		const hasAllTypes = _.every(types, (contract) => {
 			return _.has(actionContext.cards, `${contract.slug}@${contract.version}`);

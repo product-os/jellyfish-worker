@@ -1,12 +1,14 @@
 import { TypedError } from 'typed-error';
 
-export class WorkerNoExecuteEvent extends TypedError {}
-export class WorkerNoElement extends TypedError {}
-export class WorkerInvalidVersion extends TypedError {}
-export class WorkerInvalidAction extends TypedError {}
-export class WorkerInvalidActionRequest extends TypedError {}
-export class WorkerInvalidTrigger extends TypedError {}
-export class WorkerInvalidTemplate extends TypedError {}
-export class WorkerInvalidDuration extends TypedError {}
-export class WorkerSchemaMismatch extends TypedError {}
-export class WorkerAuthenticationError extends TypedError {}
+export class BaseTypedError extends TypedError {}
+
+export class WorkerAuthenticationError extends BaseTypedError {}
+export class WorkerInvalidAction extends BaseTypedError {}
+export class WorkerInvalidActionRequest extends BaseTypedError {}
+export class WorkerInvalidDuration extends BaseTypedError {}
+export class WorkerInvalidTemplate extends BaseTypedError {}
+export class WorkerInvalidTrigger extends BaseTypedError {}
+export class WorkerInvalidVersion extends BaseTypedError {}
+export class WorkerNoElement extends BaseTypedError {}
+export class WorkerNoExecuteEvent extends BaseTypedError {}
+export class WorkerSchemaMismatch extends BaseTypedError {}

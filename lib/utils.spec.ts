@@ -1,5 +1,9 @@
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type {
+	ActionContract,
+	Contract,
+} from '@balena/jellyfish-types/build/core';
 import * as utils from './utils';
-import { core, JSONSchema } from '@balena/jellyfish-types';
 
 describe('.durationToMs()', () => {
 	test('converts a duration to milliseconds', () => {
@@ -21,7 +25,7 @@ describe('.getActionArgumentsSchema()', () => {
 			data: {
 				arguments: {},
 			},
-		} as any as core.ActionContract);
+		} as any as ActionContract);
 
 		expect(schema).toEqual({
 			type: 'object',
@@ -37,7 +41,7 @@ describe('.getActionArgumentsSchema()', () => {
 					},
 				},
 			},
-		} as any as core.ActionContract);
+		} as any as ActionContract);
 
 		expect(schema).toEqual({
 			type: 'object',
@@ -63,7 +67,7 @@ describe('.getActionArgumentsSchema()', () => {
 					},
 				},
 			},
-		} as any as core.ActionContract);
+		} as any as ActionContract);
 
 		expect(schema).toEqual({
 			type: 'object',
@@ -91,7 +95,7 @@ describe('.getQueryWithOptionalLinks()', () => {
 			},
 			type: 'test@1.0.0',
 			version: '1.0.0',
-		} as any as core.Contract;
+		} as any as Contract;
 
 		const query = utils.getQueryWithOptionalLinks(object, [
 			'is owned by',

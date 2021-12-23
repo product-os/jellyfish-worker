@@ -1,8 +1,8 @@
-import ActionLibrary from '@balena/jellyfish-action-library';
+import { ActionLibrary } from '@balena/jellyfish-action-library';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import { integrationHelpers } from '@balena/jellyfish-test-harness';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Worker } from '../../lib';
 
 let ctx: integrationHelpers.IntegrationTestContext;
@@ -10,12 +10,10 @@ let user: any = {};
 let userSession: string = '';
 
 beforeAll(async () => {
-	ctx = await integrationHelpers.before(
-		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		{
-			worker: Worker,
-		},
-	);
+	ctx = await integrationHelpers.before({
+		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		worker: Worker,
+	});
 
 	const createdUser = await ctx.createUser(ctx.generateRandomID());
 	user = createdUser.contract;

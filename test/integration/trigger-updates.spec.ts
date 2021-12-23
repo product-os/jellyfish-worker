@@ -1,19 +1,17 @@
-import ActionLibrary from '@balena/jellyfish-action-library';
+import { ActionLibrary } from '@balena/jellyfish-action-library';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import { integrationHelpers } from '@balena/jellyfish-test-harness';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { Worker } from '../../lib';
 
 let ctx: integrationHelpers.IntegrationTestContext;
 
 beforeAll(async () => {
-	ctx = await integrationHelpers.before(
-		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		{
-			worker: Worker,
-		},
-	);
+	ctx = await integrationHelpers.before({
+		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		worker: Worker,
+	});
 });
 
 afterAll(() => {
@@ -22,7 +20,7 @@ afterAll(() => {
 
 describe('.setTriggers()', () => {
 	it('should be able to set triggers', () => {
-		const trigger1 = ctx.jellyfish.defaults({
+		const trigger1 = ctx.kernel.defaults({
 			id: ctx.generateRandomID(),
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -40,7 +38,7 @@ describe('.setTriggers()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const trigger2 = ctx.jellyfish.defaults({
+		const trigger2 = ctx.kernel.defaults({
 			id: ctx.generateRandomID(),
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -58,7 +56,7 @@ describe('.setTriggers()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		ctx.worker.setTriggers(ctx.context, [trigger1, trigger2]);
+		ctx.worker.setTriggers(ctx.logContext, [trigger1, trigger2]);
 
 		const triggers = ctx.worker.getTriggers();
 
@@ -68,7 +66,7 @@ describe('.setTriggers()', () => {
 
 describe('.upsertTrigger()', () => {
 	it('should be able to add a trigger', () => {
-		const trigger1 = ctx.jellyfish.defaults({
+		const trigger1 = ctx.kernel.defaults({
 			id: ctx.generateRandomID(),
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -86,7 +84,7 @@ describe('.upsertTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const trigger2 = ctx.jellyfish.defaults({
+		const trigger2 = ctx.kernel.defaults({
 			id: ctx.generateRandomID(),
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -104,9 +102,9 @@ describe('.upsertTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		ctx.worker.setTriggers(ctx.context, [trigger1]);
+		ctx.worker.setTriggers(ctx.logContext, [trigger1]);
 
-		ctx.worker.upsertTrigger(ctx.context, trigger2);
+		ctx.worker.upsertTrigger(ctx.logContext, trigger2);
 
 		const triggers = ctx.worker.getTriggers();
 
@@ -114,7 +112,7 @@ describe('.upsertTrigger()', () => {
 	});
 
 	it('should be able to modify an existing trigger', () => {
-		const trigger1 = ctx.jellyfish.defaults({
+		const trigger1 = ctx.kernel.defaults({
 			id: ctx.generateRandomID(),
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -132,7 +130,7 @@ describe('.upsertTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const trigger2 = ctx.jellyfish.defaults({
+		const trigger2 = ctx.kernel.defaults({
 			id: ctx.generateRandomID(),
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -150,13 +148,13 @@ describe('.upsertTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		ctx.worker.setTriggers(ctx.context, [trigger1, trigger2]);
+		ctx.worker.setTriggers(ctx.logContext, [trigger1, trigger2]);
 
 		const newArguments = {
 			baz: 'buzz',
 		};
 
-		ctx.worker.upsertTrigger(ctx.context, {
+		ctx.worker.upsertTrigger(ctx.logContext, {
 			...trigger2,
 			data: {
 				...trigger2.data,
@@ -181,7 +179,7 @@ describe('.upsertTrigger()', () => {
 
 describe('.removeTrigger()', () => {
 	it('should be able to remove an existing trigger', () => {
-		const trigger1 = ctx.jellyfish.defaults({
+		const trigger1 = ctx.kernel.defaults({
 			id: ctx.generateRandomID(),
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -199,7 +197,7 @@ describe('.removeTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const trigger2 = ctx.jellyfish.defaults({
+		const trigger2 = ctx.kernel.defaults({
 			id: ctx.generateRandomID(),
 			slug: ctx.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -217,9 +215,9 @@ describe('.removeTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		ctx.worker.setTriggers(ctx.context, [trigger1, trigger2]);
+		ctx.worker.setTriggers(ctx.logContext, [trigger1, trigger2]);
 
-		ctx.worker.removeTrigger(ctx.context, trigger1.id);
+		ctx.worker.removeTrigger(ctx.logContext, trigger1.id);
 
 		const triggers = ctx.worker.getTriggers();
 

@@ -1,20 +1,19 @@
-import { v4 as uuid } from 'uuid';
+import { ActionLibrary } from '@balena/jellyfish-action-library';
 import { cardMixins } from '@balena/jellyfish-core';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import ActionLibrary = require('@balena/jellyfish-action-library');
-
 import { PluginManager } from '@balena/jellyfish-plugin-base';
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
+import { v4 as uuid } from 'uuid';
 
-const context = {
+const logContext = {
 	id: 'jellyfish-integration-test',
 };
 
-const pluginManager = new PluginManager(context, {
+const pluginManager = new PluginManager(logContext, {
 	plugins: [DefaultPlugin as any, ActionLibrary as any],
 });
 
 export const loadDefaultCards = () => {
-	return pluginManager.getCards(context, cardMixins);
+	return pluginManager.getCards(logContext, cardMixins);
 };
 
 export const loadCards = () => {
@@ -30,11 +29,11 @@ export const loadCards = () => {
 };
 
 export const loadSyncIntegrations = () => {
-	return pluginManager.getSyncIntegrations(context);
+	return pluginManager.getSyncIntegrations(logContext);
 };
 
 export const loadActions = () => {
-	const allActions = pluginManager.getActions(context);
+	const allActions = pluginManager.getActions(logContext);
 	Object.assign(allActions, {
 		'action-test-originator': {
 			handler: async (session: string, ctx: any, card: any, request: any) => {

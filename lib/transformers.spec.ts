@@ -1,13 +1,13 @@
+import type { Contract } from '@balena/jellyfish-types/build/core';
+import _ from 'lodash';
 import * as sinon from 'sinon';
-import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import * as transformers from './transformers';
-import { core } from '@balena/jellyfish-types';
 
 const getEvaluateParamsStub = (
-	transformerCards: Array<core.Contract<transformers.TransformerData>>,
-	oldCard: core.Contract | null,
-	newCard: core.Contract,
+	transformerCards: Array<Contract<transformers.TransformerData>>,
+	oldCard: Contract | null,
+	newCard: Contract,
 	returnActor: boolean = true,
 ) => {
 	const executeSpy = sinon.spy((actionRequest) => {
@@ -25,7 +25,7 @@ const getEvaluateParamsStub = (
 		transformers: _.castArray(transformerCards),
 		oldCard,
 		newCard,
-		context: {
+		logContext: {
 			id: 'foobar',
 			api: '0',
 		},
@@ -41,7 +41,7 @@ const getEvaluateParamsStub = (
 							type: 'user',
 							id: uuid(),
 							data: {},
-						} as core.Contract,
+						} as Contract,
 				  ]
 				: [];
 		},
@@ -87,9 +87,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as core.Contract<transformers.TransformerData>],
-			oldCard as any as core.Contract,
-			newCard as any as core.Contract,
+			[transformer as any as Contract<transformers.TransformerData>],
+			oldCard as any as Contract,
+			newCard as any as Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -142,9 +142,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as core.Contract<transformers.TransformerData>],
-			oldCard as any as core.Contract,
-			newCard as any as core.Contract,
+			[transformer as any as Contract<transformers.TransformerData>],
+			oldCard as any as Contract,
+			newCard as any as Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -209,9 +209,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as core.Contract<transformers.TransformerData>],
-			oldCard as any as core.Contract,
-			newCard as any as core.Contract,
+			[transformer as any as Contract<transformers.TransformerData>],
+			oldCard as any as Contract,
+			newCard as any as Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -271,9 +271,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as core.Contract<transformers.TransformerData>],
-			oldCard as any as core.Contract,
-			newCard as any as core.Contract,
+			[transformer as any as Contract<transformers.TransformerData>],
+			oldCard as any as Contract,
+			newCard as any as Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -304,9 +304,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as core.Contract<transformers.TransformerData>],
+			[transformer as any as Contract<transformers.TransformerData>],
 			null,
-			newCard as any as core.Contract,
+			newCard as any as Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -363,9 +363,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as core.Contract<transformers.TransformerData>],
-			oldCard as any as core.Contract,
-			newCard as any as core.Contract,
+			[transformer as any as Contract<transformers.TransformerData>],
+			oldCard as any as Contract,
+			newCard as any as Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -404,9 +404,9 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as core.Contract<transformers.TransformerData>],
-			oldCard as any as core.Contract,
-			newCard as any as core.Contract,
+			[transformer as any as Contract<transformers.TransformerData>],
+			oldCard as any as Contract,
+			newCard as any as Contract,
 			false,
 		);
 

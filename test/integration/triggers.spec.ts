@@ -1,10 +1,13 @@
-import ActionLibrary from '@balena/jellyfish-action-library';
+import { strict as assert } from 'assert';
+import { ActionLibrary } from '@balena/jellyfish-action-library';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import { integrationHelpers } from '@balena/jellyfish-test-harness';
-import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import { strict as assert } from 'assert';
+import type {
+	Contract,
+	TypeContract,
+} from '@balena/jellyfish-types/build/core';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
 import { Worker } from '../../lib';
 import { errors, triggersLib as triggers } from '../../lib/index';
@@ -13,15 +16,13 @@ let ctx: integrationHelpers.IntegrationTestContext;
 let typeCard: TypeContract;
 
 beforeAll(async () => {
-	ctx = await integrationHelpers.before(
-		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		{
-			worker: Worker,
-		},
-	);
+	ctx = await integrationHelpers.before({
+		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		worker: Worker,
+	});
 
-	const contract = (await ctx.jellyfish.getCardBySlug(
-		ctx.context,
+	const contract = (await ctx.kernel.getCardBySlug(
+		ctx.logContext,
 		ctx.session,
 		'card@latest',
 	)) as TypeContract;
@@ -30,7 +31,7 @@ beforeAll(async () => {
 
 	typeCard = contract;
 
-	await ctx.jellyfish.insertCard(ctx.context, ctx.session, {
+	await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
 		slug: 'foo',
 		type: 'type@1.0.0',
 		version: '1.0.0',
@@ -76,7 +77,7 @@ afterAll(() => {
 
 describe('.getRequest()', () => {
 	it('should return null if the filter only has a type but there is no match', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			type: 'triggered-action@1.0.0',
 			data: {
 				mode: 'insert',
@@ -100,8 +101,8 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'card@1.0.0',
@@ -117,14 +118,14 @@ describe('.getRequest()', () => {
 
 		// TS-TODO: fix cast to any
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: new Date(),
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -133,7 +134,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return a request if the filter only has a type and there is a match', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -160,8 +161,8 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'foo@1.0.0',
@@ -176,14 +177,14 @@ describe('.getRequest()', () => {
 		);
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: date,
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -192,7 +193,7 @@ describe('.getRequest()', () => {
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
 			card: typeCard.id,
-			context: ctx.context,
+			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
 				properties: {
@@ -203,7 +204,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return null if there is no relevant from the old contract state', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			type: 'triggered-action@1.0.0',
 			data: {
 				mode: 'insert',
@@ -227,8 +228,8 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'card@1.0.0',
@@ -246,14 +247,14 @@ describe('.getRequest()', () => {
 
 		// TS-TODO: fix cast to any
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			oldCard,
 			insertedCard,
 			{
 				currentDate: new Date(),
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -262,7 +263,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return a request if a relevant field did change', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -293,8 +294,8 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				name: 'x2',
@@ -312,14 +313,14 @@ describe('.getRequest()', () => {
 		oldCard.name = 'x1';
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			oldCard,
 			insertedCard,
 			{
 				currentDate: date,
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -328,7 +329,7 @@ describe('.getRequest()', () => {
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
 			card: typeCard.id,
-			context: ctx.context,
+			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
 				properties: {
@@ -339,7 +340,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return a request given a complex matching filter', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -375,8 +376,8 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'foo@1.0.0',
@@ -393,14 +394,14 @@ describe('.getRequest()', () => {
 		);
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: date,
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -409,7 +410,7 @@ describe('.getRequest()', () => {
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
 			card: typeCard.id,
-			context: ctx.context,
+			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
 				properties: {
@@ -420,7 +421,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return null given a complex non-matching filter', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			type: 'triggered-action@1.0.0',
 			data: {
 				mode: 'insert',
@@ -453,8 +454,8 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'foo@1.0.0',
@@ -472,14 +473,14 @@ describe('.getRequest()', () => {
 
 		// TS-TODO: fix cast to any
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: new Date(),
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -488,7 +489,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should parse source templates in the triggered action arguments', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -528,8 +529,8 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'card@1.0.0',
@@ -548,14 +549,14 @@ describe('.getRequest()', () => {
 		);
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: date,
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -563,7 +564,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			card: typeCard.id,
-			context: ctx.context,
+			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
 			arguments: {
@@ -578,7 +579,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return the request if the mode matches on update', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -618,8 +619,8 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'card@1.0.0',
@@ -638,13 +639,13 @@ describe('.getRequest()', () => {
 		);
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: date,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 				mode: 'update',
 			},
@@ -653,7 +654,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			card: typeCard.id,
-			context: ctx.context,
+			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
 			arguments: {
@@ -668,7 +669,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return the request if the mode matches on insert', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -708,8 +709,8 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				type: 'card@1.0.0',
@@ -728,13 +729,13 @@ describe('.getRequest()', () => {
 		);
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: date,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 				mode: 'insert',
 			},
@@ -743,7 +744,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			card: typeCard.id,
-			context: ctx.context,
+			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
 			arguments: {
@@ -758,7 +759,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return null if the mode does not match', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -798,8 +799,8 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				slug: ctx.generateRandomID(),
@@ -818,13 +819,13 @@ describe('.getRequest()', () => {
 		);
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: date,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 				mode: 'insert',
 			},
@@ -834,7 +835,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should parse timestamp templates in the triggered action arguments', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -862,8 +863,8 @@ describe('.getRequest()', () => {
 
 		const currentDate = new Date();
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				slug: ctx.generateRandomID(),
@@ -882,14 +883,14 @@ describe('.getRequest()', () => {
 		);
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate,
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -898,7 +899,7 @@ describe('.getRequest()', () => {
 			action: 'action-create-card@1.0.0',
 			currentDate,
 			card: typeCard.id,
-			context: ctx.context,
+			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
 				properties: {
@@ -911,7 +912,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return null if one of the templates is unsatisfied', async () => {
-		const trigger = ctx.jellyfish.defaults({
+		const trigger = ctx.kernel.defaults({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			slug: 'triggered-action-cb3523c5',
 			type: 'triggered-action@1.0.0',
@@ -950,8 +951,8 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.jellyfish.insertCard(
-			ctx.context,
+		const insertedCard = await ctx.kernel.insertCard(
+			ctx.logContext,
 			ctx.session,
 			{
 				slug: ctx.generateRandomSlug(),
@@ -969,14 +970,14 @@ describe('.getRequest()', () => {
 		);
 
 		const request = await triggers.getRequest(
-			ctx.jellyfish,
+			ctx.kernel,
 			trigger,
 			null,
 			insertedCard,
 			{
 				currentDate: new Date(),
 				mode: 'insert',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				session: ctx.session,
 			},
 		);
@@ -1028,27 +1029,27 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map(ctx.jellyfish.defaults);
+		].map(ctx.kernel.defaults);
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.jellyfish.insertCard(
-					ctx.context,
+				return ctx.kernel.insertCard(
+					ctx.logContext,
 					ctx.session,
 					card as Contract,
 				);
 			}),
 		);
 
-		const updatedCard = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const updatedCard = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			insertedCards[0].id,
 		);
 
 		const result = await triggers.getTypeTriggers(
-			ctx.context,
-			ctx.jellyfish,
+			ctx.logContext,
+			ctx.kernel,
 			ctx.session,
 			'foo@1.0.0',
 		);
@@ -1104,19 +1105,19 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map(ctx.jellyfish.defaults);
+		].map(ctx.kernel.defaults);
 
 		for (const card of cards) {
-			await ctx.jellyfish.insertCard(
-				ctx.context,
+			await ctx.kernel.insertCard(
+				ctx.logContext,
 				ctx.session,
 				card as Contract,
 			);
 		}
 
 		const result = await triggers.getTypeTriggers(
-			ctx.context,
-			ctx.jellyfish,
+			ctx.logContext,
+			ctx.kernel,
 			ctx.session,
 			`${typeSlug}@1.0.0`,
 		);
@@ -1207,12 +1208,12 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map(ctx.jellyfish.defaults);
+		].map(ctx.kernel.defaults);
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.jellyfish.insertCard(
-					ctx.context,
+				return ctx.kernel.insertCard(
+					ctx.logContext,
 					ctx.session,
 					card as Contract,
 				);
@@ -1220,14 +1221,14 @@ describe('.getTypeTriggers()', () => {
 		);
 
 		const result = await triggers.getTypeTriggers(
-			ctx.context,
-			ctx.jellyfish,
+			ctx.logContext,
+			ctx.kernel,
 			ctx.session,
 			`${typeSlug}@1.0.0`,
 		);
 
-		const updatedCard = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const updatedCard = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			insertedCards[0].id,
 		);
@@ -1322,12 +1323,12 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map(ctx.jellyfish.defaults);
+		].map(ctx.kernel.defaults);
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.jellyfish.insertCard(
-					ctx.context,
+				return ctx.kernel.insertCard(
+					ctx.logContext,
 					ctx.session,
 					card as Contract,
 				);
@@ -1335,14 +1336,14 @@ describe('.getTypeTriggers()', () => {
 		);
 
 		const result = await triggers.getTypeTriggers(
-			ctx.context,
-			ctx.jellyfish,
+			ctx.logContext,
+			ctx.kernel,
 			ctx.session,
 			`${typeSlug}@1.0.0`,
 		);
 
-		const updatedCard = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const updatedCard = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			insertedCards[0].id,
 		);
@@ -1395,19 +1396,19 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map(ctx.jellyfish.defaults);
+		].map(ctx.kernel.defaults);
 
 		for (const card of cards) {
-			await ctx.jellyfish.insertCard(
-				ctx.context,
+			await ctx.kernel.insertCard(
+				ctx.logContext,
 				ctx.session,
 				card as Contract,
 			);
 		}
 
 		const result = await triggers.getTypeTriggers(
-			ctx.context,
-			ctx.jellyfish,
+			ctx.logContext,
+			ctx.kernel,
 			ctx.session,
 			`${ctx.generateRandomSlug()}@1.0.0`,
 		);
@@ -1419,7 +1420,7 @@ describe('.getStartDate()', () => {
 	it('should return epoch if the trigger has no start date', async () => {
 		// TS-TODO: remove the cast to "any"
 		const result = triggers.getStartDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1450,7 +1451,7 @@ describe('.getStartDate()', () => {
 	it('should return epoch if the trigger has an invalid date', async () => {
 		// TS-TODO: remove the cast to "any"
 		const result = triggers.getStartDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1483,7 +1484,7 @@ describe('.getStartDate()', () => {
 		const date = new Date();
 		// TS-TODO: Remove the cast to "any"
 		const result = triggers.getStartDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1519,7 +1520,7 @@ describe('.getNextExecutionDate()', () => {
 
 		// TS-TODO: fix the cast to any here
 		const result = triggers.getNextExecutionDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1551,7 +1552,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return epoch if no last execution date', async () => {
 		// TS-TODO: fix the cast to any here
 		const result = triggers.getNextExecutionDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1580,7 +1581,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return epoch if last execution date is not a valid date', async () => {
 		// TS-TODO: Remove cast to any
 		const result = triggers.getNextExecutionDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1610,7 +1611,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return epoch if last execution date is not a date', async () => {
 		// TS-TODO: fix cast
 		const result = triggers.getNextExecutionDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1643,7 +1644,7 @@ describe('.getNextExecutionDate()', () => {
 		expect(() => {
 			// TS-TODO: fix cast
 			triggers.getNextExecutionDate(
-				ctx.jellyfish.defaults({
+				ctx.kernel.defaults({
 					type: 'triggered-action@1.0.0',
 					slug: ctx.generateRandomSlug({
 						prefix: 'triggered-action',
@@ -1672,7 +1673,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return the next interval after the last execution', async () => {
 		// TS-TODO: fix cast
 		const result = triggers.getNextExecutionDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1703,7 +1704,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return the start date if the last execution happened way before the start date', async () => {
 		// TS-TODO: fix cast to any
 		const result = triggers.getNextExecutionDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1734,7 +1735,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return the subsequent interval if the last execution happened just before the start date', async () => {
 		// TS-TODO: fix cast to any
 		const result = triggers.getNextExecutionDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1765,7 +1766,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return the next interval if the last execution is the start date', async () => {
 		// TS-TODO: Fix cast to any
 		const result = triggers.getNextExecutionDate(
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				type: 'triggered-action@1.0.0',
 				slug: ctx.generateRandomSlug({
 					prefix: 'triggered-action',

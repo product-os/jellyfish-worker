@@ -1,15 +1,17 @@
-import * as _ from 'lodash';
-import * as skhema from 'skhema';
 import * as assert from '@balena/jellyfish-assert';
-import { JSONSchema, core, worker } from '@balena/jellyfish-types';
+import type { CoreKernel } from '@balena/jellyfish-core';
+import { getLogger, LogContext } from '@balena/jellyfish-logger';
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type {
+	Contract,
+	LinkContract,
+} from '@balena/jellyfish-types/build/core';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import jsone from 'json-e';
+import _ from 'lodash';
+import * as skhema from 'skhema';
 import * as errors from './errors';
 import * as utils from './utils';
-import { LogContext } from './types';
-import jsone = require('json-e');
-import { Kernel } from '@balena/jellyfish-core/build/kernel';
-import { Contract } from '@balena/jellyfish-types/build/core';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import { getLogger } from '@balena/jellyfish-logger';
 
 const logger = getLogger('worker-triggers');
 
@@ -21,22 +23,22 @@ interface CompileContext {
 		flags: string | undefined,
 		str: string,
 	) => RegExpMatchArray;
-	source?: core.Contract;
+	source?: Contract;
 }
 
 interface GetRequestOptions {
 	currentDate: Date;
 	mode?: 'update' | 'insert';
-	context: LogContext;
+	logContext: LogContext;
 	session: string;
 }
 
 export const matchesCard = async (
-	context: LogContext,
-	jellyfish: Kernel,
+	logContext: LogContext,
+	kernel: CoreKernel,
 	session: string,
 	filter: JSONSchema,
-	card: core.Contract | null,
+	card: Contract | null,
 ): Promise<Contract | false | void> => {
 	if (!card) {
 		return false;
@@ -113,7 +115,7 @@ export const matchesCard = async (
 	 * link name in the trigger schema.
 	 */
 	if (isLink) {
-		const linkContract: core.LinkContract = card as core.LinkContract;
+		const linkContract: LinkContract = card as LinkContract;
 		const linkType = Object.keys(schema.$$links!)[0];
 		if (linkType === card.name) {
 			schema.properties.id.const = linkContract.data.from.id;
@@ -130,7 +132,7 @@ export const matchesCard = async (
 
 	// Run the query
 	return _.first(
-		await jellyfish.query(context, session, schema, {
+		await kernel.query(logContext, session, schema, {
 			limit: 1,
 		}),
 	);
@@ -157,7 +159,7 @@ export const matchesCard = async (
  */
 const compileTrigger = (
 	trigger: string | Record<any, any>,
-	card: core.Contract | null,
+	card: Contract | null,
 	currentDate: Date,
 ) => {
 	const context: CompileContext = {
@@ -195,7 +197,7 @@ const compileTrigger = (
  * @function
  * @public
  *
- * @param {Object} jellyfish - jellyfish kernel instance
+ * @param kernel - jellyfish kernel
  * @param {Object} trigger - triggered action contract
  * @param {Object} oldContract - contract before the change was applied (null if contract is new)
  * @param {Object} newContract - contract after the change was applied
@@ -203,16 +205,16 @@ const compileTrigger = (
  * @param {String} options.mode - change type
  * @param {String} options.session - session
  * @param {Date} options.currentDate - current date
- * @param {Object} options.context - execution context
+ * @param {Object} options.logContext - log context
  * @returns {(Object|Null)} action request, or null if the trigger doesn't match
  *
  */
 export const getRequest = async (
-	jellyfish: Kernel,
+	kernel: CoreKernel,
 	trigger: TriggeredActionContract,
 	// If getRequest is called by a time triggered action, then card will be null
-	oldContract: core.Contract | null,
-	newContract: core.Contract,
+	oldContract: Contract | null,
+	newContract: Contract,
 	options: GetRequestOptions,
 ) => {
 	if (trigger.data.mode && trigger.data.mode !== options.mode) {
@@ -220,8 +222,8 @@ export const getRequest = async (
 	}
 
 	const newContractMatches = await matchesCard(
-		options.context,
-		jellyfish,
+		options.logContext,
+		kernel,
 		options.session,
 		trigger.data.filter!,
 		newContract,
@@ -240,7 +242,7 @@ export const getRequest = async (
 		if (!triggerPathsChanged) {
 			const { id, slug, version } = newContract;
 			logger.info(
-				options.context,
+				options.logContext,
 				'Ignoring matching trigger because match-state did not change',
 				{ id, slug, version, triggerPaths },
 			);
@@ -268,7 +270,7 @@ export const getRequest = async (
 		action: trigger.data.action,
 		arguments: compiledTrigger.arguments,
 		originator: trigger.id,
-		context: options.context,
+		logContext: options.logContext,
 		currentDate: options.currentDate,
 		card: compiledTrigger.target,
 	};
@@ -279,8 +281,8 @@ export const getRequest = async (
  * @function
  * @public
  *
- * @param {Object} context - execution context
- * @param {Object} jellyfish - jellyfish instance
+ * @param logContext - log context
+ * @param kernel - jellyfish kernel
  * @param {String} session - session id
  * @param {String} type - type slug
  * @returns {Object[]} triggered actions
@@ -294,12 +296,12 @@ export const getRequest = async (
  * }
  */
 export const getTypeTriggers = async (
-	context: LogContext,
-	jellyfish: Kernel,
+	logContext: LogContext,
+	kernel: CoreKernel,
 	session: string,
 	type: string,
-): Promise<worker.TriggeredActionContract[]> => {
-	return jellyfish.query<worker.TriggeredActionContract>(context, session, {
+): Promise<TriggeredActionContract[]> => {
+	return kernel.query<TriggeredActionContract>(logContext, session, {
 		type: 'object',
 		additionalProperties: true,
 		required: ['id', 'version', 'active', 'type', 'data'],

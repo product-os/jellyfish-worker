@@ -1,10 +1,14 @@
+import type { CoreKernel } from '@balena/jellyfish-core';
+import { getLogger, LogContext } from '@balena/jellyfish-logger';
+import type { JSONSchema } from '@balena/jellyfish-types';
+import type {
+	ActionContract,
+	Contract,
+	SessionContract,
+} from '@balena/jellyfish-types/build/core';
 import iso8601Duration from 'iso8601-duration';
+import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import * as _ from 'lodash';
-import { getLogger } from '@balena/jellyfish-logger';
-import { JSONSchema, core } from '@balena/jellyfish-types';
-import { LogContext } from './types';
-import { Kernel } from '@balena/jellyfish-core/build/kernel';
 
 const logger = getLogger('worker');
 
@@ -36,7 +40,7 @@ export const getCurrentTimestamp = (): string => {
  * console.log(schema.type)
  */
 export const getActionArgumentsSchema = (
-	actionCard: core.ActionContract,
+	actionCard: ActionContract,
 ): JSONSchema => {
 	const argumentNames = Object.keys(actionCard.data.arguments);
 	return argumentNames.length === 0
@@ -56,8 +60,8 @@ export const getActionArgumentsSchema = (
  * @function
  * @public
  *
- * @param {Object} context - execution context
- * @param {Object} jellyfish - jellyfish instance
+ * @param logContext - log context
+ * @param kernel - jellyfish kernel
  * @param {String} session - session id
  * @param {Object} object - card properties
  * @returns {Boolean} whether the card exists
@@ -77,19 +81,19 @@ export const getActionArgumentsSchema = (
  * }
  */
 export const hasCard = async (
-	context: LogContext,
-	jellyfish: Kernel,
+	logContext: LogContext,
+	kernel: CoreKernel,
 	session: string,
-	object: Pick<core.Contract, 'slug' | 'version' | 'id'>,
+	object: Pick<Contract, 'slug' | 'version' | 'id'>,
 ): Promise<boolean> => {
-	if (object.id && (await jellyfish.getCardById(context, session, object.id))) {
+	if (object.id && (await kernel.getCardById(logContext, session, object.id))) {
 		return true;
 	}
 
 	if (
 		object.slug &&
-		(await jellyfish.getCardBySlug(
-			context,
+		(await kernel.getCardBySlug(
+			logContext,
 			session,
 			`${object.slug}@${object.version}`,
 		))
@@ -130,14 +134,14 @@ export const durationToMs = (duration: string): number => {
 };
 
 export const getActorKey = async (
-	context: LogContext,
-	jellyfish: Kernel,
+	logContext: LogContext,
+	kernel: CoreKernel,
 	session: string,
 	actorId: string,
-): Promise<core.SessionContract> => {
+): Promise<SessionContract> => {
 	const keySlug = `session-action-${actorId}`;
-	const key = await jellyfish.getCardBySlug<core.SessionContract>(
-		context,
+	const key = await kernel.getCardBySlug<SessionContract>(
+		logContext,
 		session,
 		`${keySlug}@1.0.0`,
 	);
@@ -146,12 +150,12 @@ export const getActorKey = async (
 		return key;
 	}
 
-	logger.info(context, 'Create worker key', {
+	logger.info(logContext, 'Create worker key', {
 		slug: keySlug,
 		actor: actorId,
 	});
 
-	return jellyfish.replaceCard<core.SessionContract>(context, session, {
+	return kernel.replaceCard<SessionContract>(logContext, session, {
 		slug: keySlug,
 		active: true,
 		version: '1.0.0',
@@ -199,7 +203,7 @@ export const getQueryWithOptionalLinks = (
 							additionalProperties: true,
 						},
 					},
-				};
+				} as any;
 			}),
 		],
 		required,
