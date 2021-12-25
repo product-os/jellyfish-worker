@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-patch'
+      hash: 7e68fbbdfc619502ec4eb4aadbcd102925c164ea
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.1.22
+  date: 2021-12-25T03:57:31.955Z
+- commits:
     - subject: Missed one peer-dependency from the last PR
       hash: f7a9e039461b93af7947bf2eea9bd414e90cd12f
       body: ''
