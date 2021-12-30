@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^4.9.168'
+      hash: a0d66336f792ffe25a6c16191d15736b34b73ce3
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.1.24
+  date: 2021-12-30T22:57:49.193Z
+- commits:
     - subject: 'patch: Update dependency lint-staged to ^12.1.4'
       hash: 08d03c41a5ef39b0b13ff1535697ea43e1236bd2
       body: ''
