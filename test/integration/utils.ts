@@ -1,9 +1,8 @@
-import { v4 as uuid } from 'uuid';
+import { ActionLibrary } from '@balena/jellyfish-action-library';
 import { cardMixins } from '@balena/jellyfish-core';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import ActionLibrary = require('@balena/jellyfish-action-library');
-
 import { PluginManager } from '@balena/jellyfish-plugin-base';
+import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
+import { v4 as uuid } from 'uuid';
 
 const context = {
 	id: 'jellyfish-integration-test',

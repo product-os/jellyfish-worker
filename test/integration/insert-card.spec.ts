@@ -1,4 +1,4 @@
-import ActionLibrary from '@balena/jellyfish-action-library';
+import { ActionLibrary } from '@balena/jellyfish-action-library';
 import { actionCreateCard } from '@balena/jellyfish-action-library/build/actions/action-create-card';
 import type { ActionFile } from '@balena/jellyfish-plugin-base';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
