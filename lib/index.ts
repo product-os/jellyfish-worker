@@ -18,16 +18,74 @@ import * as subscriptionsLib from './subscriptions';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import * as queue from '@balena/jellyfish-queue';
-import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
-import {
-	TriggeredActionContract,
-	WorkerContext,
-} from '@balena/jellyfish-types/build/worker';
+import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
 
 export { triggersLib, errors, CARDS, utils };
+
+export interface WorkerContext {
+	errors: errors.WorkerErrors;
+	defaults: core.JellyfishKernel['defaults'];
+	sync: any;
+	getEventSlug: (type: string) => Promise<string>;
+	getCardById: (lsession: string, id: string) => Promise<core.Contract | null>;
+	getCardBySlug: (
+		lsession: string,
+		slug: string,
+	) => Promise<core.Contract | null>;
+	query: <T extends core.Contract = core.Contract>(
+		lsession: string,
+		schema: Parameters<core.JellyfishKernel['query']>[2],
+		options?: Parameters<core.JellyfishKernel['query']>[3],
+	) => Promise<T[]>;
+	privilegedSession: string;
+	insertCard: (
+		lsession: string,
+		typeCard: core.TypeContract,
+		options: {
+			timestamp?: string | number | Date;
+			reason?: string;
+			actor?: string;
+			originator?: string;
+			attachEvents?: boolean;
+		},
+		card: Partial<core.Contract>,
+	) => Promise<core.Contract | null>;
+	replaceCard: (
+		lsession: string,
+		typeCard: core.TypeContract,
+		options: {
+			timestamp?: string | number | Date;
+			reason?: string;
+			actor?: string;
+			originator?: string;
+			attachEvents?: boolean;
+		},
+		card: Partial<core.Contract>,
+	) => Promise<core.Contract | null>;
+	patchCard: (
+		lsession: string,
+		typeCard: core.TypeContract,
+		options: {
+			timestamp?: string | number | Date;
+			reason?: string;
+			actor?: string;
+			originator?: string;
+			attachEvents?: boolean;
+		},
+		card: Partial<core.Contract>,
+		patch: Operation[],
+	) => Promise<core.Contract | null>;
+	enqueueAction: (
+		session: string,
+		actionRequest: queue.ProducerOptions,
+	) => Promise<core.ActionRequestContract>;
+	cards: {
+		[slug: string]: core.ContractDefinition<core.ContractData>;
+	};
+}
 
 /**
  * @summary The "type" card type
@@ -306,7 +364,7 @@ export class Worker {
 	 *
 	 * @returns {Object} The stored action request contract
 	 */
-	async enqueueAction(session: string, actionRequest: ProducerOptions) {
+	async enqueueAction(session: string, actionRequest: queue.ProducerOptions) {
 		return this.producer.enqueue(this.getId(), session, actionRequest);
 	}
 
@@ -1172,10 +1230,10 @@ export class Worker {
 				);
 			},
 			executeAndAwaitAction: async (actionRequest) => {
-				actionRequest.context = context;
+				actionRequest.logContext = context;
 				const req = await this.enqueueAction(
 					workerContext.privilegedSession,
-					actionRequest as ProducerOptions,
+					actionRequest as queue.ProducerOptions,
 				);
 
 				const result = await this.producer.waitResults(context, req);
