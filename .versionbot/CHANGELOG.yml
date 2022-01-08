@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update external-non-major'
+      hash: 758bf45d09db0b0f54a2e2ec074a91c962bd2487
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 10.1.29
+  date: 2022-01-08T01:59:47.207Z
+- commits:
     - subject: Update action-library imports
       hash: 5ee6e5e7d512e92c94a233d20421c63745ae2580
       body: ''
