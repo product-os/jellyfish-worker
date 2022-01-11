@@ -1,16 +1,16 @@
 import { ActionLibrary } from '@balena/jellyfish-action-library';
 import { actionCreateCard } from '@balena/jellyfish-action-library/build/actions/action-create-card';
+import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type { ActionFile } from '@balena/jellyfish-plugin-base';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
-import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
 import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { strict as assert } from 'assert';
-import _ from 'lodash';
-import { Worker } from '../../lib';
+import * as _ from 'lodash';
+import { testUtils as workerTestUtils } from '../../lib';
 
-let ctx: integrationHelpers.IntegrationTestContext;
+let ctx: workerTestUtils.TestContext;
 
 beforeAll(async () => {
 	const actionTestOriginator: ActionFile = {
@@ -33,43 +33,38 @@ beforeAll(async () => {
 		},
 	};
 
-	ctx = await integrationHelpers.before(
-		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		{
-			worker: Worker,
-			actions: [actionTestOriginator],
-			cards: [
-				Object.assign({}, actionCreateCard.card, {
-					slug: 'action-test-originator',
-				}),
-			],
-		},
-	);
+	ctx = await workerTestUtils.newContext({
+		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		mixins: cardMixins,
+		actions: [actionTestOriginator],
+	});
 });
 
 afterAll(() => {
-	return integrationHelpers.after(ctx);
+	return workerTestUtils.destroyContext(ctx);
 });
 
 describe('.insertCard()', () => {
 	test('should pass a triggered action originator', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const command = ctx.generateRandomSlug({ prefix: 'originator-test' });
-		const id = ctx.generateRandomID();
+		const command = coreTestUtils.generateRandomSlug({
+			prefix: 'originator-test',
+		});
+		const id = coreTestUtils.generateRandomId();
 
-		ctx.worker.setTriggers(ctx.context, [
+		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				id,
 				type: 'triggered-action@1.0.0',
-				slug: ctx.generateRandomSlug({
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				data: {
@@ -103,17 +98,17 @@ describe('.insertCard()', () => {
 		]);
 
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
 			{
-				slug: ctx.generateRandomSlug(),
+				slug: coreTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command,
@@ -123,8 +118,8 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const card = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command}@1.0.0`,
 		);
@@ -134,21 +129,21 @@ describe('.insertCard()', () => {
 	});
 
 	test('should take an originator option', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const command = ctx.generateRandomSlug();
-		const id = ctx.generateRandomID();
-		ctx.worker.setTriggers(ctx.context, [
+		const command = coreTestUtils.generateRandomSlug();
+		const id = coreTestUtils.generateRandomId();
+		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
-			ctx.jellyfish.defaults({
+			ctx.kernel.defaults({
 				id,
-				slug: ctx.generateRandomSlug({
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -181,21 +176,21 @@ describe('.insertCard()', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const originatorId = ctx.generateRandomID();
+		const originatorId = coreTestUtils.generateRandomId();
 
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				originator: originatorId,
 				attachEvents: false,
 				reason: null,
 			},
 			{
-				slug: ctx.generateRandomSlug(),
+				slug: coreTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command,
@@ -205,8 +200,8 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const card = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
 		);
@@ -215,20 +210,20 @@ describe('.insertCard()', () => {
 	});
 
 	test('should execute one matching triggered action', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const command = ctx.generateRandomSlug();
-		ctx.worker.setTriggers(ctx.context, [
+		const command = coreTestUtils.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
-			ctx.jellyfish.defaults({
-				id: ctx.generateRandomID(),
-				slug: ctx.generateRandomSlug({
+			ctx.kernel.defaults({
+				id: coreTestUtils.generateRandomId(),
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -262,17 +257,17 @@ describe('.insertCard()', () => {
 		]);
 
 		const result = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: true,
 				reason: null,
 			},
 			{
-				slug: ctx.generateRandomSlug(),
+				slug: coreTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command,
@@ -282,7 +277,7 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const tail = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const tail = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['type', 'data'],
@@ -306,8 +301,8 @@ describe('.insertCard()', () => {
 
 		expect(tail.length).toBe(1);
 
-		const resultCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const resultCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command}@1.0.0`,
 		);
@@ -316,19 +311,19 @@ describe('.insertCard()', () => {
 	});
 
 	test('should not execute non-matching triggered actions', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const command = ctx.generateRandomSlug();
-		ctx.worker.setTriggers(ctx.context, [
-			ctx.jellyfish.defaults({
-				id: ctx.generateRandomID(),
-				slug: ctx.generateRandomSlug({
+		const command = coreTestUtils.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.logContext, [
+			ctx.kernel.defaults({
+				id: coreTestUtils.generateRandomId(),
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -361,28 +356,28 @@ describe('.insertCard()', () => {
 		]);
 
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: true,
 				reason: null,
 			},
 			{
-				slug: ctx.generateRandomSlug(),
+				slug: coreTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
-					command: ctx.generateRandomSlug(),
+					command: coreTestUtils.generateRandomSlug(),
 				},
 			},
 		);
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const resultCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command}@1.0.0`,
 		);
@@ -391,8 +386,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should execute more than one matching triggered action', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -400,12 +395,12 @@ describe('.insertCard()', () => {
 		assert(typeCard !== null);
 
 		const prefix = 'triggered-action-test';
-		const command1 = ctx.generateRandomSlug({ prefix });
-		const command2 = ctx.generateRandomSlug({ prefix });
-		ctx.worker.setTriggers(ctx.context, [
-			ctx.jellyfish.defaults({
-				id: ctx.generateRandomID(),
-				slug: ctx.generateRandomSlug({
+		const command1 = coreTestUtils.generateRandomSlug({ prefix });
+		const command2 = coreTestUtils.generateRandomSlug({ prefix });
+		ctx.worker.setTriggers(ctx.logContext, [
+			ctx.kernel.defaults({
+				id: coreTestUtils.generateRandomId(),
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -436,9 +431,9 @@ describe('.insertCard()', () => {
 					},
 				},
 			}) as TriggeredActionContract,
-			ctx.jellyfish.defaults({
-				id: ctx.generateRandomID(),
-				slug: ctx.generateRandomSlug({
+			ctx.kernel.defaults({
+				id: coreTestUtils.generateRandomId(),
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -472,17 +467,17 @@ describe('.insertCard()', () => {
 		]);
 
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: true,
 				reason: null,
 			},
 			{
-				slug: ctx.generateRandomSlug(),
+				slug: coreTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command: command1,
@@ -492,14 +487,14 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard1 = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const resultCard1 = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command1}@1.0.0`,
 		);
 
-		const resultCard2 = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const resultCard2 = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command2}@1.0.0`,
 		);
@@ -509,20 +504,20 @@ describe('.insertCard()', () => {
 	});
 
 	test('should execute the matching triggered actions given more than one', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const command1 = ctx.generateRandomSlug();
-		const command2 = ctx.generateRandomSlug();
-		ctx.worker.setTriggers(ctx.context, [
-			ctx.jellyfish.defaults({
-				id: ctx.generateRandomID(),
-				slug: ctx.generateRandomSlug({
+		const command1 = coreTestUtils.generateRandomSlug();
+		const command2 = coreTestUtils.generateRandomSlug();
+		ctx.worker.setTriggers(ctx.logContext, [
+			ctx.kernel.defaults({
+				id: coreTestUtils.generateRandomId(),
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -553,9 +548,9 @@ describe('.insertCard()', () => {
 					},
 				},
 			}) as TriggeredActionContract,
-			ctx.jellyfish.defaults({
-				id: ctx.generateRandomID(),
-				slug: ctx.generateRandomSlug({
+			ctx.kernel.defaults({
+				id: coreTestUtils.generateRandomId(),
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -589,17 +584,17 @@ describe('.insertCard()', () => {
 		]);
 
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeCard,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: true,
 				reason: null,
 			},
 			{
-				slug: ctx.generateRandomSlug(),
+				slug: coreTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command: command1,
@@ -609,14 +604,14 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard1 = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const resultCard1 = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command1}@1.0.0`,
 		);
 
-		const resultCard2 = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const resultCard2 = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command2}@1.0.0`,
 		);
@@ -626,24 +621,24 @@ describe('.insertCard()', () => {
 	});
 
 	test('should remove previously inserted type triggered actions if inserting a type', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const fooType = ctx.generateRandomSlug({
+		const fooType = coreTestUtils.generateRandomSlug({
 			prefix: 'foo',
 		});
-		const barType = ctx.generateRandomSlug({
+		const barType = coreTestUtils.generateRandomSlug({
 			prefix: 'bar',
 		});
 		const cards = [
 			{
 				type: 'triggered-action@1.0.0',
-				slug: ctx.generateRandomSlug({
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -685,7 +680,7 @@ describe('.insertCard()', () => {
 			},
 			{
 				type: 'triggered-action@1.0.0',
-				slug: ctx.generateRandomSlug({
+				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -725,12 +720,12 @@ describe('.insertCard()', () => {
 					},
 				},
 			},
-		].map(ctx.jellyfish.defaults);
+		].map(ctx.kernel.defaults);
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.jellyfish.insertCard(
-					ctx.context,
+				return ctx.kernel.insertCard(
+					ctx.logContext,
 					ctx.session,
 					card as Contract,
 				);
@@ -739,8 +734,8 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const typeTypeContract = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeTypeContract = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
@@ -748,12 +743,12 @@ describe('.insertCard()', () => {
 		assert(typeTypeContract !== null);
 
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeTypeContract,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: true,
 				reason: null,
 			},
@@ -770,7 +765,7 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const triggers = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const triggers = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['active', 'type'],
@@ -804,8 +799,8 @@ describe('.insertCard()', () => {
 			},
 		});
 
-		const updatedCard = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const updatedCard = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			insertedCards[1].id,
 		);
@@ -818,23 +813,23 @@ describe('.insertCard()', () => {
 	});
 
 	test('should add a triggered action given a type with an AGGREGATE formula', async () => {
-		const typeType = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
 		assert(typeType !== null);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -914,22 +909,22 @@ describe('.insertCard()', () => {
 	});
 
 	test('should pre-register a triggered action if using AGGREGATE', async () => {
-		const typeType = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
 		assert(typeType !== null);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -980,23 +975,23 @@ describe('.insertCard()', () => {
 	});
 
 	test('should update pre-registered triggered actions if removing an AGGREGATE', async () => {
-		const typeType = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
 		assert(typeType !== null);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 
 		const element = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1030,12 +1025,12 @@ describe('.insertCard()', () => {
 		);
 
 		await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1065,15 +1060,15 @@ describe('.insertCard()', () => {
 	});
 
 	test('should add multiple triggered actions given a type with an AGGREGATE formula', async () => {
-		const typeType = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
 		assert(typeType !== null);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 
 		const type = {
 			slug,
@@ -1104,12 +1099,12 @@ describe('.insertCard()', () => {
 		};
 
 		const element = await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1117,12 +1112,12 @@ describe('.insertCard()', () => {
 		);
 
 		await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1137,12 +1132,12 @@ describe('.insertCard()', () => {
 		);
 
 		await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1156,7 +1151,7 @@ describe('.insertCard()', () => {
 			],
 		);
 
-		const triggers = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const triggers = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['active', 'type'],
@@ -1210,31 +1205,31 @@ describe('.insertCard()', () => {
 		// * checks if formula in linked to contract was updated
 		// (and lots of sanity checks in the middle)
 
-		const typeType = await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
-		const linkType = (await ctx.jellyfish.getCardBySlug<TypeContract>(
-			ctx.context,
+		const linkType = (await ctx.kernel.getCardBySlug<TypeContract>(
+			ctx.logContext,
 			ctx.session,
 			'link@latest',
 		))!;
 
 		assert(typeType !== null);
 
-		const typeSlug = ctx.generateRandomSlug();
+		const typeSlug = coreTestUtils.generateRandomSlug();
 		const initialValue = 1;
 		const propValueBeforeUpdate = 2;
 		const magicNumber = 3;
 
 		const newType = (await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			typeType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1296,12 +1291,12 @@ describe('.insertCard()', () => {
 		// console.log('TRIGGERED ACTION', JSON.stringify(triggeredAction, null, 2));
 
 		const testContract = (await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			newType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1314,12 +1309,12 @@ describe('.insertCard()', () => {
 		))!;
 
 		const linkedContract = (await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			newType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1332,12 +1327,12 @@ describe('.insertCard()', () => {
 		))!;
 
 		await ctx.worker.insertCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			linkType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1365,12 +1360,12 @@ describe('.insertCard()', () => {
 
 		// first test if linked formula works in when invoked directly
 		await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			newType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: 'random change that should trigger formula re-eval',
 			},
@@ -1406,12 +1401,12 @@ describe('.insertCard()', () => {
 
 		// force an update as linking doesn't seem to be enough
 		await ctx.worker.patchCard(
-			ctx.context,
+			ctx.logContext,
 			ctx.session,
 			newType,
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.actor.id,
+				actor: ctx.adminUserId,
 				attachEvents: false,
 				reason: 'random change that should cause triggered action to run',
 			},

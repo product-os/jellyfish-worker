@@ -18,7 +18,6 @@ import * as subscriptionsLib from './subscriptions';
 import CARDS from './cards';
 import { Kernel } from '@balena/jellyfish-core/build/kernel';
 import * as queue from '@balena/jellyfish-queue';
-import { ProducerOptions } from '@balena/jellyfish-types/build/queue';
 import {
 	TriggeredActionContract,
 	WorkerContext,
@@ -28,6 +27,7 @@ import {
 const logger = getLogger('worker');
 
 export { triggersLib, errors, CARDS, utils };
+export * as testUtils from './test-utils';
 
 /**
  * @summary The "type" card type
@@ -306,7 +306,7 @@ export class Worker {
 	 *
 	 * @returns {Object} The stored action request contract
 	 */
-	async enqueueAction(session: string, actionRequest: ProducerOptions) {
+	async enqueueAction(session: string, actionRequest: queue.ProducerOptions) {
 		return this.producer.enqueue(this.getId(), session, actionRequest);
 	}
 
@@ -847,7 +847,7 @@ export class Worker {
 		session: string,
 		request: {
 			action: string;
-			context: LogContext;
+			logContext: LogContext;
 			arguments: any;
 			card: string;
 			type: string;
@@ -855,7 +855,7 @@ export class Worker {
 	) {
 		const actionDefinition = this.library[request.action.split('@')[0]];
 		assert.USER(
-			request.context,
+			request.logContext,
 			actionDefinition,
 			errors.WorkerInvalidAction,
 			`No such action: ${request.action}`,
@@ -863,7 +863,7 @@ export class Worker {
 
 		const modifiedArguments = await actionDefinition.pre(
 			session,
-			this.getActionContext(request.context),
+			this.getActionContext(request.logContext),
 			request,
 		);
 

@@ -1,36 +1,33 @@
 import { ActionLibrary } from '@balena/jellyfish-action-library';
+import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
-import { integrationHelpers } from '@balena/jellyfish-test-harness';
 import * as _ from 'lodash';
-import { Worker } from '../../lib';
+import { testUtils as workerTestUtils } from '../../lib';
 
-let ctx: integrationHelpers.IntegrationTestContext;
+let ctx: workerTestUtils.TestContext;
 let user: any = {};
-let userSession: string = '';
+let session: any = {};
 
 beforeAll(async () => {
-	ctx = await integrationHelpers.before(
-		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		{
-			worker: Worker,
-		},
-	);
+	ctx = await workerTestUtils.newContext({
+		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		mixins: cardMixins,
+	});
 
-	const createdUser = await ctx.createUser(ctx.generateRandomID());
-	user = createdUser.contract;
-	userSession = createdUser.session;
+	user = await ctx.createUser(coreTestUtils.generateRandomId());
+	session = await ctx.createSession(user);
 });
 
 afterAll(() => {
-	return integrationHelpers.after(ctx);
+	return workerTestUtils.destroyContext(ctx);
 });
 
 test('Should generate a notification if message is added to subscribed thread', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		userSession,
-		ctx.generateRandomWords(3),
+		session.id,
+		'foobar',
 		{
 			product: 'jellyfish',
 			status: 'open',
@@ -38,14 +35,14 @@ test('Should generate a notification if message is added to subscribed thread', 
 	);
 	const subscription = await ctx.createContract(
 		user.id,
-		userSession,
+		session.id,
 		'subscription@1.0.0',
 		'Subscription to foo',
 		{},
 	);
 	await ctx.createLink(
 		user.id,
-		userSession,
+		session.id,
 		supportThread,
 		subscription,
 		'has attached',
@@ -53,7 +50,7 @@ test('Should generate a notification if message is added to subscribed thread', 
 	);
 	const message = await ctx.createMessage(
 		user.id,
-		userSession,
+		session.id,
 		supportThread,
 		'Message text',
 	);
@@ -86,10 +83,11 @@ test('Should generate a notification if message is added to subscribed thread', 
 	).rejects.toThrowError(new Error('The wait query did not resolve'));
 
 	// Add a response to the thread using a second user
-	const otherUser = await ctx.createUser(ctx.generateRandomID());
+	const otherUser = await ctx.createUser(coreTestUtils.generateRandomId());
+	const otherUserSession = await ctx.createSession(otherUser);
 	const response = await ctx.createMessage(
-		otherUser.contract.id,
-		otherUser.session,
+		otherUser.id,
+		otherUserSession.id,
 		supportThread,
 		'Response from other user',
 	);
