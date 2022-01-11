@@ -1,12 +1,18 @@
-import find from 'lodash/find';
-import { core, JSONSchema, worker } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type {
+	Contract,
+	SessionContract,
+	TypeContract,
+} from '@balena/jellyfish-types/build/core';
+import type { CreateContract } from '@balena/jellyfish-types/build/worker';
+import { find } from 'lodash';
 
 /*
  * Get creator user from linked create contract
  */
-const getCreatorId = (contract: core.Contract) => {
+const getCreatorId = (contract: Contract) => {
 	const createContract = find(
-		contract.links!['has attached element'] as worker.CreateContract[],
+		contract.links!['has attached element'] as CreateContract[],
 		{
 			type: 'create@1.0.0',
 		},
@@ -20,20 +26,20 @@ const getCreatorId = (contract: core.Contract) => {
 };
 
 export interface EvaluateOptions {
-	oldContract: core.Contract<any> | null;
-	newContract: core.Contract<any>;
-	getTypeContract: (type: string) => core.TypeContract;
+	oldContract: Contract<any> | null;
+	newContract: Contract<any>;
+	getTypeContract: (type: string) => TypeContract;
 	insertContract: (
-		typeCard: core.TypeContract,
+		typeCard: TypeContract,
 		actorSession: string,
 		object: any,
-	) => Promise<core.Contract | null>;
-	getSession: (userId: string) => Promise<core.SessionContract | null>;
-	query: <TContract extends core.Contract = core.Contract>(
-		schema: JSONSchema,
+	) => Promise<Contract | null>;
+	getSession: (userId: string) => Promise<SessionContract | null>;
+	query: <TContract extends Contract = Contract>(
+		schema: JsonSchema,
 		opts?: { sortBy?: string; sortDir?: 'asc' | 'desc'; limit?: number },
 	) => Promise<TContract[]>;
-	getContractById: <TContract extends core.Contract = core.Contract>(
+	getContractById: <TContract extends Contract = Contract>(
 		id: string,
 	) => Promise<TContract | null>;
 }

@@ -1,11 +1,15 @@
+import { strict as assert } from 'assert';
 import { ActionLibrary } from '@balena/jellyfish-action-library';
-import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import {
+	cardMixins,
+	Kernel,
+	testUtils as coreTestUtils,
+} from '@balena/jellyfish-core';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
-import { core } from '@balena/jellyfish-types';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import { strict as assert } from 'assert';
-import * as _ from 'lodash';
+import type { ActionRequestContract } from '@balena/jellyfish-types/build/core';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import _ from 'lodash';
 import { testUtils as workerTestUtils } from '../../lib';
 
 let ctx: workerTestUtils.TestContext;
@@ -86,7 +90,7 @@ describe('.execute()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -201,7 +205,7 @@ describe('.execute()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -303,7 +307,7 @@ describe('.execute()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				id: coreTestUtils.generateRandomId(),
 				slug: `triggered-action-${coreTestUtils.generateRandomId()}`,
 				type: 'triggered-action@1.0.0',
@@ -1104,7 +1108,7 @@ describe('.execute()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -1201,33 +1205,32 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 
 		const slug = coreTestUtils.generateRandomSlug();
-		const actionRequest =
-			await ctx.kernel.insertCard<core.ActionRequestContract>(
-				ctx.logContext,
-				ctx.session,
-				{
-					slug: `action-request-${coreTestUtils.generateRandomId()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: ctx.adminUserId,
-						context: ctx.logContext,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							id: typeCard.id,
-							type: typeCard.type,
-						},
-						arguments: {
-							reason: null,
-							properties: {
-								slug,
-								version: '1.0.0',
-							},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						id: typeCard.id,
+						type: typeCard.type,
+					},
+					arguments: {
+						reason: null,
+						properties: {
+							slug,
+							version: '1.0.0',
 						},
 					},
 				},
-			);
+			},
+		);
 
 		const result = await ctx.worker.execute(ctx.session, actionRequest);
 
@@ -1240,34 +1243,33 @@ describe('.execute()', () => {
 	});
 
 	test('should throw if the input card does not exist', async () => {
-		const actionRequest =
-			await ctx.kernel.insertCard<core.ActionRequestContract>(
-				ctx.logContext,
-				ctx.session,
-				{
-					slug: `action-request-${coreTestUtils.generateRandomId()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: ctx.adminUserId,
-						context: ctx.logContext,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							// Make up a new UUID that doesn't correspond to any contract
-							id: coreTestUtils.generateRandomId(),
-							type: 'card@1.0.0',
-						},
-						arguments: {
-							reason: null,
-							properties: {
-								slug: coreTestUtils.generateRandomSlug(),
-								version: '1.0.0',
-							},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						// Make up a new UUID that doesn't correspond to any contract
+						id: coreTestUtils.generateRandomId(),
+						type: 'card@1.0.0',
+					},
+					arguments: {
+						reason: null,
+						properties: {
+							slug: coreTestUtils.generateRandomSlug(),
+							version: '1.0.0',
 						},
 					},
 				},
-			);
+			},
+		);
 
 		const result = await ctx.worker.execute(ctx.session, actionRequest);
 		expect(result.error).toBe(true);
@@ -1283,33 +1285,32 @@ describe('.execute()', () => {
 
 		assert(typeCard !== null);
 
-		const actionRequest =
-			await ctx.kernel.insertCard<core.ActionRequestContract>(
-				ctx.logContext,
-				ctx.session,
-				{
-					slug: `action-request-${coreTestUtils.generateRandomId()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-						context: ctx.logContext,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							id: typeCard.id,
-							type: typeCard.type,
-						},
-						arguments: {
-							reason: null,
-							properties: {
-								slug: coreTestUtils.generateRandomSlug(),
-								version: '1.0.0',
-							},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						id: typeCard.id,
+						type: typeCard.type,
+					},
+					arguments: {
+						reason: null,
+						properties: {
+							slug: coreTestUtils.generateRandomSlug(),
+							version: '1.0.0',
 						},
 					},
 				},
-			);
+			},
+		);
 
 		const result = await ctx.worker.execute(ctx.session, actionRequest);
 		expect(result.error).toBe(true);
@@ -1325,33 +1326,32 @@ describe('.execute()', () => {
 
 		assert(actionCard !== null);
 
-		const actionRequest =
-			await ctx.kernel.insertCard<core.ActionRequestContract>(
-				ctx.logContext,
-				ctx.session,
-				{
-					slug: `action-request-${coreTestUtils.generateRandomId()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: ctx.adminUserId,
-						context: ctx.logContext,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							id: actionCard.id,
-							type: actionCard.type,
-						},
-						arguments: {
-							reason: null,
-							properties: {
-								slug: coreTestUtils.generateRandomSlug(),
-								version: '1.0.0',
-							},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						id: actionCard.id,
+						type: actionCard.type,
+					},
+					arguments: {
+						reason: null,
+						properties: {
+							slug: coreTestUtils.generateRandomSlug(),
+							version: '1.0.0',
 						},
 					},
 				},
-			);
+			},
+		);
 
 		// The input filter on action-create-card checks that the input contracts has
 		// a type of "type". If it doesn't, the action request is rejected.
@@ -1369,30 +1369,29 @@ describe('.execute()', () => {
 
 		assert(typeCard !== null);
 
-		const actionRequest =
-			await ctx.kernel.insertCard<core.ActionRequestContract>(
-				ctx.logContext,
-				ctx.session,
-				{
-					slug: `action-request-${coreTestUtils.generateRandomId()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: ctx.adminUserId,
-						context: ctx.logContext,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							id: typeCard.id,
-							type: typeCard.type,
-						},
-						arguments: {
-							foo: 'bar',
-							bar: 'baz',
-						},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						id: typeCard.id,
+						type: typeCard.type,
+					},
+					arguments: {
+						foo: 'bar',
+						bar: 'baz',
 					},
 				},
-			);
+			},
+		);
 
 		const result = await ctx.worker.execute(ctx.session, actionRequest);
 		expect(result.error).toBe(true);
@@ -1418,7 +1417,7 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 
 		const actionRequest =
-			await localCtx.kernel.insertCard<core.ActionRequestContract>(
+			await localCtx.kernel.insertCard<ActionRequestContract>(
 				localCtx.logContext,
 				localCtx.session,
 				{

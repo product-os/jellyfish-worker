@@ -1,10 +1,14 @@
+import type { Kernel } from '@balena/jellyfish-core';
+import { getLogger, LogContext } from '@balena/jellyfish-logger';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type {
+	ActionContract,
+	Contract,
+	SessionContract,
+} from '@balena/jellyfish-types/build/core';
 import iso8601Duration from 'iso8601-duration';
+import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
-import * as _ from 'lodash';
-import { getLogger } from '@balena/jellyfish-logger';
-import { JSONSchema, core } from '@balena/jellyfish-types';
-import { LogContext } from './types';
-import { Kernel } from '@balena/jellyfish-core/build/kernel';
 
 const logger = getLogger('worker');
 
@@ -36,8 +40,8 @@ export const getCurrentTimestamp = (): string => {
  * console.log(schema.type)
  */
 export const getActionArgumentsSchema = (
-	actionCard: core.ActionContract,
-): JSONSchema => {
+	actionCard: ActionContract,
+): JsonSchema => {
 	const argumentNames = Object.keys(actionCard.data.arguments);
 	return argumentNames.length === 0
 		? {
@@ -80,7 +84,7 @@ export const hasCard = async (
 	context: LogContext,
 	jellyfish: Kernel,
 	session: string,
-	object: Pick<core.Contract, 'slug' | 'version' | 'id'>,
+	object: Pick<Contract, 'slug' | 'version' | 'id'>,
 ): Promise<boolean> => {
 	if (object.id && (await jellyfish.getCardById(context, session, object.id))) {
 		return true;
@@ -134,9 +138,9 @@ export const getActorKey = async (
 	jellyfish: Kernel,
 	session: string,
 	actorId: string,
-): Promise<core.SessionContract> => {
+): Promise<SessionContract> => {
 	const keySlug = `session-action-${actorId}`;
-	const key = await jellyfish.getCardBySlug<core.SessionContract>(
+	const key = await jellyfish.getCardBySlug<SessionContract>(
 		context,
 		session,
 		`${keySlug}@1.0.0`,
@@ -151,7 +155,7 @@ export const getActorKey = async (
 		actor: actorId,
 	});
 
-	return jellyfish.replaceCard<core.SessionContract>(context, session, {
+	return jellyfish.replaceCard<SessionContract>(context, session, {
 		slug: keySlug,
 		active: true,
 		version: '1.0.0',
@@ -165,9 +169,9 @@ export const getActorKey = async (
 export const getQueryWithOptionalLinks = (
 	object: { id?: string; slug?: string; version?: string },
 	linkVerbs: string[] = [],
-): JSONSchema => {
+): JsonSchema => {
 	const required = object.id ? ['id'] : ['slug', 'version'];
-	const properties: { [key: string]: JSONSchema } = object.id
+	const properties: { [key: string]: JsonSchema } = object.id
 		? {
 				id: {
 					type: 'string',

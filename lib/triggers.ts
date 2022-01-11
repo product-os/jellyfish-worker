@@ -1,15 +1,17 @@
-import * as _ from 'lodash';
-import * as skhema from 'skhema';
 import * as assert from '@balena/jellyfish-assert';
-import { JSONSchema, core, worker } from '@balena/jellyfish-types';
+import type { Kernel } from '@balena/jellyfish-core';
+import { getLogger, LogContext } from '@balena/jellyfish-logger';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type {
+	Contract,
+	LinkContract,
+} from '@balena/jellyfish-types/build/core';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import jsone = require('json-e');
+import _ from 'lodash';
+import * as skhema from 'skhema';
 import * as errors from './errors';
 import * as utils from './utils';
-import { LogContext } from './types';
-import jsone = require('json-e');
-import { Kernel } from '@balena/jellyfish-core/build/kernel';
-import { Contract } from '@balena/jellyfish-types/build/core';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import { getLogger } from '@balena/jellyfish-logger';
 
 const logger = getLogger('worker-triggers');
 
@@ -21,7 +23,7 @@ interface CompileContext {
 		flags: string | undefined,
 		str: string,
 	) => RegExpMatchArray;
-	source?: core.Contract;
+	source?: Contract;
 }
 
 interface GetRequestOptions {
@@ -35,14 +37,14 @@ export const matchesCard = async (
 	context: LogContext,
 	jellyfish: Kernel,
 	session: string,
-	filter: JSONSchema,
-	card: core.Contract | null,
+	filter: JsonSchema,
+	card: Contract | null,
 ): Promise<Contract | false | void> => {
 	if (!card) {
 		return false;
 	}
 
-	// TS-TODO: Change the Skhema module to accept interfaces that extend JSONSchema
+	// TS-TODO: Change the Skhema module to accept interfaces that extend JsonSchema
 	const isValid = skhema.isValid(filter as any, card);
 	const isLink = card.type.split('@')[0] === 'link';
 
@@ -113,7 +115,7 @@ export const matchesCard = async (
 	 * link name in the trigger schema.
 	 */
 	if (isLink) {
-		const linkContract: core.LinkContract = card as core.LinkContract;
+		const linkContract: LinkContract = card as LinkContract;
 		const linkType = Object.keys(schema.$$links!)[0];
 		if (linkType === card.name) {
 			schema.properties.id.const = linkContract.data.from.id;
@@ -157,7 +159,7 @@ export const matchesCard = async (
  */
 const compileTrigger = (
 	trigger: string | Record<any, any>,
-	card: core.Contract | null,
+	card: Contract | null,
 	currentDate: Date,
 ) => {
 	const context: CompileContext = {
@@ -211,8 +213,8 @@ export const getRequest = async (
 	jellyfish: Kernel,
 	trigger: TriggeredActionContract,
 	// If getRequest is called by a time triggered action, then card will be null
-	oldContract: core.Contract | null,
-	newContract: core.Contract,
+	oldContract: Contract | null,
+	newContract: Contract,
 	options: GetRequestOptions,
 ) => {
 	if (trigger.data.mode && trigger.data.mode !== options.mode) {
@@ -298,8 +300,8 @@ export const getTypeTriggers = async (
 	jellyfish: Kernel,
 	session: string,
 	type: string,
-): Promise<worker.TriggeredActionContract[]> => {
-	return jellyfish.query<worker.TriggeredActionContract>(context, session, {
+): Promise<TriggeredActionContract[]> => {
+	return jellyfish.query<TriggeredActionContract>(context, session, {
 		type: 'object',
 		additionalProperties: true,
 		required: ['id', 'version', 'active', 'type', 'data'],

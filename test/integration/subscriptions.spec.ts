@@ -2,7 +2,7 @@ import { ActionLibrary } from '@balena/jellyfish-action-library';
 import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { testUtils as workerTestUtils } from '../../lib';
 
 let ctx: workerTestUtils.TestContext;

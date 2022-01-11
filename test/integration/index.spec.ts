@@ -1,12 +1,17 @@
+import { strict as assert } from 'assert';
 import { ActionLibrary } from '@balena/jellyfish-action-library';
-import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import {
+	cardMixins,
+	errors as coreErrors,
+	Kernel,
+	testUtils as coreTestUtils,
+} from '@balena/jellyfish-core';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
-import { core } from '@balena/jellyfish-types';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import { strict as assert } from 'assert';
-import * as _ from 'lodash';
-import { testUtils as workerTestUtils, Worker } from '../../lib';
+import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import _ from 'lodash';
+import { errors, testUtils as workerTestUtils, Worker } from '../../lib';
 
 let ctx: workerTestUtils.TestContext;
 
@@ -116,7 +121,7 @@ describe('Worker', () => {
 
 		await expect(
 			ctx.worker.execute(ctx.session, enqueuedRequest1),
-		).rejects.toThrow(ctx.kernel.errors.JellyfishElementAlreadyExists);
+		).rejects.toThrow(coreErrors.JellyfishElementAlreadyExists);
 
 		const enqueuedRequest2 = await ctx.dequeue();
 		expect(enqueuedRequest2).toBeFalsy();
@@ -1020,7 +1025,7 @@ describe('Worker', () => {
 			insertAction,
 		);
 		await expect(ctx.flush(ctx.session)).rejects.toThrow(
-			ctx.kernel.errors.JellyfishSchemaMismatch,
+			coreErrors.JellyfishSchemaMismatch,
 		);
 	});
 
@@ -1079,7 +1084,7 @@ describe('Worker', () => {
 
 		await expect(
 			ctx.worker.execute(ctx.session, enqueuedRequest1),
-		).rejects.toThrow(ctx.kernel.errors.JellyfishElementAlreadyExists);
+		).rejects.toThrow(coreErrors.JellyfishElementAlreadyExists);
 
 		const enqueuedRequest2 = await ctx.dequeue();
 		expect(enqueuedRequest2).toBeFalsy();
@@ -1153,7 +1158,7 @@ describe('Worker', () => {
 		assert(session !== null);
 
 		expect(session).toEqual(
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				created_at: session.created_at,
 				linked_at: session.linked_at,
 				name: null,
@@ -1197,7 +1202,7 @@ describe('Worker', () => {
 		});
 
 		await expect(ctx.flush(ctx.session)).rejects.toThrow(
-			ctx.worker.errors.WorkerSchemaMismatch,
+			errors.WorkerSchemaMismatch,
 		);
 	});
 
@@ -1225,7 +1230,7 @@ describe('Worker', () => {
 					password: 'foobar',
 				},
 			}),
-		).rejects.toThrow(ctx.worker.errors.WorkerAuthenticationError);
+		).rejects.toThrow(errors.WorkerAuthenticationError);
 	});
 
 	it('should not be able to login as a password-less non-disallowed user', async () => {
@@ -1252,7 +1257,7 @@ describe('Worker', () => {
 		});
 
 		await expect(ctx.flush(ctx.session)).rejects.toThrow(
-			ctx.worker.errors.WorkerSchemaMismatch,
+			errors.WorkerSchemaMismatch,
 		);
 	});
 
@@ -1280,7 +1285,7 @@ describe('Worker', () => {
 		});
 
 		await expect(ctx.flush(ctx.session)).rejects.toThrow(
-			ctx.worker.errors.WorkerSchemaMismatch,
+			errors.WorkerSchemaMismatch,
 		);
 	});
 
@@ -1330,7 +1335,7 @@ describe('Worker', () => {
 					password: 'foobarbaz',
 				},
 			}),
-		).rejects.toThrow(ctx.worker.errors.WorkerAuthenticationError);
+		).rejects.toThrow(errors.WorkerAuthenticationError);
 	});
 
 	it('should post an error execute event if logging in as a disallowed user', async () => {
@@ -1352,7 +1357,7 @@ describe('Worker', () => {
 					password: 'foobarbaz',
 				},
 			}),
-		).rejects.toThrow(ctx.worker.errors.WorkerAuthenticationError);
+		).rejects.toThrow(errors.WorkerAuthenticationError);
 	});
 
 	it('a triggered action can update a dynamic list of cards (ids as array of strings)', async () => {
@@ -1373,7 +1378,7 @@ describe('Worker', () => {
 		);
 
 		ctx.worker.setTriggers(ctx.logContext, [
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1489,7 +1494,7 @@ describe('Worker', () => {
 		);
 
 		ctx.worker.setTriggers(ctx.logContext, [
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -1635,7 +1640,7 @@ describe('Worker', () => {
 
 		await expect(
 			ctx.kernel.insertCard(ctx.logContext, ctx.session, trigger),
-		).rejects.toThrow(ctx.kernel.backend.errors.JellyfishSchemaMismatch);
+		).rejects.toThrow(coreErrors.JellyfishSchemaMismatch);
 	});
 
 	test('trigger should update card if triggered by a user not owning the card', async () => {
@@ -1651,7 +1656,7 @@ describe('Worker', () => {
 		});
 
 		ctx.worker.setTriggers(ctx.logContext, [
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1795,7 +1800,7 @@ describe('.getTriggers()', () => {
 
 describe('.replaceCard()', () => {
 	test('should update type contract schema', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -1865,7 +1870,7 @@ describe('.replaceCard()', () => {
 	});
 
 	test('updating a card must have the correct tail', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -1918,7 +1923,7 @@ describe('.replaceCard()', () => {
 		assert(result1! !== null);
 
 		expect(card).toEqual(
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				created_at: result1.created_at,
 				updated_at: card.updated_at,
 				linked_at: card.linked_at,
@@ -1965,7 +1970,7 @@ describe('.replaceCard()', () => {
 	});
 
 	test('should be able to disable event creation', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2019,7 +2024,7 @@ describe('.replaceCard()', () => {
 
 describe('.insertCard()', () => {
 	test('should insert a card', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2053,7 +2058,7 @@ describe('.insertCard()', () => {
 		);
 
 		expect(card).toEqual(
-			ctx.kernel.defaults({
+			Kernel.defaults({
 				created_at: result!.created_at,
 				id: result!.id,
 				name: null,
@@ -2067,7 +2072,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should ignore an explicit type property', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2112,7 +2117,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should default active to true', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2142,7 +2147,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set active to false', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2173,7 +2178,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for links', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2203,7 +2208,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for tags', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2233,7 +2238,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for data', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2263,7 +2268,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set a slug', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2296,7 +2301,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set a name', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2334,7 +2339,7 @@ describe('.insertCard()', () => {
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2355,11 +2360,11 @@ describe('.insertCard()', () => {
 					active: false,
 				},
 			),
-		).rejects.toThrow(ctx.kernel.errors.JellyfishElementAlreadyExists);
+		).rejects.toThrow(coreErrors.JellyfishElementAlreadyExists);
 	});
 
 	test('should add a create event if attachEvents is true', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2409,7 +2414,7 @@ describe('.insertCard()', () => {
 
 describe('.patchCard()', () => {
 	test('should ignore pointless updates', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2481,7 +2486,7 @@ describe('.patchCard()', () => {
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2510,7 +2515,7 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2549,7 +2554,7 @@ describe('.patchCard()', () => {
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2611,7 +2616,7 @@ describe('.patchCard()', () => {
 			},
 		});
 
-		const typeCard = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2658,7 +2663,7 @@ describe('.patchCard()', () => {
 			},
 		});
 
-		const typeTypeContract = await ctx.kernel.getCardBySlug<core.TypeContract>(
+		const typeTypeContract = await ctx.kernel.getCardBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -2713,7 +2718,7 @@ describe('.patchCard()', () => {
 
 describe('.getActionContext()', () => {
 	it('should include a map of type contracts', async () => {
-		const types = await ctx.kernel.query<core.TypeContract>(
+		const types = await ctx.kernel.query<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			{

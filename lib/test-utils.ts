@@ -1,17 +1,28 @@
-import { ActionFile, Actions, CoreMixins, JellyfishPluginConstructor, PluginManager } from '@balena/jellyfish-plugin-base';
-import * as _ from 'lodash';
-import { CARDS as WorkerCards, Worker } from './index';
-import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
-import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
-import { Contract, LinkContract, SessionContract, UserContract } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
+import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import {
+	ActionFile,
+	Actions,
+	CoreMixins,
+	JellyfishPluginConstructor,
+	PluginManager,
+} from '@balena/jellyfish-plugin-base';
+import type {
+	Contract,
+	LinkContract,
+	SessionContract,
+	UserContract,
+} from '@balena/jellyfish-types/build/core';
+import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
+import _ from 'lodash';
+import { CARDS as WorkerCards, Worker } from './index';
 
 let ctx: TestContext;
 
 /**
  * Context that can be used in tests against the worker.
  */
- export interface TestContext extends queueTestUtils.TestContext {
+export interface TestContext extends queueTestUtils.TestContext {
 	worker: Worker;
 	adminUserId: string;
 	actionLibrary: Actions;
@@ -19,21 +30,67 @@ let ctx: TestContext;
 	flushAll: (session: string) => Promise<void>;
 	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
 	processAction: (session: string, action: any) => Promise<any>;
-	createEvent: (actor: string, session: string, target: Contract, body: string, type: 'message' | 'whisper') => Promise<any>;
-	createMessage: (actor: string, session: string, target: Contract, body: string) => Promise<any>;
-	createWhisper: (actor: string, session: string, target: Contract, body: string) => Promise<any>;
-	createUser: (username: string, hash?: string, roles?: string[]) => Promise<UserContract>;
+	createEvent: (
+		actor: string,
+		session: string,
+		target: Contract,
+		body: string,
+		type: 'message' | 'whisper',
+	) => Promise<any>;
+	createMessage: (
+		actor: string,
+		session: string,
+		target: Contract,
+		body: string,
+	) => Promise<any>;
+	createWhisper: (
+		actor: string,
+		session: string,
+		target: Contract,
+		body: string,
+	) => Promise<any>;
+	createUser: (
+		username: string,
+		hash?: string,
+		roles?: string[],
+	) => Promise<UserContract>;
 	createSession: (user: UserContract) => Promise<SessionContract>;
-	createLink: (actor: string, session: string, fromCard: Contract, toCard: Contract, verb: string, inverseVerb: string) => Promise<LinkContract>;
-	createSupportThread: (actor: string, session: string, name: string, data: any, markers?: string[]) => Promise<Contract>;
-	createIssue: (actor: string, session: string, name: string, data: any, markers?: string[]) => Promise<Contract>;
-	createContract: (actor: string, session: string, type: string, name: string, data: any, markers?: string[]) => Promise<Contract>;
+	createLink: (
+		actor: string,
+		session: string,
+		fromCard: Contract,
+		toCard: Contract,
+		verb: string,
+		inverseVerb: string,
+	) => Promise<LinkContract>;
+	createSupportThread: (
+		actor: string,
+		session: string,
+		name: string,
+		data: any,
+		markers?: string[],
+	) => Promise<Contract>;
+	createIssue: (
+		actor: string,
+		session: string,
+		name: string,
+		data: any,
+		markers?: string[],
+	) => Promise<Contract>;
+	createContract: (
+		actor: string,
+		session: string,
+		type: string,
+		name: string,
+		data: any,
+		markers?: string[],
+	) => Promise<Contract>;
 }
 
 /**
  * Options accepted by `newContext`.
  */
- export interface NewContextOptions extends coreTestUtils.NewContextOptions {
+export interface NewContextOptions extends coreTestUtils.NewContextOptions {
 	/**
 	 * Set of plugins needed to run tests.
 	 */
@@ -45,18 +102,15 @@ let ctx: TestContext;
 /**
  * Create a new `TestContext` with an initialized worker.
  */
- export const newContext = async (
+export const newContext = async (
 	options: NewContextOptions,
 ): Promise<TestContext> => {
 	const queueTestContext = await queueTestUtils.newContext(options);
 
-	// Get admin user ID, used as actor in many tests.
-	// Might should be moved to core test-utils?
-	const adminSessionToken = queueTestContext.kernel.sessions!.admin;
 	const adminSessionContract = (await queueTestContext.kernel.getCardById(
 		queueTestContext.logContext,
-		adminSessionToken,
-		adminSessionToken,
+		queueTestContext.session,
+		queueTestContext.session,
 	)) as SessionContract;
 	assert(adminSessionContract);
 
@@ -66,7 +120,7 @@ let ctx: TestContext;
 	});
 
 	// Prepare and insert all contracts, including those from plugins.
-    const contracts = pluginManager.getCards(ctx.logContext, options.mixins);
+	const contracts = pluginManager.getCards(ctx.logContext, options.mixins);
 	const actionLibrary = pluginManager.getActions(ctx.logContext);
 	if (options.actions) {
 		for (const action of options.actions) {
@@ -77,7 +131,7 @@ let ctx: TestContext;
 			});
 		}
 	}
-    const bootstrapContracts = [
+	const bootstrapContracts = [
 		WorkerCards.create,
 		WorkerCards.update,
 		WorkerCards['triggered-action'],
@@ -92,19 +146,19 @@ let ctx: TestContext;
 		}),
 	];
 
-    // Any remaining contracts from plugins can now be added to the sequence
+	// Any remaining contracts from plugins can now be added to the sequence
 	const remainder = _.filter(contracts, (contract) => {
 		return !_.find(bootstrapContracts, { slug: contract.slug });
 	});
 	for (const contract of remainder) {
 		bootstrapContracts.push(contract);
 	}
-    for (const contract of bootstrapContracts) {
+	for (const contract of bootstrapContracts) {
 		await ctx.kernel.insertCard(ctx.logContext, ctx.session, contract);
 	}
 
 	// Initialize worker instance.
-    const worker = new Worker(
+	const worker = new Worker(
 		ctx.kernel,
 		ctx.session,
 		actionLibrary,
@@ -373,9 +427,7 @@ let ctx: TestContext;
 		return contract;
 	};
 
-	const createSession = async (
-		user: UserContract,
-	) => {
+	const createSession = async (user: UserContract) => {
 		// Force login, even if we don't know the password
 		const sessionContract = await ctx.kernel.insertCard<SessionContract>(
 			ctx.logContext,

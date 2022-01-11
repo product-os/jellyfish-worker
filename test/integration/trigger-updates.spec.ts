@@ -1,8 +1,12 @@
 import { ActionLibrary } from '@balena/jellyfish-action-library';
-import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import {
+	cardMixins,
+	Kernel,
+	testUtils as coreTestUtils,
+} from '@balena/jellyfish-core';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { testUtils as workerTestUtils } from '../../lib';
 
 let ctx: workerTestUtils.TestContext;
@@ -20,7 +24,7 @@ afterAll(() => {
 
 describe('.setTriggers()', () => {
 	it('should be able to set triggers', () => {
-		const trigger1 = ctx.kernel.defaults({
+		const trigger1 = Kernel.defaults({
 			id: coreTestUtils.generateRandomId(),
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -38,7 +42,7 @@ describe('.setTriggers()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const trigger2 = ctx.kernel.defaults({
+		const trigger2 = Kernel.defaults({
 			id: coreTestUtils.generateRandomId(),
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -66,7 +70,7 @@ describe('.setTriggers()', () => {
 
 describe('.upsertTrigger()', () => {
 	it('should be able to add a trigger', () => {
-		const trigger1 = ctx.kernel.defaults({
+		const trigger1 = Kernel.defaults({
 			id: coreTestUtils.generateRandomId(),
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -84,7 +88,7 @@ describe('.upsertTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const trigger2 = ctx.kernel.defaults({
+		const trigger2 = Kernel.defaults({
 			id: coreTestUtils.generateRandomId(),
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -112,7 +116,7 @@ describe('.upsertTrigger()', () => {
 	});
 
 	it('should be able to modify an existing trigger', () => {
-		const trigger1 = ctx.kernel.defaults({
+		const trigger1 = Kernel.defaults({
 			id: coreTestUtils.generateRandomId(),
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -130,7 +134,7 @@ describe('.upsertTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const trigger2 = ctx.kernel.defaults({
+		const trigger2 = Kernel.defaults({
 			id: coreTestUtils.generateRandomId(),
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -179,7 +183,7 @@ describe('.upsertTrigger()', () => {
 
 describe('.removeTrigger()', () => {
 	it('should be able to remove an existing trigger', () => {
-		const trigger1 = ctx.kernel.defaults({
+		const trigger1 = Kernel.defaults({
 			id: coreTestUtils.generateRandomId(),
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
@@ -197,7 +201,7 @@ describe('.removeTrigger()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const trigger2 = ctx.kernel.defaults({
+		const trigger2 = Kernel.defaults({
 			id: coreTestUtils.generateRandomId(),
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',

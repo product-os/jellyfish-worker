@@ -1,27 +1,31 @@
+import * as assert from '@balena/jellyfish-assert';
+import { CARDS as CORE_CARDS, Kernel } from '@balena/jellyfish-core';
+import * as jellyscript from '@balena/jellyfish-jellyscript';
+import { getLogger, LogContext } from '@balena/jellyfish-logger';
+import { Consumer, Producer, ProducerOptions } from '@balena/jellyfish-queue';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type {
+	ActionContract,
+	ActionRequestContract,
+	Contract,
+	ContractData,
+	TypeContract,
+} from '@balena/jellyfish-types/build/core';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import * as errio from 'errio';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as fastEquals from 'fast-equals';
 import { Operation } from 'fast-json-patch';
-import { v4 as uuidv4 } from 'uuid';
 import * as skhema from 'skhema';
-import * as assert from '@balena/jellyfish-assert';
-import * as jellyscript from '@balena/jellyfish-jellyscript';
-import { getLogger } from '@balena/jellyfish-logger';
+import { v4 as uuidv4 } from 'uuid';
 import * as semver from 'semver';
-import { ActionLibrary, LogContext } from './types';
-import { core, JSONSchema } from '@balena/jellyfish-types';
-import * as errors from './errors';
-import * as utils from './utils';
-import * as triggersLib from './triggers';
-import * as transformerLib from './transformers';
-import * as subscriptionsLib from './subscriptions';
 import CARDS from './cards';
-import { Kernel } from '@balena/jellyfish-core/build/kernel';
-import * as queue from '@balena/jellyfish-queue';
-import {
-	TriggeredActionContract,
-	WorkerContext,
-} from '@balena/jellyfish-types/build/worker';
+import * as errors from './errors';
+import * as subscriptionsLib from './subscriptions';
+import * as transformerLib from './transformers';
+import * as triggersLib from './triggers';
+import { ActionLibrary } from './types';
+import * as utils from './utils';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
@@ -62,14 +66,14 @@ const INSERT_CONCURRENCY = 3;
  */
 const getInputCard = async (
 	context: LogContext,
-	jellyfish: Kernel,
+	kernel: Kernel,
 	session: string,
 	identifier: string,
-): Promise<core.Contract | null> => {
+): Promise<Contract | null> => {
 	if (identifier.includes('@')) {
-		return jellyfish.getCardBySlug(context, session, identifier);
+		return kernel.getCardBySlug(context, session, identifier);
 	}
-	return jellyfish.getCardById(context, session, identifier);
+	return kernel.getCardById(context, session, identifier);
 };
 
 /**
@@ -90,14 +94,14 @@ const getInputCard = async (
  */
 export async function getObjectWithLinks<
 	PContract extends Partial<TContract> | TContract,
-	TContract extends core.Contract<TData>,
-	TData extends core.ContractData,
+	TContract extends Contract<TData>,
+	TData extends ContractData,
 >(
 	context: LogContext,
-	jellyfish: Kernel,
+	kernel: Kernel,
 	session: string,
 	card: PContract,
-	typeCard: core.TypeContract,
+	typeCard: TypeContract,
 ): Promise<PContract> {
 	const linkVerbs = jellyscript.getReferencedLinkVerbs(typeCard);
 	if (!linkVerbs.length) {
@@ -106,7 +110,7 @@ export async function getObjectWithLinks<
 	let queriedCard: TContract | null = null;
 	if ((card.slug && card.version) || card.id) {
 		const query = utils.getQueryWithOptionalLinks(card, linkVerbs);
-		[queriedCard] = await jellyfish.query<TContract>(context, session, query);
+		[queriedCard] = await kernel.query<TContract>(context, session, query);
 	}
 	const cardWithLinks = queriedCard || card;
 
@@ -126,14 +130,13 @@ export async function getObjectWithLinks<
  * @module worker
  */
 export class Worker {
-	jellyfish: Kernel;
-	consumer: queue.Consumer;
-	producer: queue.Producer;
+	kernel: Kernel;
+	consumer: Consumer;
+	producer: Producer;
 	triggers: TriggeredActionContract[];
 	transformers: transformerLib.Transformer[];
 	latestTransformers: transformerLib.Transformer[];
-	typeContracts: { [key: string]: core.TypeContract };
-	errors: typeof errors;
+	typeContracts: { [key: string]: TypeContract };
 	session: string;
 	library: ActionLibrary;
 	id: string = '0';
@@ -161,18 +164,17 @@ export class Worker {
 	 * )
 	 */
 	constructor(
-		jellyfish: Kernel,
+		kernel: Kernel,
 		session: string,
 		actionLibrary: ActionLibrary,
-		consumer: queue.Consumer,
-		producer: queue.Producer,
+		consumer: Consumer,
+		producer: Producer,
 	) {
-		this.jellyfish = jellyfish;
+		this.kernel = kernel;
 		this.triggers = [];
 		this.transformers = [];
 		this.latestTransformers = [];
 		this.typeContracts = {};
-		this.errors = errors;
 		this.session = session;
 		this.library = actionLibrary;
 		this.consumer = consumer;
@@ -214,7 +216,7 @@ export class Worker {
 		// Insert worker specific cards
 		await Promise.all(
 			Object.values(CARDS).map(async (card) => {
-				return this.jellyfish.replaceCard(context, this.session, card);
+				return this.kernel.replaceCard(context, this.session, card);
 			}),
 		);
 	}
@@ -236,21 +238,21 @@ export class Worker {
 			// TS-TODO: remove this cast
 			errors: errors as any,
 			// TS-TODO: remove this cast
-			defaults: this.jellyfish.defaults as any,
+			defaults: Kernel.defaults as any,
 			sync: this.sync,
 			getEventSlug: utils.getEventSlug,
 			getCardById: (lsession: string, id: string) => {
-				return self.jellyfish.getCardById(context, lsession, id);
+				return self.kernel.getCardById(context, lsession, id);
 			},
 			getCardBySlug: (lsession: string, slug: string) => {
-				return self.jellyfish.getCardBySlug(context, lsession, slug);
+				return self.kernel.getCardBySlug(context, lsession, slug);
 			},
 			query: (
 				lsession: string,
 				schema: Parameters<Kernel['query']>[2],
 				options: Parameters<Kernel['query']>[3],
 			) => {
-				return self.jellyfish.query(context, lsession, schema, options);
+				return self.kernel.query(context, lsession, schema, options);
 			},
 			privilegedSession: this.session,
 			insertCard: (
@@ -289,7 +291,7 @@ export class Worker {
 				return this.enqueueAction(...args);
 			},
 			cards: {
-				...this.jellyfish.cards,
+				...CORE_CARDS,
 				...self.getTypeContracts(),
 			},
 		};
@@ -306,7 +308,7 @@ export class Worker {
 	 *
 	 * @returns {Object} The stored action request contract
 	 */
-	async enqueueAction(session: string, actionRequest: queue.ProducerOptions) {
+	async enqueueAction(session: string, actionRequest: ProducerOptions) {
 		return this.producer.enqueue(this.getId(), session, actionRequest);
 	}
 
@@ -327,7 +329,7 @@ export class Worker {
 	async insertCard(
 		context: LogContext,
 		insertSession: string,
-		typeCard: core.TypeContract,
+		typeCard: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
 			timestamp?: any;
@@ -336,10 +338,10 @@ export class Worker {
 			originator?: any;
 			attachEvents?: any;
 		},
-		object: Partial<core.Contract>,
+		object: Partial<Contract>,
 	) {
 		const instance = this;
-		const jellyfish = instance.jellyfish;
+		const kernel = instance.kernel;
 
 		logger.debug(context, 'Inserting card', {
 			slug: object.slug,
@@ -349,9 +351,9 @@ export class Worker {
 
 		object.type = `${typeCard.slug}@${typeCard.version}`;
 
-		let card: core.Contract | null = null;
+		let card: Contract | null = null;
 		if (object.slug) {
-			card = await jellyfish.getCardBySlug(
+			card = await kernel.getCardBySlug(
 				context,
 				insertSession,
 				`${object.slug}@${object.version || 'latest'}`,
@@ -359,7 +361,7 @@ export class Worker {
 		}
 
 		if (!card && object.id) {
-			card = await jellyfish.getCardById(context, insertSession, object.id);
+			card = await kernel.getCardById(context, insertSession, object.id);
 		}
 
 		if (typeof object.name !== 'string') {
@@ -384,7 +386,7 @@ export class Worker {
 				// TS-TODO: Fix these "any" castings
 				const objectWithLinks = await getObjectWithLinks(
 					context,
-					jellyfish,
+					kernel,
 					insertSession,
 					object,
 					typeCard,
@@ -393,7 +395,7 @@ export class Worker {
 					typeCard.data.schema,
 					objectWithLinks as any,
 				);
-				return jellyfish.insertCard(context, insertSession, result as any);
+				return kernel.insertCard(context, insertSession, result as any);
 			},
 		);
 	}
@@ -416,7 +418,7 @@ export class Worker {
 	patchCard(
 		context: LogContext,
 		insertSession: string,
-		typeCard: core.TypeContract,
+		typeCard: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
 			timestamp?: any;
@@ -425,11 +427,11 @@ export class Worker {
 			originator?: any;
 			attachEvents?: any;
 		},
-		card: Partial<core.Contract>,
+		card: Partial<Contract>,
 		patch: Operation[],
 	) {
 		const instance = this;
-		const jellyfish = instance.jellyfish;
+		const kernel = instance.kernel;
 		const session = insertSession;
 		const object = card;
 		assert.INTERNAL(
@@ -451,7 +453,7 @@ export class Worker {
 			context,
 			session,
 			typeCard,
-			object as core.Contract,
+			object as Contract,
 			{
 				eventPayload: patch,
 				eventType: 'update',
@@ -465,7 +467,7 @@ export class Worker {
 				// TS-TODO: Remove these any castings
 				const objectWithLinks = await getObjectWithLinks(
 					context,
-					jellyfish,
+					kernel,
 					session,
 					object,
 					typeCard,
@@ -475,7 +477,7 @@ export class Worker {
 					objectWithLinks as any,
 					patch,
 				);
-				return jellyfish.patchCardBySlug(
+				return kernel.patchCardBySlug(
 					context,
 					session,
 					`${object.slug}@${object.version}`,
@@ -504,7 +506,7 @@ export class Worker {
 	async replaceCard(
 		context: LogContext,
 		insertSession: string,
-		typeCard: core.TypeContract,
+		typeCard: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
 			timestamp?: any;
@@ -513,10 +515,10 @@ export class Worker {
 			originator?: any;
 			attachEvents?: boolean;
 		},
-		object: Partial<core.Contract<core.ContractData>>,
+		object: Partial<Contract<ContractData>>,
 	) {
 		const instance = this;
-		const jellyfish = instance.jellyfish;
+		const kernel = instance.kernel;
 		logger.debug(context, 'Replacing card', {
 			slug: object.slug,
 			type: typeCard.slug,
@@ -525,17 +527,17 @@ export class Worker {
 
 		object.type = `${typeCard.slug}@${typeCard.version}`;
 
-		let card: core.Contract | null = null;
+		let card: Contract | null = null;
 
 		if (object.slug) {
-			card = await jellyfish.getCardBySlug(
+			card = await kernel.getCardBySlug(
 				context,
 				insertSession,
 				`${object.slug}@${object.version}`,
 			);
 		}
 		if (!card && object.id) {
-			card = await jellyfish.getCardById(context, insertSession, object.id);
+			card = await kernel.getCardById(context, insertSession, object.id);
 		}
 
 		let attachEvents = options.attachEvents;
@@ -566,7 +568,7 @@ export class Worker {
 			async () => {
 				const { links } = await getObjectWithLinks(
 					context,
-					jellyfish,
+					kernel,
 					insertSession,
 					object,
 					typeCard,
@@ -579,7 +581,7 @@ export class Worker {
 				});
 
 				// TS-TODO: Remove these `any` castings
-				return jellyfish.replaceCard(context, insertSession, result as any);
+				return kernel.replaceCard(context, insertSession, result as any);
 			},
 		);
 	}
@@ -732,7 +734,7 @@ export class Worker {
 	 * const worker = new Worker({ ... })
 	 * worker.setTypeContracts([ ... ])
 	 */
-	setTypeContracts(context: LogContext, typeContracts: core.TypeContract[]) {
+	setTypeContracts(context: LogContext, typeContracts: TypeContract[]) {
 		logger.info(context, 'Setting type contracts', {
 			count: typeContracts.length,
 		});
@@ -893,11 +895,11 @@ export class Worker {
 	 * @example
 	 * const worker = new Worker({ ... })
 	 * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
-	 * const result = await worker.execute(jellyfish, session, { ... })
+	 * const result = await worker.execute(kernel, session, { ... })
 	 * console.log(result.error)
 	 * console.log(result.data)
 	 */
-	async execute(session: string, request: core.ActionRequestContract) {
+	async execute(session: string, request: ActionRequestContract) {
 		logger.info(request.data.context, 'Executing request', {
 			request: {
 				id: request.id,
@@ -911,7 +913,7 @@ export class Worker {
 		// TS-TODO: correctly type request context on action request contract
 		const requestContext = request.data.context as any as LogContext;
 
-		const actionCard = await this.jellyfish.getCardBySlug<core.ActionContract>(
+		const actionCard = await this.kernel.getCardBySlug<ActionContract>(
 			requestContext,
 			session,
 			request.data.action,
@@ -940,11 +942,11 @@ export class Worker {
 			const [input, actor] = await Promise.all([
 				getInputCard(
 					requestContext,
-					this.jellyfish,
+					this.kernel,
 					session,
 					request.data.input.id,
 				),
-				this.jellyfish.getCardById(requestContext, session, request.data.actor),
+				this.kernel.getCardById(requestContext, session, request.data.actor),
 			]);
 
 			assert.USER(
@@ -1023,7 +1025,7 @@ export class Worker {
 				timestamp: request.data.timestamp,
 				epoch: request.data.epoch,
 				// TS-TODO: correctly type arguments object on action request contract
-				arguments: request.data.arguments as { [arg: string]: JSONSchema },
+				arguments: request.data.arguments as { [arg: string]: JsonSchema },
 				originator: request.data.originator,
 			});
 
@@ -1099,7 +1101,7 @@ export class Worker {
 	 * @private
 	 *
 	 * @param {Object} context - execution context
-	 * @param {Object} jellyfish - jellyfish kernel instance
+	 * @param {Object} kernel - kernel instance
 	 * @param {String} session - session id
 	 * @param {Object} typeCard - The full type contract for the card being
 	 * inserted or updated
@@ -1111,8 +1113,8 @@ export class Worker {
 	private async commit(
 		context: LogContext,
 		session: string,
-		typeCard: core.TypeContract,
-		current: core.Contract | null,
+		typeCard: TypeContract,
+		current: Contract | null,
 		options: {
 			actor: any;
 			originator: any;
@@ -1122,7 +1124,7 @@ export class Worker {
 			eventType: any;
 			eventPayload: any;
 		},
-		fn: () => Promise<core.Contract>,
+		fn: () => Promise<Contract>,
 	) {
 		assert.INTERNAL(
 			context,
@@ -1164,7 +1166,7 @@ export class Worker {
 			newCard: insertedCard,
 			context,
 			query: (querySchema, queryOpts) => {
-				return this.jellyfish.query(
+				return this.kernel.query(
 					context,
 					workerContext.privilegedSession,
 					querySchema,
@@ -1194,13 +1196,13 @@ export class Worker {
 				getSession: async (userId: string) => {
 					return utils.getActorKey(
 						context,
-						this.jellyfish,
+						this.kernel,
 						workerContext.privilegedSession,
 						userId,
 					);
 				},
 				insertContract: async (
-					insertedContractType: core.TypeContract,
+					insertedContractType: TypeContract,
 					actorSession: string,
 					object: any,
 				) => {
@@ -1216,7 +1218,7 @@ export class Worker {
 					);
 				},
 				query: (querySchema, queryOpts = {}) => {
-					return this.jellyfish.query(
+					return this.kernel.query(
 						context,
 						workerContext.privilegedSession,
 						querySchema,
@@ -1224,7 +1226,7 @@ export class Worker {
 					);
 				},
 				getContractById: (id: string) => {
-					return this.jellyfish.getCardById(context, session, id);
+					return this.kernel.getCardById(context, session, id);
 				},
 			})
 			.catch((error) => {
@@ -1253,7 +1255,7 @@ export class Worker {
 					}
 
 					const request = await triggersLib.getRequest(
-						this.jellyfish,
+						this.kernel,
 						trigger,
 						current,
 						insertedCard,
@@ -1276,7 +1278,7 @@ export class Worker {
 						identifiers.map(async (identifier) => {
 							const triggerCard = await getInputCard(
 								context,
-								this.jellyfish,
+								this.kernel,
 								session,
 								identifier,
 							);
@@ -1373,7 +1375,7 @@ export class Worker {
 			current &&
 			!fastEquals.deepEqual(current.markers, insertedCard.markers)
 		) {
-			const timeline = await this.jellyfish.query(context, session, {
+			const timeline = await this.kernel.query(context, session, {
 				$$links: {
 					'is attached to': {
 						type: 'object',
@@ -1407,7 +1409,7 @@ export class Worker {
 
 			for (const event of timeline) {
 				if (!fastEquals.deepEqual(event.markers, insertedCard.markers)) {
-					await this.jellyfish.patchCardBySlug(
+					await this.kernel.patchCardBySlug(
 						context,
 						session,
 						`${event.slug}@${event.version}`,
@@ -1427,14 +1429,14 @@ export class Worker {
 			// Remove any previously attached trigger for this type
 			const typeTriggers = await triggersLib.getTypeTriggers(
 				context,
-				this.jellyfish,
+				this.kernel,
 				session,
 				`${insertedCard.slug}@${insertedCard.version}`,
 			);
 			await Promise.all(
 				typeTriggers.map(
 					async (trigger) => {
-						await this.jellyfish.patchCardBySlug(
+						await this.kernel.patchCardBySlug(
 							context,
 							session,
 							`${trigger.slug}@${trigger.version}`,
@@ -1465,7 +1467,7 @@ export class Worker {
 					async (trigger) => {
 						// We don't want to use the actions queue here
 						// so that watchers are applied right away
-						const triggeredActionContract = await this.jellyfish.replaceCard(
+						const triggeredActionContract = await this.kernel.replaceCard(
 							context,
 							session,
 							trigger,
