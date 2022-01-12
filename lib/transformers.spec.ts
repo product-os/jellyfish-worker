@@ -25,9 +25,8 @@ const getEvaluateParamsStub = (
 		transformers: _.castArray(transformerCards),
 		oldCard,
 		newCard,
-		context: {
+		logContext: {
 			id: 'foobar',
-			api: '0',
 		},
 
 		// Query is only used to receive an actorId, so just stub the response here

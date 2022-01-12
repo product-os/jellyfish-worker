@@ -63,9 +63,9 @@ describe('.getId()', () => {
 			ctx.queue.producer,
 		);
 
-		await worker1.initialize(ctx.logContext);
-		await worker2.initialize(ctx.logContext);
-		await worker3.initialize(ctx.logContext);
+		await worker1.initialize(ctx.logContext, null);
+		await worker2.initialize(ctx.logContext, null);
+		await worker3.initialize(ctx.logContext, null);
 
 		expect(worker1.getId()).not.toBe(worker2.getId());
 		expect(worker1.getId()).not.toBe(worker3.getId());

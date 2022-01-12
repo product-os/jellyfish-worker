@@ -1,5 +1,6 @@
 import { strict as assert } from 'assert';
 import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
 import {
 	ActionFile,
 	Actions,
@@ -13,9 +14,8 @@ import type {
 	SessionContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
-import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
 import _ from 'lodash';
-import { CARDS as WorkerCards, Worker } from './index';
+import { CARDS, Worker } from '.';
 
 /**
  * Context that can be used in tests against the worker.
@@ -133,9 +133,9 @@ export const newContext = async (
 		}
 	}
 	const bootstrapContracts = [
-		WorkerCards.create,
-		WorkerCards.update,
-		WorkerCards['triggered-action'],
+		CARDS.create,
+		CARDS.update,
+		CARDS['triggered-action'],
 		contracts['role-user-community'],
 		contracts.message,
 		// Make sure any loop contracts are initialized, as they can be a prerequisite

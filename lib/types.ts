@@ -1,8 +1,109 @@
+import type { Kernel } from '@balena/jellyfish-core';
 import type { LogContext } from '@balena/jellyfish-logger';
-import type { Action } from '@balena/jellyfish-types/build/worker';
+import type { ProducerOptions } from '@balena/jellyfish-queue';
+import type {
+	ActionContract,
+	ActionRequestContract,
+	Contract,
+	ContractData,
+	ContractDefinition,
+	ContractSummary,
+	TypeContract,
+} from '@balena/jellyfish-types/build/core';
+import { Operation } from 'fast-json-patch';
+
+export interface Action {
+	handler: <TData = ContractData>(
+		session: string,
+		context: WorkerContext,
+		contract: Contract<ContractData>,
+		request: {
+			action: ActionContract;
+			card: string;
+			actor: string;
+			logContext: LogContext;
+			timestamp: any;
+			epoch: any;
+			arguments: {
+				[k: string]: any;
+			};
+			originator?: string;
+		},
+	) => Promise<null | ContractSummary<TData> | Array<ContractSummary<TData>>>;
+	pre: (
+		session: string,
+		context: WorkerContext,
+		request: {
+			action: string;
+			card: string;
+			type: string;
+			logContext: LogContext;
+			arguments: {
+				[k: string]: any;
+			};
+		},
+	) => Promise<any> | any;
+}
+
+export interface WorkerContext {
+	sync: any;
+	getEventSlug: (type: string) => Promise<string>;
+	getCardById: (lsession: string, id: string) => Promise<Contract | null>;
+	getCardBySlug: (lsession: string, slug: string) => Promise<Contract | null>;
+	query: <T extends Contract = Contract>(
+		lsession: string,
+		schema: Parameters<Kernel['query']>[2],
+		options?: Parameters<Kernel['query']>[3],
+	) => Promise<T[]>;
+	privilegedSession: string;
+	insertCard: (
+		lsession: string,
+		typeCard: TypeContract,
+		options: {
+			timestamp?: string | number | Date;
+			reason?: string;
+			actor?: string;
+			originator?: string;
+			attachEvents?: boolean;
+		},
+		card: Partial<Contract>,
+	) => Promise<Contract | null>;
+	replaceCard: (
+		lsession: string,
+		typeCard: TypeContract,
+		options: {
+			timestamp?: string | number | Date;
+			reason?: string;
+			actor?: string;
+			originator?: string;
+			attachEvents?: boolean;
+		},
+		card: Partial<Contract>,
+	) => Promise<Contract | null>;
+	patchCard: (
+		lsession: string,
+		typeCard: TypeContract,
+		options: {
+			timestamp?: string | number | Date;
+			reason?: string;
+			actor?: string;
+			originator?: string;
+			attachEvents?: boolean;
+		},
+		card: Partial<Contract>,
+		patch: Operation[],
+	) => Promise<Contract | null>;
+	enqueueAction: (
+		session: string,
+		actionRequest: ProducerOptions,
+	) => Promise<ActionRequestContract>;
+	cards: {
+		[slug: string]: ContractDefinition<ContractData>;
+	};
+}
 
 export interface EnqueueOptions {
-	context?: LogContext;
+	logContext?: LogContext;
 	/** slug or id of input contract */
 	card: string;
 	/** type of input contract */

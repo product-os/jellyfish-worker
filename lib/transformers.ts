@@ -14,7 +14,7 @@ export interface EvaluateOptions {
 	transformers: Transformer[];
 	oldCard: Contract<any> | null;
 	newCard: Contract<any>;
-	context: LogContext;
+	logContext: LogContext;
 	query: (
 		schema: JsonSchema,
 		opts: { sortBy?: string; sortDir?: 'asc' | 'desc'; limit?: number },
@@ -37,7 +37,7 @@ export const evaluate = async ({
 	transformers,
 	oldCard,
 	newCard,
-	context,
+	logContext,
 	query,
 	executeAndAwaitAction,
 }: EvaluateOptions): Promise<null> => {
@@ -76,7 +76,7 @@ export const evaluate = async ({
 			const transformerActor = await getTransformerActor(query, transformer);
 			if (!transformerActor) {
 				logger.warn(
-					context,
+					logContext,
 					'Cannot run transformer that does not have an owner',
 					{
 						transformerId: transformer.id,
