@@ -3,14 +3,14 @@ import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import _ from 'lodash';
-import { testUtils as workerTestUtils } from '../../lib';
+import { testUtils } from '../../lib';
 
-let ctx: workerTestUtils.TestContext;
+let ctx: testUtils.TestContext;
 let user: any = {};
 let session: any = {};
 
 beforeAll(async () => {
-	ctx = await workerTestUtils.newContext({
+	ctx = await testUtils.newContext({
 		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
 		mixins: cardMixins,
 	});
@@ -20,7 +20,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	return workerTestUtils.destroyContext(ctx);
+	return testUtils.destroyContext(ctx);
 });
 
 test('Should generate a notification if message is added to subscribed thread', async () => {

@@ -15,9 +15,9 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
-import { testUtils as workerTestUtils } from '../../lib';
+import { testUtils } from '../../lib';
 
-let ctx: workerTestUtils.TestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
 	const actionTestOriginator: ActionFile = {
@@ -45,7 +45,7 @@ beforeAll(async () => {
 		},
 	};
 
-	ctx = await workerTestUtils.newContext({
+	ctx = await testUtils.newContext({
 		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
 		mixins: cardMixins,
 		actions: [actionTestOriginator],
@@ -53,7 +53,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	return workerTestUtils.destroyContext(ctx);
+	return testUtils.destroyContext(ctx);
 });
 
 describe('.insertCard()', () => {

@@ -10,19 +10,19 @@ import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import type { ActionRequestContract } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
-import { testUtils as workerTestUtils } from '../../lib';
+import { testUtils } from '../../lib';
 
-let ctx: workerTestUtils.TestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await workerTestUtils.newContext({
+	ctx = await testUtils.newContext({
 		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
 		mixins: cardMixins,
 	});
 });
 
 afterAll(() => {
-	return workerTestUtils.destroyContext(ctx);
+	return testUtils.destroyContext(ctx);
 });
 
 describe('.execute()', () => {
@@ -1399,7 +1399,7 @@ describe('.execute()', () => {
 	});
 
 	test('should return an error if the action has no corresponding implementation', async () => {
-		const localCtx = await workerTestUtils.newContext({
+		const localCtx = await testUtils.newContext({
 			plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
 			mixins: cardMixins,
 		});
@@ -1451,6 +1451,6 @@ describe('.execute()', () => {
 		expect(result.error).toBe(true);
 		expect(result.data.name).toBe('WorkerInvalidAction');
 
-		await workerTestUtils.destroyContext(localCtx);
+		await testUtils.destroyContext(localCtx);
 	});
 });

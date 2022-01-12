@@ -11,19 +11,19 @@ import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
-import { errors, testUtils as workerTestUtils, Worker } from '../../lib';
+import { errors, testUtils, Worker } from '../../lib';
 
-let ctx: workerTestUtils.TestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await workerTestUtils.newContext({
+	ctx = await testUtils.newContext({
 		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
 		mixins: cardMixins,
 	});
 });
 
 afterAll(() => {
-	return workerTestUtils.destroyContext(ctx);
+	return testUtils.destroyContext(ctx);
 });
 
 describe('.getId()', () => {

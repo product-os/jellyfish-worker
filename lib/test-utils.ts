@@ -17,8 +17,6 @@ import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
 import _ from 'lodash';
 import { CARDS as WorkerCards, Worker } from './index';
 
-let ctx: TestContext;
-
 /**
  * Context that can be used in tests against the worker.
  */
@@ -115,13 +113,16 @@ export const newContext = async (
 	assert(adminSessionContract);
 
 	// Initialize plugins.
-	const pluginManager = new PluginManager(ctx.logContext, {
+	const pluginManager = new PluginManager(queueTestContext.logContext, {
 		plugins: options.plugins || [],
 	});
 
 	// Prepare and insert all contracts, including those from plugins.
-	const contracts = pluginManager.getCards(ctx.logContext, options.mixins);
-	const actionLibrary = pluginManager.getActions(ctx.logContext);
+	const contracts = pluginManager.getCards(
+		queueTestContext.logContext,
+		options.mixins,
+	);
+	const actionLibrary = pluginManager.getActions(queueTestContext.logContext);
 	if (options.actions) {
 		for (const action of options.actions) {
 			Object.assign(actionLibrary, {
@@ -154,18 +155,22 @@ export const newContext = async (
 		bootstrapContracts.push(contract);
 	}
 	for (const contract of bootstrapContracts) {
-		await ctx.kernel.insertCard(ctx.logContext, ctx.session, contract);
+		await queueTestContext.kernel.insertCard(
+			queueTestContext.logContext,
+			queueTestContext.session,
+			contract,
+		);
 	}
 
 	// Initialize worker instance.
 	const worker = new Worker(
-		ctx.kernel,
-		ctx.session,
+		queueTestContext.kernel,
+		queueTestContext.session,
 		actionLibrary,
-		ctx.queue.consumer,
-		ctx.queue.producer,
+		queueTestContext.queue.consumer,
+		queueTestContext.queue.producer,
 	);
-	await worker.initialize(ctx.logContext);
+	await worker.initialize(queueTestContext.logContext);
 
 	const flush = async (session: string) => {
 		const request = await queueTestContext.dequeue();
@@ -184,9 +189,9 @@ export const newContext = async (
 		if (times === 0) {
 			throw new Error('The wait query did not resolve');
 		}
-		const results = await ctx.kernel.query<T>(
-			ctx.logContext,
-			ctx.session,
+		const results = await queueTestContext.kernel.query<T>(
+			queueTestContext.logContext,
+			queueTestContext.session,
 			waitQuery,
 		);
 		if (results.length > 0) {
@@ -210,13 +215,16 @@ export const newContext = async (
 	};
 
 	const processAction = async (session: string, action: any) => {
-		const createRequest = await ctx.queue.producer.enqueue(
+		const createRequest = await queueTestContext.queue.producer.enqueue(
 			worker.getId(),
 			session,
 			action,
 		);
 		await flush(session);
-		return ctx.queue.producer.waitResults(ctx.logContext, createRequest);
+		return queueTestContext.queue.producer.waitResults(
+			queueTestContext.logContext,
+			createRequest,
+		);
 	};
 
 	const createEvent = async (
@@ -226,9 +234,9 @@ export const newContext = async (
 		body: string,
 		type: 'message' | 'whisper',
 	) => {
-		const req = await ctx.queue.producer.enqueue(actor, session, {
+		const req = await queueTestContext.queue.producer.enqueue(actor, session, {
 			action: 'action-create-event@1.0.0',
-			logContext: ctx.logContext,
+			logContext: queueTestContext.logContext,
 			card: target.id,
 			type: target.type,
 			arguments: {
@@ -240,16 +248,16 @@ export const newContext = async (
 		});
 
 		await flushAll(session);
-		const result: any = await ctx.queue.producer.waitResults(
-			ctx.logContext,
+		const result: any = await queueTestContext.queue.producer.waitResults(
+			queueTestContext.logContext,
 			req,
 		);
 		expect(result.error).toBe(false);
 		assert(result.data);
 		await flushAll(session);
-		const contract = (await ctx.kernel.getCardById(
-			ctx.logContext,
-			ctx.session,
+		const contract = (await queueTestContext.kernel.getCardById(
+			queueTestContext.logContext,
+			queueTestContext.session,
 			result.data.id,
 		)) as Contract;
 		assert(contract);
@@ -282,20 +290,24 @@ export const newContext = async (
 	) => {
 		// Create the user, only if it doesn't exist yet
 		const userContract =
-			((await ctx.kernel.getCardBySlug(
-				ctx.logContext,
-				ctx.session,
+			((await queueTestContext.kernel.getCardBySlug(
+				queueTestContext.logContext,
+				queueTestContext.session,
 				`user-${username}@latest`,
 			)) as UserContract) ||
-			(await ctx.kernel.insertCard<UserContract>(ctx.logContext, ctx.session, {
-				type: 'user@1.0.0',
-				slug: `user-${username}`,
-				data: {
-					email: `${username}@example.com`,
-					hash,
-					roles,
+			(await queueTestContext.kernel.insertCard<UserContract>(
+				queueTestContext.logContext,
+				queueTestContext.session,
+				{
+					type: 'user@1.0.0',
+					slug: `user-${username}`,
+					data: {
+						email: `${username}@example.com`,
+						hash,
+						roles,
+					},
 				},
-			}));
+			));
 		assert(userContract);
 
 		return userContract;
@@ -309,10 +321,10 @@ export const newContext = async (
 		verb: string,
 		inverseVerb: string,
 	) => {
-		const inserted = await ctx.worker.insertCard(
-			ctx.logContext,
+		const inserted = await worker.insertCard(
+			queueTestContext.logContext,
 			session,
-			ctx.worker.typeContracts['link@1.0.0'],
+			worker.typeContracts['link@1.0.0'],
 			{
 				attachEvents: true,
 				actor,
@@ -344,9 +356,9 @@ export const newContext = async (
 		assert(inserted);
 		await flushAll(session);
 
-		const link = await ctx.kernel.getCardById<LinkContract>(
-			ctx.logContext,
-			ctx.session,
+		const link = await queueTestContext.kernel.getCardById<LinkContract>(
+			queueTestContext.logContext,
+			queueTestContext.session,
 			inserted.id,
 		);
 		assert(link);
@@ -358,7 +370,7 @@ export const newContext = async (
 		session: string,
 		name: string,
 		data: any,
-		markers = [],
+		markers = [''],
 	) => {
 		const contract = await createContract(
 			actor,
@@ -376,7 +388,7 @@ export const newContext = async (
 		session: string,
 		name: string,
 		data: any,
-		markers = [],
+		markers = [''],
 	) => {
 		const contract = await createContract(
 			actor,
@@ -395,12 +407,12 @@ export const newContext = async (
 		type: string,
 		name: string,
 		data: any,
-		markers = [],
+		markers = [''],
 	) => {
-		const inserted = await ctx.worker.insertCard(
-			ctx.logContext,
+		const inserted = await worker.insertCard(
+			queueTestContext.logContext,
 			session,
-			ctx.worker.typeContracts[type],
+			worker.typeContracts[type],
 			{
 				attachEvents: true,
 				actor,
@@ -418,9 +430,9 @@ export const newContext = async (
 		assert(inserted);
 		await flushAll(session);
 
-		const contract = await ctx.kernel.getCardById(
-			ctx.logContext,
-			ctx.session,
+		const contract = await queueTestContext.kernel.getCardById(
+			queueTestContext.logContext,
+			queueTestContext.session,
 			inserted.id,
 		);
 		assert(contract);
@@ -429,19 +441,20 @@ export const newContext = async (
 
 	const createSession = async (user: UserContract) => {
 		// Force login, even if we don't know the password
-		const sessionContract = await ctx.kernel.insertCard<SessionContract>(
-			ctx.logContext,
-			ctx.session,
-			{
-				slug: `session-${
-					user.slug
-				}-integration-tests-${coreTestUtils.generateRandomId()}`,
-				type: 'session@1.0.0',
-				data: {
-					actor: user.id,
+		const sessionContract =
+			await queueTestContext.kernel.insertCard<SessionContract>(
+				queueTestContext.logContext,
+				queueTestContext.session,
+				{
+					slug: `session-${
+						user.slug
+					}-integration-tests-${coreTestUtils.generateRandomId()}`,
+					type: 'session@1.0.0',
+					data: {
+						actor: user.id,
+					},
 				},
-			},
-		);
+			);
 		assert(sessionContract);
 
 		return sessionContract;

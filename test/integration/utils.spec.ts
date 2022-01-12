@@ -3,19 +3,19 @@ import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
 import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import * as utils from '../../lib/utils';
-import { testUtils as workerTestUtils } from '../../lib';
+import { testUtils } from '../../lib';
 
-let ctx: workerTestUtils.TestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await workerTestUtils.newContext({
+	ctx = await testUtils.newContext({
 		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
 		mixins: cardMixins,
 	});
 });
 
 afterAll(() => {
-	return workerTestUtils.destroyContext(ctx);
+	return testUtils.destroyContext(ctx);
 });
 
 describe('.hasCard()', () => {

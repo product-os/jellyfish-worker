@@ -13,17 +13,13 @@ import type {
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { strict as assert } from 'assert';
 import _ from 'lodash';
-import {
-	errors,
-	testUtils as workerTestUtils,
-	triggersLib as triggers,
-} from '../../lib';
+import { errors, testUtils, triggersLib as triggers } from '../../lib';
 
-let ctx: workerTestUtils.TestContext;
+let ctx: testUtils.TestContext;
 let typeCard: TypeContract;
 
 beforeAll(async () => {
-	ctx = await workerTestUtils.newContext({
+	ctx = await testUtils.newContext({
 		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
 		mixins: cardMixins,
 	});
@@ -79,7 +75,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	return workerTestUtils.destroyContext(ctx);
+	return testUtils.destroyContext(ctx);
 });
 
 describe('.getRequest()', () => {
