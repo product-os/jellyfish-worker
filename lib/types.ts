@@ -45,6 +45,10 @@ export interface Action {
 	) => Promise<any> | any;
 }
 
+export interface ActionMap {
+	[key: string]: Action;
+}
+
 export interface WorkerContext {
 	sync: any;
 	getEventSlug: (type: string) => Promise<string>;

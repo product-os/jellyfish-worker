@@ -15,7 +15,7 @@ import type { TriggeredActionContract } from '@balena/jellyfish-types/build/work
 import * as errio from 'errio';
 import _ from 'lodash';
 import * as fastEquals from 'fast-equals';
-import { Operation } from 'fast-json-patch';
+import type { Operation } from 'fast-json-patch';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
 import * as semver from 'semver';
@@ -27,11 +27,22 @@ import * as triggersLib from './triggers';
 import type { ActionLibrary, WorkerContext } from './types';
 import * as utils from './utils';
 
+export { triggersLib, errors, CARDS, utils };
+export {
+	ActionDefinition,
+	ContractBuilder,
+	ContractBuilderMap,
+	Integration,
+	IntegrationResult,
+	Plugin,
+	PluginDefinition,
+	PluginIdentity,
+} from './plugin';
+export * as testUtils from './test-utils';
+export { Action } from './types';
+
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
-
-export { triggersLib, errors, CARDS, utils };
-export * as testUtils from './test-utils';
 
 /**
  * @summary The "type" card type
