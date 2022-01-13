@@ -24,10 +24,10 @@ import * as errors from './errors';
 import * as subscriptionsLib from './subscriptions';
 import * as transformerLib from './transformers';
 import * as triggersLib from './triggers';
-import type { WorkerContext } from './types';
+import type { Action, Map, WorkerContext } from './types';
 import * as utils from './utils';
 
-export { triggersLib, errors, CARDS, utils };
+export { Action, triggersLib, errors, CARDS, utils };
 export {
 	ActionDefinition,
 	ContractBuilder,
@@ -37,7 +37,6 @@ export {
 	PluginIdentity,
 } from './plugin';
 export * as testUtils from './test-utils';
-export { Action } from './types';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
@@ -147,7 +146,7 @@ export class Worker {
 	latestTransformers: transformerLib.Transformer[];
 	typeContracts: { [key: string]: TypeContract };
 	session: string;
-	library: ActionLibrary;
+	library: Map<Action>;
 	id: string = '0';
 	// TS-TODO: use correct sync typings
 	sync: any;
@@ -175,7 +174,7 @@ export class Worker {
 	constructor(
 		kernel: Kernel,
 		session: string,
-		actionLibrary: ActionLibrary,
+		actionLibrary: Map<Action>,
 		consumer: Consumer,
 		producer: Producer,
 	) {
