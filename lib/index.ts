@@ -584,7 +584,7 @@ export class Worker {
 				const result = jellyscript.evaluateObject(typeCard.data.schema, {
 					...object,
 					links: links || {},
-				});
+				} as any);
 
 				// TS-TODO: Remove these `any` castings
 				return kernel.replaceCard(logContext, insertSession, result as any);

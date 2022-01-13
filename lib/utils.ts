@@ -195,7 +195,7 @@ export const getQueryWithOptionalLinks = (
 		// All links will be optional
 		anyOf: [
 			true,
-			...linkVerbs.map((linkVerb) => {
+			...linkVerbs.map((linkVerb): JsonSchema => {
 				return {
 					$$links: {
 						[linkVerb]: {

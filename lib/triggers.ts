@@ -67,7 +67,7 @@ export const matchesCard = async (
 	 * then its validity depends on whether it matches
 	 * against the card or not.
 	 */
-	if (!filter || !filter.$$links) {
+	if (!filter || !(filter instanceof Object && filter.$$links)) {
 		return isValid ? card : false;
 	}
 
