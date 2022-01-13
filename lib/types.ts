@@ -45,10 +45,6 @@ export interface Action {
 	) => Promise<any> | any;
 }
 
-export interface ActionMap {
-	[key: string]: Action;
-}
-
 export interface WorkerContext {
 	sync: any;
 	getEventSlug: (type: string) => Promise<string>;
@@ -122,6 +118,6 @@ export interface EnqueueOptions {
 	};
 }
 
-export interface ActionLibrary {
-	[key: string]: Action;
+export interface Map<T> {
+	[key: string]: T;
 }

@@ -1,13 +1,6 @@
 import { strict as assert } from 'assert';
 import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
-import {
-	ActionFile,
-	Actions,
-	CoreMixins,
-	JellyfishPluginConstructor,
-	PluginManager,
-} from '@balena/jellyfish-plugin-base';
 import type {
 	Contract,
 	LinkContract,
@@ -15,6 +8,9 @@ import type {
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
+import { ActionDefinition, Plugin } from './plugin';
+import { PluginManager } from './plugin-manager';
+import { Action, Map } from './types';
 import { CARDS, Worker } from '.';
 
 /**
@@ -23,7 +19,7 @@ import { CARDS, Worker } from '.';
 export interface TestContext extends queueTestUtils.TestContext {
 	worker: Worker;
 	adminUserId: string;
-	actionLibrary: Actions;
+	actionLibrary: Map<Action>;
 	flush: (session: string) => Promise<null>;
 	flushAll: (session: string) => Promise<void>;
 	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
@@ -92,16 +88,15 @@ export interface NewContextOptions extends coreTestUtils.NewContextOptions {
 	/**
 	 * Set of plugins needed to run tests.
 	 */
-	plugins?: JellyfishPluginConstructor[];
-	actions?: ActionFile[];
-	mixins: CoreMixins;
+	plugins?: Array<new () => Plugin>;
+	actions?: ActionDefinition[];
 }
 
 /**
  * Create a new `TestContext` with an initialized worker.
  */
 export const newContext = async (
-	options: NewContextOptions,
+	options: NewContextOptions = {},
 ): Promise<TestContext> => {
 	const queueTestContext = await queueTestUtils.newContext(options);
 
@@ -113,16 +108,11 @@ export const newContext = async (
 	assert(adminSessionContract);
 
 	// Initialize plugins.
-	const pluginManager = new PluginManager(queueTestContext.logContext, {
-		plugins: options.plugins || [],
-	});
+	const pluginManager = new PluginManager(options.plugins || []);
 
 	// Prepare and insert all contracts, including those from plugins.
-	const contracts = pluginManager.getCards(
-		queueTestContext.logContext,
-		options.mixins,
-	);
-	const actionLibrary = pluginManager.getActions(queueTestContext.logContext);
+	const contracts = pluginManager.getCards();
+	const actionLibrary = pluginManager.getActions();
 	if (options.actions) {
 		for (const action of options.actions) {
 			Object.assign(actionLibrary, {

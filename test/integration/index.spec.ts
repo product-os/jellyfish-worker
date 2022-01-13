@@ -1,13 +1,9 @@
 import { strict as assert } from 'assert';
-import { ActionLibrary } from '@balena/jellyfish-action-library';
 import {
-	cardMixins,
 	errors as coreErrors,
 	Kernel,
 	testUtils as coreTestUtils,
 } from '@balena/jellyfish-core';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
@@ -16,10 +12,7 @@ import { errors, testUtils, Worker } from '../../lib';
 let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await testUtils.newContext({
-		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		mixins: cardMixins,
-	});
+	ctx = await testUtils.newContext();
 });
 
 afterAll(() => {

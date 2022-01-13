@@ -1,11 +1,9 @@
-import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import _ from 'lodash';
 import semver from 'semver';
-import type { ContractBuilderMap, Plugin, PluginDefinition } from './plugin';
+import type { Plugin } from './plugin';
+import type { Map } from './types';
 
-const logger = getLogger(__filename);
-
-const validateDependencies = (plugins: JellyfishPlugins) => {
+const validateDependencies = (plugins: Map<Plugin>) => {
 	_.forEach(plugins, (plugin) => {
 		_.forEach(plugin.requires, ({ slug, version }) => {
 			const dependency = plugins[slug];
@@ -34,106 +32,57 @@ const validateDependencies = (plugins: JellyfishPlugins) => {
 	});
 };
 
-const loadPlugins = (plugins: JellyfishPluginConstructor[]) => {
-	const allPlugins = _.reduce<JellyfishPluginConstructor, JellyfishPlugins>(
-		plugins,
-		(acc, Plugin: JellyfishPluginConstructor) => {
-			const loadedPlugin = new Plugin();
-			if (loadedPlugin) {
-				if (acc[loadedPlugin.slug]) {
-					throw new Error(
-						`Cannot load plugin '${loadedPlugin.slug}' (${
-							loadedPlugin.name
-						}) because a plugin with that slug (${
-							acc[loadedPlugin.slug].name
-						}) has already been loaded`,
-					);
-				}
-				acc[loadedPlugin.slug] = loadedPlugin;
+const mergeMaps = <T>(maps: Map<Map<T>>): Map<T> => {
+	const merged = {};
+	for (const [pluginSlug, map] of Object.entries(maps)) {
+		for (const [key, value] of Object.entries(map)) {
+			if (key in merged) {
+				throw new Error(
+					`'${key}' already exists and cannot be loaded from plugin '${pluginSlug}'`,
+				);
 			}
-			return acc;
-		},
-		{},
-	);
-	validateDependencies(allPlugins);
-	return allPlugins;
-};
 
-const validatedAddToMap = <T>(
-	logContext: LogContext,
-	plugin: Plugin,
-	pluginItems: Map<T>,
-	consolidatedItems: Map<T>,
-	itemName: string,
-) => {
-	_.each(pluginItems, (item: T, slug: string) => {
-		if (consolidatedItems[slug]) {
-			const errorMessage = `${itemName} '${slug}' already exists and cannot be loaded from plugin '${plugin.name}'`;
-			logger.error(logContext, errorMessage);
-			throw new Error(errorMessage);
+			merged[key] = value;
 		}
+	}
 
-		consolidatedItems[slug] = item;
-	});
+	return merged;
 };
 
 export class PluginManager {
-	private plugins: JellyfishPlugins;
+	private pluginMap: Map<Plugin>;
 
-	constructor(logContext: LogContext, options: PluginDefinition) {
-		try {
-			this.plugins = loadPlugins(options.plugins);
-		} catch (err: any) {
-			logger.error(logContext, err.message);
-			throw err;
+	constructor(pluginConstructors: Array<new () => Plugin>) {
+		this.pluginMap = {};
+		for (const pluginConstructor of pluginConstructors) {
+			const plugin = new pluginConstructor();
+			if (plugin.slug in this.pluginMap) {
+				throw new Error(`Duplicate plugin: ${plugin.slug}`);
+			}
+
+			this.pluginMap[plugin.slug] = plugin;
 		}
+
+		validateDependencies(this.pluginMap);
 	}
 
-	getCards(logContext: LogContext, mixins: CoreMixins) {
-		return _.reduce<JellyfishPlugins, ContractBuilderMap>(
-			this.plugins,
-			(carry, plugin) => {
-				if (plugin.getCards) {
-					const pluginCards = plugin.getCards(logContext, mixins);
-					validatedAddToMap(logContext, plugin, pluginCards, carry, 'Card');
-				}
-				return carry;
-			},
-			{},
+	getCards() {
+		return mergeMaps(
+			_.mapValues(this.pluginMap, (plugin: Plugin) => plugin.getCards()),
 		);
 	}
 
-	getSyncIntegrations(logContext: LogContext) {
-		return _.reduce<JellyfishPlugins, Integrations>(
-			this.plugins,
-			(carry, plugin) => {
-				if (plugin.getSyncIntegrations) {
-					const pluginIntegrations = plugin.getSyncIntegrations(logContext);
-					validatedAddToMap(
-						logContext,
-						plugin,
-						pluginIntegrations,
-						carry,
-						'Integration',
-					);
-				}
-				return carry;
-			},
-			{},
+	getSyncIntegrations() {
+		return mergeMaps(
+			_.mapValues(this.pluginMap, (plugin: Plugin) =>
+				plugin.getSyncIntegrations(),
+			),
 		);
 	}
 
-	getActions(logContext: LogContext) {
-		return _.reduce<JellyfishPlugins, ActionMap>(
-			this.plugins,
-			(carry, plugin) => {
-				if (plugin.getActions) {
-					const pluginActions = plugin.getActions(logContext);
-					validatedAddToMap(logContext, plugin, pluginActions, carry, 'Action');
-				}
-				return carry;
-			},
-			{},
+	getActions() {
+		return mergeMaps(
+			_.mapValues(this.pluginMap, (plugin: Plugin) => plugin.getActions()),
 		);
 	}
 }

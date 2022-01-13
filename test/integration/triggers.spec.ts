@@ -1,11 +1,4 @@
-import { ActionLibrary } from '@balena/jellyfish-action-library';
-import {
-	cardMixins,
-	Kernel,
-	testUtils as coreTestUtils,
-} from '@balena/jellyfish-core';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type {
 	Contract,
 	TypeContract,
@@ -19,10 +12,7 @@ let ctx: testUtils.TestContext;
 let typeCard: TypeContract;
 
 beforeAll(async () => {
-	ctx = await testUtils.newContext({
-		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		mixins: cardMixins,
-	});
+	ctx = await testUtils.newContext();
 
 	const contract = (await ctx.kernel.getCardBySlug(
 		ctx.logContext,

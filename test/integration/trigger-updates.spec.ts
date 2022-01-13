@@ -1,21 +1,11 @@
-import { ActionLibrary } from '@balena/jellyfish-action-library';
-import {
-	cardMixins,
-	Kernel,
-	testUtils as coreTestUtils,
-} from '@balena/jellyfish-core';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { testUtils } from '../../lib';
 
 let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await testUtils.newContext({
-		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		mixins: cardMixins,
-	});
+	ctx = await testUtils.newContext();
 });
 
 afterAll(() => {

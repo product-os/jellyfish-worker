@@ -1,14 +1,5 @@
 import { strict as assert } from 'assert';
-import { ActionLibrary } from '@balena/jellyfish-action-library';
-import { actions } from '@balena/jellyfish-action-library';
-import {
-	cardMixins,
-	Kernel,
-	testUtils as coreTestUtils,
-} from '@balena/jellyfish-core';
-import type { ActionFile } from '@balena/jellyfish-plugin-base';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type {
 	Contract,
 	TypeContract,
@@ -46,8 +37,6 @@ beforeAll(async () => {
 	};
 
 	ctx = await testUtils.newContext({
-		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		mixins: cardMixins,
 		actions: [actionTestOriginator],
 	});
 });

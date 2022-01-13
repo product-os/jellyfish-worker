@@ -24,16 +24,14 @@ import * as errors from './errors';
 import * as subscriptionsLib from './subscriptions';
 import * as transformerLib from './transformers';
 import * as triggersLib from './triggers';
-import type { ActionLibrary, WorkerContext } from './types';
+import type { WorkerContext } from './types';
 import * as utils from './utils';
 
 export { triggersLib, errors, CARDS, utils };
 export {
 	ActionDefinition,
 	ContractBuilder,
-	ContractBuilderMap,
 	Integration,
-	IntegrationResult,
 	Plugin,
 	PluginDefinition,
 	PluginIdentity,

@@ -1,7 +1,4 @@
-import { ActionLibrary } from '@balena/jellyfish-action-library';
-import { cardMixins, testUtils as coreTestUtils } from '@balena/jellyfish-core';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import _ from 'lodash';
 import { testUtils } from '../../lib';
 
@@ -10,10 +7,7 @@ let user: any = {};
 let session: any = {};
 
 beforeAll(async () => {
-	ctx = await testUtils.newContext({
-		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		mixins: cardMixins,
-	});
+	ctx = await testUtils.newContext();
 
 	user = await ctx.createUser(coreTestUtils.generateRandomId());
 	session = await ctx.createSession(user);

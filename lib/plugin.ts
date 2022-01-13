@@ -1,14 +1,11 @@
-import { getLogger, LogContext } from '@balena/jellyfish-logger';
+import { cardMixins } from '@balena/jellyfish-core';
 import type {
 	Contract,
 	ContractData,
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
-import { mixins } from './mixins';
-import type { Action, ActionMap } from './types';
-
-const logger = getLogger(__filename);
+import type { Action, Map } from './types';
 
 export abstract class Plugin {
 	public slug: string;
@@ -16,92 +13,58 @@ export abstract class Plugin {
 	public version: string;
 	public requires: PluginIdentity[];
 
-	private actions: ActionDefinition[];
+	private actions: Map<ActionDefinition>;
 	private contracts: ContractBuilder[];
-	private integrations: Integration[];
-	private mixins: ContractBuilderMap;
+	private integrations: Map<Integration>;
 
 	protected constructor(options: PluginDefinition) {
 		this.slug = options.slug;
 		this.name = options.name;
 		this.version = options.version;
 		this.requires = options.requires || [];
-		this.actions = options.actions || [];
-		this.contracts = options.cards || [];
-		this.integrations = options.integrations || [];
-		this.mixins = {
-			...(options.mixins || {}),
-			...mixins,
-		};
+		this.integrations = options.integrations || {};
+		const actions = options.actions || [];
+		this.contracts = _.concat(options.contracts || [], _.map(actions, 'card'));
+
+		this.actions = {};
+		for (const action of actions) {
+			const slug = action.card.slug;
+			if (slug in this.actions) {
+				throw new Error(`Duplicate action: ${slug}`);
+			}
+
+			this.actions[slug] = action;
+		}
 	}
 
-	// TODO: gonna inline this as it is not necessary to have this kind of
-	// function
-	private getSafeMap<T extends Sluggable>(
-		logContext: LogContext,
-		source: any[],
-		sourceType: string,
-		resolver: (item: any) => T = _.identity,
-	): Map<T> {
-		return _.reduce(
-			source,
-			(map: Map<T>, item: T) => {
-				const resolvedItem = resolver(item);
-				const slug =
-					_.get(resolvedItem, 'slug') || _.get(resolvedItem, ['card', 'slug']);
-				if (map[slug]) {
-					const errorMessage = `Duplicate ${sourceType} with slug '${slug}' found`;
-					logger.error(logContext, `${this.name}: ${errorMessage}`);
-					throw new Error(errorMessage);
-				}
-				map[slug] = resolvedItem;
-				return map;
-			},
-			{},
-		);
+	public getCards(): Map<Contract> {
+		const contractMap = {};
+		for (const contractBuilder of this.contracts) {
+			let contractTemplate: ContractDefinition;
+			if (typeof contractBuilder === 'function') {
+				contractTemplate = contractBuilder();
+			} else {
+				contractTemplate = contractBuilder;
+			}
+			const contract = cardMixins.initialize(contractTemplate);
+
+			const slug = contract.slug;
+			if (slug in contractMap) {
+				throw new Error(`Duplicate contract: ${slug}`);
+			}
+
+			contractMap[slug] = contract;
+		}
+
+		return contractMap;
 	}
 
-	public getCards(logContext: LogContext, mixins: CoreMixins) {
-		const actionCards = _.map(this.actions, 'card');
-		const allCards = _.concat(this.contracts, actionCards);
-		const cardMixins = {
-			...mixins,
-			...this.mixins,
-		};
-		const cards = this.getSafeMap<ContractDefinition>(
-			logContext,
-			allCards,
-			'cards',
-			(cardFile: ContractBuilder) => {
-				const card =
-					typeof cardFile === 'function' ? cardFile(cardMixins) : cardFile;
-				return mixins.initialize(card);
-			},
-		);
-		return cards;
+	public getSyncIntegrations(): Map<Integration> {
+		return this.integrations;
 	}
 
-	public getSyncIntegrations(logContext: LogContext) {
-		return this.getSafeMap<Integration>(
-			logContext,
-			this.integrations,
-			'integrations',
-		);
-	}
-
-	public getActions(_logContext: LogContext) {
-		return _.reduce(
-			this.actions,
-			(actions: ActionMap, action: ActionDefinition) => {
-				const slug = action.card.slug;
-				actions[slug] = {
-					handler: action.handler,
-					pre: action.pre || _.noop,
-				};
-				return actions;
-			},
-			{},
-		);
+	public getActions(): Map<ActionDefinition> {
+		return this.actions;
 	}
 }
 
@@ -111,9 +74,9 @@ export interface PluginDefinition {
 	version: string;
 	requires?: PluginIdentity[];
 	actions?: ActionDefinition[];
-	cards?: ContractBuilder[];
-	integrations?: Integration[];
-	mixins?: ContractBuilderMap;
+	contracts?: ContractBuilder[];
+	integrations?: Map<Integration>;
+	mixins?: Map<ContractBuilder>;
 }
 
 export interface PluginIdentity {
@@ -127,11 +90,7 @@ export interface ActionDefinition<T = ContractData> extends Action {
 
 export type ContractBuilder<T = ContractData> =
 	| ContractDefinition<T>
-	| ((mixins: CoreMixins) => ContractDefinition<T>);
-
-export interface ContractBuilderMap {
-	[key: string]: ContractBuilder;
-}
+	| (() => ContractDefinition<T>);
 
 export interface Integration<T = ContractData> {
 	slug: string;
@@ -147,6 +106,7 @@ export interface Integration<T = ContractData> {
 	) => Promise<Array<IntegrationResult<T>>>;
 }
 
+// TODO: probably from sync
 export interface IntegrationResult<T> {
 	time: Date;
 	actor: string;

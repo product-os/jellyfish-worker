@@ -1,12 +1,5 @@
 import { strict as assert } from 'assert';
-import { ActionLibrary } from '@balena/jellyfish-action-library';
-import {
-	cardMixins,
-	Kernel,
-	testUtils as coreTestUtils,
-} from '@balena/jellyfish-core';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
+import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type { ActionRequestContract } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
@@ -15,10 +8,7 @@ import { testUtils } from '../../lib';
 let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await testUtils.newContext({
-		plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		mixins: cardMixins,
-	});
+	ctx = await testUtils.newContext();
 });
 
 afterAll(() => {
@@ -1400,8 +1390,7 @@ describe('.execute()', () => {
 
 	test('should return an error if the action has no corresponding implementation', async () => {
 		const localCtx = await testUtils.newContext({
-			plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
-			mixins: cardMixins,
+			// plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
 		});
 
 		const action = 'action-create-card@1.0.0';
