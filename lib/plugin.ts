@@ -91,24 +91,3 @@ export interface ActionDefinition<T = ContractData> extends Action {
 export type ContractBuilder<T = ContractData> =
 	| ContractDefinition<T>
 	| (() => ContractDefinition<T>);
-
-export interface Integration<T = ContractData> {
-	slug: string;
-	initialize: () => Promise<void>;
-	destroy: () => Promise<void>;
-	mirror: (
-		card: Contract<T>,
-		options: SyncFunctionOptions,
-	) => Promise<Array<IntegrationResult<T>>>;
-	translate: (
-		event: IntegrationEvent,
-		options?: SyncFunctionOptions,
-	) => Promise<Array<IntegrationResult<T>>>;
-}
-
-// TODO: probably from sync
-export interface IntegrationResult<T> {
-	time: Date;
-	actor: string;
-	card: ContractDefinition<T>;
-}
