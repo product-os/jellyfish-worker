@@ -88,7 +88,7 @@ export interface NewContextOptions extends coreTestUtils.NewContextOptions {
 	/**
 	 * Set of plugins needed to run tests.
 	 */
-	plugins?: Array<new () => Plugin>;
+	plugins?: Array<() => Plugin>;
 	actions?: ActionDefinition[];
 }
 

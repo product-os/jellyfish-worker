@@ -30,7 +30,7 @@ export interface Action {
 			originator?: string;
 		},
 	) => Promise<null | ContractSummary<TData> | Array<ContractSummary<TData>>>;
-	pre: (
+	pre?: (
 		session: string,
 		context: WorkerContext,
 		request: {

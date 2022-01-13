@@ -15,20 +15,20 @@ export abstract class Plugin {
 
 	private actions: Map<ActionDefinition>;
 	private contracts: ContractBuilder[];
-	private integrations: Map<Integration>;
+	private integrationMap: Map<Integration>;
 
 	protected constructor(options: PluginDefinition) {
 		this.slug = options.slug;
 		this.name = options.name;
 		this.version = options.version;
 		this.requires = options.requires || [];
-		this.integrations = options.integrations || {};
+		this.integrationMap = options.integrationMap || {};
 		const actions = options.actions || [];
 		this.contracts = _.concat(options.contracts || [], _.map(actions, 'card'));
 
 		this.actions = {};
 		for (const action of actions) {
-			const slug = action.card.slug;
+			const slug = action.contract.slug;
 			if (slug in this.actions) {
 				throw new Error(`Duplicate action: ${slug}`);
 			}
@@ -60,7 +60,7 @@ export abstract class Plugin {
 	}
 
 	public getSyncIntegrations(): Map<Integration> {
-		return this.integrations;
+		return this.integrationMap;
 	}
 
 	public getActions(): Map<ActionDefinition> {
@@ -75,7 +75,7 @@ export interface PluginDefinition {
 	requires?: PluginIdentity[];
 	actions?: ActionDefinition[];
 	contracts?: ContractBuilder[];
-	integrations?: Map<Integration>;
+	integrationMap?: Map<Integration>;
 	mixins?: Map<ContractBuilder>;
 }
 
@@ -85,7 +85,7 @@ export interface PluginIdentity {
 }
 
 export interface ActionDefinition<T = ContractData> extends Action {
-	card: ContractDefinition<T>;
+	contract: ContractDefinition<T>;
 }
 
 export type ContractBuilder<T = ContractData> =

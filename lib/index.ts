@@ -868,6 +868,10 @@ export class Worker {
 			`No such action: ${request.action}`,
 		);
 
+		if (!actionDefinition.pre) {
+			return request;
+		}
+
 		const modifiedArguments = await actionDefinition.pre(
 			session,
 			this.getActionContext(request.logContext),

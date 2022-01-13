@@ -52,10 +52,10 @@ const mergeMaps = <T>(maps: Map<Map<T>>): Map<T> => {
 export class PluginManager {
 	private pluginMap: Map<Plugin>;
 
-	constructor(pluginConstructors: Array<new () => Plugin>) {
+	constructor(pluginBuilders: Array<() => Plugin>) {
 		this.pluginMap = {};
-		for (const pluginConstructor of pluginConstructors) {
-			const plugin = new pluginConstructor();
+		for (const pluginBuilder of pluginBuilders) {
+			const plugin = pluginBuilder();
 			if (plugin.slug in this.pluginMap) {
 				throw new Error(`Duplicate plugin: ${plugin.slug}`);
 			}
