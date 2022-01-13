@@ -3,15 +3,16 @@ import * as assert from '@balena/jellyfish-assert';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
+import type { WorkerContext } from '../types';
 import * as errors from './errors';
 import * as instance from './instance';
 import * as oauth from './oauth';
 import * as pipeline from './pipeline';
 import * as syncContext from './sync-context';
 import type { SyncActionContext } from './sync-context';
-import type { IntegrationConstructor, WorkerContext } from './types';
+import { Integration, IntegrationConstructor } from './types';
 
-export { IntegrationConstructor };
+export { Integration, IntegrationConstructor };
 
 /**
  * Jellyfish sync library module.

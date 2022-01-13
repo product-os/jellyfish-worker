@@ -28,10 +28,10 @@ import type { Action, Map, WorkerContext } from './types';
 import * as utils from './utils';
 
 export { Action, triggersLib, errors, CARDS, utils };
+export { Integration } from './sync';
 export {
 	ActionDefinition,
 	ContractBuilder,
-	Integration,
 	Plugin,
 	PluginDefinition,
 	PluginIdentity,

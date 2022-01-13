@@ -329,7 +329,7 @@ export const run = async (
 				options.context.log.info('Creating sync actor', information);
 
 				const username = information.handle || information.email;
-				const translatedUsername = await getUsername(username.toLowerCase());
+				const translatedUsername = getUsername(username.toLowerCase());
 				const slug = translatedUsername
 					.toLowerCase()
 					.replace(/[^a-z0-9-]/g, '-');

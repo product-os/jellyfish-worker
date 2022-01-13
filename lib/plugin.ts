@@ -5,6 +5,7 @@ import type {
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
+import type { Integration } from './sync';
 import type { Action, Map } from './types';
 
 export abstract class Plugin {

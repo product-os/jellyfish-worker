@@ -116,7 +116,7 @@ export const newContext = async (
 	if (options.actions) {
 		for (const action of options.actions) {
 			Object.assign(actionLibrary, {
-				[action.card.slug]: {
+				[action.contract.slug]: {
 					handler: action.handler,
 				},
 			});
