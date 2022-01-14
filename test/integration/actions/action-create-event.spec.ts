@@ -138,25 +138,24 @@ describe('action-create-event', () => {
 	});
 
 	test('should create a link card', async () => {
-		const supportThread = await ctx.createSupportThread(
+		const root = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
-			coreTestUtils.generateRandomSlug(),
-			{
-				status: 'open',
-			},
+			'card@1.0.0',
+			null,
+			{},
 		);
 
-		const messageRequest = await ctx.queue.producer.enqueue(
+		const eventRequest = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
 				logContext: ctx.logContext,
-				card: supportThread.id,
-				type: supportThread.type,
+				card: root.id,
+				type: root.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					tags: [],
 					payload: {
 						message: 'johndoe',
@@ -165,11 +164,11 @@ describe('action-create-event', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const messageResult: any = await ctx.queue.producer.waitResults(
+		const eventResult: any = await ctx.queue.producer.waitResults(
 			ctx.logContext,
-			messageRequest,
+			eventRequest,
 		);
-		expect(messageResult.error).toBe(false);
+		expect(eventResult.error).toBe(false);
 
 		const [link] = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
@@ -186,7 +185,7 @@ describe('action-create-event', () => {
 							properties: {
 								id: {
 									type: 'string',
-									const: messageResult.data.id,
+									const: eventResult.data.id,
 								},
 							},
 							required: ['id'],
@@ -209,12 +208,12 @@ describe('action-create-event', () => {
 				data: {
 					inverseName: 'has attached element',
 					from: {
-						id: messageResult.data.id,
-						type: 'message@1.0.0',
+						id: eventResult.data.id,
+						type: 'card@1.0.0',
 					},
 					to: {
-						id: supportThread.id,
-						type: supportThread.type,
+						id: root.id,
+						type: root.type,
 					},
 				},
 			}),
@@ -222,23 +221,22 @@ describe('action-create-event', () => {
 	});
 
 	test('should be able to add an event name', async () => {
-		const supportThread = await ctx.createSupportThread(
+		const root = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
-			coreTestUtils.generateRandomSlug(),
-			{
-				status: 'open',
-			},
+			'card@1.0.0',
+			null,
+			{},
 		);
 
-		const messageRequest = await ctx.queue.producer.enqueue(
+		const eventRequest = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
 				logContext: ctx.logContext,
-				card: supportThread.id,
-				type: supportThread.type,
+				card: root.id,
+				type: root.type,
 				arguments: {
 					type: 'message',
 					name: 'Hello world',
@@ -250,16 +248,16 @@ describe('action-create-event', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const messageResult: any = await ctx.queue.producer.waitResults(
+		const eventResult: any = await ctx.queue.producer.waitResults(
 			ctx.logContext,
-			messageRequest,
+			eventRequest,
 		);
-		expect(messageResult.error).toBe(false);
+		expect(eventResult.error).toBe(false);
 
 		const event = await ctx.kernel.getCardById(
 			ctx.logContext,
 			ctx.session,
-			messageResult.data.id,
+			eventResult.data.id,
 		);
 		assert(event);
 		expect(event.name).toBe('Hello world');

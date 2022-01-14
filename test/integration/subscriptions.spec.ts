@@ -3,29 +3,24 @@ import _ from 'lodash';
 import { testUtils } from '../../lib';
 
 let ctx: testUtils.TestContext;
-let user: any = {};
-let session: any = {};
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
-
-	user = await ctx.createUser(coreTestUtils.generateRandomId());
-	session = await ctx.createSession(user);
 });
 
 afterAll(() => {
 	return testUtils.destroyContext(ctx);
 });
 
-test('Should generate a notification if message is added to subscribed thread', async () => {
-	const supportThread = await ctx.createSupportThread(
+test('Should generate a notification if an event is attached to a contract', async () => {
+	const user = await ctx.createUser(coreTestUtils.generateRandomSlug());
+	const session = await ctx.createSession(user);
+	const root = await ctx.createContract(
 		user.id,
 		session.id,
-		'foobar',
-		{
-			product: 'jellyfish',
-			status: 'open',
-		},
+		'card@1.0.0',
+		null,
+		{},
 	);
 	const subscription = await ctx.createContract(
 		user.id,
@@ -37,16 +32,17 @@ test('Should generate a notification if message is added to subscribed thread', 
 	await ctx.createLink(
 		user.id,
 		session.id,
-		supportThread,
+		root,
 		subscription,
 		'has attached',
 		'is attached to',
 	);
-	const message = await ctx.createMessage(
+	const event = await ctx.createEvent(
 		user.id,
 		session.id,
-		supportThread,
-		'Message text',
+		root,
+		'event1',
+		'card@1.0.0',
 	);
 
 	// Should not generate notification to the sender
@@ -65,7 +61,7 @@ test('Should generate a notification if message is added to subscribed thread', 
 						type: 'object',
 						properties: {
 							id: {
-								const: message.id,
+								const: event.id,
 							},
 						},
 						required: ['id'],
@@ -76,14 +72,15 @@ test('Should generate a notification if message is added to subscribed thread', 
 		),
 	).rejects.toThrowError(new Error('The wait query did not resolve'));
 
-	// Add a response to the thread using a second user
-	const otherUser = await ctx.createUser(coreTestUtils.generateRandomId());
+	// Add another event by a second user
+	const otherUser = await ctx.createUser(coreTestUtils.generateRandomSlug());
 	const otherUserSession = await ctx.createSession(otherUser);
-	const response = await ctx.createMessage(
+	const response = await ctx.createEvent(
 		otherUser.id,
 		otherUserSession.id,
-		supportThread,
-		'Response from other user',
+		root,
+		'event2',
+		'card@1.0.0',
 	);
 	await ctx.waitForMatch({
 		type: 'object',

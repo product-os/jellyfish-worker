@@ -31,19 +31,7 @@ export interface TestContext extends queueTestUtils.TestContext {
 		session: string,
 		target: Contract,
 		body: string,
-		type: 'message' | 'whisper',
-	) => Promise<any>;
-	createMessage: (
-		actor: string,
-		session: string,
-		target: Contract,
-		body: string,
-	) => Promise<any>;
-	createWhisper: (
-		actor: string,
-		session: string,
-		target: Contract,
-		body: string,
+		type: string,
 	) => Promise<any>;
 	createUser: (
 		username: string,
@@ -59,25 +47,11 @@ export interface TestContext extends queueTestUtils.TestContext {
 		verb: string,
 		inverseVerb: string,
 	) => Promise<LinkContract>;
-	createSupportThread: (
-		actor: string,
-		session: string,
-		name: string,
-		data: any,
-		markers?: any,
-	) => Promise<Contract>;
-	createIssue: (
-		actor: string,
-		session: string,
-		name: string,
-		data: any,
-		markers?: any,
-	) => Promise<Contract>;
 	createContract: (
 		actor: string,
 		session: string,
 		type: string,
-		name: string,
+		name: string | null,
 		data: any,
 		markers?: any,
 	) => Promise<Contract>;
@@ -268,7 +242,7 @@ export const newContext = async (
 		session: string,
 		target: Contract,
 		body: string,
-		type: 'message' | 'whisper',
+		type: string,
 	) => {
 		const req = await queueTestContext.queue.producer.enqueue(actor, session, {
 			action: 'action-create-event@1.0.0',
@@ -301,36 +275,18 @@ export const newContext = async (
 		return contract;
 	};
 
-	const createMessage = (
-		actor: string,
-		session: string,
-		target: Contract,
-		body: string,
-	) => {
-		return createEvent(actor, session, target, body, 'message');
-	};
-
-	const createWhisper = (
-		actor: string,
-		session: string,
-		target: Contract,
-		body: string,
-	) => {
-		return createEvent(actor, session, target, body, 'whisper');
-	};
-
 	const createUser = async (
 		username: string,
 		hash = 'foobar',
-		roles = ['user-community'],
+		roles = ['user-admin'],
 	) => {
 		// Create the user, only if it doesn't exist yet
 		const userContract =
-			((await queueTestContext.kernel.getCardBySlug(
+			(await queueTestContext.kernel.getCardBySlug<UserContract>(
 				queueTestContext.logContext,
 				queueTestContext.session,
 				`user-${username}@latest`,
-			)) as UserContract) ||
+			)) ||
 			(await queueTestContext.kernel.insertCard<UserContract>(
 				queueTestContext.logContext,
 				queueTestContext.session,
@@ -401,47 +357,11 @@ export const newContext = async (
 		return link;
 	};
 
-	const createSupportThread = async (
-		actor: string,
-		session: string,
-		name: string,
-		data: any,
-		markers = [],
-	) => {
-		const contract = await createContract(
-			actor,
-			session,
-			'support-thread@1.0.0',
-			name,
-			data,
-			markers,
-		);
-		return contract;
-	};
-
-	const createIssue = async (
-		actor: string,
-		session: string,
-		name: string,
-		data: any,
-		markers = [],
-	) => {
-		const contract = await createContract(
-			actor,
-			session,
-			'issue@1.0.0',
-			name,
-			data,
-			markers,
-		);
-		return contract;
-	};
-
 	const createContract = async (
 		actor: string,
 		session: string,
 		type: string,
-		name: string,
+		name: string | null,
 		data: any,
 		markers = [],
 	) => {
@@ -504,13 +424,9 @@ export const newContext = async (
 		flushAll,
 		processAction,
 		createEvent,
-		createMessage,
-		createWhisper,
 		createUser,
 		createSession,
 		createLink,
-		createSupportThread,
-		createIssue,
 		createContract,
 		worker,
 		...queueTestContext,
