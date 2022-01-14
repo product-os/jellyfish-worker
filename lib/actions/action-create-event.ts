@@ -1,5 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { JellyfishError } from '@balena/jellyfish-types';
+import { errors as coreErrors } from '@balena/jellyfish-core';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import type { ActionDefinition } from '../plugin';
 import { WorkerNoElement } from '../errors';
@@ -63,9 +63,9 @@ const handler: ActionDefinition['handler'] = async (
 				data,
 			},
 		)
-		.catch((error: JellyfishError) => {
+		.catch((error: unknown) => {
 			// This is a user error
-			if (error.name === 'JellyfishElementAlreadyExists') {
+			if (error instanceof coreErrors.JellyfishElementAlreadyExists) {
 				error.expected = true;
 			}
 

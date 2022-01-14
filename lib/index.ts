@@ -26,10 +26,10 @@ import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
 import * as transformerLib from './transformers';
 import * as triggersLib from './triggers';
-import type { Action, Map, WorkerContext } from './types';
+import { Action, Map, WorkerContext } from './types';
 import * as utils from './utils';
 
-export { Action, triggersLib, errors, CARDS, utils };
+export { Action, triggersLib, errors, CARDS, utils, WorkerContext };
 export { Integration } from './sync';
 export {
 	ActionDefinition,

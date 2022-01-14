@@ -10,7 +10,7 @@ import type {
 	ContractSummary,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import { Operation } from 'fast-json-patch';
+import type { Operation } from 'fast-json-patch';
 
 export interface Action {
 	handler: <TData = ContractData>(

@@ -1,6 +1,6 @@
 import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
-import * as utils from '../../lib/utils';
 import { testUtils } from '../../lib';
+import * as utils from '../../lib/utils';
 
 let ctx: testUtils.TestContext;
 

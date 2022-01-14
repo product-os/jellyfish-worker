@@ -1,10 +1,10 @@
+import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type {
 	Contract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import { strict as assert } from 'assert';
 import _ from 'lodash';
 import { errors, testUtils, triggersLib as triggers } from '../../lib';
 

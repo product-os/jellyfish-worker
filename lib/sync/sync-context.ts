@@ -1,7 +1,10 @@
 import * as assert from '@balena/jellyfish-assert';
 import { Kernel } from '@balena/jellyfish-core';
 import { getLogger } from '@balena/jellyfish-logger';
-import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
+import type {
+	Contract,
+	TypeContract,
+} from '@balena/jellyfish-types/build/core';
 import { strict } from 'assert';
 import _ from 'lodash';
 import jsonpatch, { Operation } from 'fast-json-patch';

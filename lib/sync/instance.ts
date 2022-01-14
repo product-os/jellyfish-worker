@@ -1,12 +1,12 @@
 import * as assert from '@balena/jellyfish-assert';
-import * as JellyfishTypes from '@balena/jellyfish-types';
+import type { Contract } from '@balena/jellyfish-types/build/core';
 import Bluebird from 'bluebird';
 import _ from 'lodash';
 import request from 'request';
 import * as errors from './errors';
 import * as oauth from './oauth';
-import { SyncActionContext } from './sync-context';
-import {
+import type { SyncActionContext } from './sync-context';
+import type {
 	ActorInformation,
 	Integration,
 	IntegrationConstructor,
@@ -76,7 +76,7 @@ const setProperty = (
 
 const getOrCreate = async (
 	context: SyncActionContext,
-	object: Partial<JellyfishTypes.core.Contract> & { type: string },
+	object: Partial<Contract> & { type: string },
 ) => {
 	// TODO: Attempt to unify user cards based on
 	// their e-mails. i.e. if two user cards have

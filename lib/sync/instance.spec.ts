@@ -1,6 +1,4 @@
-/* eslint no-unused-vars: [2, { "args": "none" }] */
-
-import { Contract } from '@balena/jellyfish-types/build/core';
+import type { Contract } from '@balena/jellyfish-types/build/core';
 import Bluebird from 'bluebird';
 import _ from 'lodash';
 import nock from 'nock';

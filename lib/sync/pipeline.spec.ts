@@ -1,7 +1,7 @@
 import { constant } from 'lodash';
 import sinon from 'sinon';
 import * as pipeline from './pipeline';
-import { SyncActionContext } from './sync-context';
+import type { SyncActionContext } from './sync-context';
 
 describe('pipeline.importCards()', () => {
 	test('should work with card partials', async () => {
