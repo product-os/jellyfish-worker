@@ -278,7 +278,7 @@ export const newContext = async (
 	const createUser = async (
 		username: string,
 		hash = 'foobar',
-		roles = ['user-admin'],
+		roles = ['user-community'],
 	) => {
 		// Create the user, only if it doesn't exist yet
 		const userContract =
