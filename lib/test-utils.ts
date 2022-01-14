@@ -5,6 +5,7 @@ import type {
 	Contract,
 	LinkContract,
 	SessionContract,
+	TypeContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
@@ -63,14 +64,14 @@ export interface TestContext extends queueTestUtils.TestContext {
 		session: string,
 		name: string,
 		data: any,
-		markers?: string[],
+		markers?: any,
 	) => Promise<Contract>;
 	createIssue: (
 		actor: string,
 		session: string,
 		name: string,
 		data: any,
-		markers?: string[],
+		markers?: any,
 	) => Promise<Contract>;
 	createContract: (
 		actor: string,
@@ -78,7 +79,7 @@ export interface TestContext extends queueTestUtils.TestContext {
 		type: string,
 		name: string,
 		data: any,
-		markers?: string[],
+		markers?: any,
 	) => Promise<Contract>;
 }
 
@@ -127,8 +128,6 @@ export const newContext = async (
 		CARDS.create,
 		CARDS.update,
 		CARDS['triggered-action'],
-		contracts['role-user-community'],
-		contracts.message,
 		// Make sure any loop contracts are initialized, as they can be a prerequisite
 		..._.filter(contracts, (contract) => {
 			return contract.slug.startsWith('loop-');
@@ -167,6 +166,47 @@ export const newContext = async (
 		queueTestContext.queue.producer,
 	);
 	await worker.initialize(queueTestContext.logContext, sync);
+
+	const types = await queueTestContext.kernel.query<TypeContract>(
+		queueTestContext.logContext,
+		worker.session,
+		{
+			type: 'object',
+			properties: {
+				type: {
+					const: 'type@1.0.0',
+				},
+			},
+		},
+	);
+	worker.setTypeContracts(queueTestContext.logContext, types);
+
+	// Update type cards through the worker for generated triggers, etc
+	for (const contract of types) {
+		await worker.replaceCard(
+			queueTestContext.logContext,
+			worker.session,
+			worker.typeContracts['type@1.0.0'],
+			{
+				attachEvents: false,
+			},
+			contract,
+		);
+	}
+
+	const triggers = await queueTestContext.kernel.query<TypeContract>(
+		queueTestContext.logContext,
+		worker.session,
+		{
+			type: 'object',
+			properties: {
+				type: {
+					const: 'triggered-action@1.0.0',
+				},
+			},
+		},
+	);
+	worker.setTriggers(queueTestContext.logContext, triggers);
 
 	const flush = async (session: string) => {
 		const request = await queueTestContext.dequeue();
@@ -366,7 +406,7 @@ export const newContext = async (
 		session: string,
 		name: string,
 		data: any,
-		markers = [''],
+		markers = [],
 	) => {
 		const contract = await createContract(
 			actor,
@@ -384,7 +424,7 @@ export const newContext = async (
 		session: string,
 		name: string,
 		data: any,
-		markers = [''],
+		markers = [],
 	) => {
 		const contract = await createContract(
 			actor,
@@ -403,7 +443,7 @@ export const newContext = async (
 		type: string,
 		name: string,
 		data: any,
-		markers = [''],
+		markers = [],
 	) => {
 		const inserted = await worker.insertCard(
 			queueTestContext.logContext,

@@ -19,6 +19,7 @@ import type { Operation } from 'fast-json-patch';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
 import * as semver from 'semver';
+import { actions } from './actions';
 import CARDS from './cards';
 import * as errors from './errors';
 import * as subscriptionsLib from './subscriptions';
@@ -38,6 +39,7 @@ export {
 	PluginIdentity,
 } from './plugin';
 export * as testUtils from './test-utils';
+export * as actions from './actions';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
@@ -189,6 +191,11 @@ export class Worker {
 		this.library = actionLibrary;
 		this.consumer = consumer;
 		this.producer = producer;
+
+		// Add actions defined in this repo
+		Object.keys(actions).forEach((name) => {
+			actionLibrary[name] = actions[name];
+		});
 	}
 
 	/**

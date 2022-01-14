@@ -9,7 +9,6 @@ import * as instance from './instance';
 import * as oauth from './oauth';
 import * as pipeline from './pipeline';
 import * as syncContext from './sync-context';
-import type { SyncActionContext } from './sync-context';
 import { Integration, IntegrationConstructor } from './types';
 
 export { Integration, IntegrationConstructor };
@@ -91,7 +90,7 @@ export class Sync {
 	async authorize(
 		name: string,
 		token: any,
-		context: SyncActionContext,
+		context: syncContext.SyncActionContext,
 		options: {
 			code: string;
 			origin: string;
@@ -130,7 +129,11 @@ export class Sync {
 	 * @param {String} credentials - access token for external provider api
 	 * @returns {Object} external user
 	 */
-	async whoami(context: SyncActionContext, name: string, credentials: any) {
+	async whoami(
+		context: syncContext.SyncActionContext,
+		name: string,
+		credentials: any,
+	) {
 		const integration = this.integrations[name];
 
 		assert.INTERNAL(
@@ -166,7 +169,7 @@ export class Sync {
 	 * @returns {Object} external user
 	 */
 	async match(
-		context: SyncActionContext,
+		context: syncContext.SyncActionContext,
 		name: string,
 		externalUser: any,
 		options: {
@@ -262,7 +265,7 @@ export class Sync {
 		name: string,
 		userCard: Contract,
 		credentials: any,
-		context: SyncActionContext,
+		context: syncContext.SyncActionContext,
 	) {
 		const integration = this.integrations[name];
 
@@ -322,7 +325,7 @@ export class Sync {
 		name: string,
 		token: any,
 		card: Contract,
-		context: SyncActionContext,
+		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;
 			origin: string;
@@ -378,7 +381,7 @@ export class Sync {
 		name: string,
 		token: string,
 		card: Contract,
-		context: SyncActionContext,
+		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;
 			defaultUser: string;
@@ -448,7 +451,7 @@ export class Sync {
 		name: string,
 		token: any,
 		file: string,
-		context: SyncActionContext,
+		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;
 		},

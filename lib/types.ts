@@ -45,6 +45,17 @@ export interface Action {
 	) => Promise<any> | any;
 }
 
+interface ActionCore {
+	handler: Action['handler'];
+}
+
+export interface ActionFile<TData = ContractData> extends ActionCore {
+	pre?: Action['pre'];
+	card: ContractDefinition<TData>;
+}
+
+export interface Actions extends Map<Action> {}
+
 export interface WorkerContext {
 	sync: any;
 	getEventSlug: (type: string) => Promise<string>;
