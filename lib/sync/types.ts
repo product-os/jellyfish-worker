@@ -40,6 +40,7 @@ export interface SequenceItem {
 		  };
 }
 
+// TS-TODO: Properly type any arguments.
 export interface Integration {
 	initialize: () => Promise<any>;
 	destroy: () => Promise<any>;

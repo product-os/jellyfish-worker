@@ -1,10 +1,7 @@
-import dotenv from 'dotenv';
 import * as errors from './errors';
 import { Sync } from '.';
 import type { SyncActionContext } from './sync-context';
 import type { IntegrationConstructor } from './types';
-
-dotenv.config();
 
 const sync = new Sync({
 	integrations: {},

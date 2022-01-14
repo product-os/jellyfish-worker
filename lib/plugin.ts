@@ -5,7 +5,7 @@ import type {
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
-import type { Integration } from './sync';
+import type { IntegrationConstructor } from './sync';
 import type { Action, Map } from './types';
 
 export abstract class Plugin {
@@ -16,7 +16,7 @@ export abstract class Plugin {
 
 	private actions: Map<ActionDefinition>;
 	private contracts: ContractBuilder[];
-	private integrationMap: Map<Integration>;
+	private integrationMap: Map<IntegrationConstructor>;
 
 	protected constructor(options: PluginDefinition) {
 		this.slug = options.slug;
@@ -60,7 +60,7 @@ export abstract class Plugin {
 		return contractMap;
 	}
 
-	public getSyncIntegrations(): Map<Integration> {
+	public getSyncIntegrations(): Map<IntegrationConstructor> {
 		return this.integrationMap;
 	}
 
@@ -76,7 +76,7 @@ export interface PluginDefinition {
 	requires?: PluginIdentity[];
 	actions?: ActionDefinition[];
 	contracts?: ContractBuilder[];
-	integrationMap?: Map<Integration>;
+	integrationMap?: Map<IntegrationConstructor>;
 	mixins?: Map<ContractBuilder>;
 }
 

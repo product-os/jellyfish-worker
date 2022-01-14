@@ -1,10 +1,7 @@
-import dotenv from 'dotenv';
 import _ from 'lodash';
 import nock from 'nock';
 import querystring from 'querystring';
 import * as oauth from './oauth';
-
-dotenv.config();
 
 const authorizationNock = () => {
 	nock('https://api.balena-cloud.com')

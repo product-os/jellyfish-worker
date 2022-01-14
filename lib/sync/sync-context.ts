@@ -1,7 +1,8 @@
 import * as assert from '@balena/jellyfish-assert';
 import { Kernel } from '@balena/jellyfish-core';
 import { getLogger } from '@balena/jellyfish-logger';
-import { Contract } from '@balena/jellyfish-types/build/core';
+import { Contract, TypeContract } from '@balena/jellyfish-types/build/core';
+import { strict } from 'assert';
 import _ from 'lodash';
 import jsonpatch, { Operation } from 'fast-json-patch';
 import * as workerErrors from '../errors';
@@ -116,7 +117,7 @@ export const getActionContext = (
 				| Partial<Contract>
 				| { id: string; type: string; patch: Operation[] },
 			options: { actor?: string; timestamp?: Date; originator?: string },
-		): Promise<Contract> => {
+		): Promise<Contract | null> => {
 			const typeCard = await workerContext.getCardBySlug(session, type);
 
 			assert.INTERNAL(
@@ -127,6 +128,7 @@ export const getActionContext = (
 			);
 
 			const actor = options.actor || (await getDefaultActor());
+			strict(actor);
 
 			// If an ID was passed in, use that ID to load the current card, this
 			// prevents the situation where an integration may unintentionally
@@ -178,7 +180,7 @@ export const getActionContext = (
 					return workerContext
 						.insertCard(
 							session,
-							typeCard!,
+							typeCard! as TypeContract,
 							{
 								attachEvents: true,
 								timestamp: options.timestamp,
@@ -216,7 +218,7 @@ export const getActionContext = (
 
 			return workerContext.patchCard(
 				session,
-				typeCard!,
+				typeCard! as TypeContract,
 				{
 					attachEvents: true,
 					timestamp: options.timestamp,

@@ -22,6 +22,7 @@ import * as semver from 'semver';
 import CARDS from './cards';
 import * as errors from './errors';
 import * as subscriptionsLib from './subscriptions';
+import { Sync } from './sync';
 import * as transformerLib from './transformers';
 import * as triggersLib from './triggers';
 import type { Action, Map, WorkerContext } from './types';
@@ -148,8 +149,9 @@ export class Worker {
 	session: string;
 	library: Map<Action>;
 	id: string = '0';
-	// TS-TODO: use correct sync typings
-	sync: any;
+	// TS-TODO: use correct sync typings.
+	// Starts off undefined, set to Sync with initialize().
+	sync: undefined | Sync;
 
 	/**
 	 * @summary The Jellyfish Actions Worker
@@ -217,7 +219,7 @@ export class Worker {
 	 * await worker.initialize(logContext)
 	 */
 	// TS-TODO: this signature
-	async initialize(logContext: LogContext, sync: any) {
+	async initialize(logContext: LogContext, sync: Sync) {
 		// TS-TODO: type this correctly
 		this.id = uuidv4();
 		this.sync = sync;

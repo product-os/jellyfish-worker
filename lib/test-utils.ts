@@ -10,6 +10,7 @@ import type {
 import _ from 'lodash';
 import { ActionDefinition, Plugin } from './plugin';
 import { PluginManager } from './plugin-manager';
+import { Sync } from './sync';
 import { Action, Map } from './types';
 import { CARDS, Worker } from '.';
 
@@ -152,6 +153,11 @@ export const newContext = async (
 		);
 	}
 
+	// Initialize sync.
+	const sync = new Sync({
+		integrations: pluginManager.getSyncIntegrations(),
+	});
+
 	// Initialize worker instance.
 	const worker = new Worker(
 		queueTestContext.kernel,
@@ -160,7 +166,7 @@ export const newContext = async (
 		queueTestContext.queue.consumer,
 		queueTestContext.queue.producer,
 	);
-	await worker.initialize(queueTestContext.logContext);
+	await worker.initialize(queueTestContext.logContext, sync);
 
 	const flush = async (session: string) => {
 		const request = await queueTestContext.dequeue();

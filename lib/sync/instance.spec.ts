@@ -2,7 +2,6 @@
 
 import { Contract } from '@balena/jellyfish-types/build/core';
 import Bluebird from 'bluebird';
-import dotenv from 'dotenv';
 import _ from 'lodash';
 import nock from 'nock';
 import querystring from 'querystring';
@@ -10,8 +9,6 @@ import * as errors from './errors';
 import * as instance from './instance';
 import type { SyncActionContext } from './sync-context';
 import type { Integration } from './types';
-
-dotenv.config();
 
 const firstNock = () => {
 	nock.disableNetConnect();

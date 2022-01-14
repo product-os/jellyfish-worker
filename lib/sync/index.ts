@@ -3,7 +3,7 @@ import * as assert from '@balena/jellyfish-assert';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
-import type { WorkerContext } from '../types';
+import type { Map, WorkerContext } from '../types';
 import * as errors from './errors';
 import * as instance from './instance';
 import * as oauth from './oauth';
@@ -21,15 +21,11 @@ export { Integration, IntegrationConstructor };
  */
 
 interface SyncOptions {
-	integrations?: {
-		[key: string]: IntegrationConstructor;
-	};
+	integrations?: Map<IntegrationConstructor>;
 }
 
 export class Sync {
-	integrations: {
-		[key: string]: IntegrationConstructor;
-	};
+	integrations: Map<IntegrationConstructor>;
 	errors: typeof errors;
 	pipeline: typeof pipeline;
 
@@ -44,7 +40,7 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {Object} token - token details
 	 * @param {String} slug - user slug
 	 * @param {Object} options - options
@@ -52,21 +48,25 @@ export class Sync {
 	 * @returns {String} Authorize URL
 	 */
 	getAssociateUrl(
-		integration: string,
+		name: string,
 		token: any,
 		slug: string,
 		options: { origin: string },
 	) {
-		const Integration = this.integrations[integration];
-		if (!Integration || !token || !token.appId) {
+		const integration = this.integrations[name];
+		if (
+			!integration ||
+			!token ||
+			!token.appId ||
+			!integration.OAUTH_BASE_URL ||
+			!integration.OAUTH_SCOPES
+		) {
 			return null;
 		}
 
-		// TS-TODO: OAUTH_BASE_URL and OAUTH_SCOPES might not exist on
-		// Integration, but it's assumed that they are.
 		return oauth.getAuthorizeUrl(
-			Integration.OAUTH_BASE_URL!,
-			Integration.OAUTH_SCOPES!,
+			integration.OAUTH_BASE_URL,
+			integration.OAUTH_SCOPES,
 			slug,
 			{
 				appId: token.appId,
@@ -80,7 +80,7 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {Object} token - token details
 	 * @param {Object} context - execution context
 	 * @param {Object} options - options
@@ -89,7 +89,7 @@ export class Sync {
 	 * @returns {Object} external provider's access token
 	 */
 	async authorize(
-		integration: string,
+		name: string,
 		token: any,
 		context: SyncActionContext,
 		options: {
@@ -97,23 +97,23 @@ export class Sync {
 			origin: string;
 		},
 	) {
-		const Integration = this.integrations[integration];
+		const integration = this.integrations[name];
 
 		assert.INTERNAL(
 			context,
-			!!Integration,
+			!!integration,
 			errors.SyncNoCompatibleIntegration,
-			`There is no compatible integration for provider: ${integration}`,
+			`There is no compatible integration for provider: ${name}`,
 		);
 
 		assert.INTERNAL(
 			context,
 			token && token.appId && token.appSecret,
 			errors.SyncNoIntegrationAppCredentials,
-			`No application credentials found for integration: ${integration}`,
+			`No application credentials found for integration: ${name}`,
 		);
 
-		return oauth.getAccessToken(Integration.OAUTH_BASE_URL, options.code, {
+		return oauth.getAccessToken(integration.OAUTH_BASE_URL, options.code, {
 			appId: token.appId,
 			appSecret: token.appSecret,
 			redirectUri: options.origin,
@@ -126,33 +126,29 @@ export class Sync {
 	 * @public
 	 *
 	 * @param {Object} context - execution context
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {String} credentials - access token for external provider api
 	 * @returns {Object} external user
 	 */
-	async whoami(
-		context: SyncActionContext,
-		integration: string,
-		credentials: any,
-	) {
-		const Integration = this.integrations[integration];
+	async whoami(context: SyncActionContext, name: string, credentials: any) {
+		const integration = this.integrations[name];
 
 		assert.INTERNAL(
 			context,
-			!!Integration,
+			!!integration,
 			errors.SyncNoCompatibleIntegration,
-			`There is no compatible integration for provider: ${integration}`,
+			`There is no compatible integration for provider: ${name}`,
 		);
 
 		assert.INTERNAL(
 			context,
-			!!Integration.whoami,
+			!!integration.whoami,
 			errors.SyncNoCompatibleIntegration,
-			`Integration for ${integration} does not provide a whoami() function`,
+			`Integration for ${name} does not provide a whoami() function`,
 		);
 
-		strict.ok(Integration.whoami);
-		return Integration.whoami(context, credentials, {
+		strict.ok(integration.whoami);
+		return integration.whoami(context, credentials, {
 			errors,
 		});
 	}
@@ -163,7 +159,7 @@ export class Sync {
 	 * @public
 	 *
 	 * @param {Object} context - execution context
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {Object} externalUser - external user
 	 * @param {Object} options - options
 	 * @param {String} options.slug - slug to be used as a fallback to get a user
@@ -171,30 +167,30 @@ export class Sync {
 	 */
 	async match(
 		context: SyncActionContext,
-		integration: string,
+		name: string,
 		externalUser: any,
 		options: {
 			slug: string;
 		},
 	) {
-		const Integration = this.integrations[integration];
+		const integration = this.integrations[name];
 
 		assert.INTERNAL(
 			context,
-			!!Integration,
+			!!integration,
 			errors.SyncNoCompatibleIntegration,
-			`There is no compatible integration for provider: ${integration}`,
+			`There is no compatible integration for provider: ${name}`,
 		);
 
 		assert.INTERNAL(
 			context,
-			!!Integration.match,
+			!!integration.match,
 			errors.SyncNoCompatibleIntegration,
-			`Integration for ${integration} does not provide a match() function`,
+			`Integration for ${name} does not provide a match() function`,
 		);
 
-		strict.ok(Integration.match);
-		const user = await Integration.match(context, externalUser, {
+		strict.ok(integration.match);
+		const user = await integration.match(context, externalUser, {
 			errors,
 			slug: `${options.slug}@latest`,
 		});
@@ -204,7 +200,7 @@ export class Sync {
 				context,
 				user.slug === options.slug,
 				errors.SyncNoMatchingUser,
-				`Could not find matching user for provider: ${integration}, slugs do not match ${user.slug} !== ${options.slug}`,
+				`Could not find matching user for provider: ${name}, slugs do not match ${user.slug} !== ${options.slug}`,
 			);
 		}
 
@@ -213,27 +209,27 @@ export class Sync {
 
 	async getExternalUserSyncEventData(
 		context: any,
-		integration: string,
+		name: string,
 		externalUser: any,
 	) {
-		const Integration = this.integrations[integration];
+		const integration = this.integrations[name];
 
 		assert.INTERNAL(
 			context,
-			!!Integration,
+			!!integration,
 			errors.SyncNoCompatibleIntegration,
-			`There is no compatible integration for provider: ${integration}`,
+			`There is no compatible integration for provider: ${name}`,
 		);
 
 		assert.INTERNAL(
 			context,
-			!!Integration.getExternalUserSyncEventData,
+			!!integration.getExternalUserSyncEventData,
 			errors.SyncNoCompatibleIntegration,
-			`Integration for ${integration} does not provide a getExternalUserSyncEventData() function`,
+			`Integration for ${name} does not provide a getExternalUserSyncEventData() function`,
 		);
 
-		strict.ok(Integration.getExternalUserSyncEventData);
-		const event = await Integration.getExternalUserSyncEventData(
+		strict.ok(integration.getExternalUserSyncEventData);
+		const event = await integration.getExternalUserSyncEventData(
 			context,
 			externalUser,
 			{
@@ -256,31 +252,31 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {Object} userCard - user to associate external token to
 	 * @param {Object} credentials - external provider's api token
 	 * @param {Object} context - execution context
 	 * @returns {Object} Upserted user card
 	 */
 	async associate(
-		integration: string,
+		name: string,
 		userCard: Contract,
 		credentials: any,
 		context: SyncActionContext,
 	) {
-		const Integration = this.integrations[integration];
+		const integration = this.integrations[name];
 
 		assert.INTERNAL(
 			context,
-			!!Integration,
+			!!integration,
 			errors.SyncNoCompatibleIntegration,
-			`There is no compatible integration: ${integration}`,
+			`There is no compatible integration: ${name}`,
 		);
 
 		/*
 		 * Set the access token in the user card.
 		 */
-		_.set(userCard, ['data', 'oauth', integration], credentials);
+		_.set(userCard, ['data', 'oauth', name], credentials);
 		return context.upsertElement(userCard.type, _.omit(userCard, ['type']), {
 			timestamp: new Date(),
 		});
@@ -291,7 +287,7 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {Object} token - token details
 	 * @param {Object} event - event
 	 * @param {String} event.raw - raw event payload
@@ -299,18 +295,13 @@ export class Sync {
 	 * @param {Object} context - logger context
 	 * @returns {Boolean} whether the external event should be accepted or not
 	 */
-	async isValidEvent(
-		integration: string,
-		token: any,
-		event: any,
-		context: any,
-	) {
-		const Integration = this.integrations[integration];
-		if (!Integration || !token) {
+	async isValidEvent(name: string, token: any, event: any, context: any) {
+		const integration = this.integrations[name];
+		if (!integration || !token) {
 			return false;
 		}
 
-		return Integration.isEventValid(token, event.raw, event.headers, context);
+		return integration.isEventValid(token, event.raw, event.headers, context);
 	}
 
 	/**
@@ -318,7 +309,7 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {Object} token - token details
 	 * @param {Object} card - action target card
 	 * @param {Object} context - execution context
@@ -328,7 +319,7 @@ export class Sync {
 	 * @returns {Object[]} inserted cards
 	 */
 	async mirror(
-		integration: string,
+		name: string,
 		token: any,
 		card: Contract,
 		context: SyncActionContext,
@@ -340,29 +331,29 @@ export class Sync {
 	) {
 		if (!token) {
 			context.log.warn('Ignoring mirror as there is no token', {
-				integration,
+				integration: name,
 			});
 
 			return [];
 		}
 
-		const Integration = this.integrations[integration];
-		if (!Integration) {
+		const integration = this.integrations[name];
+		if (!integration) {
 			context.log.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
-					integration,
+					integration: name,
 				},
 			);
 
 			return [];
 		}
 
-		return pipeline.mirrorCard(Integration, card, {
+		return pipeline.mirrorCard(integration, card, {
 			actor: options.actor,
 			origin: options.origin,
 			defaultUser: options.defaultUser,
-			provider: integration,
+			provider: name,
 			token,
 			context,
 		});
@@ -373,7 +364,7 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {Object} token - token details
 	 * @param {Object} card - action target card
 	 * @param {Object} context - execution context
@@ -384,7 +375,7 @@ export class Sync {
 	 * @returns {Object[]} inserted cards
 	 */
 	async translate(
-		integration: string,
+		name: string,
 		token: string,
 		card: Contract,
 		context: SyncActionContext,
@@ -396,18 +387,18 @@ export class Sync {
 	) {
 		if (!token) {
 			context.log.warn('Ignoring translate as there is no token', {
-				integration,
+				integration: name,
 			});
 
 			return [];
 		}
 
-		const Integration = this.integrations[integration];
-		if (!Integration) {
+		const integration = this.integrations[name];
+		if (!integration) {
 			context.log.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
-					integration,
+					integration: name,
 				},
 			);
 
@@ -417,15 +408,15 @@ export class Sync {
 		context.log.info('Translating external event', {
 			id: card.id,
 			slug: card.slug,
-			integration,
+			integration: name,
 		});
 
-		const cards = await metrics.measureTranslate(integration, async () => {
-			return pipeline.translateExternalEvent(Integration, card, {
+		const cards = await metrics.measureTranslate(name, async () => {
+			return pipeline.translateExternalEvent(integration, card, {
 				actor: options.actor,
 				origin: options.origin,
 				defaultUser: options.defaultUser,
-				provider: integration,
+				provider: name,
 				token,
 				context,
 			});
@@ -445,7 +436,7 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} integration - integration name
+	 * @param {String} name - integration name
 	 * @param {Object} token - token details
 	 * @param {String} file - file id
 	 * @param {Object} context - execution context
@@ -454,7 +445,7 @@ export class Sync {
 	 * @returns {Buffer} file
 	 */
 	async getFile(
-		integration: string,
+		name: string,
 		token: any,
 		file: string,
 		context: SyncActionContext,
@@ -464,18 +455,18 @@ export class Sync {
 	): Promise<Buffer | null> {
 		if (!token) {
 			context.log.warn('Not fetching file as there is no token', {
-				integration,
+				integration: name,
 			});
 
 			return null;
 		}
 
-		const Integration = this.integrations[integration];
-		if (!Integration) {
+		const integration = this.integrations[name];
+		if (!integration) {
 			context.log.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
-					integration,
+					integration: name,
 				},
 			);
 
@@ -484,19 +475,19 @@ export class Sync {
 
 		context.log.info('Retrieving external file', {
 			file,
-			integration,
+			integration: name,
 		});
 
 		// TS-TODO: Its unclear if the origin and defaultUser options are required
 		return instance.run(
-			Integration,
+			integration,
 			token,
 			async (integrationInstance) => {
 				return integrationInstance.getFile(file);
 			},
 			{
 				actor: options.actor,
-				provider: integration,
+				provider: name,
 				origin: '',
 				defaultUser: '',
 				context,
