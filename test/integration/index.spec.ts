@@ -8,6 +8,7 @@ import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
 import { errors, testUtils, Worker } from '../../lib';
+import { Sync } from '../../lib/sync';
 
 let ctx: testUtils.TestContext;
 
@@ -56,9 +57,9 @@ describe('.getId()', () => {
 			ctx.queue.producer,
 		);
 
-		await worker1.initialize(ctx.logContext, null);
-		await worker2.initialize(ctx.logContext, null);
-		await worker3.initialize(ctx.logContext, null);
+		await worker1.initialize(ctx.logContext, new Sync());
+		await worker2.initialize(ctx.logContext, new Sync());
+		await worker3.initialize(ctx.logContext, new Sync());
 
 		expect(worker1.getId()).not.toBe(worker2.getId());
 		expect(worker1.getId()).not.toBe(worker3.getId());

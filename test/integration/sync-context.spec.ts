@@ -1,7 +1,7 @@
 import { strict } from 'assert';
 import _ from 'lodash';
 import * as uuid from 'uuid';
-import { testUtils } from '../../';
+import { testUtils } from '../../lib';
 
 let ctx: testUtils.TestContext;
 let actionContext: any;

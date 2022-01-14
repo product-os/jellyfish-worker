@@ -186,7 +186,7 @@ describe('.getRequest()', () => {
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
 			card: typeCard.id,
-			logContext: ctx.logContext,
+			context: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
 				properties: {
@@ -322,7 +322,7 @@ describe('.getRequest()', () => {
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
 			card: typeCard.id,
-			logContext: ctx.logContext,
+			context: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
 				properties: {
@@ -403,7 +403,7 @@ describe('.getRequest()', () => {
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
 			card: typeCard.id,
-			logContext: ctx.logContext,
+			context: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
 				properties: {
@@ -557,7 +557,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			card: typeCard.id,
-			logContext: ctx.logContext,
+			context: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
 			arguments: {
@@ -647,7 +647,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			card: typeCard.id,
-			logContext: ctx.logContext,
+			context: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
 			arguments: {
@@ -737,7 +737,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			card: typeCard.id,
-			logContext: ctx.logContext,
+			context: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
 			arguments: {

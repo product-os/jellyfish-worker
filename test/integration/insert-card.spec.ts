@@ -6,12 +6,12 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
-import { testUtils } from '../../lib';
+import { ActionDefinition, testUtils } from '../../lib';
 
 let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	const actionTestOriginator: ActionFile = {
+	const actionTestOriginator: ActionDefinition = {
 		handler: async (
 			session: string,
 			handlerCtx: any,
@@ -28,7 +28,7 @@ beforeAll(async () => {
 				request,
 			);
 		},
-		card: {
+		contract: {
 			slug: 'action-test-originator',
 			type: actions.actionCreateCard.card.type,
 			name: actions.actionCreateCard.card.name,

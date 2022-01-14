@@ -1,11 +1,11 @@
 import * as assert from '@balena/jellyfish-assert';
 import type { JellyfishError } from '@balena/jellyfish-types';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
-import type { ActionFile } from '../types';
+import type { ActionDefinition } from '../plugin';
 import { WorkerNoElement } from '../errors';
 
 // TODO: Bring in relavent tests from action-library
-const handler: ActionFile['handler'] = async (
+const handler: ActionDefinition['handler'] = async (
 	session,
 	context,
 	card,
@@ -117,9 +117,9 @@ const handler: ActionFile['handler'] = async (
 	};
 };
 
-export const actionCreateEvent: ActionFile = {
+export const actionCreateEvent: ActionDefinition = {
 	handler,
-	card: {
+	contract: {
 		slug: 'action-create-event',
 		type: 'action@1.0.0',
 		name: 'Attach an event to a card',
