@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
-import type { ActionRequestContract } from '@balena/jellyfish-types/build/core';
+import type { ActionRequestContract } from '@balena/jellyfish-queue';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { testUtils } from '../../lib';
 
 let ctx: testUtils.TestContext;
@@ -554,7 +554,7 @@ describe('.execute()', () => {
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					payload: {
 						mentions: ['johndoe'],
 						message: 'Hello',
@@ -572,7 +572,7 @@ describe('.execute()', () => {
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					payload: {
 						mentions: ['janedoe', 'johnsmith'],
 						message: 'Hello',
@@ -718,7 +718,7 @@ describe('.execute()', () => {
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					tags: [],
 					payload: {
 						mentions: ['johndoe'],
@@ -860,7 +860,7 @@ describe('.execute()', () => {
 				logContext: ctx.logContext,
 				type: slug,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					tags: [],
 					payload: {
 						$$mentions: ['johndoe'],
@@ -987,7 +987,7 @@ describe('.execute()', () => {
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					tags: ['testtag'],
 					payload: {
 						$$mentions: ['johndoe'],
@@ -1203,7 +1203,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
-					context: ctx.logContext,
+					logContext: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1241,7 +1241,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
-					context: ctx.logContext,
+					logContext: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1283,7 +1283,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-					context: ctx.logContext,
+					logContext: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1324,7 +1324,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
-					context: ctx.logContext,
+					logContext: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1367,7 +1367,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
-					context: ctx.logContext,
+					logContext: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1414,7 +1414,7 @@ describe('.execute()', () => {
 					type: 'action-request@1.0.0',
 					data: {
 						actor: localCtx.adminUserId,
-						context: localCtx.logContext,
+						logContext: localCtx.logContext,
 						action,
 						epoch: 1530663772247,
 						timestamp: '2018-07-04T00:22:52.247Z',
