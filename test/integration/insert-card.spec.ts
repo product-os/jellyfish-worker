@@ -1285,7 +1285,6 @@ describe('.insertCard()', () => {
 				},
 			},
 		});
-		// console.log('TRIGGERED ACTION', JSON.stringify(triggeredAction, null, 2));
 
 		const testContract = (await ctx.worker.insertCard(
 			ctx.logContext,

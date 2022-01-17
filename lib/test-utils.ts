@@ -22,7 +22,7 @@ export interface TestContext extends queueTestUtils.TestContext {
 	worker: Worker;
 	adminUserId: string;
 	actionLibrary: Map<Action>;
-	flush: (session: string) => Promise<null>;
+	flush: (session: string) => Promise<void>;
 	flushAll: (session: string) => Promise<void>;
 	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
 	processAction: (session: string, action: any) => Promise<any>;
@@ -189,7 +189,9 @@ export const newContext = async (
 		}
 
 		const result = await worker.execute(session, request);
-		throw new Error(result.data.message);
+		if (result.error) {
+			throw new Error(result.data.message);
+		}
 	};
 
 	const waitForMatch = async <T extends Contract>(

@@ -3,17 +3,17 @@ import { CARDS as CORE_CARDS, Kernel } from '@balena/jellyfish-core';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import { Consumer, Producer, ProducerOptions } from '@balena/jellyfish-queue';
+import type { ActionRequestContract } from '@balena/jellyfish-queue';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	ActionContract,
-	ActionRequestContract,
 	Contract,
 	ContractData,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import * as errio from 'errio';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
 import * as skhema from 'skhema';
@@ -235,6 +235,11 @@ export class Worker {
 		await Promise.all(
 			Object.values(CARDS).map(async (card) => {
 				return this.kernel.replaceCard(logContext, this.session, card);
+			}),
+		);
+		await Promise.all(
+			Object.values(actions).map(async (card) => {
+				return this.kernel.replaceCard(logContext, this.session, card.contract);
 			}),
 		);
 	}
@@ -1305,7 +1310,7 @@ export class Worker {
 								card: triggerCard.id,
 								action: request.action!,
 								actor: options.actor,
-								context: request.context,
+								logContext: request.context,
 								timestamp: request.currentDate.toISOString(),
 								epoch: request.currentDate.valueOf(),
 								arguments: request.arguments,

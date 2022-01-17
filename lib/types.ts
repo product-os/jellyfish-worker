@@ -1,9 +1,9 @@
 import type { Kernel } from '@balena/jellyfish-core';
 import type { LogContext } from '@balena/jellyfish-logger';
 import type { ProducerOptions } from '@balena/jellyfish-queue';
+import type { ActionRequestContract } from '@balena/jellyfish-queue';
 import type {
 	ActionContract,
-	ActionRequestContract,
 	Contract,
 	ContractData,
 	ContractDefinition,
