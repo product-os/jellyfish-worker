@@ -270,7 +270,7 @@ export const getRequest = async (
 		action: trigger.data.action,
 		arguments: compiledTrigger.arguments,
 		originator: trigger.id,
-		context: options.logContext,
+		logContext: options.logContext,
 		currentDate: options.currentDate,
 		card: compiledTrigger.target,
 	};

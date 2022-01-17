@@ -1310,7 +1310,7 @@ export class Worker {
 								card: triggerCard.id,
 								action: request.action!,
 								actor: options.actor,
-								logContext: request.context,
+								logContext: request.logContext,
 								timestamp: request.currentDate.toISOString(),
 								epoch: request.currentDate.valueOf(),
 								arguments: request.arguments,
