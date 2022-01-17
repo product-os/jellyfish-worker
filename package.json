@@ -61,7 +61,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@balena/jellyfish-action-library": "^16.1.12",
+    "@balena/jellyfish-action-library": "^16.2.5",
     "@balena/jellyfish-config": "^2.0.2",
     "@balena/jellyfish-core": "^8.2.0",
     "@balena/jellyfish-environment": "^6.0.1",
