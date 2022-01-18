@@ -1,32 +1,24 @@
-import { ActionLibrary } from '@balena/jellyfish-action-library';
-import { DefaultPlugin } from '@balena/jellyfish-plugin-default';
-import { ProductOsPlugin } from '@balena/jellyfish-plugin-product-os';
-import { integrationHelpers } from '@balena/jellyfish-test-harness';
-import { core } from '@balena/jellyfish-types';
-import { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import { strict as assert } from 'assert';
-import * as _ from 'lodash';
-import { Worker } from '../../lib';
+import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import type { ActionRequestContract } from '@balena/jellyfish-types/build/core';
+import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import _ from 'lodash';
+import { testUtils } from '../../lib';
 
-let ctx: integrationHelpers.IntegrationTestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	ctx = await integrationHelpers.before(
-		[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		{
-			worker: Worker,
-		},
-	);
+	ctx = await testUtils.newContext();
 });
 
 afterAll(() => {
-	return integrationHelpers.after(ctx);
+	return testUtils.destroyContext(ctx);
 });
 
 describe('.execute()', () => {
 	test('should execute an action', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
@@ -38,13 +30,13 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
 					reason: null,
 					properties: {
-						slug: ctx.generateRandomSlug({ prefix: 'execute-test' }),
+						slug: coreTestUtils.generateRandomSlug({ prefix: 'execute-test' }),
 						version: '1.0.0',
 						data: {
 							foo: 'bar',
@@ -56,13 +48,13 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const result: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			request,
 		);
 
 		expect(result.error).toBe(false);
-		const card = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const card = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			result.data.id,
 		);
@@ -71,13 +63,13 @@ describe('.execute()', () => {
 	});
 
 	test('should execute a triggered action given a matching mode', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
@@ -85,10 +77,10 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const command = ctx.generateRandomSlug();
+		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
-			ctx.context,
-			ctx.jellyfish.defaults({
+			ctx.logContext,
+			Kernel.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -123,13 +115,13 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -146,14 +138,17 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(ctx.context, request);
+		const result = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
 
 		expect(result.error).toBe(false);
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const card = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
 		);
@@ -183,13 +178,13 @@ describe('.execute()', () => {
 	});
 
 	test('should not execute a triggered action given a non matching mode', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
@@ -197,10 +192,10 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const command = ctx.generateRandomSlug();
+		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
-			ctx.context,
-			ctx.jellyfish.defaults({
+			ctx.logContext,
+			Kernel.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -235,13 +230,13 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -258,20 +253,23 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(ctx.context, request);
+		const result = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
 
 		expect(result.error).toBe(false);
 
-		const card = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const card = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
 		);
 
 		expect(card).toBeFalsy();
 
-		const resultCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const resultCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${slug}@latest`,
 		);
@@ -282,13 +280,13 @@ describe('.execute()', () => {
 	});
 
 	test('should execute a triggered action with a top level anyOf', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
@@ -296,12 +294,12 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const command = ctx.generateRandomSlug();
+		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
-			ctx.context,
-			ctx.jellyfish.defaults({
-				id: ctx.generateRandomID(),
-				slug: `triggered-action-${ctx.generateRandomID()}`,
+			ctx.logContext,
+			Kernel.defaults({
+				id: coreTestUtils.generateRandomId(),
+				slug: `triggered-action-${coreTestUtils.generateRandomId()}`,
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -344,7 +342,7 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 
 		await new Promise((resolve) => {
 			setTimeout(resolve, 5000);
@@ -355,7 +353,7 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -373,14 +371,17 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 
-		const result = await ctx.queue.producer.waitResults(ctx.context, request);
+		const result = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
 
 		expect(result.error).toBe(false);
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const card = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
 		);
@@ -388,13 +389,13 @@ describe('.execute()', () => {
 	});
 
 	test('should add a create event when creating a card', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
@@ -402,13 +403,13 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -426,13 +427,13 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const result: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			request,
 		);
 
 		expect(result.error).toBe(false);
 
-		const timeline = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const timeline = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['data'],
@@ -457,21 +458,21 @@ describe('.execute()', () => {
 
 	test('should be able to AGGREGATE based on the card timeline', async () => {
 		jest.setTimeout(10 * 1000);
-		const typeType = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
 		assert(typeType !== null);
 
-		const slug = ctx.generateRandomSlug({ prefix: 'test-type' });
+		const slug = coreTestUtils.generateRandomSlug({ prefix: 'test-type' });
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeType.id,
 				type: typeType.type,
 				arguments: {
@@ -510,7 +511,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			request,
 		);
 
@@ -521,14 +522,14 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeResult.data.id,
 				type: typeResult.data.type,
 				arguments: {
 					reason: null,
 					properties: {
 						version: '1.0.0',
-						slug: ctx.generateRandomSlug(),
+						slug: coreTestUtils.generateRandomSlug(),
 						data: {
 							mentions: [],
 						},
@@ -539,7 +540,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const threadResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			threadRequest,
 		);
 		expect(threadResult.error).toBe(false);
@@ -549,11 +550,11 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					payload: {
 						mentions: ['johndoe'],
 						message: 'Hello',
@@ -567,11 +568,11 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					payload: {
 						mentions: ['janedoe', 'johnsmith'],
 						message: 'Hello',
@@ -583,11 +584,11 @@ describe('.execute()', () => {
 		await ctx.flush(ctx.session);
 		await ctx.flush(ctx.session);
 		const messageResult1 = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			messageRequest1,
 		);
 		const messageResult2 = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			messageRequest2,
 		);
 
@@ -624,21 +625,21 @@ describe('.execute()', () => {
 	});
 
 	test('AGGREGATE should create a property on the target if it does not exist', async () => {
-		const typeType = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
 		assert(typeType !== null);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeType.id,
 				type: typeType.type,
 				arguments: {
@@ -677,7 +678,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			request,
 		);
 		expect(typeResult.error).toBe(false);
@@ -687,13 +688,13 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeResult.data.id,
 				type: typeResult.data.type,
 				arguments: {
 					reason: null,
 					properties: {
-						slug: ctx.generateRandomSlug(),
+						slug: coreTestUtils.generateRandomSlug(),
 						version: '1.0.0',
 						data: {},
 					},
@@ -703,7 +704,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const threadResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			threadRequest,
 		);
 		expect(threadResult.error).toBe(false);
@@ -713,11 +714,11 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					tags: [],
 					payload: {
 						mentions: ['johndoe'],
@@ -729,7 +730,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const messageResult = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			messageRequest,
 		);
 		expect(messageResult.error).toBe(false);
@@ -762,21 +763,21 @@ describe('.execute()', () => {
 	});
 
 	test('AGGREGATE should work with $$ prefixed properties', async () => {
-		const typeType = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
 		assert(typeType !== null);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeType.id,
 				type: typeType.type,
 				arguments: {
@@ -815,7 +816,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			request,
 		);
 
@@ -826,13 +827,13 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeResult.data.id,
 				type: 'type',
 				arguments: {
 					reason: null,
 					properties: {
-						slug: ctx.generateRandomSlug(),
+						slug: coreTestUtils.generateRandomSlug(),
 						version: '1.0.0',
 						data: {
 							$$mentions: [],
@@ -844,7 +845,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const threadResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			threadRequest,
 		);
 
@@ -856,10 +857,10 @@ describe('.execute()', () => {
 			{
 				action: 'action-create-event@1.0.0',
 				card: threadResult.data.id,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				type: slug,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					tags: [],
 					payload: {
 						$$mentions: ['johndoe'],
@@ -871,7 +872,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const messageResult = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			messageRequest,
 		);
 
@@ -905,21 +906,21 @@ describe('.execute()', () => {
 	});
 
 	test('should create a message with tags', async () => {
-		const typeType = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeType = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
 		assert(typeType !== null);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeType.id,
 				type: typeType.type,
 				arguments: {
@@ -947,7 +948,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			request,
 		);
 		expect(typeResult.error).toBe(false);
@@ -957,13 +958,13 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeResult.data.id,
 				type: typeResult.data.type,
 				arguments: {
 					reason: null,
 					properties: {
-						slug: ctx.generateRandomSlug(),
+						slug: coreTestUtils.generateRandomSlug(),
 						version: '1.0.0',
 					},
 				},
@@ -972,7 +973,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const threadResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			threadRequest,
 		);
 		expect(threadResult.error).toBe(false);
@@ -982,11 +983,11 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: 'action-create-event@1.0.0',
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: threadResult.data.id,
 				type: threadResult.data.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					tags: ['testtag'],
 					payload: {
 						$$mentions: ['johndoe'],
@@ -998,14 +999,14 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 		const messageResult: any = await ctx.queue.producer.waitResults(
-			ctx.context,
+			ctx.logContext,
 			messageRequest,
 		);
 
 		expect(messageResult.error).toBe(false);
 
-		const element = await ctx.jellyfish.getCardById(
-			ctx.context,
+		const element = await ctx.kernel.getCardById(
+			ctx.logContext,
 			ctx.session,
 			messageResult.data.id,
 		);
@@ -1016,13 +1017,13 @@ describe('.execute()', () => {
 	});
 
 	test('should add an execution event to the action request', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
@@ -1034,13 +1035,13 @@ describe('.execute()', () => {
 			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
 					reason: null,
 					properties: {
-						slug: ctx.generateRandomSlug(),
+						slug: coreTestUtils.generateRandomSlug(),
 						version: '1.0.0',
 						data: {
 							foo: 'bar',
@@ -1051,10 +1052,13 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(ctx.context, request);
+		const result = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
 		expect(result.error).toBe(false);
 
-		const timeline = await ctx.jellyfish.query(ctx.context, ctx.session, {
+		const timeline = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,
 			required: ['data'],
@@ -1078,23 +1082,23 @@ describe('.execute()', () => {
 	});
 
 	test('should execute a triggered action', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const command = ctx.generateRandomSlug();
+		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
-			ctx.context,
-			ctx.jellyfish.defaults({
+			ctx.logContext,
+			Kernel.defaults({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -1128,13 +1132,13 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const slug = ctx.generateRandomSlug();
+		const slug = coreTestUtils.generateRandomSlug();
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: `${actionCard.slug}@${actionCard.version}`,
-				context: ctx.context,
+				logContext: ctx.logContext,
 				card: typeCard.id,
 				type: typeCard.type,
 				arguments: {
@@ -1151,14 +1155,17 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(ctx.context, request);
+		const result = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
 
 		expect(result.error).toBe(false);
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const card = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
 		);
@@ -1167,8 +1174,8 @@ describe('.execute()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const resultCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			`${slug}@latest`,
 		);
@@ -1179,42 +1186,41 @@ describe('.execute()', () => {
 	});
 
 	test('should create a card', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const slug = ctx.generateRandomSlug();
-		const actionRequest =
-			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
-				ctx.context,
-				ctx.session,
-				{
-					slug: `action-request-${ctx.generateRandomID()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: ctx.actor.id,
-						context: ctx.context,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							id: typeCard.id,
-							type: typeCard.type,
-						},
-						arguments: {
-							reason: null,
-							properties: {
-								slug,
-								version: '1.0.0',
-							},
+		const slug = coreTestUtils.generateRandomSlug();
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						id: typeCard.id,
+						type: typeCard.type,
+					},
+					arguments: {
+						reason: null,
+						properties: {
+							slug,
+							version: '1.0.0',
 						},
 					},
 				},
-			);
+			},
+		);
 
 		const result = await ctx.worker.execute(ctx.session, actionRequest);
 
@@ -1227,34 +1233,33 @@ describe('.execute()', () => {
 	});
 
 	test('should throw if the input card does not exist', async () => {
-		const actionRequest =
-			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
-				ctx.context,
-				ctx.session,
-				{
-					slug: `action-request-${ctx.generateRandomID()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: ctx.actor.id,
-						context: ctx.context,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							// Make up a new UUID that doesn't correspond to any contract
-							id: ctx.generateRandomID(),
-							type: 'card@1.0.0',
-						},
-						arguments: {
-							reason: null,
-							properties: {
-								slug: ctx.generateRandomSlug(),
-								version: '1.0.0',
-							},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						// Make up a new UUID that doesn't correspond to any contract
+						id: coreTestUtils.generateRandomId(),
+						type: 'card@1.0.0',
+					},
+					arguments: {
+						reason: null,
+						properties: {
+							slug: coreTestUtils.generateRandomSlug(),
+							version: '1.0.0',
 						},
 					},
 				},
-			);
+			},
+		);
 
 		const result = await ctx.worker.execute(ctx.session, actionRequest);
 		expect(result.error).toBe(true);
@@ -1262,41 +1267,40 @@ describe('.execute()', () => {
 	});
 
 	test('should throw if the actor does not exist', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const actionRequest =
-			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
-				ctx.context,
-				ctx.session,
-				{
-					slug: `action-request-${ctx.generateRandomID()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-						context: ctx.context,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							id: typeCard.id,
-							type: typeCard.type,
-						},
-						arguments: {
-							reason: null,
-							properties: {
-								slug: ctx.generateRandomSlug(),
-								version: '1.0.0',
-							},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						id: typeCard.id,
+						type: typeCard.type,
+					},
+					arguments: {
+						reason: null,
+						properties: {
+							slug: coreTestUtils.generateRandomSlug(),
+							version: '1.0.0',
 						},
 					},
 				},
-			);
+			},
+		);
 
 		const result = await ctx.worker.execute(ctx.session, actionRequest);
 		expect(result.error).toBe(true);
@@ -1304,41 +1308,40 @@ describe('.execute()', () => {
 	});
 
 	test('should throw if input card does not match the action filter', async () => {
-		const actionCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const actionCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
 
 		assert(actionCard !== null);
 
-		const actionRequest =
-			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
-				ctx.context,
-				ctx.session,
-				{
-					slug: `action-request-${ctx.generateRandomID()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: ctx.actor.id,
-						context: ctx.context,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							id: actionCard.id,
-							type: actionCard.type,
-						},
-						arguments: {
-							reason: null,
-							properties: {
-								slug: ctx.generateRandomSlug(),
-								version: '1.0.0',
-							},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						id: actionCard.id,
+						type: actionCard.type,
+					},
+					arguments: {
+						reason: null,
+						properties: {
+							slug: coreTestUtils.generateRandomSlug(),
+							version: '1.0.0',
 						},
 					},
 				},
-			);
+			},
+		);
 
 		// The input filter on action-create-card checks that the input contracts has
 		// a type of "type". If it doesn't, the action request is rejected.
@@ -1348,38 +1351,37 @@ describe('.execute()', () => {
 	});
 
 	test('should return an error if the arguments do not match the action', async () => {
-		const typeCard = await ctx.jellyfish.getCardBySlug(
-			ctx.context,
+		const typeCard = await ctx.kernel.getCardBySlug(
+			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
 		assert(typeCard !== null);
 
-		const actionRequest =
-			await ctx.jellyfish.insertCard<core.ActionRequestContract>(
-				ctx.context,
-				ctx.session,
-				{
-					slug: `action-request-${ctx.generateRandomID()}`,
-					type: 'action-request@1.0.0',
-					data: {
-						actor: ctx.actor.id,
-						context: ctx.context,
-						action: 'action-create-card@1.0.0',
-						epoch: 1530663772247,
-						timestamp: '2018-07-04T00:22:52.247Z',
-						input: {
-							id: typeCard.id,
-							type: typeCard.type,
-						},
-						arguments: {
-							foo: 'bar',
-							bar: 'baz',
-						},
+		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				type: 'action-request@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					context: ctx.logContext,
+					action: 'action-create-card@1.0.0',
+					epoch: 1530663772247,
+					timestamp: '2018-07-04T00:22:52.247Z',
+					input: {
+						id: typeCard.id,
+						type: typeCard.type,
+					},
+					arguments: {
+						foo: 'bar',
+						bar: 'baz',
 					},
 				},
-			);
+			},
+		);
 
 		const result = await ctx.worker.execute(ctx.session, actionRequest);
 		expect(result.error).toBe(true);
@@ -1387,35 +1389,32 @@ describe('.execute()', () => {
 	});
 
 	test('should return an error if the action has no corresponding implementation', async () => {
-		const localCtx = await integrationHelpers.before(
-			[DefaultPlugin, ActionLibrary, ProductOsPlugin],
-			{
-				worker: Worker,
-			},
-		);
+		const localCtx = await testUtils.newContext({
+			// plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
+		});
 
 		const action = 'action-create-card@1.0.0';
 
 		// Remove the library function from the worker instance
 		Reflect.deleteProperty(localCtx.worker.library, action.split('@')[0]);
 
-		const typeCard = await localCtx.jellyfish.getCardBySlug(
-			localCtx.context,
+		const typeCard = await localCtx.kernel.getCardBySlug(
+			localCtx.logContext,
 			localCtx.session,
 			'card@latest',
 		);
 		assert(typeCard !== null);
 
 		const actionRequest =
-			await localCtx.jellyfish.insertCard<core.ActionRequestContract>(
-				localCtx.context,
+			await localCtx.kernel.insertCard<ActionRequestContract>(
+				localCtx.logContext,
 				localCtx.session,
 				{
-					slug: `action-request-${ctx.generateRandomID()}`,
+					slug: `action-request-${coreTestUtils.generateRandomId()}`,
 					type: 'action-request@1.0.0',
 					data: {
-						actor: localCtx.actor.id,
-						context: localCtx.context,
+						actor: localCtx.adminUserId,
+						context: localCtx.logContext,
 						action,
 						epoch: 1530663772247,
 						timestamp: '2018-07-04T00:22:52.247Z',
@@ -1426,7 +1425,7 @@ describe('.execute()', () => {
 						arguments: {
 							reason: null,
 							properties: {
-								slug: ctx.generateRandomSlug(),
+								slug: coreTestUtils.generateRandomSlug(),
 								version: '1.0.0',
 							},
 						},
@@ -1441,6 +1440,6 @@ describe('.execute()', () => {
 		expect(result.error).toBe(true);
 		expect(result.data.name).toBe('WorkerInvalidAction');
 
-		await integrationHelpers.after(localCtx);
+		await testUtils.destroyContext(localCtx);
 	});
 });

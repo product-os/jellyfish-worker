@@ -1,22 +1,24 @@
-import * as _ from 'lodash';
+import { getLogger } from '@balena/jellyfish-logger';
+import type { LogContext } from '@balena/jellyfish-logger';
+import type { ProducerResults } from '@balena/jellyfish-queue';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type { Contract } from '@balena/jellyfish-types/build/core';
+import _ from 'lodash';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
-import { getLogger } from '@balena/jellyfish-logger';
-import { JSONSchema, core } from '@balena/jellyfish-types';
-import { LogContext, EnqueueOptions } from './types';
-import { ProducerResults } from '@balena/jellyfish-types/build/queue';
+import type { EnqueueOptions } from './types';
 
 const logger = getLogger('worker');
 
 export interface EvaluateOptions {
 	transformers: Transformer[];
-	oldCard: core.Contract<any> | null;
-	newCard: core.Contract<any>;
-	context: LogContext;
+	oldCard: Contract<any> | null;
+	newCard: Contract<any>;
+	logContext: LogContext;
 	query: (
-		schema: JSONSchema,
+		schema: JsonSchema,
 		opts: { sortBy?: string; sortDir?: 'asc' | 'desc'; limit?: number },
-	) => Promise<core.Contract[]>;
+	) => Promise<Contract[]>;
 	// TS-TODO: Make slug optional in core model
 	executeAndAwaitAction: (
 		actionRequest: EnqueueOptions,
@@ -28,14 +30,14 @@ export interface TransformerData {
 	workerFilter: any;
 	[key: string]: unknown;
 }
-export type Transformer = core.Contract<TransformerData>;
+export type Transformer = Contract<TransformerData>;
 
 // TS-TODO: Transformers should be a default model and included in this module
 export const evaluate = async ({
 	transformers,
 	oldCard,
 	newCard,
-	context,
+	logContext,
 	query,
 	executeAndAwaitAction,
 }: EvaluateOptions): Promise<null> => {
@@ -74,7 +76,7 @@ export const evaluate = async ({
 			const transformerActor = await getTransformerActor(query, transformer);
 			if (!transformerActor) {
 				logger.warn(
-					context,
+					logContext,
 					'Cannot run transformer that does not have an owner',
 					{
 						transformerId: transformer.id,
@@ -148,7 +150,7 @@ async function getTransformerActor(
 			sortDir?: 'asc' | 'desc';
 			limit?: number;
 		},
-	) => Promise<core.Contract[]>,
+	) => Promise<Contract[]>,
 	transformer: Transformer,
 ) {
 	// The transformer should be run on behalf of the actor that owns the

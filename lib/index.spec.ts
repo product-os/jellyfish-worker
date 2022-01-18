@@ -1,7 +1,7 @@
+import type { Kernel } from '@balena/jellyfish-core';
+import type * as queue from '@balena/jellyfish-queue';
 import { Worker } from './index';
-import { Transformer } from './transformers';
-import * as queue from '@balena/jellyfish-queue';
-import { Kernel } from '@balena/jellyfish-core/build/kernel';
+import type { Transformer } from './transformers';
 
 describe('Worker.updateCurrentTransformers()', () => {
 	test('should generate properly filtered list of transformers', async () => {

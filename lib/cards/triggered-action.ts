@@ -1,4 +1,4 @@
-export default {
+export const triggeredAction = {
 	slug: 'triggered-action',
 	type: 'type@1.0.0',
 	version: '1.0.0',
