@@ -12,7 +12,7 @@ afterAll(() => {
 	return testUtils.destroyContext(ctx);
 });
 
-test('Should generate a notification if an event is attached to a contract', async () => {
+test.skip('Should generate a notification if an event is attached to a contract', async () => {
 	const user = await ctx.createUser(coreTestUtils.generateRandomSlug());
 	const session = await ctx.createSession(user);
 	const root = await ctx.createContract(

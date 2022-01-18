@@ -1,6 +1,6 @@
-import type { ActionDefinition } from '../plugin';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import * as bcrypt from 'bcrypt';
+import type { ActionDefinition } from '../plugin';
 import { BCRYPT_SALT_ROUNDS, PASSWORDLESS_USER_HASH } from './constants';
 
 const pre: ActionDefinition['pre'] = async (_session, _context, request) => {

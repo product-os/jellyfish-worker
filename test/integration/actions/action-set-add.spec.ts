@@ -1,8 +1,8 @@
-import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import { strict as assert } from 'assert';
-import * as _ from 'lodash';
-import { testUtils, WorkerContext } from '../../../lib';
+import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import _ from 'lodash';
 import { actionSetAdd } from '../../../lib/actions/action-set-add';
+import { testUtils, WorkerContext } from '../../../lib';
 
 const handler = actionSetAdd.handler;
 let ctx: testUtils.TestContext;

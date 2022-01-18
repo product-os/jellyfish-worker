@@ -2,7 +2,7 @@ import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { errors, testUtils, Worker } from '../../lib';
 import { Sync } from '../../lib/sync';
 

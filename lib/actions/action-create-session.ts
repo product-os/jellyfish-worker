@@ -1,16 +1,16 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { ActionDefinition } from '../plugin';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import * as bcrypt from 'bcrypt';
 import { v4 as isUUID } from 'is-uuid';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
-import { BCRYPT_SALT_ROUNDS } from './constants';
 import {
 	WorkerAuthenticationError,
 	WorkerNoElement,
 	WorkerSchemaMismatch,
 } from '../errors';
+import type { ActionDefinition } from '../plugin';
+import { BCRYPT_SALT_ROUNDS } from './constants';
 
 const pre: ActionDefinition['pre'] = async (session, context, request) => {
 	// Validate scope schema if set.
@@ -117,7 +117,7 @@ const handler: ActionDefinition['handler'] = async (
 	 */
 	const suffix = uuidv4();
 
-	const secretToken = await uuidv4();
+	const secretToken = uuidv4();
 	const secretTokenHash = await bcrypt.hash(secretToken, BCRYPT_SALT_ROUNDS);
 
 	const result = await context.insertCard(

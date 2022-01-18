@@ -1,7 +1,7 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { ActionDefinition } from '../plugin';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import { WorkerNoElement } from '../errors';
+import type { ActionDefinition } from '../plugin';
 
 const handler: ActionDefinition['handler'] = async (
 	session,

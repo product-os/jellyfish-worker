@@ -5,7 +5,7 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { errors, testUtils, triggersLib as triggers } from '../../lib';
 
 let ctx: testUtils.TestContext;

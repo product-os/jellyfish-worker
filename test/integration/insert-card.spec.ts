@@ -5,7 +5,7 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { ActionDefinition, testUtils } from '../../lib';
 import { actionCreateCard } from '../../lib/actions/action-create-card';
 

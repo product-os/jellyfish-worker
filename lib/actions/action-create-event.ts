@@ -1,8 +1,8 @@
 import * as assert from '@balena/jellyfish-assert';
 import { errors as coreErrors } from '@balena/jellyfish-core';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
-import type { ActionDefinition } from '../plugin';
 import { WorkerNoElement } from '../errors';
+import type { ActionDefinition } from '../plugin';
 
 // TODO: Bring in relavent tests from action-library
 const handler: ActionDefinition['handler'] = async (
