@@ -29,7 +29,7 @@ import * as triggersLib from './triggers';
 import { Action, Map, WorkerContext } from './types';
 import * as utils from './utils';
 
-export { Action, triggersLib, errors, CARDS, utils, WorkerContext };
+export { Action, actions, triggersLib, errors, CARDS, utils, WorkerContext };
 export { Integration } from './sync';
 export {
 	ActionDefinition,
@@ -39,7 +39,6 @@ export {
 	PluginIdentity,
 } from './plugin';
 export * as testUtils from './test-utils';
-export * as actions from './actions';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
