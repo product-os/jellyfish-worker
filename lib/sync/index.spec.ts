@@ -1,7 +1,7 @@
 import * as errors from './errors';
 import { Sync } from '.';
 import type { SyncActionContext } from './sync-context';
-import type { IntegrationConstructor } from './types';
+import type { IntegrationDefinition } from './types';
 
 const sync = new Sync({
 	integrations: {},
@@ -10,8 +10,8 @@ const sync = new Sync({
 describe('.isValidEvent()', () => {
 	test('should return false for an unknown integration', async () => {
 		const result = await sync.isValidEvent(
-			'helloworld',
-			null,
+			{ id: 'test' },
+			'invalid',
 			{
 				headers: {},
 				raw: '....',
@@ -67,7 +67,7 @@ describe('.authorize()', () => {
 	const makeSyncActionContextStub = () => ({} as any as SyncActionContext);
 	const syncInstanceWithIntegration = new Sync({
 		integrations: {
-			helloworld: {} as any as IntegrationConstructor,
+			helloworld: {} as any as IntegrationDefinition,
 		},
 	});
 
@@ -204,7 +204,7 @@ describe('.associate()', () => {
 
 		const syncInstance = new Sync({
 			integrations: {
-				helloworld: {} as any as IntegrationConstructor,
+				helloworld: {} as any as IntegrationDefinition,
 			},
 		});
 
@@ -260,7 +260,7 @@ describe('.associate()', () => {
 
 		const syncInstance = new Sync({
 			integrations: {
-				helloworld: {} as any as IntegrationConstructor,
+				helloworld: {} as any as IntegrationDefinition,
 			},
 		});
 
@@ -320,7 +320,7 @@ describe('.associate()', () => {
 
 		const syncInstance = new Sync({
 			integrations: {
-				helloworld: {} as any as IntegrationConstructor,
+				helloworld: {} as any as IntegrationDefinition,
 			},
 		});
 

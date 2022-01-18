@@ -8,9 +8,8 @@ import type {
 	TypeContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
-import * as _ from 'lodash';
-import { ActionDefinition, Plugin } from './plugin';
-import { PluginManager } from './plugin-manager';
+import _ from 'lodash';
+import { ActionDefinition, Plugin, PluginManager } from './plugin';
 import { Sync } from './sync';
 import { Action, Map } from './types';
 import { CARDS, Worker } from '.';

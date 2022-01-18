@@ -1,5 +1,7 @@
+import type { LogContext } from '@balena/jellyfish-logger';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { Operation } from 'fast-json-patch';
+import type { Map } from '../types';
 import type { SyncActionContext } from './sync-context';
 
 export interface ActorInformation {
@@ -42,21 +44,22 @@ export interface SequenceItem {
 
 // TS-TODO: Properly type any arguments.
 export interface Integration {
-	initialize: () => Promise<any>;
 	destroy: () => Promise<any>;
+
 	translate: (
 		contract: Contract,
 		options: { actor: string },
 	) => Promise<SequenceItem[]>;
+
 	mirror: (
 		contract: Contract,
 		options: { actor: string },
 	) => Promise<SequenceItem[]>;
+
 	getFile: (file: string) => Promise<Buffer>;
 }
 
-export interface IntegrationConstructorParams {
-	errors: any;
+export interface IntegrationInitializationOptions {
 	token: any;
 	defaultUser: string;
 	context: {
@@ -74,37 +77,31 @@ export interface IntegrationConstructorParams {
 	};
 }
 
-export interface IntegrationConstructor {
+export interface IntegrationDefinition {
 	OAUTH_BASE_URL?: string;
 	OAUTH_SCOPES?: string[];
+
+	initialize: (
+		options: IntegrationInitializationOptions,
+	) => Promise<Integration>;
+
 	isEventValid: (
+		logContext: LogContext,
 		token: any,
 		rawEvent: any,
-		headers: { [key: string]: string },
-		loggerContext: any,
+		headers: Map<string>,
 	) => boolean;
-	whoami?: (
-		loggerContext: any,
-		credentials: any,
-		options: {
-			errors: any;
-		},
-	) => null | Promise<any>;
+
+	whoami?: (context: SyncActionContext, credentials: any) => Promise<any>;
+
 	match?: (
 		context: SyncActionContext,
 		externalUser: any,
-		options: {
-			errors: any;
-			slug: string;
-		},
+		options: { slug: string },
 	) => Promise<Contract | null>;
-	getExternalUserSyncEventData?: (
-		loggerContext: any,
-		externalUser: any,
-		options: {
-			errors: any;
-		},
-	) => Promise<any>;
 
-	new (params: IntegrationConstructorParams): Integration;
+	getExternalUserSyncEventData?: (
+		logContext: LogContext,
+		externalUser: any,
+	) => Promise<any>;
 }

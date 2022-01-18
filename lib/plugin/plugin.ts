@@ -5,8 +5,8 @@ import type {
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
-import type { IntegrationConstructor } from './sync';
-import type { Action, Map } from './types';
+import type { IntegrationDefinition } from '../sync';
+import type { Action, Map } from '../types';
 
 export abstract class Plugin {
 	public slug: string;
@@ -14,11 +14,15 @@ export abstract class Plugin {
 	public version: string;
 	public requires: PluginIdentity[];
 
-	private actions: Map<ActionDefinition>;
+	private actions: Map<Action>;
 	private contracts: ContractBuilder[];
-	private integrationMap: Map<IntegrationConstructor>;
+	private integrationMap: Map<IntegrationDefinition>;
 
 	protected constructor(options: PluginDefinition) {
+		if (!options.slug.match(/^plugin-[a-z0-9-]+$/)) {
+			throw new Error(`Invalid slug: ${options.slug}`);
+		}
+
 		this.slug = options.slug;
 		this.name = options.name;
 		this.version = options.version;
@@ -34,7 +38,7 @@ export abstract class Plugin {
 				throw new Error(`Duplicate action: ${slug}`);
 			}
 
-			this.actions[slug] = action;
+			this.actions[slug] = _.omit(action, 'contract');
 		}
 	}
 
@@ -60,11 +64,11 @@ export abstract class Plugin {
 		return contractMap;
 	}
 
-	public getSyncIntegrations(): Map<IntegrationConstructor> {
+	public getSyncIntegrations(): Map<IntegrationDefinition> {
 		return this.integrationMap;
 	}
 
-	public getActions(): Map<ActionDefinition> {
+	public getActions(): Map<Action> {
 		return this.actions;
 	}
 }
@@ -76,7 +80,7 @@ export interface PluginDefinition {
 	requires?: PluginIdentity[];
 	actions?: ActionDefinition[];
 	contracts?: ContractBuilder[];
-	integrationMap?: Map<IntegrationConstructor>;
+	integrationMap?: Map<IntegrationDefinition>;
 	mixins?: Map<ContractBuilder>;
 }
 

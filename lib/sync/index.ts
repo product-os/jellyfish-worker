@@ -1,5 +1,6 @@
 import strict from 'assert';
 import * as assert from '@balena/jellyfish-assert';
+import type { LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
@@ -9,9 +10,9 @@ import * as instance from './instance';
 import * as oauth from './oauth';
 import * as pipeline from './pipeline';
 import * as syncContext from './sync-context';
-import { Integration, IntegrationConstructor } from './types';
+import { Integration, IntegrationDefinition } from './types';
 
-export { Integration, IntegrationConstructor };
+export { Integration, IntegrationDefinition };
 
 /**
  * Jellyfish sync library module.
@@ -20,11 +21,11 @@ export { Integration, IntegrationConstructor };
  */
 
 interface SyncOptions {
-	integrations?: Map<IntegrationConstructor>;
+	integrations?: Map<IntegrationDefinition>;
 }
 
 export class Sync {
-	integrations: Map<IntegrationConstructor>;
+	integrations: Map<IntegrationDefinition>;
 	errors: typeof errors;
 	pipeline: typeof pipeline;
 
@@ -151,9 +152,7 @@ export class Sync {
 		);
 
 		strict.ok(integration.whoami);
-		return integration.whoami(context, credentials, {
-			errors,
-		});
+		return integration.whoami(context, credentials);
 	}
 
 	/**
@@ -194,7 +193,6 @@ export class Sync {
 
 		strict.ok(integration.match);
 		const user = await integration.match(context, externalUser, {
-			errors,
 			slug: `${options.slug}@latest`,
 		});
 
@@ -211,21 +209,21 @@ export class Sync {
 	}
 
 	async getExternalUserSyncEventData(
-		context: any,
+		logContext: LogContext,
 		name: string,
 		externalUser: any,
 	) {
 		const integration = this.integrations[name];
 
 		assert.INTERNAL(
-			context,
+			logContext,
 			!!integration,
 			errors.SyncNoCompatibleIntegration,
 			`There is no compatible integration for provider: ${name}`,
 		);
 
 		assert.INTERNAL(
-			context,
+			logContext,
 			!!integration.getExternalUserSyncEventData,
 			errors.SyncNoCompatibleIntegration,
 			`Integration for ${name} does not provide a getExternalUserSyncEventData() function`,
@@ -233,15 +231,12 @@ export class Sync {
 
 		strict.ok(integration.getExternalUserSyncEventData);
 		const event = await integration.getExternalUserSyncEventData(
-			context,
+			logContext,
 			externalUser,
-			{
-				errors,
-			},
 		);
 
 		assert.INTERNAL(
-			context,
+			logContext,
 			event,
 			errors.SyncNoMatchingUser,
 			'Could not generate external user sync event',
@@ -298,13 +293,23 @@ export class Sync {
 	 * @param {Object} context - logger context
 	 * @returns {Boolean} whether the external event should be accepted or not
 	 */
-	async isValidEvent(name: string, token: any, event: any, context: any) {
+	async isValidEvent(
+		logContext: LogContext,
+		name: string,
+		token: any,
+		event: any,
+	) {
 		const integration = this.integrations[name];
 		if (!integration || !token) {
 			return false;
 		}
 
-		return integration.isEventValid(token, event.raw, event.headers, context);
+		return integration.isEventValid(
+			logContext,
+			token,
+			event.raw,
+			event.headers,
+		);
 	}
 
 	/**

@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-import { PluginManager } from '../lib/plugin-manager';
+import _ from 'lodash';
 import {
 	action1,
 	action2,
@@ -8,17 +7,15 @@ import {
 	integration1,
 	integration2,
 	TestPlugin,
-} from './plugin-fixtures';
+} from './helpers';
+import { PluginManager } from '.';
 
 describe('PluginManager', () => {
 	describe('validates plugins', () => {
 		test('by throwing an exception if you try and load two plugins with the same slug', () => {
 			const getPluginManager = () =>
 				new PluginManager([() => new TestPlugin(), () => new TestPlugin()]);
-			expect(getPluginManager).toThrow(
-				"Cannot load plugin 'test-plugin-1' (Test plugin 2) " +
-					'because a plugin with that slug (Test plugin 1) has already been loaded',
-			);
+			expect(getPluginManager).toThrow('Duplicate plugin: plugin-test');
 		});
 
 		test('by throwing an exception if a plugin requires another plugin that is not provided', () => {
@@ -26,19 +23,18 @@ describe('PluginManager', () => {
 				new PluginManager([
 					() =>
 						new TestPlugin({
-							slug: 'test-plugin-2',
+							slug: 'plugin-test-2',
 							name: 'Test plugin 2',
 							requires: [
 								{
-									slug: 'test-plugin-1',
+									slug: 'plugin-test-1',
 									version: '^2.0.0',
 								},
 							],
 						}),
 				]);
 			expect(getPluginManager).toThrow(
-				"Cannot load plugin 'test-plugin-2' (Test plugin 2) " +
-					'because a plugin it depends on (test-plugin-1) is not loaded',
+				"Cannot load plugin 'plugin-test-2' (Test plugin 2) because a plugin it depends on (plugin-test-1) is not loaded",
 			);
 		});
 
@@ -47,25 +43,25 @@ describe('PluginManager', () => {
 				new PluginManager([
 					() =>
 						new TestPlugin({
-							slug: 'test-plugin-1',
+							slug: 'plugin-test-1',
 							name: 'Test plugin 1',
 							version: '1.0.0',
 						}),
 					() =>
 						new TestPlugin({
-							slug: 'test-plugin-2',
+							slug: 'plugin-test-2',
 							name: 'Test plugin 2',
 							requires: [
 								{
-									slug: 'test-plugin-1',
+									slug: 'plugin-test-1',
 									version: '^2.0.0',
 								},
 							],
 						}),
 				]);
 			expect(getPluginManager).toThrow(
-				"Cannot load plugin 'test-plugin-2' (Test plugin 2) " +
-					'because a plugin it depends on (test-plugin-1@^2.0.0) is not loaded',
+				"Cannot load plugin 'plugin-test-2' (Test plugin 2) " +
+					'because a plugin it depends on (plugin-test-1@^2.0.0) is not loaded',
 			);
 		});
 
@@ -74,17 +70,17 @@ describe('PluginManager', () => {
 				new PluginManager([
 					() =>
 						new TestPlugin({
-							slug: 'test-plugin-1',
+							slug: 'plugin-test-1',
 							name: 'Test plugin 1',
 							version: '1.1.0',
 						}),
 					() =>
 						new TestPlugin({
-							slug: 'test-plugin-2',
+							slug: 'plugin-test-2',
 							name: 'Test plugin 2',
 							requires: [
 								{
-									slug: 'test-plugin-1',
+									slug: 'plugin-test-1',
 									version: '^1.0.0',
 								},
 							],
@@ -98,17 +94,17 @@ describe('PluginManager', () => {
 				new PluginManager([
 					() =>
 						new TestPlugin({
-							slug: 'test-plugin-1',
+							slug: 'plugin-test-1',
 							name: 'Test plugin 1',
 							version: '1.0.1-beta-1',
 						}),
 					() =>
 						new TestPlugin({
-							slug: 'test-plugin-2',
+							slug: 'plugin-test-2',
 							name: 'Test plugin 2',
 							requires: [
 								{
-									slug: 'test-plugin-1',
+									slug: 'plugin-test-1',
 									version: '^1.0.0',
 								},
 							],
@@ -121,8 +117,8 @@ describe('PluginManager', () => {
 	describe('.getCards', () => {
 		test('returns an empty object if no cards are supplied to any of the plugins', () => {
 			const pluginManager = new PluginManager([
-				() => new TestPlugin({ slug: 'test-plugin-1' }),
-				() => new TestPlugin({ slug: 'test-plugin-2' }),
+				() => new TestPlugin({ slug: 'plugin-test-1' }),
+				() => new TestPlugin({ slug: 'plugin-test-2' }),
 			]);
 			const cards = pluginManager.getCards();
 			expect(cards).toEqual({});
@@ -132,13 +128,13 @@ describe('PluginManager', () => {
 			const pluginManager = new PluginManager([
 				() =>
 					new TestPlugin({
-						slug: 'test-plugin-1',
+						slug: 'plugin-test-1',
 						name: 'Test Plugin 1',
 						contracts: [card1],
 					}),
 				() =>
 					new TestPlugin({
-						slug: 'test-plugin-2',
+						slug: 'plugin-test-2',
 						name: 'Test Plugin 2',
 						contracts: [Object.assign({}, card2, { slug: card1.slug })],
 					}),
@@ -146,7 +142,7 @@ describe('PluginManager', () => {
 			const getCards = () => pluginManager.getCards();
 
 			expect(getCards).toThrow(
-				"Card 'card-1' already exists and cannot be loaded from plugin 'Test Plugin 2'",
+				"'card-1' already exists and cannot be loaded from plugin 'plugin-test-2'",
 			);
 		});
 
@@ -158,7 +154,7 @@ describe('PluginManager', () => {
 							// Cards can be passed in as objects:
 							card1,
 							// ...or as a function that returns a card
-							({ mixin }) => mixin()(card2),
+							() => card2,
 						],
 					}),
 			]);
@@ -174,8 +170,8 @@ describe('PluginManager', () => {
 	describe('.getSyncIntegrations', () => {
 		test('returns an empty object if no integrations are supplied to any of the plugins', () => {
 			const pluginManager = new PluginManager([
-				() => new TestPlugin({ slug: 'test-plugin-1' }),
-				() => new TestPlugin({ slug: 'test-plugin-2' }),
+				() => new TestPlugin({ slug: 'plugin-test-1' }),
+				() => new TestPlugin({ slug: 'plugin-test-2' }),
 			]);
 			const loadedIntegrations = pluginManager.getSyncIntegrations();
 			expect(loadedIntegrations).toEqual({});
@@ -185,22 +181,22 @@ describe('PluginManager', () => {
 			const pluginManager = new PluginManager([
 				() =>
 					new TestPlugin({
-						slug: 'test-plugin-1',
-						integrationMap: { [integration1.slug]: integration1 },
+						slug: 'plugin-test-1',
+						integrationMap: { integration1 },
 					}),
 
 				() =>
 					new TestPlugin({
-						slug: 'test-plugin-2',
-						integrationMap: { [integration2.slug]: integration2 },
+						slug: 'plugin-test-2',
+						integrationMap: { integration2 },
 					}),
 			]);
 
 			const loadedIntegrations = pluginManager.getSyncIntegrations();
 
 			expect(loadedIntegrations).toEqual({
-				'integration-1': integration1,
-				'integration-2': integration2,
+				integration1,
+				integration2,
 			});
 		});
 	});
@@ -208,8 +204,8 @@ describe('PluginManager', () => {
 	describe('.getActions', () => {
 		test('returns an empty object if no actions are supplied to any of the plugins', () => {
 			const pluginManager = new PluginManager([
-				() => new TestPlugin({ slug: 'test-plugin-1' }),
-				() => new TestPlugin({ slug: 'test-plugin-2' }),
+				() => new TestPlugin({ slug: 'plugin-test-1' }),
+				() => new TestPlugin({ slug: 'plugin-test-2' }),
 			]);
 			const loadedActions = pluginManager.getActions();
 			expect(loadedActions).toEqual({});
@@ -219,13 +215,13 @@ describe('PluginManager', () => {
 			const pluginManager = new PluginManager([
 				() =>
 					new TestPlugin({
-						slug: 'test-plugin-1',
+						slug: 'plugin-test-1',
 						name: 'Test Plugin 1',
 						actions: [action1],
 					}),
 				() =>
 					new TestPlugin({
-						slug: 'test-plugin-2',
+						slug: 'plugin-test-2',
 						name: 'Test Plugin 2',
 						actions: [
 							Object.assign({}, action2, {
@@ -240,7 +236,7 @@ describe('PluginManager', () => {
 			const getActions = () => pluginManager.getActions();
 
 			expect(getActions).toThrow(
-				"Action 'action-1' already exists and cannot be loaded from plugin 'Test Plugin 2'",
+				"'action-1' already exists and cannot be loaded from plugin 'plugin-test-2'",
 			);
 		});
 
@@ -248,13 +244,13 @@ describe('PluginManager', () => {
 			const pluginManager = new PluginManager([
 				() =>
 					new TestPlugin({
-						slug: 'test-plugin-1',
+						slug: 'plugin-test-1',
 						actions: [action1],
 					}),
 
 				() =>
 					new TestPlugin({
-						slug: 'test-plugin-2',
+						slug: 'plugin-test-2',
 						actions: [action2],
 					}),
 			]);
@@ -262,14 +258,8 @@ describe('PluginManager', () => {
 			const loadedActions = pluginManager.getActions();
 
 			expect(loadedActions).toEqual({
-				'action-1': {
-					handler: action1.handler,
-					pre: action1.pre || _.noop,
-				},
-				'action-2': {
-					handler: action2.handler,
-					pre: action2.pre || _.noop,
-				},
+				'action-1': _.omit(action1, ['contract']),
+				'action-2': _.omit(action2, ['contract']),
 			});
 		});
 	});

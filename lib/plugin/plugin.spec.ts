@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-import * as sinon from 'sinon';
+import _ from 'lodash';
 import {
 	action1,
 	action2,
@@ -8,19 +7,20 @@ import {
 	integration1,
 	integration2,
 	TestPlugin,
-} from './plugin-fixtures';
+} from './helpers';
 
-describe('JellyfishPlugin', () => {
+describe('Plugin', () => {
 	describe('validates the plugin', () => {
 		test('by throwing an exception if the plugin does not implement the required interface', () => {
+			const slug = 'Invalid slug';
 			const getPlugin = () =>
 				new TestPlugin({
 					slug: 'Invalid slug',
 				});
-			expect(getPlugin).toThrow(/data\.slug should match pattern/);
+			expect(getPlugin).toThrow(`Invalid slug: ${slug}`);
 		});
 
-		test('but will not throw an exception if the plugin specifies a beta version', () => {
+		test('by not throwing an exception if the plugin specifies a beta version', () => {
 			const getPlugin = () =>
 				new TestPlugin({
 					version: '1.0.0-some-beta-version',
@@ -43,45 +43,7 @@ describe('JellyfishPlugin', () => {
 
 			const getCards = () => plugin.getCards();
 
-			expect(getCards).toThrow("Duplicate cards with slug 'card-1' found");
-		});
-
-		test('throws an exception if duplicate action slugs are found', () => {
-			const plugin = new TestPlugin({
-				contracts: [card1],
-				actions: [
-					action1,
-					Object.assign({}, action2, {
-						contract: {
-							slug: action1.contract.slug,
-						},
-					}),
-				],
-			});
-
-			const getCards = () => plugin.getCards();
-
-			expect(getCards).toThrow("Duplicate cards with slug 'action-1' found");
-		});
-
-		test('passes mixins to any card provided as a function', () => {
-			const cardFunction = sinon.stub().returns(card1);
-			const testMixin = _.identity;
-
-			const plugin = new TestPlugin({
-				contracts: [cardFunction],
-				mixins: {
-					test: testMixin,
-				},
-			});
-
-			const cards = plugin.getCards();
-
-			expect(cardFunction.calledOnce).toBe(true);
-			expect(cardFunction.firstCall.firstArg.test).toBe(testMixin);
-			expect(cards).toEqual({
-				'card-1': card1,
-			});
+			expect(getCards).toThrow('Duplicate contract: card-1');
 		});
 
 		test('returns a dictionary of cards, keyed by slug', () => {
@@ -90,7 +52,7 @@ describe('JellyfishPlugin', () => {
 					// Cards can be passed in as objects:
 					card1,
 					// ...or as a function that returns a card
-					({ mixin }) => mixin()(card2),
+					() => card2,
 				],
 			});
 
@@ -113,16 +75,16 @@ describe('JellyfishPlugin', () => {
 		test('returns a dictionary of integrations keyed by slug', () => {
 			const plugin = new TestPlugin({
 				integrationMap: {
-					[integration1.slug]: integration1,
-					[integration2.slug]: integration2,
+					integration1,
+					integration2,
 				},
 			});
 
 			const loadedIntegrations = plugin.getSyncIntegrations();
 
 			expect(loadedIntegrations).toEqual({
-				'integration-1': integration1,
-				'integration-2': integration2,
+				integration1,
+				integration2,
 			});
 		});
 	});
@@ -142,14 +104,8 @@ describe('JellyfishPlugin', () => {
 			const loadedActions = plugin.getActions();
 
 			expect(loadedActions).toEqual({
-				'action-1': {
-					handler: action1.handler,
-					pre: action1.pre || _.noop,
-				},
-				'action-2': {
-					handler: action2.handler,
-					pre: action2.pre || _.noop,
-				},
+				'action-1': _.omit(action1, ['contract']),
+				'action-2': _.omit(action2, ['contract']),
 			});
 		});
 	});

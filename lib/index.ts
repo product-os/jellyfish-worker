@@ -13,7 +13,7 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import * as errio from 'errio';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
 import * as skhema from 'skhema';

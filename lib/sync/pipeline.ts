@@ -7,13 +7,13 @@ import * as errors from './errors';
 import * as instance from './instance';
 import type {
 	Integration,
-	IntegrationConstructor,
+	IntegrationDefinition,
 	PipelineOpts,
 	SequenceItem,
 } from './types';
 
 const runIntegration = async (
-	integration: IntegrationConstructor,
+	integration: IntegrationDefinition,
 	options: PipelineOpts,
 	fn: 'translate' | 'mirror',
 	card: Contract,
@@ -258,7 +258,7 @@ export const importCards = async (
  * })
  */
 export const translateExternalEvent = async (
-	integration: IntegrationConstructor,
+	integration: IntegrationDefinition,
 	externalEvent: Contract,
 	options: PipelineOpts,
 ) => {
@@ -287,7 +287,7 @@ export const translateExternalEvent = async (
  * })
  */
 export const mirrorCard = async (
-	integration: IntegrationConstructor,
+	integration: IntegrationDefinition,
 	card: Contract,
 	options: PipelineOpts,
 ) => {

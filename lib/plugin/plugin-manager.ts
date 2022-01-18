@@ -1,8 +1,8 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as semver from 'semver';
 import type { Plugin } from './plugin';
-import type { IntegrationConstructor } from './sync/types';
-import type { Map } from './types';
+import type { IntegrationDefinition } from '../sync/types';
+import type { Map } from '../types';
 
 const validateDependencies = (plugins: Map<Plugin>) => {
 	_.forEach(plugins, (plugin) => {
@@ -73,8 +73,8 @@ export class PluginManager {
 		);
 	}
 
-	getSyncIntegrations(): Map<IntegrationConstructor> {
-		return mergeMaps<IntegrationConstructor>(
+	getSyncIntegrations(): Map<IntegrationDefinition> {
+		return mergeMaps<IntegrationDefinition>(
 			_.mapValues(this.pluginMap, (plugin: Plugin) =>
 				plugin.getSyncIntegrations(),
 			),

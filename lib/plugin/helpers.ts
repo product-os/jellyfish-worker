@@ -1,11 +1,9 @@
+import type { LogContext } from '@balena/jellyfish-logger';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
-import {
-	ActionDefinition,
-	Integration,
-	Plugin,
-	PluginDefinition,
-} from '../lib';
+import type { Integration, IntegrationDefinition } from '../sync';
+import type { Map } from '../types';
+import { ActionDefinition, Plugin, PluginDefinition } from '.';
 
 const commonCard = {
 	tags: [],
@@ -16,6 +14,7 @@ const commonCard = {
 	data: {},
 	requires: [],
 	capabilities: [],
+	loop: null,
 };
 
 export const card1: Contract = {
@@ -49,24 +48,40 @@ class TestIntegration implements Integration {
 		return Promise.resolve();
 	}
 
-	async mirror(_contract: Contract, _options: any) {
+	async translate(_contract: Contract, _options: { actor: string }) {
 		return Promise.resolve([]);
 	}
 
-	async translate(_event: IntegrationEvent) {
+	async mirror(_contract: Contract, _options: { actor: string }) {
 		return Promise.resolve([]);
+	}
+
+	async getFile(_file: string) {
+		return Promise.resolve(Buffer.from([]));
 	}
 }
 
-export const integration1 = new TestIntegration('integration-1');
-export const integration2 = new TestIntegration('integration-2');
+const integrationDefinitionFor = (slug: string): IntegrationDefinition => {
+	return {
+		initialize: async () => new TestIntegration(slug),
+
+		isEventValid: (
+			_logContext: LogContext,
+			_token: any,
+			_rawEvent: any,
+			_headers: Map<string>,
+		) => true,
+	};
+};
+export const integration1 = integrationDefinitionFor('integration1');
+export const integration2 = integrationDefinitionFor('integration2');
 
 export class TestPlugin extends Plugin {
 	public constructor(definition: Partial<PluginDefinition> = {}) {
 		super(
 			Object.assign(
 				{
-					slug: 'test-plugin',
+					slug: 'plugin-test',
 					name: 'Test Plugin',
 					version: '1.0.0',
 				},

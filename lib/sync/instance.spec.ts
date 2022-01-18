@@ -6,7 +6,7 @@ import querystring from 'querystring';
 import * as errors from './errors';
 import * as instance from './instance';
 import type { SyncActionContext } from './sync-context';
-import type { Integration } from './types';
+import type { Integration, IntegrationInitializationOptions } from './types';
 
 const firstNock = () => {
 	nock.disableNetConnect();
@@ -96,37 +96,23 @@ afterAll(() => {
 	nock.cleanAll();
 });
 
+const oAuthTokenRefreshTestIntegration = {
+	OAUTH_BASE_URL: 'https://api.balena-cloud.com',
+	OAUTH_SCOPES: ['users'],
+
+	initialize: async (options: IntegrationInitializationOptions) =>
+		new OAuthTokenRefreshTestIntegration(options),
+
+	isEventValid: () => true,
+};
+
 class OAuthTokenRefreshTestIntegration implements Integration {
-	options: any;
+	options: IntegrationInitializationOptions;
 	context: any;
 
-	static OAUTH_BASE_URL = 'https://api.balena-cloud.com';
-	static OAUTH_SCOPES = ['users'];
-
-	static isEventValid() {
-		return true;
-	}
-
-	static async whoami() {
-		return true;
-	}
-
-	static async match() {
-		return null;
-	}
-
-	static async getExternalUserSyncEventData() {
-		return null;
-	}
-
-	constructor(options: any) {
+	constructor(options: IntegrationInitializationOptions) {
 		this.options = options;
 		this.context = this.options.context;
-	}
-
-	// eslint-disable-next-line class-methods-use-this
-	async initialize() {
-		return Bluebird.resolve();
 	}
 
 	// eslint-disable-next-line class-methods-use-this
@@ -198,7 +184,7 @@ describe('instance', () => {
 		};
 
 		const result = await instance.run(
-			OAuthTokenRefreshTestIntegration,
+			oAuthTokenRefreshTestIntegration,
 			{
 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
@@ -291,7 +277,7 @@ describe('instance', () => {
 		};
 
 		const result = await instance.run(
-			OAuthTokenRefreshTestIntegration,
+			oAuthTokenRefreshTestIntegration,
 			{
 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
@@ -406,7 +392,7 @@ describe('instance', () => {
 			*/
 
 		const result = await instance.run(
-			OAuthTokenRefreshTestIntegration,
+			oAuthTokenRefreshTestIntegration,
 			{
 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
@@ -499,7 +485,7 @@ describe('instance', () => {
 		};
 
 		const result = await instance.run(
-			OAuthTokenRefreshTestIntegration,
+			oAuthTokenRefreshTestIntegration,
 			{
 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
@@ -586,7 +572,7 @@ describe('instance', () => {
 
 		await expect(
 			instance.run(
-				OAuthTokenRefreshTestIntegration,
+				oAuthTokenRefreshTestIntegration,
 				{
 					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
@@ -635,7 +621,7 @@ describe('instance', () => {
 
 		await expect(
 			instance.run(
-				OAuthTokenRefreshTestIntegration,
+				oAuthTokenRefreshTestIntegration,
 				{
 					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
@@ -693,7 +679,7 @@ describe('instance', () => {
 
 		await expect(
 			instance.run(
-				OAuthTokenRefreshTestIntegration,
+				oAuthTokenRefreshTestIntegration,
 				{
 					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',

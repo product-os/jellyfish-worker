@@ -9,7 +9,7 @@ import type { SyncActionContext } from './sync-context';
 import type {
 	ActorInformation,
 	Integration,
-	IntegrationConstructor,
+	IntegrationDefinition,
 	PipelineOpts,
 } from './types';
 
@@ -209,7 +209,7 @@ const getOAuthUser = async (
 };
 
 export const run = async (
-	integration: IntegrationConstructor,
+	integration: IntegrationDefinition,
 	token: any,
 	fn: (integrationInstance: Integration) => any,
 	options: Omit<PipelineOpts, 'token'>,
@@ -217,8 +217,7 @@ export const run = async (
 	const getUsername = options.context.getLocalUsername || _.identity;
 
 	// eslint-disable-next-line new-cap
-	const instance = new integration({
-		errors,
+	const instance = await integration.initialize({
 		token,
 		defaultUser: options.defaultUser,
 		context: {
@@ -400,8 +399,6 @@ export const run = async (
 			},
 		},
 	});
-
-	await instance.initialize();
 
 	try {
 		const result = await fn(instance);
