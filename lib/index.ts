@@ -30,7 +30,7 @@ import { Action, Map, WorkerContext } from './types';
 import * as utils from './utils';
 
 export { Action, actions, triggersLib, errors, CARDS, utils, WorkerContext };
-export { Integration } from './sync';
+export { Integration, IntegrationDefinition } from './sync';
 export {
 	ActionDefinition,
 	ContractBuilder,
