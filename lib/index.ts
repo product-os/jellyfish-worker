@@ -3,10 +3,10 @@ import { CARDS as CORE_CARDS, Kernel } from '@balena/jellyfish-core';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import { Consumer, Producer, ProducerOptions } from '@balena/jellyfish-queue';
-import type { ActionRequestContract } from '@balena/jellyfish-queue';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	ActionContract,
+	ActionRequestContract,
 	Contract,
 	ContractData,
 	TypeContract,

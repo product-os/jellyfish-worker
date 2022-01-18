@@ -8,7 +8,7 @@ import type {
 	TypeContract,
 	UserContract,
 } from '@balena/jellyfish-types/build/core';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { ActionDefinition, Plugin } from './plugin';
 import { PluginManager } from './plugin-manager';
 import { Sync } from './sync';
@@ -89,15 +89,6 @@ export const newContext = async (
 	// Prepare and insert all contracts, including those from plugins.
 	const contracts = pluginManager.getCards();
 	const actionLibrary = pluginManager.getActions();
-	if (options.actions) {
-		for (const action of options.actions) {
-			Object.assign(actionLibrary, {
-				[action.contract.slug]: {
-					handler: action.handler,
-				},
-			});
-		}
-	}
 	const bootstrapContracts = [
 		CARDS.create,
 		CARDS.update,
@@ -110,6 +101,22 @@ export const newContext = async (
 			return contract.slug.startsWith('action-');
 		}),
 	];
+
+	// Add passed in actions
+	if (options.actions) {
+		for (const action of options.actions) {
+			Object.assign(actionLibrary, {
+				[action.contract.slug]: {
+					handler: action.handler,
+				},
+			});
+			await queueTestContext.kernel.insertContract(
+				queueTestContext.logContext,
+				queueTestContext.session,
+				action.contract,
+			);
+		}
+	}
 
 	// Any remaining contracts from plugins can now be added to the sequence
 	const remainder = _.filter(contracts, (contract) => {

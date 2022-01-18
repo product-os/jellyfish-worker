@@ -47,10 +47,10 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.6",
-    "@balena/jellyfish-core": "13.0.0-joshbwlng-action-request-context-440059bbbd0bcbd09e2878c143da5cfe3bd369b6",
+    "@balena/jellyfish-core": "^12.2.2",
     "@balena/jellyfish-jellyscript": "^5.1.1",
     "@balena/jellyfish-logger": "^4.0.5",
-    "@balena/jellyfish-queue": "4.0.0-joshbwlng-log-context-8a15eea907d1a5c8d9c926da6535e6f7449677cb",
+    "@balena/jellyfish-queue": "^3.0.11",
     "@types/is-uuid": "^1.0.0",
     "bcrypt": "^5.0.1",
     "errio": "^1.2.2",

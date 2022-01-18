@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
-import type { ActionRequestContract } from '@balena/jellyfish-queue';
+import type { ActionRequestContract } from '@balena/jellyfish-types/build/core';
 import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import * as _ from 'lodash';
 import { testUtils } from '../../lib';
@@ -1203,7 +1203,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
-					logContext: ctx.logContext,
+					context: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1241,7 +1241,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
-					logContext: ctx.logContext,
+					context: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1283,7 +1283,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-					logContext: ctx.logContext,
+					context: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1324,7 +1324,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
-					logContext: ctx.logContext,
+					context: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1367,7 +1367,7 @@ describe('.execute()', () => {
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
-					logContext: ctx.logContext,
+					context: ctx.logContext,
 					action: 'action-create-card@1.0.0',
 					epoch: 1530663772247,
 					timestamp: '2018-07-04T00:22:52.247Z',
@@ -1414,7 +1414,7 @@ describe('.execute()', () => {
 					type: 'action-request@1.0.0',
 					data: {
 						actor: localCtx.adminUserId,
-						logContext: localCtx.logContext,
+						context: localCtx.logContext,
 						action,
 						epoch: 1530663772247,
 						timestamp: '2018-07-04T00:22:52.247Z',
