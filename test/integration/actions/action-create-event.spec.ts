@@ -1,6 +1,9 @@
 import { strict as assert } from 'assert';
-import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
-import { isArray, isNull } from 'lodash';
+import {
+	errors as coreErrors,
+	Kernel,
+	testUtils as coreTestUtils,
+} from '@balena/jellyfish-core';
 import { testUtils, WorkerContext } from '../../../lib';
 import { actionCreateEvent } from '../../../lib/actions/action-create-event';
 
@@ -18,20 +21,14 @@ afterAll(async () => {
 
 describe('action-create-event', () => {
 	test('should throw an error on invalid type', async () => {
-		const message = await ctx.createContract(
+		const card = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
-			'message@1.0.0',
+			'card@1.0.0',
 			coreTestUtils.generateRandomSlug(),
-			{
-				actor: ctx.adminUserId,
-				payload: {
-					message: coreTestUtils.generateRandomSlug(),
-				},
-				timestamp: new Date().toISOString(),
-			},
+			{ payload: 'test' },
 		);
-		const request: any = {
+		const request = {
 			context: {
 				id: `TEST-${coreTestUtils.generateRandomId()}`,
 			},
@@ -40,38 +37,29 @@ describe('action-create-event', () => {
 			originator: coreTestUtils.generateRandomId(),
 			arguments: {
 				type: 'foobar',
-				payload: message.data.payload,
+				payload: card.data.payload,
 			},
-		} as any;
+		};
 
-		expect.assertions(1);
-		try {
-			await actionCreateEvent.handler(
+		await expect(
+			actionCreateEvent.handler(
 				ctx.session,
 				actionContext,
-				message,
-				request,
-			);
-		} catch (error: any) {
-			expect(error.message).toEqual(`No such type: ${request.arguments.type}`);
-		}
+				card,
+				request as any,
+			),
+		).rejects.toThrow(`No such type: ${request.arguments.type}`);
 	});
 
 	test('should return event card', async () => {
-		const message = await ctx.createContract(
+		const card = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
-			'message@1.0.0',
+			'card@1.0.0',
 			coreTestUtils.generateRandomSlug(),
-			{
-				actor: ctx.adminUserId,
-				payload: {
-					message: coreTestUtils.generateRandomSlug(),
-				},
-				timestamp: new Date().toISOString(),
-			},
+			{ payload: 'test' },
 		);
-		const request: any = {
+		const request = {
 			context: {
 				id: `TEST-${coreTestUtils.generateRandomId()}`,
 			},
@@ -79,38 +67,29 @@ describe('action-create-event', () => {
 			actor: ctx.adminUserId,
 			originator: coreTestUtils.generateRandomId(),
 			arguments: {
-				type: 'message',
-				payload: message.data.payload,
+				type: 'card',
+				payload: card.data.payload,
 			},
-		} as any;
+		};
 
-		expect.assertions(1);
-		const result = await actionCreateEvent.handler(
+		const results = await actionCreateEvent.handler(
 			ctx.session,
 			actionContext,
-			message,
-			request,
+			card,
+			request as any,
 		);
-		if (!isNull(result) && !isArray(result)) {
-			expect(result.slug).toMatch(/^message-/);
-		}
+		expect((results as any).slug).toMatch(/^card-/);
 	});
 
 	test('should throw an error on attempt to insert existing card', async () => {
-		const message = await ctx.createContract(
+		const card = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
-			'message@1.0.0',
+			'card@1.0.0',
 			coreTestUtils.generateRandomSlug(),
-			{
-				actor: ctx.adminUserId,
-				payload: {
-					message: coreTestUtils.generateRandomSlug(),
-				},
-				timestamp: new Date().toISOString(),
-			},
+			{ payload: 'test' },
 		);
-		const request: any = {
+		const request = {
 			context: {
 				id: `TEST-${coreTestUtils.generateRandomId()}`,
 			},
@@ -118,23 +97,20 @@ describe('action-create-event', () => {
 			actor: ctx.adminUserId,
 			originator: coreTestUtils.generateRandomId(),
 			arguments: {
-				type: 'message',
-				slug: message.slug,
-				payload: message.data.payload,
+				type: 'card',
+				slug: card.slug,
+				payload: card.data.payload,
 			},
-		} as any;
+		};
 
-		expect.assertions(1);
-		try {
-			await actionCreateEvent.handler(
+		await expect(
+			actionCreateEvent.handler(
 				ctx.session,
 				actionContext,
-				message,
-				request,
-			);
-		} catch (error: any) {
-			expect(error.name).toEqual('JellyfishElementAlreadyExists');
-		}
+				card,
+				request as any,
+			),
+		).rejects.toThrow(coreErrors.JellyfishElementAlreadyExists);
 	});
 
 	test('should create a link card', async () => {
@@ -143,7 +119,7 @@ describe('action-create-event', () => {
 			ctx.session,
 			'card@1.0.0',
 			null,
-			{},
+			{ payload: 'test' },
 		);
 
 		const eventRequest = await ctx.queue.producer.enqueue(
@@ -226,7 +202,7 @@ describe('action-create-event', () => {
 			ctx.session,
 			'card@1.0.0',
 			null,
-			{},
+			{ payload: 'test' },
 		);
 
 		const eventRequest = await ctx.queue.producer.enqueue(
@@ -238,7 +214,7 @@ describe('action-create-event', () => {
 				card: root.id,
 				type: root.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					name: 'Hello world',
 					tags: [],
 					payload: {
@@ -265,10 +241,10 @@ describe('action-create-event', () => {
 
 	test("events should always inherit their parent's markers", async () => {
 		const marker = 'org-test';
-		const supportThread = await ctx.worker.insertCard(
+		const card = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			ctx.worker.typeContracts['support-thread@1.0.0'],
+			ctx.worker.typeContracts['card@1.0.0'],
 			{
 				attachEvents: true,
 				actor: ctx.adminUserId,
@@ -276,7 +252,7 @@ describe('action-create-event', () => {
 			{
 				name: coreTestUtils.generateRandomSlug(),
 				slug: coreTestUtils.generateRandomSlug({
-					prefix: 'support-thread',
+					prefix: 'card',
 				}),
 				version: '1.0.0',
 				markers: [marker],
@@ -285,7 +261,7 @@ describe('action-create-event', () => {
 				},
 			},
 		);
-		assert(supportThread);
+		assert(card);
 
 		const request = await ctx.queue.producer.enqueue(
 			ctx.worker.getId(),
@@ -293,10 +269,10 @@ describe('action-create-event', () => {
 			{
 				action: 'action-create-event@1.0.0',
 				logContext: ctx.logContext,
-				card: supportThread.id,
-				type: supportThread.type,
+				card: card.id,
+				type: card.type,
 				arguments: {
-					type: 'message',
+					type: 'card',
 					tags: [],
 					payload: {
 						message: 'johndoe',
@@ -305,18 +281,18 @@ describe('action-create-event', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const messageResult: any = await ctx.queue.producer.waitResults(
+		const cardResult: any = await ctx.queue.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
-		expect(messageResult.error).toBe(false);
+		expect(cardResult.error).toBe(false);
 
-		const card = await ctx.kernel.getCardById(
+		const result = await ctx.kernel.getCardById(
 			ctx.logContext,
 			ctx.session,
-			messageResult.data.id,
+			cardResult.data.id,
 		);
-		assert(card);
-		expect(card.markers).toEqual([marker]);
+		assert(result);
+		expect(result.markers).toEqual([marker]);
 	});
 });

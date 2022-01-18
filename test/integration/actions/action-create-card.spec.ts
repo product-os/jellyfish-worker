@@ -1,7 +1,6 @@
 import { strict as assert } from 'assert';
 import {
 	errors as coreErrors,
-	Kernel,
 	testUtils as coreTestUtils,
 } from '@balena/jellyfish-core';
 import { testUtils, WorkerContext } from '../../../lib';
@@ -18,26 +17,13 @@ beforeAll(async () => {
 
 	actionContext = ctx.worker.getActionContext(ctx.logContext);
 
-	guestUser = await ctx.kernel.getCardBySlug(
-		ctx.logContext,
-		ctx.session,
-		'user-guest@1.0.0',
+	guestUser = await ctx.createUser(
+		coreTestUtils.generateRandomSlug(),
+		undefined,
+		['user-guest'],
 	);
-	assert(guestUser);
 
-	guestUserSession = await ctx.kernel.replaceCard(
-		ctx.logContext,
-		ctx.session,
-		Kernel.defaults({
-			slug: 'session-guest',
-			version: '1.0.0',
-			type: 'session@1.0.0',
-			data: {
-				actor: guestUser.id,
-			},
-		}),
-	);
-	assert(guestUserSession);
+	guestUserSession = await ctx.createSession(guestUser);
 });
 
 afterAll(async () => {
@@ -48,34 +34,15 @@ describe('action-create-card', () => {
 	test('should use provided slug', async () => {
 		const request = makeRequest(ctx, {
 			properties: {
-				id: coreTestUtils.generateRandomId(),
-				name: coreTestUtils.generateRandomSlug(),
-				slug: coreTestUtils.generateRandomSlug({
-					prefix: 'message',
-				}),
-				type: 'message@1.0.0',
-				version: '1.0.0',
-				active: true,
-				links: {},
-				tags: [],
-				markers: [],
-				created_at: new Date().toISOString(),
-				requires: [],
-				capabilities: [],
-				data: {
-					actor: ctx.adminUserId,
-					payload: {
-						message: coreTestUtils.generateRandomSlug(),
-					},
-					timestamp: new Date().toISOString(),
-				},
+				slug: coreTestUtils.generateRandomSlug(),
+				type: 'card@1.0.0',
 			},
 		});
 
 		const result: any = await actionCreateCard.handler(
 			ctx.session,
 			actionContext,
-			ctx.worker.typeContracts['message@1.0.0'],
+			ctx.worker.typeContracts['card@1.0.0'],
 			request,
 		);
 		assert(result);
@@ -85,35 +52,18 @@ describe('action-create-card', () => {
 	test('should generate a slug when one is not provided', async () => {
 		const request = makeRequest(ctx, {
 			properties: {
-				id: coreTestUtils.generateRandomId(),
-				name: coreTestUtils.generateRandomSlug(),
-				type: 'message@1.0.0',
-				version: '1.0.0',
-				active: true,
-				links: {},
-				tags: [],
-				markers: [],
-				created_at: new Date().toISOString(),
-				requires: [],
-				capabilities: [],
-				data: {
-					actor: ctx.adminUserId,
-					payload: {
-						message: coreTestUtils.generateRandomSlug(),
-					},
-					timestamp: new Date().toISOString(),
-				},
+				type: 'card@1.0.0',
 			},
 		});
 
 		const result: any = await actionCreateCard.handler(
 			ctx.session,
 			actionContext,
-			ctx.worker.typeContracts['message@1.0.0'],
+			ctx.worker.typeContracts['card@1.0.0'],
 			request,
 		);
 		assert(result);
-		expect(result.slug).toMatch(/^message-/);
+		expect(result.slug).toMatch(/^card-/);
 	});
 
 	test('should fail to create an event with an action-create-card', async () => {
