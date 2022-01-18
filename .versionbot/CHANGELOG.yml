@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency typedoc to ^0.22.11'
+      hash: 0741dbe0a9f2f0c9fb6e5effa54557b49d5e490a
+      body: |
+        Update typedoc from 0.22.10 to 0.22.11
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 11.1.1
+  date: 2022-01-18T20:09:13.344Z
+- commits:
     - subject: Export `IntegrationDefinition`
       hash: 31f920d7a9f1cbffbf7c818e2d23ba81b2d4c4b1
       body: ''
