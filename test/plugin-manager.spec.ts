@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { PluginManager } from '../lib/plugin-manager';
 import {
 	action1,

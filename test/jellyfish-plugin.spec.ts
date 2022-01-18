@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import sinon from 'sinon';
+import * as _ from 'lodash';
+import * as sinon from 'sinon';
 import {
 	action1,
 	action2,
