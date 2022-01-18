@@ -1,4 +1,127 @@
 - commits:
+    - subject: Add view-all-views and role-user-community tests
+      hash: 6f49378440fe52e2bc42c0baefdfdb0722d60f0a
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Add action-set-add integration tests
+      hash: d5050793beee7405ebb64a76d41e890dab9ddc2e
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: More integration test work
+      hash: e7062a624054dc36dbc41b9e935f0639dc5bc2d5
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: More logContext and integration test work
+      hash: 748c59481ffd5bff2f37fea7f8160674688dc934
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Get integration/execute.spec.ts passing
+      hash: 50083364d284d5dab7ef93543c46d79f1f1347a8
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'Add more cards/actions, work on tests'
+      hash: 142dd3eb613d09d635030ac98d56610152855484
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Get sync-context integration tests passing
+      hash: e161cf112a84e023c4f78673167c7c2ec0b8b3d6
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: 'Work on sync types, now builds'
+      hash: e62105b99adc87f26435d30f232b770e15d8f8a1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Bump jellyfish-jellyscript to v5
+      hash: cf5a8a0b2966cc522fcacc5e40f6cfd94539400c
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Some cleanup
+      hash: 653ab26dad951e252e869b39b49854a4401025f5
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Update everything we can and reorganize imports
+      hash: 63a0ba5109ec2237ecddc9828c3e463567006449
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+    - subject: Replace test-harness with test-utils
+      hash: a55c20536de754be645e44919afb90598a475b49
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 11.0.0
+  date: 2022-01-18T14:58:50.407Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-assert to ^1.2.6'
       hash: 6cc4ea94813e0623e59bd9d14c2091f16d8fce51
       body: ''
