@@ -1,4 +1,17 @@
 - commits:
+    - subject: Export `actions` properly
+      hash: 4d01e8a62281164fd046ceded91a2e71b4094dee
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 11.0.4
+  date: 2022-01-18T19:13:25.426Z
+- commits:
     - subject: 'patch: Update external-non-major'
       hash: 2ee7ebe6524e08e1068114d092f9a8c916330308
       body: ''
