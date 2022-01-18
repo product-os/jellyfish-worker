@@ -1,4 +1,17 @@
 - commits:
+    - subject: Export `IntegrationDefinition`
+      hash: 31f920d7a9f1cbffbf7c818e2d23ba81b2d4c4b1
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 11.1.0
+  date: 2022-01-18T19:58:42.241Z
+- commits:
     - subject: Export `actions` properly
       hash: 4d01e8a62281164fd046ceded91a2e71b4094dee
       body: ''
