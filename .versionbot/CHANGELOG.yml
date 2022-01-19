@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency skhema to v6'
+      hash: 9df7f5bcb7aeb7bb9c9cfc69480c496d8ae6408f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 12.0.2
+  date: 2022-01-19T03:46:33.609Z
+- commits:
     - subject: Move more from card to contract
       hash: 52fc945d19b4e8da3b258e59ed1b586338519b9b
       body: ''
