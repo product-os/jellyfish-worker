@@ -1,7 +1,6 @@
 import { create } from './create';
 import { roleUserCommunity } from './role-user-community';
 import { roleUserExternalSupport } from './role-user-external-support';
-import { roleUserGuest } from './role-user-guest';
 import { roleUserOperator } from './role-user-operator';
 import { roleUserTest } from './role-user-test';
 import { scheduledAction } from './scheduled-action';
@@ -15,7 +14,6 @@ export default {
 	'triggered-action': triggeredAction,
 	'role-user-community': roleUserCommunity,
 	'role-user-external-support': roleUserExternalSupport,
-	'role-user-guest': roleUserGuest,
 	'role-user-operator': roleUserOperator,
 	'role-user-test': roleUserTest,
 	'scheduled-action': scheduledAction,
