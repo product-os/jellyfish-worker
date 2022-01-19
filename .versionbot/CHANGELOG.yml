@@ -1,4 +1,17 @@
 - commits:
+    - subject: Switch to kernel contract function names
+      hash: 1bbb8ee1975b871a9e5acab1494b6a34993b82e6
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 11.1.2
+  date: 2022-01-19T00:43:09.119Z
+- commits:
     - subject: 'patch: Update dependency typedoc to ^0.22.11'
       hash: 0741dbe0a9f2f0c9fb6e5effa54557b49d5e490a
       body: |
