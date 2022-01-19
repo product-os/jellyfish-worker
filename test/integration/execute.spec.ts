@@ -1,9 +1,8 @@
 import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
-import type { ActionRequestContract } from '@balena/jellyfish-types/build/core';
-import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
+import type { ActionRequestContract } from '@balena/jellyfish-queue';
 import _ from 'lodash';
-import { testUtils } from '../../lib';
+import { testUtils, TriggeredActionContract } from '../../lib';
 
 let ctx: testUtils.TestContext;
 

@@ -1,9 +1,11 @@
 import type { Kernel } from '@balena/jellyfish-core';
 import type { LogContext } from '@balena/jellyfish-logger';
-import type { ProducerOptions } from '@balena/jellyfish-queue';
 import type {
 	ActionContract,
 	ActionRequestContract,
+	ProducerOptions,
+} from '@balena/jellyfish-queue';
+import type {
 	Contract,
 	ContractData,
 	ContractDefinition,
@@ -121,3 +123,60 @@ export interface EnqueueOptions {
 export interface Map<T> {
 	[key: string]: T;
 }
+
+export type TriggeredActionData = TriggeredActionData1 & TriggeredActionData2;
+export type TriggeredActionData2 = {
+	[k: string]: unknown;
+};
+
+export interface TriggeredActionData1 {
+	mode?: 'insert' | 'update';
+	type?: string;
+	action?: string;
+	filter?: {
+		[k: string]: unknown;
+	};
+	target?:
+		| string
+		| {
+				[k: string]: unknown;
+		  }
+		| string[];
+	interval?: string;
+	/**
+	 * Indicates whether the triggered action should be executed synchronously, asynchronously or enqueued
+	 */
+	schedule?: 'async' | 'sync' | 'enqueue';
+	arguments?: {
+		[k: string]: unknown;
+	};
+	startDate?: string;
+	[k: string]: unknown;
+}
+
+export interface TriggeredActionContractDefinition
+	extends ContractDefinition<TriggeredActionData> {}
+
+export interface TriggeredActionContract
+	extends Contract<TriggeredActionData> {}
+
+export interface ScheduledActionData {
+	options: ProducerOptions;
+	schedule: {
+		once?: {
+			date: string;
+		};
+		recurring?: {
+			start: string;
+			end: string;
+			interval: string;
+		};
+	};
+	[k: string]: unknown;
+}
+
+export interface ScheduledActionContractDefinition
+	extends ContractDefinition<ScheduledActionData> {}
+
+export interface ScheduledActionContract
+	extends Contract<ScheduledActionData> {}

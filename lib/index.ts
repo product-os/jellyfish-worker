@@ -2,16 +2,19 @@ import * as assert from '@balena/jellyfish-assert';
 import { CARDS as CORE_CARDS, Kernel } from '@balena/jellyfish-core';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import { Consumer, Producer, ProducerOptions } from '@balena/jellyfish-queue';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
+import {
 	ActionContract,
 	ActionRequestContract,
+	Consumer,
+	Producer,
+	ProducerOptions,
+} from '@balena/jellyfish-queue';
+import type { JsonSchema } from '@balena/jellyfish-types';
+import type {
 	Contract,
 	ContractData,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import * as errio from 'errio';
 import _ from 'lodash';
 import * as fastEquals from 'fast-equals';
@@ -26,10 +29,15 @@ import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
 import * as transformerLib from './transformers';
 import * as triggersLib from './triggers';
-import { Action, Map, WorkerContext } from './types';
+import type {
+	Action,
+	Map,
+	TriggeredActionContract,
+	WorkerContext,
+} from './types';
 import * as utils from './utils';
 
-export { Action, actions, triggersLib, errors, CARDS, utils, WorkerContext };
+export { actions, triggersLib, errors, CARDS, utils };
 export { Integration, IntegrationDefinition } from './sync';
 export {
 	ActionDefinition,
@@ -39,6 +47,7 @@ export {
 	PluginIdentity,
 } from './plugin';
 export * as testUtils from './test-utils';
+export * from './types';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');

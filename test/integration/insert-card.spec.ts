@@ -4,9 +4,12 @@ import type {
 	Contract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
-import { ActionDefinition, testUtils } from '../../lib';
+import {
+	ActionDefinition,
+	testUtils,
+	TriggeredActionContract,
+} from '../../lib';
 import { actionCreateCard } from '../../lib/actions/action-create-card';
 
 let ctx: testUtils.TestContext;

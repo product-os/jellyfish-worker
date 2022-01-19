@@ -6,11 +6,11 @@ import type {
 	Contract,
 	LinkContract,
 } from '@balena/jellyfish-types/build/core';
-import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import jsone = require('json-e');
 import _ from 'lodash';
 import * as skhema from 'skhema';
 import * as errors from './errors';
+import type { TriggeredActionContract } from './types';
 import * as utils from './utils';
 
 const logger = getLogger('worker-triggers');
