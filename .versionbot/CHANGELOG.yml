@@ -1,4 +1,28 @@
 - commits:
+    - subject: Bump core and queue
+      hash: 9f7bb087bfcee14fa252ad20dc141179c3a8f93d
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Drop role-user-guest contract
+      hash: f4b55778ea1db003fdb7e9ffa9ab6fd9f7dc163d
+      body: |
+        role-user-guest contract has been moved to jellyfish-core
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 13.0.0
+  date: 2022-01-19T08:54:36.358Z
+- commits:
     - subject: Make getFile optional
       hash: 2ea76488f48ef84a48eeef5edd21cb58bb41204f
       body: ''
