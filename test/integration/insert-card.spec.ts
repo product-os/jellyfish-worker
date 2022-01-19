@@ -724,7 +724,7 @@ describe('.insertCard()', () => {
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.kernel.insertCard(
+				return ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
 					card as Contract,
