@@ -43,7 +43,7 @@ afterAll(() => {
 
 describe('.insertCard()', () => {
 	test('should pass a triggered action originator', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -115,7 +115,7 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.kernel.getCardBySlug(
+		const card = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command}@1.0.0`,
@@ -126,7 +126,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should take an originator option', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -197,7 +197,7 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.kernel.getCardBySlug(
+		const card = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
@@ -207,7 +207,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should execute one matching triggered action', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -298,7 +298,7 @@ describe('.insertCard()', () => {
 
 		expect(tail.length).toBe(1);
 
-		const resultCard = await ctx.kernel.getCardBySlug(
+		const resultCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command}@1.0.0`,
@@ -308,7 +308,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should not execute non-matching triggered actions', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -373,7 +373,7 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard = await ctx.kernel.getCardBySlug(
+		const resultCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command}@1.0.0`,
@@ -383,7 +383,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should execute more than one matching triggered action', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -484,13 +484,13 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard1 = await ctx.kernel.getCardBySlug(
+		const resultCard1 = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command1}@1.0.0`,
 		);
 
-		const resultCard2 = await ctx.kernel.getCardBySlug(
+		const resultCard2 = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command2}@1.0.0`,
@@ -501,7 +501,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should execute the matching triggered actions given more than one', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -601,13 +601,13 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard1 = await ctx.kernel.getCardBySlug(
+		const resultCard1 = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command1}@1.0.0`,
 		);
 
-		const resultCard2 = await ctx.kernel.getCardBySlug(
+		const resultCard2 = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command2}@1.0.0`,
@@ -618,7 +618,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should remove previously inserted type triggered actions if inserting a type', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -731,7 +731,7 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const typeTypeContract = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeTypeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -796,7 +796,7 @@ describe('.insertCard()', () => {
 			},
 		});
 
-		const updatedCard = await ctx.kernel.getCardById(
+		const updatedCard = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			insertedCards[1].id,
@@ -810,7 +810,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should add a triggered action given a type with an AGGREGATE formula', async () => {
-		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeType = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -906,7 +906,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should pre-register a triggered action if using AGGREGATE', async () => {
-		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeType = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -972,7 +972,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should update pre-registered triggered actions if removing an AGGREGATE', async () => {
-		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeType = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -1057,7 +1057,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should add multiple triggered actions given a type with an AGGREGATE formula', async () => {
-		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeType = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -1202,12 +1202,12 @@ describe('.insertCard()', () => {
 		// * checks if formula in linked to contract was updated
 		// (and lots of sanity checks in the middle)
 
-		const typeType = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeType = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
-		const linkType = (await ctx.kernel.getCardBySlug<TypeContract>(
+		const linkType = (await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'link@latest',

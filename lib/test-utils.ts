@@ -75,7 +75,7 @@ export const newContext = async (
 ): Promise<TestContext> => {
 	const queueTestContext = await queueTestUtils.newContext(options);
 
-	const adminSessionContract = (await queueTestContext.kernel.getCardById(
+	const adminSessionContract = (await queueTestContext.kernel.getContractById(
 		queueTestContext.logContext,
 		queueTestContext.session,
 		queueTestContext.session,
@@ -273,7 +273,7 @@ export const newContext = async (
 		expect(result.error).toBe(false);
 		assert(result.data);
 		await flushAll(session);
-		const contract = (await queueTestContext.kernel.getCardById(
+		const contract = (await queueTestContext.kernel.getContractById(
 			queueTestContext.logContext,
 			queueTestContext.session,
 			result.data.id,
@@ -290,12 +290,12 @@ export const newContext = async (
 	) => {
 		// Create the user, only if it doesn't exist yet
 		const userContract =
-			(await queueTestContext.kernel.getCardBySlug<UserContract>(
+			(await queueTestContext.kernel.getContractBySlug<UserContract>(
 				queueTestContext.logContext,
 				queueTestContext.session,
 				`user-${username}@latest`,
 			)) ||
-			(await queueTestContext.kernel.insertCard<UserContract>(
+			(await queueTestContext.kernel.insertContract<UserContract>(
 				queueTestContext.logContext,
 				queueTestContext.session,
 				{
@@ -356,7 +356,7 @@ export const newContext = async (
 		assert(inserted);
 		await flushAll(session);
 
-		const link = await queueTestContext.kernel.getCardById<LinkContract>(
+		const link = await queueTestContext.kernel.getContractById<LinkContract>(
 			queueTestContext.logContext,
 			queueTestContext.session,
 			inserted.id,
@@ -394,7 +394,7 @@ export const newContext = async (
 		assert(inserted);
 		await flushAll(session);
 
-		const contract = await queueTestContext.kernel.getCardById(
+		const contract = await queueTestContext.kernel.getContractById(
 			queueTestContext.logContext,
 			queueTestContext.session,
 			inserted.id,

@@ -61,14 +61,14 @@ export const getActionArgumentsSchema = (
  * @public
  *
  * @param {Object} context - execution context
- * @param {Object} jellyfish - jellyfish instance
+ * @param {Object} kernel - kernel instance
  * @param {String} session - session id
  * @param {Object} object - card properties
  * @returns {Boolean} whether the card exists
  *
  * @example
  * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- * const hasCard = await utils.hasCard({ ... }, jellyfish, session, {
+ * const hasCard = await utils.hasCard({ ... }, kernel, session, {
  *   id: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
  *   active: true,
  *   data: {
@@ -82,17 +82,20 @@ export const getActionArgumentsSchema = (
  */
 export const hasCard = async (
 	context: LogContext,
-	jellyfish: Kernel,
+	kernel: Kernel,
 	session: string,
 	object: Pick<Contract, 'slug' | 'version' | 'id'>,
 ): Promise<boolean> => {
-	if (object.id && (await jellyfish.getCardById(context, session, object.id))) {
+	if (
+		object.id &&
+		(await kernel.getContractById(context, session, object.id))
+	) {
 		return true;
 	}
 
 	if (
 		object.slug &&
-		(await jellyfish.getCardBySlug(
+		(await kernel.getContractBySlug(
 			context,
 			session,
 			`${object.slug}@${object.version}`,
@@ -135,12 +138,12 @@ export const durationToMs = (duration: string): number => {
 
 export const getActorKey = async (
 	context: LogContext,
-	jellyfish: Kernel,
+	kernel: Kernel,
 	session: string,
 	actorId: string,
 ): Promise<SessionContract> => {
 	const keySlug = `session-action-${actorId}`;
-	const key = await jellyfish.getCardBySlug<SessionContract>(
+	const key = await kernel.getContractBySlug<SessionContract>(
 		context,
 		session,
 		`${keySlug}@1.0.0`,
@@ -155,7 +158,7 @@ export const getActorKey = async (
 		actor: actorId,
 	});
 
-	return jellyfish.replaceCard<SessionContract>(context, session, {
+	return kernel.replaceContract<SessionContract>(context, session, {
 		slug: keySlug,
 		active: true,
 		version: '1.0.0',
