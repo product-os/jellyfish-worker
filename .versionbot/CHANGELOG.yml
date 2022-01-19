@@ -1,4 +1,17 @@
 - commits:
+    - subject: Make getFile optional
+      hash: 2ea76488f48ef84a48eeef5edd21cb58bb41204f
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 12.0.3
+  date: 2022-01-19T04:11:55.741Z
+- commits:
     - subject: 'patch: Update dependency skhema to v6'
       hash: 9df7f5bcb7aeb7bb9c9cfc69480c496d8ae6408f
       body: ''
