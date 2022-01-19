@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update action contracts/types
+      hash: 669d8ee799c8db4905bcb9ddd8927e149709845e
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 12.0.0
+  date: 2022-01-19T02:57:46.525Z
+- commits:
     - subject: Switch to kernel contract function names
       hash: 1bbb8ee1975b871a9e5acab1494b6a34993b82e6
       body: ''
