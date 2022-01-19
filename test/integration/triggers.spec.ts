@@ -4,9 +4,13 @@ import type {
 	Contract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
 import _ from 'lodash';
-import { errors, testUtils, triggersLib as triggers } from '../../lib';
+import {
+	errors,
+	testUtils,
+	TriggeredActionContract,
+	triggersLib as triggers,
+} from '../../lib';
 
 let ctx: testUtils.TestContext;
 let typeCard: TypeContract;
@@ -24,7 +28,7 @@ beforeAll(async () => {
 
 	typeCard = contract;
 
-	await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+	await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 		slug: 'foo',
 		type: 'type@1.0.0',
 		version: '1.0.0',
@@ -94,7 +98,7 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{

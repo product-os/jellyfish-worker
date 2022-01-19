@@ -1,6 +1,5 @@
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
-import type { TriggeredActionContract } from '@balena/jellyfish-types/build/worker';
-import { testUtils } from '../../lib';
+import { testUtils, TriggeredActionContract } from '../../lib';
 
 let ctx: testUtils.TestContext;
 

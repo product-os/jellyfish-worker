@@ -1,8 +1,8 @@
 import type { Kernel } from '@balena/jellyfish-core';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
+import type { ActionContract } from '@balena/jellyfish-queue';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
-	ActionContract,
 	Contract,
 	SessionContract,
 } from '@balena/jellyfish-types/build/core';
