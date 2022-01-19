@@ -14,7 +14,7 @@ let typeCard: TypeContract;
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
-	const contract = (await ctx.kernel.getCardBySlug(
+	const contract = (await ctx.kernel.getContractBySlug(
 		ctx.logContext,
 		ctx.session,
 		'card@latest',
@@ -1034,7 +1034,7 @@ describe('.getTypeTriggers()', () => {
 			}),
 		);
 
-		const updatedCard = await ctx.kernel.getCardById(
+		const updatedCard = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			insertedCards[0].id,
@@ -1220,7 +1220,7 @@ describe('.getTypeTriggers()', () => {
 			`${typeSlug}@1.0.0`,
 		);
 
-		const updatedCard = await ctx.kernel.getCardById(
+		const updatedCard = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			insertedCards[0].id,
@@ -1335,7 +1335,7 @@ describe('.getTypeTriggers()', () => {
 			`${typeSlug}@1.0.0`,
 		);
 
-		const updatedCard = await ctx.kernel.getCardById(
+		const updatedCard = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			insertedCards[0].id,

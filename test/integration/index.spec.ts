@@ -65,7 +65,7 @@ describe('.getId()', () => {
 
 describe('Worker', () => {
 	it('should not re-enqueue requests after duplicated execute events', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -118,7 +118,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on insertion', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -205,7 +205,7 @@ describe('Worker', () => {
 		);
 		expect(insertResult.error).toBe(false);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			insertResult.data.id,
@@ -236,7 +236,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple SUM property on a insertAction', async () => {
-		const typeCard: any = await ctx.kernel.getCardBySlug(
+		const typeCard: any = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -326,7 +326,7 @@ describe('Worker', () => {
 		);
 		expect(insertResult.error).toBe(false);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			insertResult.data.id,
@@ -359,7 +359,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch move', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -473,7 +473,7 @@ describe('Worker', () => {
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
@@ -505,7 +505,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch copy', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -619,7 +619,7 @@ describe('Worker', () => {
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
@@ -651,7 +651,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch replace', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -764,7 +764,7 @@ describe('Worker', () => {
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
@@ -795,7 +795,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch addition', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -906,7 +906,7 @@ describe('Worker', () => {
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
@@ -937,7 +937,7 @@ describe('Worker', () => {
 	});
 
 	it('should throw if the result of the formula is incompatible with the given type', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -1018,7 +1018,7 @@ describe('Worker', () => {
 	});
 
 	it('should not re-enqueue requests after execute failure', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -1079,7 +1079,7 @@ describe('Worker', () => {
 	});
 
 	it('should be able to login as a user with a password', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'user@latest',
@@ -1137,7 +1137,7 @@ describe('Worker', () => {
 		);
 		expect(loginResult.error).toBe(false);
 
-		const session = await ctx.kernel.getCardById(
+		const session = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			loginResult.data.id,
@@ -1274,7 +1274,7 @@ describe('Worker', () => {
 	});
 
 	it('should fail if signing up with the wrong password', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'user@latest',
@@ -1323,7 +1323,7 @@ describe('Worker', () => {
 	});
 
 	it('should post an error execute event if logging in as a disallowed user', async () => {
-		const adminCard = await ctx.kernel.getCardBySlug(
+		const adminCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'user-admin@latest',
@@ -1405,12 +1405,12 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -1449,7 +1449,7 @@ describe('Worker', () => {
 
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.kernel.getCardBySlug(
+				const card = await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.session,
 					`${slug}${idx}@latest`,
@@ -1530,12 +1530,12 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -1574,7 +1574,7 @@ describe('Worker', () => {
 
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.kernel.getCardBySlug(
+				const card = await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.session,
 					`${slug}${idx}@latest`,
@@ -1694,12 +1694,12 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -1764,7 +1764,7 @@ describe('Worker', () => {
 		// Now flush any remaining jobs that have been generated by triggers
 		await ctx.flushAll(ctx.session);
 
-		const result = await ctx.kernel.getCardById(
+		const result = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			card.id,
@@ -1784,7 +1784,7 @@ describe('.getTriggers()', () => {
 
 describe('.replaceCard()', () => {
 	test('should update type contract schema', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -1841,7 +1841,7 @@ describe('.replaceCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result1!.id,
@@ -1854,7 +1854,7 @@ describe('.replaceCard()', () => {
 	});
 
 	test('updating a card must have the correct tail', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -1897,7 +1897,7 @@ describe('.replaceCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result1!.id,
@@ -1954,7 +1954,7 @@ describe('.replaceCard()', () => {
 	});
 
 	test('should be able to disable event creation', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2008,7 +2008,7 @@ describe('.replaceCard()', () => {
 
 describe('.insertCard()', () => {
 	test('should insert a card', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2035,7 +2035,7 @@ describe('.insertCard()', () => {
 
 		assert(result !== null);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result.id,
@@ -2056,7 +2056,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should ignore an explicit type property', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2089,7 +2089,7 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
@@ -2101,7 +2101,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should default active to true', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2121,7 +2121,7 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
@@ -2131,7 +2131,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set active to false', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2152,7 +2152,7 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
@@ -2162,7 +2162,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for links', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2182,7 +2182,7 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
@@ -2192,7 +2192,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for tags', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2212,7 +2212,7 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
@@ -2222,7 +2222,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for data', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2242,7 +2242,7 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
@@ -2252,7 +2252,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set a slug', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2275,7 +2275,7 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
@@ -2285,7 +2285,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set a name', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2306,7 +2306,7 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
@@ -2323,7 +2323,7 @@ describe('.insertCard()', () => {
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2348,7 +2348,7 @@ describe('.insertCard()', () => {
 	});
 
 	test('should add a create event if attachEvents is true', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2398,7 +2398,7 @@ describe('.insertCard()', () => {
 
 describe('.patchCard()', () => {
 	test('should ignore pointless updates', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2454,7 +2454,7 @@ describe('.patchCard()', () => {
 		expect(result2).toBeFalsy();
 		expect(result3).toBeFalsy();
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result1.id,
@@ -2470,7 +2470,7 @@ describe('.patchCard()', () => {
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2499,7 +2499,7 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2522,7 +2522,7 @@ describe('.patchCard()', () => {
 			],
 		);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			previousCard.id,
@@ -2538,7 +2538,7 @@ describe('.patchCard()', () => {
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2600,7 +2600,7 @@ describe('.patchCard()', () => {
 			},
 		});
 
-		const typeCard = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -2647,7 +2647,7 @@ describe('.patchCard()', () => {
 			},
 		});
 
-		const typeTypeContract = await ctx.kernel.getCardBySlug<TypeContract>(
+		const typeTypeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',

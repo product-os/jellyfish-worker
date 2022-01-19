@@ -17,7 +17,7 @@ afterAll(() => {
 
 describe('.execute()', () => {
 	test('should execute an action', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -53,7 +53,7 @@ describe('.execute()', () => {
 		);
 
 		expect(result.error).toBe(false);
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result.data.id,
@@ -63,12 +63,12 @@ describe('.execute()', () => {
 	});
 
 	test('should execute a triggered action given a matching mode', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -147,7 +147,7 @@ describe('.execute()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.kernel.getCardBySlug(
+		const card = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
@@ -178,12 +178,12 @@ describe('.execute()', () => {
 	});
 
 	test('should not execute a triggered action given a non matching mode', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -260,7 +260,7 @@ describe('.execute()', () => {
 
 		expect(result.error).toBe(false);
 
-		const card = await ctx.kernel.getCardBySlug(
+		const card = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
@@ -268,7 +268,7 @@ describe('.execute()', () => {
 
 		expect(card).toBeFalsy();
 
-		const resultCard = await ctx.kernel.getCardBySlug(
+		const resultCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${slug}@latest`,
@@ -280,12 +280,12 @@ describe('.execute()', () => {
 	});
 
 	test('should execute a triggered action with a top level anyOf', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -380,7 +380,7 @@ describe('.execute()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.kernel.getCardBySlug(
+		const card = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
@@ -389,12 +389,12 @@ describe('.execute()', () => {
 	});
 
 	test('should add a create event when creating a card', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -458,7 +458,7 @@ describe('.execute()', () => {
 
 	test('should be able to AGGREGATE based on the card timeline', async () => {
 		jest.setTimeout(10 * 1000);
-		const typeType = await ctx.kernel.getCardBySlug(
+		const typeType = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -625,7 +625,7 @@ describe('.execute()', () => {
 	});
 
 	test('AGGREGATE should create a property on the target if it does not exist', async () => {
-		const typeType = await ctx.kernel.getCardBySlug(
+		const typeType = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -763,7 +763,7 @@ describe('.execute()', () => {
 	});
 
 	test('AGGREGATE should work with $$ prefixed properties', async () => {
-		const typeType = await ctx.kernel.getCardBySlug(
+		const typeType = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -906,7 +906,7 @@ describe('.execute()', () => {
 	});
 
 	test('should create a message with tags', async () => {
-		const typeType = await ctx.kernel.getCardBySlug(
+		const typeType = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -1005,7 +1005,7 @@ describe('.execute()', () => {
 
 		expect(messageResult.error).toBe(false);
 
-		const element = await ctx.kernel.getCardById(
+		const element = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			messageResult.data.id,
@@ -1017,12 +1017,12 @@ describe('.execute()', () => {
 	});
 
 	test('should add an execution event to the action request', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -1082,12 +1082,12 @@ describe('.execute()', () => {
 	});
 
 	test('should execute a triggered action', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -1164,7 +1164,7 @@ describe('.execute()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const card = await ctx.kernel.getCardBySlug(
+		const card = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command}@latest`,
@@ -1174,7 +1174,7 @@ describe('.execute()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard = await ctx.kernel.getCardBySlug(
+		const resultCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${slug}@latest`,
@@ -1186,7 +1186,7 @@ describe('.execute()', () => {
 	});
 
 	test('should create a card', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -1267,7 +1267,7 @@ describe('.execute()', () => {
 	});
 
 	test('should throw if the actor does not exist', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -1308,7 +1308,7 @@ describe('.execute()', () => {
 	});
 
 	test('should throw if input card does not match the action filter', async () => {
-		const actionCard = await ctx.kernel.getCardBySlug(
+		const actionCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
@@ -1351,7 +1351,7 @@ describe('.execute()', () => {
 	});
 
 	test('should return an error if the arguments do not match the action', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -1398,7 +1398,7 @@ describe('.execute()', () => {
 		// Remove the library function from the worker instance
 		Reflect.deleteProperty(localCtx.worker.library, action.split('@')[0]);
 
-		const typeCard = await localCtx.kernel.getCardBySlug(
+		const typeCard = await localCtx.kernel.getContractBySlug(
 			localCtx.logContext,
 			localCtx.session,
 			'card@latest',

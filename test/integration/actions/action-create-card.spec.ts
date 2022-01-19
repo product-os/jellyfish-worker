@@ -67,14 +67,14 @@ describe('action-create-card', () => {
 	});
 
 	test('should fail to create an event with an action-create-card', async () => {
-		const cardType = await ctx.kernel.getCardBySlug(
+		const cardType = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 		assert(cardType);
 
-		const typeType = await ctx.kernel.getCardBySlug(
+		const typeType = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -182,7 +182,7 @@ describe('action-create-card', () => {
 	});
 
 	test('should create a new card along with a reason', async () => {
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -276,7 +276,7 @@ describe('action-create-card', () => {
 			},
 		};
 
-		const typeCard = await ctx.kernel.getCardBySlug(
+		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
@@ -308,7 +308,7 @@ describe('action-create-card', () => {
 		);
 		expect(createResult.error).toBe(false);
 
-		const card = await ctx.kernel.getCardById(
+		const card = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			(createResult.data as any).id,

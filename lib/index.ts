@@ -63,13 +63,13 @@ const INSERT_CONCURRENCY = 3;
  * @private
  *
  * @param {LogContext} logContext - log context
- * @param {Object} jellyfish - jellyfish instance
+ * @param {Object} kernel - kernel instance
  * @param {String} session - session id
  * @param {String} identifier - id or slug
  * @returns {(Object|Null)}
  *
  * @example
- * const card = await getInputCard({ ... }, jellyfish, session, 'foo-bar')
+ * const card = await getInputCard({ ... }, kernel, session, 'foo-bar')
  * if (card) {
  *   console.log(card)
  * }
@@ -81,9 +81,9 @@ const getInputCard = async (
 	identifier: string,
 ): Promise<Contract | null> => {
 	if (identifier.includes('@')) {
-		return kernel.getCardBySlug(logContext, session, identifier);
+		return kernel.getContractBySlug(logContext, session, identifier);
 	}
-	return kernel.getCardById(logContext, session, identifier);
+	return kernel.getContractById(logContext, session, identifier);
 };
 
 /**
@@ -94,7 +94,7 @@ const getInputCard = async (
  * immediately.
  *
  * @param {LogContext} logContext - log context
- * @param {Object} jellyfish - jellyfish instance
+ * @param {Object} kernel - kernel instance
  * @param {String} session - session id
  * @param {Object} card - card to fill with links
  * @param {Object} typeCard - type card
@@ -233,12 +233,16 @@ export class Worker {
 		// Insert worker specific cards
 		await Promise.all(
 			Object.values(CARDS).map(async (card) => {
-				return this.kernel.replaceCard(logContext, this.session, card);
+				return this.kernel.replaceContract(logContext, this.session, card);
 			}),
 		);
 		await Promise.all(
 			Object.values(actions).map(async (card) => {
-				return this.kernel.replaceCard(logContext, this.session, card.contract);
+				return this.kernel.replaceContract(
+					logContext,
+					this.session,
+					card.contract,
+				);
 			}),
 		);
 	}
@@ -260,10 +264,10 @@ export class Worker {
 			sync: this.sync,
 			getEventSlug: utils.getEventSlug,
 			getCardById: (lsession: string, id: string) => {
-				return self.kernel.getCardById(logContext, lsession, id);
+				return self.kernel.getContractById(logContext, lsession, id);
 			},
 			getCardBySlug: (lsession: string, slug: string) => {
-				return self.kernel.getCardBySlug(logContext, lsession, slug);
+				return self.kernel.getContractBySlug(logContext, lsession, slug);
 			},
 			query: (
 				lsession: string,
@@ -371,7 +375,7 @@ export class Worker {
 
 		let card: Contract | null = null;
 		if (object.slug) {
-			card = await kernel.getCardBySlug(
+			card = await kernel.getContractBySlug(
 				logContext,
 				insertSession,
 				`${object.slug}@${object.version || 'latest'}`,
@@ -379,7 +383,7 @@ export class Worker {
 		}
 
 		if (!card && object.id) {
-			card = await kernel.getCardById(logContext, insertSession, object.id);
+			card = await kernel.getContractById(logContext, insertSession, object.id);
 		}
 
 		if (typeof object.name !== 'string') {
@@ -548,14 +552,14 @@ export class Worker {
 		let card: Contract | null = null;
 
 		if (object.slug) {
-			card = await kernel.getCardBySlug(
+			card = await kernel.getContractBySlug(
 				logContext,
 				insertSession,
 				`${object.slug}@${object.version}`,
 			);
 		}
 		if (!card && object.id) {
-			card = await kernel.getCardById(logContext, insertSession, object.id);
+			card = await kernel.getContractById(logContext, insertSession, object.id);
 		}
 
 		let attachEvents = options.attachEvents;
@@ -599,7 +603,7 @@ export class Worker {
 				} as any);
 
 				// TS-TODO: Remove these `any` castings
-				return kernel.replaceCard(logContext, insertSession, result as any);
+				return kernel.replaceContract(logContext, insertSession, result as any);
 			},
 		);
 	}
@@ -933,7 +937,7 @@ export class Worker {
 			},
 		});
 
-		const actionCard = await this.kernel.getCardBySlug<ActionContract>(
+		const actionCard = await this.kernel.getContractBySlug<ActionContract>(
 			logContext,
 			session,
 			request.data.action,
@@ -961,7 +965,7 @@ export class Worker {
 		try {
 			const [input, actor] = await Promise.all([
 				getInputCard(logContext, this.kernel, session, request.data.input.id),
-				this.kernel.getCardById(logContext, session, request.data.actor),
+				this.kernel.getContractById(logContext, session, request.data.actor),
 			]);
 
 			assert.USER(
@@ -1241,7 +1245,7 @@ export class Worker {
 					);
 				},
 				getContractById: (id: string) => {
-					return this.kernel.getCardById(logContext, session, id);
+					return this.kernel.getContractById(logContext, session, id);
 				},
 			})
 			.catch((error) => {
@@ -1482,7 +1486,7 @@ export class Worker {
 					async (trigger) => {
 						// We don't want to use the actions queue here
 						// so that watchers are applied right away
-						const triggeredActionContract = await this.kernel.replaceCard(
+						const triggeredActionContract = await this.kernel.replaceContract(
 							logContext,
 							session,
 							trigger,

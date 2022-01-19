@@ -230,7 +230,7 @@ describe('action-create-event', () => {
 		);
 		expect(eventResult.error).toBe(false);
 
-		const event = await ctx.kernel.getCardById(
+		const event = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			eventResult.data.id,
@@ -287,7 +287,7 @@ describe('action-create-event', () => {
 		);
 		expect(cardResult.error).toBe(false);
 
-		const result = await ctx.kernel.getCardById(
+		const result = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			cardResult.data.id,
