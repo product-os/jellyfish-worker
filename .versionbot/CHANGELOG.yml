@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-non-major'
+      hash: 04c0e652b8323766cc9f9182e7ed641b4ca14003
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 13.0.1
+  date: 2022-01-19T14:57:20.511Z
+- commits:
     - subject: Bump core and queue
       hash: 9f7bb087bfcee14fa252ad20dc141179c3a8f93d
       body: ''
