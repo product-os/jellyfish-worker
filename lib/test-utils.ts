@@ -125,7 +125,7 @@ export const newContext = async (
 		bootstrapContracts.push(contract);
 	}
 	for (const contract of bootstrapContracts) {
-		await queueTestContext.kernel.insertCard(
+		await queueTestContext.kernel.insertContract(
 			queueTestContext.logContext,
 			queueTestContext.session,
 			contract,

@@ -1046,7 +1046,7 @@ describe('Worker', () => {
 
 		assert(enqueuedRequest1 !== null);
 
-		await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			slug: 'foo',
 			type: 'card@1.0.0',
 			version: '1.0.0',
@@ -1169,7 +1169,7 @@ describe('Worker', () => {
 	});
 
 	it('should not be able to login as a password-less user', async () => {
-		const user = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		const user = await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			type: 'user@1.0.0',
 			version: '1.0.0',
 			slug: coreTestUtils.generateRandomSlug({
@@ -1194,7 +1194,7 @@ describe('Worker', () => {
 	});
 
 	it('should not be able to login as a password-less user given a random password', async () => {
-		const user = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		const user = await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			type: 'user@1.0.0',
 			version: '1.0.0',
 			slug: coreTestUtils.generateRandomSlug({
@@ -1221,7 +1221,7 @@ describe('Worker', () => {
 	});
 
 	it('should not be able to login as a password-less non-disallowed user', async () => {
-		const user = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		const user = await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			type: 'user@1.0.0',
 			version: '1.0.0',
 			slug: coreTestUtils.generateRandomSlug({
@@ -1247,7 +1247,7 @@ describe('Worker', () => {
 	});
 
 	it('should not be able to login as a password-less disallowed user', async () => {
-		const user = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		const user = await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			type: 'user@1.0.0',
 			version: '1.0.0',
 			slug: coreTestUtils.generateRandomSlug({
@@ -1348,14 +1348,18 @@ describe('Worker', () => {
 		const slug = coreTestUtils.generateRandomSlug();
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
-					slug: `${slug}${idx}`,
-					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {
-						id: `id${idx}`,
+				const card = await ctx.kernel.insertContract(
+					ctx.logContext,
+					ctx.session,
+					{
+						slug: `${slug}${idx}`,
+						type: 'card@1.0.0',
+						version: '1.0.0',
+						data: {
+							id: `id${idx}`,
+						},
 					},
-				});
+				);
 				cardIds.push(card.id);
 			}),
 		);
@@ -1464,14 +1468,18 @@ describe('Worker', () => {
 		const slug = coreTestUtils.generateRandomSlug();
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
-					slug: `${slug}${idx}`,
-					type: 'card@1.0.0',
-					version: '1.0.0',
-					data: {
-						id: `id${idx}`,
+				const card = await ctx.kernel.insertContract(
+					ctx.logContext,
+					ctx.session,
+					{
+						slug: `${slug}${idx}`,
+						type: 'card@1.0.0',
+						version: '1.0.0',
+						data: {
+							id: `id${idx}`,
+						},
 					},
-				});
+				);
 				cardsWithId.push({ id: card.id });
 			}),
 		);
@@ -1622,12 +1630,12 @@ describe('Worker', () => {
 		};
 
 		await expect(
-			ctx.kernel.insertCard(ctx.logContext, ctx.session, trigger),
+			ctx.kernel.insertContract(ctx.logContext, ctx.session, trigger),
 		).rejects.toThrowError();
 	});
 
 	test('trigger should update card if triggered by a user not owning the card', async () => {
-		const card = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		const card = await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'user',
 			}),
@@ -1707,7 +1715,7 @@ describe('Worker', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const userJohnDoe = await ctx.kernel.insertCard(
+		const userJohnDoe = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -1724,7 +1732,7 @@ describe('Worker', () => {
 			},
 		);
 
-		const sessionOfJohnDoe = await ctx.kernel.insertCard(
+		const sessionOfJohnDoe = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -2316,7 +2324,7 @@ describe('.insertCard()', () => {
 
 	test('throw if card already exists and override is false', async () => {
 		const slug = coreTestUtils.generateRandomSlug();
-		await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			slug,
 			type: 'card@1.0.0',
 			version: '1.0.0',
@@ -2463,11 +2471,15 @@ describe('.patchCard()', () => {
 	});
 
 	test('should not upsert if no changes were made', async () => {
-		const element = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
-			slug: coreTestUtils.generateRandomSlug(),
-			type: 'card@1.0.0',
-			version: '1.0.0',
-		});
+		const element = await ctx.kernel.insertContract(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: coreTestUtils.generateRandomSlug(),
+				type: 'card@1.0.0',
+				version: '1.0.0',
+			},
+		);
 
 		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
@@ -2488,7 +2500,7 @@ describe('.patchCard()', () => {
 	});
 
 	test('should set a card to inactive', async () => {
-		const previousCard = await ctx.kernel.insertCard(
+		const previousCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -2531,11 +2543,15 @@ describe('.patchCard()', () => {
 	});
 
 	test('should add an update event if attachEvents is true', async () => {
-		const element = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
-			slug: coreTestUtils.generateRandomSlug(),
-			type: 'card@1.0.0',
-			version: '1.0.0',
-		});
+		const element = await ctx.kernel.insertContract(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: coreTestUtils.generateRandomSlug(),
+				type: 'card@1.0.0',
+				version: '1.0.0',
+			},
+		);
 
 		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
@@ -2588,7 +2604,7 @@ describe('.patchCard()', () => {
 
 	test('should remove previously inserted type triggered actions if deactivating a type', async () => {
 		const slug = coreTestUtils.generateRandomSlug();
-		const type = await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		const type = await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			type: 'type@1.0.0',
 			version: '1.0.0',
 			slug,
@@ -2605,7 +2621,7 @@ describe('.patchCard()', () => {
 			'card@latest',
 		);
 		assert(typeCard !== null);
-		await ctx.kernel.insertCard(ctx.logContext, ctx.session, {
+		await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			type: 'triggered-action@1.0.0',
 			slug: coreTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',

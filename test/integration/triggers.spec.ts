@@ -158,7 +158,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -225,7 +225,7 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -291,7 +291,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -373,7 +373,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -451,7 +451,7 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -526,7 +526,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -616,7 +616,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -706,7 +706,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -796,7 +796,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -860,7 +860,7 @@ describe('.getRequest()', () => {
 
 		const currentDate = new Date();
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -948,7 +948,7 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.kernel.insertCard(
+		const insertedCard = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -1030,7 +1030,7 @@ describe('.getTypeTriggers()', () => {
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.kernel.insertCard(
+				return ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
 					card as Contract,
@@ -1105,7 +1105,7 @@ describe('.getTypeTriggers()', () => {
 		].map(Kernel.defaults);
 
 		for (const card of cards) {
-			await ctx.kernel.insertCard(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.session,
 				card as Contract,
@@ -1209,7 +1209,7 @@ describe('.getTypeTriggers()', () => {
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.kernel.insertCard(
+				return ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
 					card as Contract,
@@ -1324,7 +1324,7 @@ describe('.getTypeTriggers()', () => {
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.kernel.insertCard(
+				return ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
 					card as Contract,
@@ -1396,7 +1396,7 @@ describe('.getTypeTriggers()', () => {
 		].map(Kernel.defaults);
 
 		for (const card of cards) {
-			await ctx.kernel.insertCard(
+			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.session,
 				card as Contract,

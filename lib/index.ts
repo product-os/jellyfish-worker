@@ -23,7 +23,7 @@ import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
 import * as semver from 'semver';
 import { actions } from './actions';
-import CARDS from './cards';
+import CARDS from './contracts';
 import * as errors from './errors';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
@@ -426,7 +426,7 @@ export class Worker {
 					typeCard.data.schema,
 					objectWithLinks as any,
 				);
-				return kernel.insertCard(logContext, insertSession, result as any);
+				return kernel.insertContract(logContext, insertSession, result as any);
 			},
 		);
 	}
