@@ -56,7 +56,7 @@ export interface Integration {
 		options: { actor: string },
 	) => Promise<SequenceItem[]>;
 
-	getFile: (file: string) => Promise<Buffer>;
+	getFile?: (file: string) => Promise<Buffer>;
 }
 
 export interface IntegrationInitializationOptions {

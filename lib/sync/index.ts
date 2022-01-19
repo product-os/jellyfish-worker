@@ -491,6 +491,17 @@ export class Sync {
 			integration,
 			token,
 			async (integrationInstance) => {
+				if (!integrationInstance.getFile) {
+					context.log.warn(
+						'Not fetching file as the integration does not support this feature',
+						{
+							integration: name,
+						},
+					);
+
+					return null;
+				}
+
 				return integrationInstance.getFile(file);
 			},
 			{
