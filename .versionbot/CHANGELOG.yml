@@ -1,4 +1,17 @@
 - commits:
+    - subject: Move more from card to contract
+      hash: 52fc945d19b4e8da3b258e59ed1b586338519b9b
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 12.0.1
+  date: 2022-01-19T03:29:20.336Z
+- commits:
     - subject: Update action contracts/types
       hash: 669d8ee799c8db4905bcb9ddd8927e149709845e
       body: ''
