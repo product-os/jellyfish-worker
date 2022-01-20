@@ -1,4 +1,15 @@
 - commits:
+    - subject: Make passing oauth scopes optional
+      hash: a10c994a636ba9a7b08a38ee34f89d595bae073b
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: karaxuna
+      nested: []
+  version: 14.1.0
+  date: 2022-01-20T20:07:34.558Z
+- commits:
     - subject: >-
         Fix the plugin constructor accessing the wrong property in an action
         definition
