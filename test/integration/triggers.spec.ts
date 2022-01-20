@@ -4,7 +4,7 @@ import type {
 	Contract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import {
 	errors,
 	testUtils,

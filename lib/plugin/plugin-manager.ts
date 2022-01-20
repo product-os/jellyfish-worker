@@ -1,8 +1,9 @@
-import _ from 'lodash';
+import { Contract } from '@balena/jellyfish-types/build/core';
+import * as _ from 'lodash';
 import * as semver from 'semver';
 import type { Plugin } from './plugin';
 import type { IntegrationDefinition } from '../sync/types';
-import type { Map } from '../types';
+import type { Action, Map } from '../types';
 
 const validateDependencies = (plugins: Map<Plugin>) => {
 	_.forEach(plugins, (plugin) => {
@@ -67,7 +68,7 @@ export class PluginManager {
 		validateDependencies(this.pluginMap);
 	}
 
-	getCards() {
+	getCards(): Map<Contract> {
 		return mergeMaps(
 			_.mapValues(this.pluginMap, (plugin: Plugin) => plugin.getCards()),
 		);
@@ -81,7 +82,7 @@ export class PluginManager {
 		);
 	}
 
-	getActions() {
+	getActions(): Map<Action> {
 		return mergeMaps(
 			_.mapValues(this.pluginMap, (plugin: Plugin) => plugin.getActions()),
 		);

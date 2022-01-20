@@ -16,7 +16,7 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import * as errio from 'errio';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
 import * as skhema from 'skhema';

@@ -3,12 +3,12 @@ import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
 import type {
 	Contract,
+	ContractDefinition,
 	LinkContract,
 	SessionContract,
 	TypeContract,
-	UserContract,
 } from '@balena/jellyfish-types/build/core';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { ActionDefinition, Plugin, PluginManager } from './plugin';
 import { Sync } from './sync';
 import { Action, Map } from './types';
@@ -32,12 +32,6 @@ export interface TestContext extends queueTestUtils.TestContext {
 		body: string,
 		type: string,
 	) => Promise<any>;
-	createUser: (
-		username: string,
-		hash?: string,
-		roles?: string[],
-	) => Promise<UserContract>;
-	createSession: (user: UserContract) => Promise<SessionContract>;
 	createLink: (
 		actor: string,
 		session: string,
@@ -88,18 +82,18 @@ export const newContext = async (
 	// Prepare and insert all contracts, including those from plugins.
 	const contracts = pluginManager.getCards();
 	const actionLibrary = pluginManager.getActions();
-	const bootstrapContracts = [
+	const bootstrapContracts: ContractDefinition[] = [
 		CARDS.create,
 		CARDS.update,
 		CARDS['triggered-action'],
-		// Make sure any loop contracts are initialized, as they can be a prerequisite
-		..._.filter(contracts, (contract) => {
-			return contract.slug.startsWith('loop-');
-		}),
-		..._.filter(contracts, (contract) => {
-			return contract.slug.startsWith('action-');
-		}),
 	];
+
+	// Make sure any loop contracts are initialized, as they can be a prerequisite
+	Object.keys(contracts).forEach((slug: string) => {
+		if (slug.startsWith('loop-') || slug.startsWith('action-')) {
+			bootstrapContracts.push(contracts[slug]);
+		}
+	});
 
 	// Add passed in actions
 	if (options.actions) {
@@ -118,7 +112,7 @@ export const newContext = async (
 	}
 
 	// Any remaining contracts from plugins can now be added to the sequence
-	const remainder = _.filter(contracts, (contract) => {
+	const remainder = _.filter(contracts, (contract: Contract) => {
 		return !_.find(bootstrapContracts, { slug: contract.slug });
 	});
 	for (const contract of remainder) {
@@ -283,36 +277,6 @@ export const newContext = async (
 		return contract;
 	};
 
-	const createUser = async (
-		username: string,
-		hash = 'foobar',
-		roles = ['user-community'],
-	) => {
-		// Create the user, only if it doesn't exist yet
-		const userContract =
-			(await queueTestContext.kernel.getContractBySlug<UserContract>(
-				queueTestContext.logContext,
-				queueTestContext.session,
-				`user-${username}@latest`,
-			)) ||
-			(await queueTestContext.kernel.insertContract<UserContract>(
-				queueTestContext.logContext,
-				queueTestContext.session,
-				{
-					type: 'user@1.0.0',
-					slug: `user-${username}`,
-					data: {
-						email: `${username}@example.com`,
-						hash,
-						roles,
-					},
-				},
-			));
-		assert(userContract);
-
-		return userContract;
-	};
-
 	const createLink = async (
 		actor: string,
 		session: string,
@@ -403,27 +367,6 @@ export const newContext = async (
 		return contract;
 	};
 
-	const createSession = async (user: UserContract) => {
-		// Force login, even if we don't know the password
-		const sessionContract =
-			await queueTestContext.kernel.insertCard<SessionContract>(
-				queueTestContext.logContext,
-				queueTestContext.session,
-				{
-					slug: `session-${
-						user.slug
-					}-integration-tests-${coreTestUtils.generateRandomId()}`,
-					type: 'session@1.0.0',
-					data: {
-						actor: user.id,
-					},
-				},
-			);
-		assert(sessionContract);
-
-		return sessionContract;
-	};
-
 	return {
 		adminUserId: adminSessionContract.data.actor,
 		actionLibrary,
@@ -432,8 +375,6 @@ export const newContext = async (
 		flushAll,
 		processAction,
 		createEvent,
-		createUser,
-		createSession,
 		createLink,
 		createContract,
 		worker,

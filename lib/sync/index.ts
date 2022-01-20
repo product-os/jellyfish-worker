@@ -1,9 +1,9 @@
-import strict from 'assert';
 import * as assert from '@balena/jellyfish-assert';
 import type { LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { Contract } from '@balena/jellyfish-types/build/core';
-import _ from 'lodash';
+import { strict } from 'assert';
+import * as _ from 'lodash';
 import type { Map, WorkerContext } from '../types';
 import * as errors from './errors';
 import * as instance from './instance';
