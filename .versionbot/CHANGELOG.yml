@@ -1,4 +1,19 @@
 - commits:
+    - subject: >-
+        Fix the plugin constructor accessing the wrong property in an action
+        definition
+      hash: cca405729045d02c01c153e2ec89b320e7764b01
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 14.0.2
+  date: 2022-01-20T12:15:32.467Z
+- commits:
     - subject: Use core test utils for create user/session
       hash: 0b29315739a3a6d98c2ff4f4858e8c928abae4c2
       body: ''
