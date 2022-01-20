@@ -1,4 +1,19 @@
 - commits:
+    - subject: Drop roles
+      hash: 2eeae4e9a6d30fbd37041d44a9527d2cd261659b
+      body: |
+        Most roles have been moved to jellyfish-core
+        external-support role exists in plugin-default
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 14.0.0
+  date: 2022-01-20T06:21:21.996Z
+- commits:
     - subject: 'patch: Update internal-non-major'
       hash: 04c0e652b8323766cc9f9182e7ed641b4ca14003
       body: ''
