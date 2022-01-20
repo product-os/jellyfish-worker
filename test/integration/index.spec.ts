@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { errors, testUtils, TriggeredActionContract, Worker } from '../../lib';
 import { Sync } from '../../lib/sync';
 

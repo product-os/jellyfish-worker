@@ -4,7 +4,7 @@ import type {
 	ContractData,
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import type { IntegrationDefinition } from '../sync';
 import type { Action, Map } from '../types';
 
