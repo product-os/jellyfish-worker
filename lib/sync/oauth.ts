@@ -95,7 +95,7 @@ export const request = async (
  */
 export const getAuthorizeUrl = (
 	baseUrl: string,
-	scopes: any[],
+	scopes: any[] = [],
 	state: any,
 	options: { appId: string; redirectUri: string },
 ) => {
@@ -110,12 +110,6 @@ export const getAuthorizeUrl = (
 		Boolean(options.redirectUri),
 		OAuthInvalidOption,
 		'Missing redirectUri',
-	);
-	assert.INTERNAL(
-		null,
-		scopes && scopes.length > 0,
-		OAuthInvalidOption,
-		'Missing or invalid scopes',
 	);
 
 	const authorizeUrl = new url.URL('/oauth/authorize', baseUrl);
