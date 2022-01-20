@@ -216,38 +216,6 @@ describe('oauth', () => {
 				);
 			}).toThrow(oauth.OAuthInvalidOption);
 		});
-
-		test('should throw given no scopes', () => {
-			expect(() => {
-				oauth.getAuthorizeUrl(
-					'https://api.balena-cloud.com',
-					[],
-					{
-						hello: 'world',
-					},
-					{
-						appId: 'xxxxxxxxxx',
-						redirectUri: 'https://jel.ly.fish/oauth/balena',
-					},
-				);
-			}).toThrow(oauth.OAuthInvalidOption);
-		});
-
-		test('should throw given scopes is null', () => {
-			expect(() => {
-				oauth.getAuthorizeUrl(
-					'https://api.balena-cloud.com',
-					[],
-					{
-						hello: 'world',
-					},
-					{
-						appId: 'xxxxxxxxxx',
-						redirectUri: 'https://jel.ly.fish/oauth/balena',
-					},
-				);
-			}).toThrow(oauth.OAuthInvalidOption);
-		});
 	});
 
 	describe('.getAccessToken()', () => {
