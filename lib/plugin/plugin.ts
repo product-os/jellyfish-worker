@@ -29,7 +29,10 @@ export abstract class Plugin {
 		this.requires = options.requires || [];
 		this.integrationMap = options.integrationMap || {};
 		const actions = options.actions || [];
-		this.contracts = _.concat(options.contracts || [], _.map(actions, 'card'));
+		this.contracts = _.concat(
+			options.contracts || [],
+			_.map(actions, 'contract'),
+		);
 
 		this.actions = {};
 		for (const action of actions) {
