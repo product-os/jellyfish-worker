@@ -8,7 +8,7 @@ import type {
 	SessionContract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { ActionDefinition, Plugin, PluginManager } from './plugin';
 import { Sync } from './sync';
 import { Action, Map } from './types';
