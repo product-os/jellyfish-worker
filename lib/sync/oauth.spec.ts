@@ -250,7 +250,7 @@ describe('oauth', () => {
 					appSecret: 'yyyyyyyy',
 					redirectUri: 'https://jel.ly.fish/oauth/balena',
 				}),
-			).rejects.toThrow(oauth.OAuthUnsuccessfulResponse);
+			).rejects.toThrowError();
 		});
 
 		test('should throw given no appId', async () => {
@@ -321,7 +321,7 @@ describe('oauth', () => {
 						redirectUri: 'https://jel.ly.fish/oauth/balena',
 					},
 				),
-			).rejects.toThrow(oauth.OAuthUnsuccessfulResponse);
+			).rejects.toThrowError();
 		});
 
 		test('should fail if no appId', async () => {

@@ -1,8 +1,8 @@
 import * as assert from '@balena/jellyfish-assert';
 import type { Contract } from '@balena/jellyfish-types/build/core';
+import axios, { Method } from 'axios';
 import Bluebird from 'bluebird';
 import _ from 'lodash';
-import request from 'request';
 import * as errors from './errors';
 import * as oauth from './oauth';
 import type { SyncActionContext } from './sync-context';
@@ -14,54 +14,67 @@ import type {
 } from './types';
 
 const httpRequest = async <T = any>(
-	options: { uri: any },
+	options: {
+		method: Method;
+		baseUrl: string;
+		json?: boolean;
+		uri: string;
+		headers?: {
+			[key: string]: string;
+		};
+		data?: {
+			[key: string]: any;
+		};
+	},
 	retries = 30,
 ): Promise<{ code: number; body: T }> => {
-	const result = await new Promise<{ code: number; body: T }>(
-		(resolve, reject) => {
-			request(
-				options,
-				(error: any, response: { statusCode: any }, body: any) => {
-					if (error) {
-						return reject(error);
-					}
+	try {
+		const result = await axios({
+			method: options.method,
+			baseURL: options.baseUrl,
+			url: options.uri,
+			headers: options.headers || {},
+			data: options.data || {},
+		});
+		return {
+			code: result.status,
+			body: result.data,
+		};
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			// Automatically retry on server failures
+			if (error.response.status >= 500) {
+				assert.USER(
+					null,
+					retries > 0,
+					errors.SyncExternalRequestError,
+					`External service responded with ${error.response.status} to ${options.uri}`,
+				);
 
-					return resolve({
-						code: response.statusCode,
-						body,
-					});
-				},
-			);
-		},
-	);
+				await Bluebird.delay(2000);
+				return httpRequest(options, retries - 1);
+			}
 
-	// Automatically retry on server failures
-	if (result.code >= 500) {
-		assert.USER(
-			null,
-			retries > 0,
-			errors.SyncExternalRequestError,
-			`External service responded with ${result.code} to ${options.uri}`,
-		);
+			// Automatically retry on rate limit or request time out
+			if (error.response.status === 429 || error.response.status === 408) {
+				assert.USER(
+					null,
+					retries > 0,
+					errors.SyncRateLimit,
+					`External service rate limit with ${error.response.status} to ${options.uri}`,
+				);
 
-		await Bluebird.delay(2000);
-		return httpRequest(options, retries - 1);
+				await Bluebird.delay(5000);
+				return httpRequest(options, retries - 1);
+			}
+
+			return {
+				code: error.response.status,
+				body: error.response.data,
+			};
+		}
+		throw error;
 	}
-
-	// Automatically retry on rate limit or request time out
-	if (result.code === 429 || result.code === 408) {
-		assert.USER(
-			null,
-			retries > 0,
-			errors.SyncRateLimit,
-			`External service rate limit with ${result.code} to ${options.uri}`,
-		);
-
-		await Bluebird.delay(5000);
-		return httpRequest(options, retries - 1);
-	}
-
-	return result;
 };
 
 const setProperty = (

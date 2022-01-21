@@ -1,7 +1,8 @@
 import * as assert from '@balena/jellyfish-assert';
+import axios from 'axios';
 import Bluebird from 'bluebird';
 import _ from 'lodash';
-import { default as makeRequest } from 'request';
+import qs from 'qs';
 import { TypedError } from 'typed-error';
 import url from 'url';
 import * as errors from './errors';
@@ -21,56 +22,57 @@ export class OAuthUnsuccessfulResponse extends TypedError {}
  * delegate to the `request` module.
  *
  * @param {(Object|Undefined)} accessToken - Access token
- * @param {Object} options - Request options (passed to `request`)
+ * @param {Object} options - Request options
  * @param {Number} [retries] - Number of retries
  * @returns {Object} HTTP response (code, body)
  */
 export const request = async (
 	accessToken: { access_token: any } | null,
-	options: any,
+	options: {
+		baseUrl: string;
+		uri: string;
+		form: string;
+		headers?: {
+			[key: string]: string;
+		};
+	},
 	retries = 10,
 ): Promise<{ code: number; body: any }> => {
-	const result = await new Promise<{ code: number; body: any }>(
-		(resolve, reject) => {
-			// Use access token if available
-			if (accessToken) {
-				_.set(
-					options,
-					['headers', 'Authorization'],
-					`Bearer ${accessToken.access_token}`,
-				);
-			}
-
-			makeRequest(
-				options,
-				(error: any, response: { statusCode: any }, body: any) => {
-					if (error) {
-						return reject(error);
-					}
-
-					return resolve({
-						code: response.statusCode,
-						body,
-					});
-				},
-			);
-		},
-	);
-
-	// Automatically retry on server failures
-	if (result.code >= 500) {
-		assert.USER(
-			null,
-			retries > 0,
-			errors.SyncExternalRequestError,
-			`External service responded with ${result.code} to OAuth request`,
-		);
-
-		await Bluebird.delay(2000);
-		return request(accessToken, options, retries - 1);
+	// Use access token if available
+	const headers = options.headers || {};
+	if (accessToken) {
+		headers['Authorization'] = `Bearer ${accessToken.access_token}`;
 	}
 
-	return result;
+	try {
+		const result = await axios.post(
+			`${options.baseUrl}${options.uri}`,
+			options.form,
+			{
+				headers,
+			},
+		);
+		return {
+			code: result.status,
+			body: result.data,
+		};
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			// Automatically retry on server failures
+			if (error.response.status >= 500) {
+				assert.USER(
+					null,
+					retries > 0,
+					errors.SyncExternalRequestError,
+					`External service responded with ${error.response.status} to OAuth request`,
+				);
+
+				await Bluebird.delay(2000);
+				return request(accessToken, options, retries - 1);
+			}
+		}
+		throw error;
+	}
 };
 
 /**
@@ -141,9 +143,7 @@ const oauthPost = async (
 	const { code, body } = await request(null, {
 		baseUrl,
 		uri: path,
-		json: true,
-		method: 'POST',
-		form: data,
+		form: qs.stringify(data),
 	});
 
 	assert.INTERNAL(null, code < 500, OAuthRequestError, () => {
