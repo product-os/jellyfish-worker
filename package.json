@@ -50,7 +50,7 @@
     "@balena/jellyfish-core": "^13.3.0",
     "@balena/jellyfish-jellyscript": "^5.1.9",
     "@balena/jellyfish-logger": "^4.0.19",
-    "@balena/jellyfish-queue": "^3.2.1",
+    "@balena/jellyfish-queue": "^4.0.0",
     "@types/is-uuid": "^1.0.0",
     "axios": "^0.25.0",
     "bcrypt": "^5.0.1",
