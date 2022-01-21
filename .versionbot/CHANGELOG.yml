@@ -1,4 +1,17 @@
 - commits:
+    - subject: Replace deprecated request package
+      hash: e038f12b50cfbcbe309f48735b43051ccf18a757
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 14.1.2
+  date: 2022-01-21T08:25:40.455Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-queue to ^3.2.1'
       hash: 4500f2fce04e55b5184df79e2ab86443137fa9ec
       body: ''
