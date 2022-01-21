@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-queue to ^3.2.1'
+      hash: 4500f2fce04e55b5184df79e2ab86443137fa9ec
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 14.1.1
+  date: 2022-01-21T02:57:00.788Z
+- commits:
     - subject: Make passing oauth scopes optional
       hash: a10c994a636ba9a7b08a38ee34f89d595bae073b
       body: ''
