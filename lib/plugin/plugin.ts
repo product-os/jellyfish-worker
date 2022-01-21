@@ -98,4 +98,4 @@ export interface ActionDefinition<T = ContractData> extends Action {
 
 export type ContractBuilder<T = ContractData> =
 	| ContractDefinition<T>
-	| (() => ContractDefinition<T>);
+	| ((mixins?: any) => ContractDefinition<T>);
