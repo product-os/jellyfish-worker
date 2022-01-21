@@ -1,5 +1,5 @@
 import { Contract } from '@balena/jellyfish-types/build/core';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as semver from 'semver';
 import type { Plugin } from './plugin';
 import type { IntegrationDefinition } from '../sync/types';

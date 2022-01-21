@@ -1,8 +1,12 @@
 import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type { ActionRequestContract } from '@balena/jellyfish-queue';
-import * as _ from 'lodash';
-import { testUtils, TriggeredActionContract } from '../../lib';
+import _ from 'lodash';
+import {
+	testUtils,
+	TriggeredActionContract,
+	TriggeredActionData,
+} from '../../lib';
 
 let ctx: testUtils.TestContext;
 
@@ -79,7 +83,7 @@ describe('.execute()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -194,7 +198,7 @@ describe('.execute()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -296,7 +300,7 @@ describe('.execute()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: `triggered-action-${coreTestUtils.generateRandomId()}`,
 				type: 'triggered-action@1.0.0',
@@ -1097,7 +1101,7 @@ describe('.execute()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',

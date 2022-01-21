@@ -1,5 +1,5 @@
 import { strict } from 'assert';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as uuid from 'uuid';
 import { testUtils } from '../../lib';
 
