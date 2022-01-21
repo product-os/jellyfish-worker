@@ -9,6 +9,7 @@ import {
 	ActionDefinition,
 	testUtils,
 	TriggeredActionContract,
+	TriggeredActionData,
 } from '../../lib';
 import { actionCreateCard } from '../../lib/actions/action-create-card';
 
@@ -61,7 +62,7 @@ describe('.insertCard()', () => {
 
 		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id,
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
@@ -141,7 +142,7 @@ describe('.insertCard()', () => {
 		const id = coreTestUtils.generateRandomId();
 		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id,
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -221,7 +222,7 @@ describe('.insertCard()', () => {
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -321,7 +322,7 @@ describe('.insertCard()', () => {
 
 		const command = coreTestUtils.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.logContext, [
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -398,7 +399,7 @@ describe('.insertCard()', () => {
 		const command1 = coreTestUtils.generateRandomSlug({ prefix });
 		const command2 = coreTestUtils.generateRandomSlug({ prefix });
 		ctx.worker.setTriggers(ctx.logContext, [
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -431,7 +432,7 @@ describe('.insertCard()', () => {
 					},
 				},
 			}) as TriggeredActionContract,
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -515,7 +516,7 @@ describe('.insertCard()', () => {
 		const command1 = coreTestUtils.generateRandomSlug();
 		const command2 = coreTestUtils.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.logContext, [
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -548,7 +549,7 @@ describe('.insertCard()', () => {
 					},
 				},
 			}) as TriggeredActionContract,
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -724,11 +725,7 @@ describe('.insertCard()', () => {
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.kernel.insertContract(
-					ctx.logContext,
-					ctx.session,
-					card as Contract,
-				);
+				return ctx.kernel.insertContract(ctx.logContext, ctx.session, card);
 			}),
 		);
 

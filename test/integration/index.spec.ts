@@ -2,7 +2,13 @@ import { strict as assert } from 'assert';
 import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import * as _ from 'lodash';
-import { errors, testUtils, TriggeredActionContract, Worker } from '../../lib';
+import {
+	errors,
+	testUtils,
+	TriggeredActionContract,
+	Worker,
+	TriggeredActionData,
+} from '../../lib';
 import { Sync } from '../../lib/sync';
 
 let ctx: testUtils.TestContext;
@@ -1365,7 +1371,7 @@ describe('Worker', () => {
 		);
 
 		ctx.worker.setTriggers(ctx.logContext, [
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1485,7 +1491,7 @@ describe('Worker', () => {
 		);
 
 		ctx.worker.setTriggers(ctx.logContext, [
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 				slug: 'triggered-action-foo-bar',
 				type: 'triggered-action@1.0.0',
@@ -1647,7 +1653,7 @@ describe('Worker', () => {
 		});
 
 		ctx.worker.setTriggers(ctx.logContext, [
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				id: coreTestUtils.generateRandomId(),
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',

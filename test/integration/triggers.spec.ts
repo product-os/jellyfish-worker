@@ -9,6 +9,7 @@ import {
 	errors,
 	testUtils,
 	TriggeredActionContract,
+	TriggeredActionData,
 	triggersLib as triggers,
 } from '../../lib';
 
@@ -74,7 +75,7 @@ afterAll(() => {
 
 describe('.getRequest()', () => {
 	it('should return null if the filter only has a type but there is no match', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			type: 'triggered-action@1.0.0',
 			data: {
 				mode: 'insert',
@@ -131,7 +132,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return a request if the filter only has a type and there is a match', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -201,7 +202,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return null if there is no relevant from the old contract state', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			type: 'triggered-action@1.0.0',
 			data: {
 				mode: 'insert',
@@ -260,7 +261,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return a request if a relevant field did change', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -337,7 +338,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return a request given a complex matching filter', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -418,7 +419,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return null given a complex non-matching filter', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			type: 'triggered-action@1.0.0',
 			data: {
 				mode: 'insert',
@@ -486,7 +487,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should parse source templates in the triggered action arguments', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -576,7 +577,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return the request if the mode matches on update', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -666,7 +667,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return the request if the mode matches on insert', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -756,7 +757,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return null if the mode does not match', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -832,7 +833,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should parse timestamp templates in the triggered action arguments', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
 			data: {
@@ -909,7 +910,7 @@ describe('.getRequest()', () => {
 	});
 
 	it('should return null if one of the templates is unsatisfied', async () => {
-		const trigger = Kernel.defaults({
+		const trigger = Kernel.defaults<TriggeredActionData>({
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			slug: 'triggered-action-cb3523c5',
 			type: 'triggered-action@1.0.0',
@@ -1030,11 +1031,7 @@ describe('.getTypeTriggers()', () => {
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.kernel.insertContract(
-					ctx.logContext,
-					ctx.session,
-					card as Contract,
-				);
+				return ctx.kernel.insertContract(ctx.logContext, ctx.session, card);
 			}),
 		);
 
@@ -1105,11 +1102,7 @@ describe('.getTypeTriggers()', () => {
 		].map(Kernel.defaults);
 
 		for (const card of cards) {
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.session,
-				card as Contract,
-			);
+			await ctx.kernel.insertContract(ctx.logContext, ctx.session, card);
 		}
 
 		const result = await triggers.getTypeTriggers(
@@ -1209,11 +1202,7 @@ describe('.getTypeTriggers()', () => {
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.kernel.insertContract(
-					ctx.logContext,
-					ctx.session,
-					card as Contract,
-				);
+				return ctx.kernel.insertContract(ctx.logContext, ctx.session, card);
 			}),
 		);
 
@@ -1324,11 +1313,7 @@ describe('.getTypeTriggers()', () => {
 
 		const insertedCards = await Promise.all(
 			cards.map((card) => {
-				return ctx.kernel.insertContract(
-					ctx.logContext,
-					ctx.session,
-					card as Contract,
-				);
+				return ctx.kernel.insertContract(ctx.logContext, ctx.session, card);
 			}),
 		);
 
@@ -1396,11 +1381,7 @@ describe('.getTypeTriggers()', () => {
 		].map(Kernel.defaults);
 
 		for (const card of cards) {
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.session,
-				card as Contract,
-			);
+			await ctx.kernel.insertContract(ctx.logContext, ctx.session, card);
 		}
 
 		const result = await triggers.getTypeTriggers(
@@ -1417,7 +1398,7 @@ describe('.getStartDate()', () => {
 	it('should return epoch if the trigger has no start date', async () => {
 		// TS-TODO: remove the cast to "any"
 		const result = triggers.getStartDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1448,7 +1429,7 @@ describe('.getStartDate()', () => {
 	it('should return epoch if the trigger has an invalid date', async () => {
 		// TS-TODO: remove the cast to "any"
 		const result = triggers.getStartDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1481,7 +1462,7 @@ describe('.getStartDate()', () => {
 		const date = new Date();
 		// TS-TODO: Remove the cast to "any"
 		const result = triggers.getStartDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1517,7 +1498,7 @@ describe('.getNextExecutionDate()', () => {
 
 		// TS-TODO: fix the cast to any here
 		const result = triggers.getNextExecutionDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1549,7 +1530,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return epoch if no last execution date', async () => {
 		// TS-TODO: fix the cast to any here
 		const result = triggers.getNextExecutionDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1578,7 +1559,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return epoch if last execution date is not a valid date', async () => {
 		// TS-TODO: Remove cast to any
 		const result = triggers.getNextExecutionDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1608,7 +1589,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return epoch if last execution date is not a date', async () => {
 		// TS-TODO: fix cast
 		const result = triggers.getNextExecutionDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1641,7 +1622,7 @@ describe('.getNextExecutionDate()', () => {
 		expect(() => {
 			// TS-TODO: fix cast
 			triggers.getNextExecutionDate(
-				Kernel.defaults({
+				Kernel.defaults<TriggeredActionData>({
 					type: 'triggered-action@1.0.0',
 					slug: coreTestUtils.generateRandomSlug({
 						prefix: 'triggered-action',
@@ -1670,7 +1651,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return the next interval after the last execution', async () => {
 		// TS-TODO: fix cast
 		const result = triggers.getNextExecutionDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1701,7 +1682,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return the start date if the last execution happened way before the start date', async () => {
 		// TS-TODO: fix cast to any
 		const result = triggers.getNextExecutionDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1732,7 +1713,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return the subsequent interval if the last execution happened just before the start date', async () => {
 		// TS-TODO: fix cast to any
 		const result = triggers.getNextExecutionDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
@@ -1763,7 +1744,7 @@ describe('.getNextExecutionDate()', () => {
 	it('should return the next interval if the last execution is the start date', async () => {
 		// TS-TODO: Fix cast to any
 		const result = triggers.getNextExecutionDate(
-			Kernel.defaults({
+			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
 				slug: coreTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
