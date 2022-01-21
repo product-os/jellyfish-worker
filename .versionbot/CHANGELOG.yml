@@ -1,4 +1,17 @@
 - commits:
+    - subject: Update queue and core dependencies
+      hash: 50473edffe366744a6a56dae4a349ac8c88d5e0d
+      body: ''
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 15.0.0
+  date: 2022-01-21T17:09:52.821Z
+- commits:
     - subject: Replace deprecated request package
       hash: e038f12b50cfbcbe309f48735b43051ccf18a757
       body: ''
