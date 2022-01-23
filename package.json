@@ -47,9 +47,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.10",
-    "@balena/jellyfish-core": "^14.0.5",
-    "@balena/jellyfish-jellyscript": "^5.1.16",
-    "@balena/jellyfish-logger": "^4.0.22",
+    "@balena/jellyfish-core": "^14.0.7",
+    "@balena/jellyfish-jellyscript": "^5.1.19",
+    "@balena/jellyfish-logger": "^4.0.25",
     "@balena/jellyfish-queue": "^4.0.7",
     "axios": "^0.25.0",
     "bcrypt": "^5.0.1",
