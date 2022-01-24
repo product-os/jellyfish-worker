@@ -1,4 +1,25 @@
 - commits:
+    - subject: Simplify the plugin interface
+      hash: 1a2d457ac78851b0f0d8f78adcea3daa6bf1b423
+      body: >
+        - Don't export the `Plugin` class. Plugins are now defined as
+        `PluginDefinition` objects.
+
+        - Remove the ability to define contracts as functions.
+
+        - Remove custom mixins.
+
+        - Properly define the type for action contracts.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 16.0.0
+  date: 2022-01-24T14:45:53.722Z
+- commits:
     - subject: Allow async isEventValid
       hash: 7c294f03c94794671210f1e2f976218aaa10ce71
       body: ''
