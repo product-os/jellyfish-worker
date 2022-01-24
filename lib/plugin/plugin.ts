@@ -1,25 +1,25 @@
 import { cardMixins } from '@balena/jellyfish-core';
 import type {
+	ActionContract,
 	Contract,
-	ContractData,
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
 import type { IntegrationDefinition } from '../sync';
 import type { Action, Map } from '../types';
 
-export abstract class Plugin {
+export class Plugin {
 	public slug: string;
 	public name: string;
 	public version: string;
 	public requires: PluginIdentity[];
 
 	private actions: Map<Action>;
-	private contracts: ContractBuilder[];
+	private contracts: ContractDefinition[];
 	private integrationMap: Map<IntegrationDefinition>;
 
-	protected constructor(options: PluginDefinition) {
-		if (!options.slug.match(/^plugin-[a-z0-9-]+$/)) {
+	public constructor(options: PluginDefinition) {
+		if (!options.slug.match(/^[a-z0-9-]+$/)) {
 			throw new Error(`Invalid slug: ${options.slug}`);
 		}
 
@@ -47,14 +47,8 @@ export abstract class Plugin {
 
 	public getCards(): Map<Contract> {
 		const contractMap = {};
-		for (const contractBuilder of this.contracts) {
-			let contractTemplate: ContractDefinition;
-			if (typeof contractBuilder === 'function') {
-				contractTemplate = contractBuilder();
-			} else {
-				contractTemplate = contractBuilder;
-			}
-			const contract = cardMixins.initialize(contractTemplate);
+		for (const contractDefinition of this.contracts) {
+			const contract = cardMixins.initialize(contractDefinition);
 
 			const slug = contract.slug;
 			if (slug in contractMap) {
@@ -82,9 +76,8 @@ export interface PluginDefinition {
 	version: string;
 	requires?: PluginIdentity[];
 	actions?: ActionDefinition[];
-	contracts?: ContractBuilder[];
+	contracts?: ContractDefinition[];
 	integrationMap?: Map<IntegrationDefinition>;
-	mixins?: Map<ContractBuilder>;
 }
 
 export interface PluginIdentity {
@@ -92,10 +85,11 @@ export interface PluginIdentity {
 	version: string;
 }
 
-export interface ActionDefinition<T = ContractData> extends Action {
-	contract: ContractDefinition<T>;
+export interface ActionDefinition extends Action {
+	contract: ActionContractDefinition;
 }
 
-export type ContractBuilder<T = ContractData> =
-	| ContractDefinition<T>
-	| (() => ContractDefinition<T>);
+export type ActionContractDefinition = Pick<
+	ActionContract,
+	'slug' | 'version' | 'name' | 'type' | 'data'
+>;

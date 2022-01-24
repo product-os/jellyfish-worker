@@ -9,7 +9,7 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
-import { ActionDefinition, Plugin, PluginManager } from './plugin';
+import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
 import { Sync } from './sync';
 import { Action, Map } from './types';
 import { CARDS, Worker } from '.';
@@ -57,7 +57,7 @@ export interface NewContextOptions extends coreTestUtils.NewContextOptions {
 	/**
 	 * Set of plugins needed to run tests.
 	 */
-	plugins?: Array<() => Plugin>;
+	plugins?: PluginDefinition[];
 	actions?: ActionDefinition[];
 }
 

@@ -74,6 +74,7 @@ export const actionSetAdd: ActionDefinition = {
 	handler,
 	contract: {
 		slug: 'action-set-add',
+		version: '1.0.0',
 		type: 'action@1.0.0',
 		name: 'Add an element to a set',
 		data: {

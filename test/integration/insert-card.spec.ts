@@ -30,6 +30,7 @@ beforeAll(async () => {
 		},
 		contract: {
 			slug: 'action-test-originator',
+			version: '1.0.0',
 			type: actionCreateCard.contract.type,
 			name: actionCreateCard.contract.name,
 			data: actionCreateCard.contract.data,
