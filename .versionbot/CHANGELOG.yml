@@ -1,4 +1,15 @@
 - commits:
+    - subject: Allow async isEventValid
+      hash: 7c294f03c94794671210f1e2f976218aaa10ce71
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: karaxuna
+      nested: []
+  version: 15.0.18
+  date: 2022-01-24T10:43:37.956Z
+- commits:
     - subject: 'patch: Update internal-non-major'
       hash: 89e610c7ab0c6af508b4db4762f1ed47d9186c42
       body: ''
