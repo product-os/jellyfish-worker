@@ -40,9 +40,8 @@ import * as utils from './utils';
 export { actions, triggersLib, errors, CARDS, utils };
 export { Integration, IntegrationDefinition } from './sync';
 export {
+	ActionContractDefinition,
 	ActionDefinition,
-	ContractBuilder,
-	Plugin,
 	PluginDefinition,
 	PluginIdentity,
 } from './plugin';

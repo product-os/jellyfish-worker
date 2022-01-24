@@ -1,7 +1,6 @@
 export {
+	ActionContractDefinition,
 	ActionDefinition,
-	ContractBuilder,
-	Plugin,
 	PluginDefinition,
 	PluginIdentity,
 } from './plugin';

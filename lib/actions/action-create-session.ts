@@ -165,6 +165,7 @@ export const actionCreateSession: ActionDefinition = {
 	handler,
 	contract: {
 		slug: 'action-create-session',
+		version: '1.0.0',
 		type: 'action@1.0.0',
 		name: 'Login as a user',
 		data: {

@@ -48,6 +48,7 @@ export const actionCreateCard: ActionDefinition = {
 	handler,
 	contract: {
 		slug: 'action-create-card',
+		version: '1.0.0',
 		type: 'action@1.0.0',
 		name: 'Create a new card',
 		data: {

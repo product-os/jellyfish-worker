@@ -3,7 +3,7 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
 import type { Integration, IntegrationDefinition } from '../sync';
 import type { Map } from '../types';
-import { ActionDefinition, Plugin, PluginDefinition } from '.';
+import { ActionDefinition, PluginDefinition } from '.';
 
 const commonCard = {
 	tags: [],
@@ -76,26 +76,21 @@ const integrationDefinitionFor = (slug: string): IntegrationDefinition => {
 export const integration1 = integrationDefinitionFor('integration1');
 export const integration2 = integrationDefinitionFor('integration2');
 
-export class TestPlugin extends Plugin {
-	public constructor(definition: Partial<PluginDefinition> = {}) {
-		super(
-			Object.assign(
-				{
-					slug: 'plugin-test',
-					name: 'Test Plugin',
-					version: '1.0.0',
-				},
-				definition,
-			),
-		);
-	}
-}
+export const testPlugin = (definition: Partial<PluginDefinition> = {}) => {
+	return {
+		slug: 'plugin-test',
+		name: 'Test Plugin',
+		version: '1.0.0',
+		...definition,
+	};
+};
 
 export const action1: ActionDefinition = {
 	contract: {
 		slug: 'action-1',
+		version: '1.0.0',
 		type: 'action',
-		data: {},
+		data: { arguments: {} },
 	},
 	handler: async () => null,
 };
@@ -103,8 +98,9 @@ export const action1: ActionDefinition = {
 export const action2: ActionDefinition = {
 	contract: {
 		slug: 'action-2',
+		version: '1.0.0',
 		type: 'action',
-		data: {},
+		data: { arguments: {} },
 	},
 	pre: _.noop,
 	handler: async () => _.pick(card1, 'id', 'slug', 'type', 'version'),

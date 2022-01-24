@@ -121,6 +121,7 @@ export const actionCreateEvent: ActionDefinition = {
 	handler,
 	contract: {
 		slug: 'action-create-event',
+		version: '1.0.0',
 		type: 'action@1.0.0',
 		name: 'Attach an event to a card',
 		data: {

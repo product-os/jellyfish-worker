@@ -56,6 +56,7 @@ export const actionUpdateCard: ActionDefinition = {
 	handler,
 	contract: {
 		slug: 'action-update-card',
+		version: '1.0.0',
 		type: 'action@1.0.0',
 		name: 'Update properties of a card',
 		data: {

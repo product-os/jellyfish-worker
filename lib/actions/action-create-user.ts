@@ -74,6 +74,7 @@ export const actionCreateUser: ActionDefinition = {
 	handler,
 	contract: {
 		slug: 'action-create-user',
+		version: '1.0.0',
 		type: 'action@1.0.0',
 		name: 'Create a user',
 		data: {
