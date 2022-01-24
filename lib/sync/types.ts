@@ -90,7 +90,7 @@ export interface IntegrationDefinition {
 		token: any,
 		rawEvent: any,
 		headers: Map<string>,
-	) => boolean;
+	) => Promise<boolean> | boolean;
 
 	whoami?: (context: SyncActionContext, credentials: any) => Promise<any>;
 
