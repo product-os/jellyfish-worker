@@ -1,4 +1,19 @@
 - commits:
+    - subject: >-
+        Export the `request` argument of `Action.handler` and `Action.pre` as
+        separate types
+      hash: ebc4bd1858e77d2833239d72d16933f7f9f0681c
+      body: ''
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 16.1.0
+  date: 2022-01-25T17:50:39.996Z
+- commits:
     - subject: 'patch: Update dependency @balena/jellyfish-jellyscript to ^5.1.22'
       hash: d7d596adf4c15954dd5bcd33a9b64d8b286112fc
       body: ''
