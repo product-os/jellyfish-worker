@@ -44,6 +44,7 @@ export {
 	ActionDefinition,
 	PluginDefinition,
 	PluginIdentity,
+	PluginManager,
 } from './plugin';
 export * as testUtils from './test-utils';
 export * from './types';
