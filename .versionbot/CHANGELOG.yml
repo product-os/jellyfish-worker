@@ -1,4 +1,17 @@
 - commits:
+    - subject: Export PluginManager
+      hash: 9aed673d89cb847dd45ed0ed478633f2d25992f1
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 16.0.5
+  date: 2022-01-25T01:09:38.986Z
+- commits:
     - subject: 'patch: Update internal-non-major'
       hash: e5dbb2c20dc74158ba486a6930c9f4c22743ecec
       body: ''
