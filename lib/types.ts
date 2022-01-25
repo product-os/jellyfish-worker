@@ -19,32 +19,36 @@ export interface Action {
 		session: string,
 		context: WorkerContext,
 		contract: Contract<ContractData>,
-		request: {
-			action: ActionContract;
-			card: string;
-			actor: string;
-			logContext: LogContext;
-			timestamp: any;
-			epoch: any;
-			arguments: {
-				[k: string]: any;
-			};
-			originator?: string;
-		},
+		request: ActionHandlerRequest,
 	) => Promise<null | ContractSummary<TData> | Array<ContractSummary<TData>>>;
 	pre?: (
 		session: string,
 		context: WorkerContext,
-		request: {
-			action: string;
-			card: string;
-			type: string;
-			logContext: LogContext;
-			arguments: {
-				[k: string]: any;
-			};
-		},
+		request: ActionPreRequest,
 	) => Promise<any> | any;
+}
+
+export interface ActionHandlerRequest {
+	action: ActionContract;
+	card: string;
+	actor: string;
+	logContext: LogContext;
+	timestamp: any;
+	epoch: any;
+	arguments: {
+		[k: string]: any;
+	};
+	originator?: string;
+}
+
+export interface ActionPreRequest {
+	action: string;
+	card: string;
+	type: string;
+	logContext: LogContext;
+	arguments: {
+		[k: string]: any;
+	};
 }
 
 export interface WorkerContext {
