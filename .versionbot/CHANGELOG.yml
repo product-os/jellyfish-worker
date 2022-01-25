@@ -1,4 +1,15 @@
 - commits:
+    - subject: 'patch: Update internal-non-major'
+      hash: c359303db2565c547c1bca57c56619acf01e9761
+      body: ''
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 16.1.1
+  date: 2022-01-25T19:41:50.716Z
+- commits:
     - subject: >-
         Export the `request` argument of `Action.handler` and `Action.pre` as
         separate types
