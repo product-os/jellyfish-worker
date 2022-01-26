@@ -1,4 +1,16 @@
 - commits:
+    - subject: 'patch: Update dependency @balena/jellyfish-core to ^14.1.0'
+      hash: d72688b0b4a3c6a456201191163f58b26ce050d7
+      body: |
+        Update @balena/jellyfish-core from 14.0.13 to 14.1.0
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 16.1.5
+  date: 2022-01-26T08:31:11.877Z
+- commits:
     - subject: 'patch: Update resinci/jellyfish-test Docker tag to v1.4.21'
       hash: 7c3150e6d6d7800192d02d53ad63587a0ea1b795
       body: |
