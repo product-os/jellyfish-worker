@@ -13,6 +13,7 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import type { Operation } from 'fast-json-patch';
+import type { Sync } from './sync';
 
 export interface Action {
 	handler: <TData = ContractData>(
@@ -52,7 +53,7 @@ export interface ActionPreRequest {
 }
 
 export interface WorkerContext {
-	sync: any;
+	sync: Sync | undefined;
 	getEventSlug: (type: string) => Promise<string>;
 	getCardById: (lsession: string, id: string) => Promise<Contract | null>;
 	getCardBySlug: (lsession: string, slug: string) => Promise<Contract | null>;

@@ -32,7 +32,7 @@ export const getCurrentTimestamp = (): string => {
  * @function
  * @public
  *
- * @param {Object} actionCard - action card
+ * @param {Object} actionContract - action contract
  * @returns {Object} arguments schema
  *
  * @example
@@ -40,18 +40,18 @@ export const getCurrentTimestamp = (): string => {
  * console.log(schema.type)
  */
 export const getActionArgumentsSchema = (
-	actionCard: ActionContract,
+	actionContract: ActionContract,
 ): JsonSchema => {
-	const argumentNames = Object.keys(actionCard.data.arguments);
+	const argumentNames = Object.keys(actionContract.data.arguments);
 	return argumentNames.length === 0
 		? {
 				type: 'object',
 		  }
 		: {
 				type: 'object',
-				properties: actionCard.data.arguments,
+				properties: actionContract.data.arguments,
 				additionalProperties: false,
-				required: (actionCard.data.required as string[]) || argumentNames,
+				required: (actionContract.data.required as string[]) || argumentNames,
 		  };
 };
 

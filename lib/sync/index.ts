@@ -3,15 +3,20 @@ import type { LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import { strict } from 'assert';
+import Bluebird from 'bluebird';
 import _ from 'lodash';
-import type { Map, WorkerContext } from '../types';
+import type { Map } from '../types';
 import * as errors from './errors';
-import * as instance from './instance';
 import * as oauth from './oauth';
-import * as pipeline from './pipeline';
-import * as syncContext from './sync-context';
-import { Integration, IntegrationDefinition } from './types';
-
+import { getIntegrationExecutionContext } from './context';
+import type { SyncActionContext } from './context';
+import {
+	Integration,
+	IntegrationDefinition,
+	IntegrationExecutionOptions,
+	IntegrationExecutionResult,
+} from './types';
+import * as utils from './utils';
 export { Integration, IntegrationDefinition };
 
 /**
@@ -21,18 +26,16 @@ export { Integration, IntegrationDefinition };
  */
 
 interface SyncOptions {
-	integrations?: Map<IntegrationDefinition>;
+	integrationsDefinitions?: Map<IntegrationDefinition>;
 }
 
 export class Sync {
-	integrations: Map<IntegrationDefinition>;
+	integrationDefinitions: Map<IntegrationDefinition>;
 	errors: typeof errors;
-	pipeline: typeof pipeline;
 
 	constructor(options: SyncOptions = {}) {
-		this.integrations = options.integrations || {};
+		this.integrationDefinitions = options.integrationsDefinitions || {};
 		this.errors = errors;
-		this.pipeline = pipeline;
 	}
 
 	/**
@@ -53,7 +56,7 @@ export class Sync {
 		slug: string,
 		options: { origin: string },
 	) {
-		const integration = this.integrations[name];
+		const integration = this.integrationDefinitions[name];
 		if (
 			!integration ||
 			!token ||
@@ -91,13 +94,13 @@ export class Sync {
 	async authorize(
 		name: string,
 		token: any,
-		context: syncContext.SyncActionContext,
+		context: SyncActionContext,
 		options: {
 			code: string;
 			origin: string;
 		},
 	) {
-		const integration = this.integrations[name];
+		const integration = this.integrationDefinitions[name];
 
 		assert.INTERNAL(
 			context,
@@ -130,12 +133,8 @@ export class Sync {
 	 * @param {String} credentials - access token for external provider api
 	 * @returns {Object} external user
 	 */
-	async whoami(
-		context: syncContext.SyncActionContext,
-		name: string,
-		credentials: any,
-	) {
-		const integration = this.integrations[name];
+	async whoami(context: SyncActionContext, name: string, credentials: any) {
+		const integration = this.integrationDefinitions[name];
 
 		assert.INTERNAL(
 			context,
@@ -168,31 +167,31 @@ export class Sync {
 	 * @returns {Object} external user
 	 */
 	async match(
-		context: syncContext.SyncActionContext,
+		context: SyncActionContext,
 		name: string,
 		externalUser: any,
 		options: {
 			slug: string;
 		},
 	) {
-		const integration = this.integrations[name];
+		const integrationDefinition = this.integrationDefinitions[name];
 
 		assert.INTERNAL(
 			context,
-			!!integration,
+			!!integrationDefinition,
 			errors.SyncNoCompatibleIntegration,
 			`There is no compatible integration for provider: ${name}`,
 		);
 
 		assert.INTERNAL(
 			context,
-			!!integration.match,
+			!!integrationDefinition.match,
 			errors.SyncNoCompatibleIntegration,
 			`Integration for ${name} does not provide a match() function`,
 		);
 
-		strict.ok(integration.match);
-		const user = await integration.match(context, externalUser, {
+		strict.ok(integrationDefinition.match);
+		const user = await integrationDefinition.match(context, externalUser, {
 			slug: `${options.slug}@latest`,
 		});
 
@@ -213,24 +212,24 @@ export class Sync {
 		name: string,
 		externalUser: any,
 	) {
-		const integration = this.integrations[name];
+		const integrationDefinition = this.integrationDefinitions[name];
 
 		assert.INTERNAL(
 			logContext,
-			!!integration,
+			!!integrationDefinition,
 			errors.SyncNoCompatibleIntegration,
 			`There is no compatible integration for provider: ${name}`,
 		);
 
 		assert.INTERNAL(
 			logContext,
-			!!integration.getExternalUserSyncEventData,
+			!!integrationDefinition.getExternalUserSyncEventData,
 			errors.SyncNoCompatibleIntegration,
 			`Integration for ${name} does not provide a getExternalUserSyncEventData() function`,
 		);
 
-		strict.ok(integration.getExternalUserSyncEventData);
-		const event = await integration.getExternalUserSyncEventData(
+		strict.ok(integrationDefinition.getExternalUserSyncEventData);
+		const event = await integrationDefinition.getExternalUserSyncEventData(
 			logContext,
 			externalUser,
 		);
@@ -260,13 +259,13 @@ export class Sync {
 		name: string,
 		userCard: Contract,
 		credentials: any,
-		context: syncContext.SyncActionContext,
+		context: SyncActionContext,
 	) {
-		const integration = this.integrations[name];
+		const integrationDefinition = this.integrationDefinitions[name];
 
 		assert.INTERNAL(
 			context,
-			!!integration,
+			!!integrationDefinition,
 			errors.SyncNoCompatibleIntegration,
 			`There is no compatible integration: ${name}`,
 		);
@@ -299,12 +298,12 @@ export class Sync {
 		token: any,
 		event: any,
 	) {
-		const integration = this.integrations[name];
-		if (!integration || !token) {
+		const integrationDefinition = this.integrationDefinitions[name];
+		if (!integrationDefinition || !token) {
 			return false;
 		}
 
-		return integration.isEventValid(
+		return integrationDefinition.isEventValid(
 			logContext,
 			token,
 			event.raw,
@@ -329,8 +328,8 @@ export class Sync {
 	async mirror(
 		name: string,
 		token: any,
-		card: Contract,
-		context: syncContext.SyncActionContext,
+		contract: Contract,
+		context: SyncActionContext,
 		options: {
 			actor: string;
 			origin: string;
@@ -345,8 +344,8 @@ export class Sync {
 			return [];
 		}
 
-		const integration = this.integrations[name];
-		if (!integration) {
+		const integrationDefinition = this.integrationDefinitions[name];
+		if (!integrationDefinition) {
 			context.log.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
@@ -357,15 +356,217 @@ export class Sync {
 			return [];
 		}
 
-		return pipeline.mirrorCard(integration, card, {
-			actor: options.actor,
-			origin: options.origin,
-			defaultUser: options.defaultUser,
-			provider: name,
-			token,
-			context,
+		const contracts = await metrics.measureMirror(name, async () => {
+			return this.executeIntegration(
+				integrationDefinition,
+				{
+					context,
+					token,
+					provider: name,
+					actor: options.actor,
+					origin: options.origin,
+					defaultUser: options.defaultUser,
+				},
+				'mirror',
+				contract,
+			);
 		});
+
+		context.log.info('Mirrored external event', {
+			slugs: contracts.map((mirroredContract) => {
+				return mirroredContract.slug;
+			}),
+		});
+
+		return contracts;
 	}
+
+	executeIntegration = async (
+		integrationDefinition: IntegrationDefinition,
+		options: IntegrationExecutionOptions,
+		fn: 'translate' | 'mirror',
+		contract: Contract,
+	): Promise<Contract[]> => {
+		const integration = await integrationDefinition.initialize({
+			token: options.token,
+			defaultUser: options.defaultUser,
+			context: getIntegrationExecutionContext(integrationDefinition, options),
+		});
+
+		try {
+			const results = await integration[fn](contract, {
+				actor: options.actor,
+			});
+
+			options.context.log.debug('Processing integration execution results:', {
+				type: fn,
+				results,
+			});
+
+			const contracts = this.importIntegrationExecutionResultsAsContracts(
+				options.context,
+				results,
+				{
+					origin: contract,
+				},
+			);
+
+			await integration.destroy();
+			return contracts;
+		} catch (error) {
+			await integration.destroy();
+			throw error;
+		}
+	};
+
+	/**
+	 * @summary Save integration execution results as contracts
+	 * @function
+	 * @public
+	 *
+	 * @param {Object} context - worker execution context
+	 * @param {Array} sequence - contract sequence
+	 * @param {Object} options - options
+	 * @param {String} options.origin - origin id
+	 * @returns {Contract[]} inserted contracts
+	 *
+	 * @example
+	 * const result = await sync.importIntegrationExecutionResultsAsContracts({ ... }, [
+	 *   {
+	 *     time: new Date(),
+	 *     contract: { ... }
+	 *   },
+	 *   {
+	 *     time: new Date(),
+	 *     contract: { ... }
+	 *   },
+	 *   {
+	 *     time: new Date(),
+	 *     contract: { ... }
+	 *   }
+	 * ], {
+	 *   origin: 'e9b74e2a-3553-4188-8ab8-a67e92aedbe2'
+	 * })
+	 */
+	importIntegrationExecutionResultsAsContracts = async (
+		context: SyncActionContext,
+		results: Array<IntegrationExecutionResult | IntegrationExecutionResult[]>,
+		options: {
+			references?: any;
+			origin?: Contract;
+		} = {},
+	) => {
+		// TODO: AFAICT the references option is never
+		// provided and can probably be removed.
+		const references = options.references || {};
+		const insertedContracts: Contract[] = [];
+
+		for (const [index, value] of results.entries()) {
+			const step = _.castArray(value);
+			await Bluebird.map(
+				step,
+				async (result, subindex, length) => {
+					const path = ['cards', index];
+					if (length !== 1) {
+						path.push(subindex);
+					}
+
+					let object = {};
+					let finalObject: Partial<Contract> = {};
+					const type = result.contract.type;
+
+					// Check if this is a JSONpatch or a slug-based upsert
+					if ('patch' in result.contract) {
+						// If the patch doesn't update the origin, add it now
+						if (
+							!_.find(result.contract.patch, {
+								path: '/data/origin',
+							})
+						) {
+							if (
+								options.origin &&
+								options.origin.type === 'external-event@1.0.0'
+							) {
+								result.contract.patch.push({
+									op: 'add',
+									path: '/data/origin',
+									value: `${options.origin.slug}@${options.origin.version}`,
+								});
+							}
+						}
+						finalObject = utils.evaluateObjectWithContext(
+							_.omit(result.contract, ['links']),
+							references,
+						);
+					} else {
+						object = utils.evaluateObjectWithContext(
+							_.omit(result.contract, ['links']),
+							references,
+						);
+						assert.INTERNAL(
+							context,
+							!!object,
+							errors.SyncInvalidTemplate,
+							() =>
+								`Could not evaluate template in: ${JSON.stringify(
+									result.contract,
+									null,
+									2,
+								)}`,
+						);
+
+						finalObject = Object.assign(
+							{
+								active: true,
+								version: '1.0.0',
+								tags: [],
+								markers: [],
+								links: {},
+								requires: [],
+								capabilities: [],
+								data: {},
+							},
+							object,
+						);
+
+						if (
+							options.origin &&
+							options.origin.type === 'external-event@1.0.0' &&
+							!result.skipOriginator
+						) {
+							finalObject.data!.origin = `${options.origin.slug}@${options.origin.version}`;
+						}
+					}
+
+					assert.INTERNAL(
+						context,
+						!!result.actor,
+						errors.SyncNoActor,
+						() => `No actor in result: ${JSON.stringify(result)}`,
+					);
+
+					const contract = await context.upsertElement(type, finalObject, {
+						timestamp: result.time,
+						actor: result.actor,
+						originator: result.skipOriginator
+							? null
+							: _.get(options, ['origin', 'id']),
+					});
+
+					if (contract) {
+						insertedContracts.push(contract);
+					}
+
+					_.set(references, path, contract);
+				},
+				{
+					concurrency: 3,
+				},
+			);
+		}
+
+		return insertedContracts;
+	};
 
 	/**
 	 * @summary Translate an external event into Jellyfish
@@ -374,7 +575,7 @@ export class Sync {
 	 *
 	 * @param {String} name - integration name
 	 * @param {Object} token - token details
-	 * @param {Object} card - action target card
+	 * @param {Object} contract - action target contract
 	 * @param {Object} context - execution context
 	 * @param {Object} options - options
 	 * @param {String} options.actor - actor id
@@ -382,17 +583,17 @@ export class Sync {
 	 * @param {String} [options.origin] - OAuth origin URL
 	 * @returns {Object[]} inserted cards
 	 */
-	async translate(
+	translate = async (
 		name: string,
 		token: string,
-		card: Contract,
-		context: syncContext.SyncActionContext,
+		contract: Contract,
+		context: SyncActionContext,
 		options: {
 			actor: string;
 			defaultUser: string;
 			origin: string;
 		},
-	) {
+	) => {
 		if (!token) {
 			context.log.warn('Ignoring translate as there is no token', {
 				integration: name,
@@ -401,8 +602,8 @@ export class Sync {
 			return [];
 		}
 
-		const integration = this.integrations[name];
-		if (!integration) {
+		const integrationDefinition = this.integrationDefinitions[name];
+		if (!integrationDefinition) {
 			context.log.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
@@ -414,30 +615,35 @@ export class Sync {
 		}
 
 		context.log.info('Translating external event', {
-			id: card.id,
-			slug: card.slug,
+			id: contract.id,
+			slug: contract.slug,
 			integration: name,
 		});
 
-		const cards = await metrics.measureTranslate(name, async () => {
-			return pipeline.translateExternalEvent(integration, card, {
-				actor: options.actor,
-				origin: options.origin,
-				defaultUser: options.defaultUser,
-				provider: name,
-				token,
-				context,
-			});
+		const contracts = await metrics.measureTranslate(name, async () => {
+			return this.executeIntegration(
+				integrationDefinition,
+				{
+					actor: options.actor,
+					origin: options.origin,
+					defaultUser: options.defaultUser,
+					provider: name,
+					token,
+					context,
+				},
+				'translate',
+				contract,
+			);
 		});
 
 		context.log.info('Translated external event', {
-			slugs: cards.map((translatedCard) => {
+			slugs: contracts.map((translatedCard) => {
 				return translatedCard.slug;
 			}),
 		});
 
-		return cards;
-	}
+		return contracts;
+	};
 
 	/**
 	 * @summary Fetch a file synced in an external service
@@ -456,21 +662,20 @@ export class Sync {
 		name: string,
 		token: any,
 		file: string,
-		context: syncContext.SyncActionContext,
+		context: SyncActionContext,
 		options: {
 			actor: string;
 		},
 	): Promise<Buffer | null> {
 		if (!token) {
-			context.log.warn('Not fetching file as there is no token', {
+			context.log.warn('Not fetching file due to missing token', {
 				integration: name,
 			});
-
 			return null;
 		}
 
-		const integration = this.integrations[name];
-		if (!integration) {
+		const integrationDefinition = this.integrationDefinitions[name];
+		if (!integrationDefinition) {
 			context.log.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
@@ -481,51 +686,38 @@ export class Sync {
 			return null;
 		}
 
-		context.log.info('Retrieving external file', {
-			file,
-			integration: name,
-		});
-
-		// TS-TODO: Its unclear if the origin and defaultUser options are required
-		return instance.run(
-			integration,
+		const integration = await integrationDefinition.initialize({
 			token,
-			async (integrationInstance) => {
-				if (!integrationInstance.getFile) {
-					context.log.warn(
-						'Not fetching file as the integration does not support this feature',
-						{
-							integration: name,
-						},
-					);
-
-					return null;
-				}
-
-				return integrationInstance.getFile(file);
-			},
-			{
+			defaultUser: '',
+			context: getIntegrationExecutionContext(integrationDefinition, {
+				token,
 				actor: options.actor,
 				provider: name,
 				origin: '',
 				defaultUser: '',
 				context,
-			},
-		);
-	}
+			}),
+		});
 
-	// eslint-disable-next-line class-methods-use-this
-	getActionContext(
-		provider: string,
-		workerContext: WorkerContext,
-		context: any,
-		session: string,
-	) {
-		return syncContext.getActionContext(
-			provider,
-			workerContext,
-			context,
-			session,
-		);
+		context.log.info('Retrieving external file', {
+			file,
+			integration: name,
+		});
+
+		try {
+			if (!integration.getFile) {
+				context.log.warn(
+					'Not fetching file as the integration does not support this feature',
+					{
+						integration: name,
+					},
+				);
+				return null;
+			}
+			return integration.getFile(file);
+		} catch (error) {
+			await integration.destroy();
+			throw error;
+		}
 	}
 }

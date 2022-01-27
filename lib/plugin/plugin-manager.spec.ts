@@ -2,8 +2,8 @@ import _ from 'lodash';
 import {
 	action1,
 	action2,
-	card1,
-	card2,
+	contract1,
+	contract2,
 	integration1,
 	integration2,
 	testPlugin,
@@ -122,32 +122,32 @@ describe('PluginManager', () => {
 				testPlugin({
 					slug: 'plugin-test-1',
 					name: 'Test Plugin 1',
-					contracts: [card1],
+					contracts: [contract1],
 				}),
 				testPlugin({
 					slug: 'plugin-test-2',
 					name: 'Test Plugin 2',
-					contracts: [Object.assign({}, card2, { slug: card1.slug })],
+					contracts: [Object.assign({}, contract2, { slug: contract1.slug })],
 				}),
 			]);
 			const getCards = () => pluginManager.getCards();
 
 			expect(getCards).toThrow(
-				"'card-1' already exists and cannot be loaded from plugin 'plugin-test-2'",
+				"'contract-1' already exists and cannot be loaded from plugin 'plugin-test-2'",
 			);
 		});
 
 		test('returns a dictionary of cards, keyed by slug', () => {
 			const pluginManager = new PluginManager([
 				testPlugin({
-					contracts: [card1, card2],
+					contracts: [contract1, contract2],
 				}),
 			]);
 
 			const cards = pluginManager.getCards();
 			expect(cards).toEqual({
-				'card-1': card1,
-				'card-2': card2,
+				'contract-1': contract1,
+				'contract-2': contract2,
 			});
 		});
 	});

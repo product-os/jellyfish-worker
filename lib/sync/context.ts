@@ -10,6 +10,14 @@ import _ from 'lodash';
 import jsonpatch, { Operation } from 'fast-json-patch';
 import * as workerErrors from '../errors';
 import type { WorkerContext } from '../types';
+import {
+	ActorInformation,
+	IntegrationDefinition,
+	IntegrationExecutionOptions,
+} from './types';
+import * as errors from './errors';
+import * as utils from './utils';
+import * as oauth from './oauth';
 
 const logger = getLogger(__filename);
 
@@ -296,3 +304,183 @@ export const getActionContext = (
 
 	return contextObject;
 };
+
+export const getIntegrationExecutionContext = (
+	integrationDefinition: IntegrationDefinition,
+	options: IntegrationExecutionOptions,
+) => ({
+	log: options.context.log,
+	getRemoteUsername: options.context.getRemoteUsername,
+	getLocalUsername: options.context.getLocalUsername,
+	getElementBySlug: options.context.getElementBySlug,
+	getElementById: options.context.getElementById,
+	getElementByMirrorId: options.context.getElementByMirrorId,
+	request: async (actor: boolean, requestOptions: any) => {
+		assert.INTERNAL(null, actor, errors.SyncNoActor, 'Missing request actor');
+
+		if (
+			!integrationDefinition.OAUTH_BASE_URL ||
+			!options.token.appId ||
+			!options.token.appSecret
+		) {
+			return utils.httpRequest(requestOptions);
+		}
+
+		options.context.log.info('Sync: OAuth origin URL', {
+			origin: options.origin,
+		});
+		assert.INTERNAL(
+			null,
+			!!options.origin,
+			errors.SyncOAuthError,
+			'Missing OAuth origin URL',
+		);
+
+		options.context.log.info('Sync: Getting OAuth user', {
+			actor,
+			provider: options.provider,
+			defaultUser: options.defaultUser,
+		});
+		const userCard = await utils.getOAuthUser(
+			options.context,
+			options.provider,
+			actor,
+			{
+				defaultUser: options.defaultUser,
+			},
+		);
+		options.context.log.info('Sync OAuth user', {
+			id: userCard.id,
+		});
+
+		const tokenPath = ['data', 'oauth', options.provider];
+		const tokenData = _.get(userCard, tokenPath);
+		if (tokenData) {
+			_.set(
+				requestOptions,
+				['headers', 'Authorization'],
+				`Bearer ${tokenData.access_token}`,
+			);
+		}
+
+		const result = await utils.httpRequest(requestOptions);
+
+		// Lets try refreshing the token and retry if so
+		if (result.code === 401 && tokenData) {
+			options.context.log.info('Refreshing OAuth token', {
+				provider: options.provider,
+				user: userCard.slug,
+				origin: options.origin,
+				appId: options.token.appId,
+				oldToken: tokenData.access_token,
+			});
+
+			/*
+			 * Keep in mind that there exists the possibility
+			 * that we refresh the token on the provider's API
+			 * but we fail to save the result to the user's
+			 * card, in which case the user will need to re-link
+			 * his account.
+			 */
+			const newToken = await oauth.refreshAccessToken(
+				integrationDefinition.OAUTH_BASE_URL,
+				tokenData,
+				{
+					appId: options.token.appId,
+					appSecret: options.token.appSecret,
+					redirectUri: options.origin,
+				},
+			);
+			_.set(userCard, tokenPath, newToken);
+			await options.context.upsertElement(
+				userCard.type,
+				_.omit(userCard, ['type']),
+				{
+					timestamp: new Date(),
+				},
+			);
+
+			_.set(
+				requestOptions,
+				['headers', 'Authorization'],
+				`Bearer ${newToken.access_token}`,
+			);
+
+			return utils.httpRequest(requestOptions);
+		}
+
+		return result;
+	},
+	getActorId: async (information: ActorInformation) => {
+		options.context.log.info('Creating sync actor', information);
+		const username = information.handle || information.email;
+		const translatedUsername = (options.context.getLocalUsername || _.identity)(
+			username.toLowerCase(),
+		);
+		const slug = translatedUsername.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+
+		// There is a known Front/Intercom issue where some messages
+		// would arrive (or be duplicated) as coming from the "intercom"
+		// user, without any way to get to the actual actor (from either
+		// the webhooks or the API).
+		// We declared this as a "can't fix", but this log line will be
+		// useful to get a pulse of the problem.
+		if (slug === 'intercom') {
+			options.context.log.warn('Using "intercom" actor', information);
+		}
+
+		const profile: {
+			title?: string;
+			company?: string;
+			country?: string;
+			city?: string;
+		} = {};
+
+		if (information.title) {
+			profile.title = information.title;
+		}
+
+		if (information.company) {
+			profile.company = information.company;
+		}
+
+		if (information.country) {
+			profile.country = information.country;
+		}
+
+		if (information.city) {
+			profile.city = information.city;
+		}
+
+		const firstName = _.get(information, ['name', 'first']);
+		const lastName = _.get(information, ['name', 'last']);
+		if (firstName) {
+			_.set(profile, ['name', 'first'], firstName);
+		}
+		if (lastName) {
+			_.set(profile, ['name', 'lastName'], lastName);
+		}
+
+		const data = {
+			// A hash that can never occur in the real-world
+			// See https://github.com/product-os/jellyfish/issues/2011
+			hash: 'PASSWORDLESS',
+
+			roles: [],
+			profile,
+		};
+
+		if (information.email) {
+			// TS-TODO: Allow optional email
+			(data as any).email = information.email;
+		}
+
+		return utils.getOrCreateActorContractFromFragment(options.context, {
+			slug: `user-${slug}`,
+			active: _.isBoolean(information.active) ? information.active : true,
+			type: 'user@1.0.0',
+			version: '1.0.0',
+			data,
+		});
+	},
+});

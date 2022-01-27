@@ -1,5 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import { CARDS as CORE_CARDS, Kernel } from '@balena/jellyfish-core';
+import { CONTRACTS as CORE_CONTRACTS, Kernel } from '@balena/jellyfish-core';
 import * as jellyscript from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import {
@@ -271,6 +271,11 @@ export class Worker {
 		const self = this;
 		return {
 			sync: this.sync,
+			privilegedSession: this.session,
+			cards: {
+				...CORE_CONTRACTS,
+				...self.getTypeContracts(),
+			},
 			getEventSlug: utils.getEventSlug,
 			getCardById: (lsession: string, id: string) => {
 				return self.kernel.getContractById(logContext, lsession, id);
@@ -285,7 +290,6 @@ export class Worker {
 			) => {
 				return self.kernel.query(logContext, lsession, schema, options);
 			},
-			privilegedSession: this.session,
 			insertCard: (
 				lsession: string,
 				typeCard: Parameters<Worker['insertCard']>[2],
@@ -318,13 +322,7 @@ export class Worker {
 					patch,
 				);
 			},
-			enqueueAction: (...args) => {
-				return this.enqueueAction(...args);
-			},
-			cards: {
-				...CORE_CARDS,
-				...self.getTypeContracts(),
-			},
+			enqueueAction: this.enqueueAction,
 		};
 	}
 

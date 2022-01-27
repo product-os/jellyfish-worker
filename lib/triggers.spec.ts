@@ -49,7 +49,7 @@ describe('.findUsedPropertyPaths()', () => {
 				'is owned by': {
 					type: 'object',
 					properties: {
-						slug: { const: 'card-1' },
+						slug: { const: 'contract-1' },
 					},
 				},
 			},

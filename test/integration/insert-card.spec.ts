@@ -489,20 +489,20 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard1 = await ctx.kernel.getContractBySlug(
+		const resultContract1 = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command1}@1.0.0`,
 		);
 
-		const resultCard2 = await ctx.kernel.getContractBySlug(
+		const resultContract2 = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command2}@1.0.0`,
 		);
 
-		expect(resultCard1).toBeTruthy();
-		expect(resultCard2).toBeTruthy();
+		expect(resultContract1).toBeTruthy();
+		expect(resultContract2).toBeTruthy();
 	});
 
 	test('should execute the matching triggered actions given more than one', async () => {
@@ -606,20 +606,20 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const resultCard1 = await ctx.kernel.getContractBySlug(
+		const resultContract1 = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command1}@1.0.0`,
 		);
 
-		const resultCard2 = await ctx.kernel.getContractBySlug(
+		const resultContract2 = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			`${command2}@1.0.0`,
 		);
 
-		expect(resultCard1).toBeTruthy();
-		expect(resultCard2).toBeFalsy();
+		expect(resultContract1).toBeTruthy();
+		expect(resultContract2).toBeFalsy();
 	});
 
 	test('should remove previously inserted type triggered actions if inserting a type', async () => {

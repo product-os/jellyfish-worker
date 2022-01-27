@@ -128,7 +128,7 @@ export const newContext = async (
 
 	// Initialize sync.
 	const sync = new Sync({
-		integrations: pluginManager.getSyncIntegrations(),
+		integrationsDefinitions: pluginManager.getSyncIntegrations(),
 	});
 
 	// Initialize worker instance.
