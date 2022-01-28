@@ -83,7 +83,7 @@ export interface IntegrationExecutionContext {
 		options: { usePattern?: boolean },
 	) => Promise<Contract | null>;
 	request: <T>(
-		actor: boolean,
+		actorId: string,
 		requestOptions: any,
 	) => Promise<{ code: number; body: T }>;
 	getActorId: (information: ActorInformation) => Promise<string>;
@@ -363,10 +363,10 @@ export const getIntegrationExecutionContext = (
 	getElementById: options.syncActionContext.getElementById,
 	getElementByMirrorId: options.syncActionContext.getElementByMirrorId,
 	request: async (
-		actor: boolean,
+		actorId: string,
 		requestOptions: any,
 	): Promise<{ code: number; body: any }> => {
-		assert.INTERNAL(null, actor, errors.SyncNoActor, 'Missing request actor');
+		assert.INTERNAL(null, actorId, errors.SyncNoActor, 'Missing request actor');
 
 		// If the integration definition does not contain all required
 		// OAuth information, simply make the http request as usual.
@@ -375,7 +375,6 @@ export const getIntegrationExecutionContext = (
 			!options.token.appId ||
 			!options.token.appSecret
 		) {
-			console.info('====> making standard http request');
 			return utils.httpRequest(requestOptions);
 		}
 
@@ -390,24 +389,24 @@ export const getIntegrationExecutionContext = (
 		);
 
 		options.syncActionContext.logger.info('Sync: Getting OAuth user', {
-			actor,
+			actorId,
 			provider: options.provider,
 			defaultUser: options.defaultUser,
 		});
-		const userCard = await utils.getOAuthUser(
+
+		const userContract = await utils.getOAuthUserContract(
 			options.syncActionContext,
 			options.provider,
-			actor,
-			{
-				defaultUser: options.defaultUser,
-			},
+			actorId,
+			options.defaultUser,
 		);
+
 		options.syncActionContext.logger.info('Sync OAuth user', {
-			id: userCard.id,
+			id: userContract!.id,
 		});
 
 		const tokenPath = ['data', 'oauth', options.provider];
-		const tokenData = _.get(userCard, tokenPath);
+		const tokenData = _.get(userContract, tokenPath);
 		if (tokenData) {
 			_.set(
 				requestOptions,
@@ -422,7 +421,7 @@ export const getIntegrationExecutionContext = (
 		if (result.code === 401 && tokenData) {
 			options.syncActionContext.logger.info('Refreshing OAuth token', {
 				provider: options.provider,
-				user: userCard.slug,
+				user: userContract!.slug,
 				origin: options.origin,
 				appId: options.token.appId,
 				oldToken: tokenData.access_token,
@@ -444,21 +443,19 @@ export const getIntegrationExecutionContext = (
 					redirectUri: options.origin,
 				},
 			);
-			_.set(userCard, tokenPath, newToken);
+			_.set(userContract as any, tokenPath, newToken);
 			await options.syncActionContext.upsertElement(
-				userCard.type,
-				_.omit(userCard, ['type']),
+				userContract!.type,
+				_.omit(userContract, ['type']),
 				{
 					timestamp: new Date(),
 				},
 			);
-
 			_.set(
 				requestOptions,
 				['headers', 'Authorization'],
 				`Bearer ${newToken.access_token}`,
 			);
-
 			return utils.httpRequest(requestOptions);
 		}
 

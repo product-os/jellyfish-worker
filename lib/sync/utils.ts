@@ -80,8 +80,6 @@ export const httpRequest = async <T = any>(
 	},
 	retries = 30,
 ): Promise<{ code: number; body: T }> => {
-	console.warn('===> utils.httpRequest called:', options);
-
 	const client = axios.create({
 		method: options.method,
 		baseURL: options.baseUrl,
@@ -126,8 +124,6 @@ export const httpRequest = async <T = any>(
 			body: result.data,
 		};
 	} catch (error: any) {
-		console.warn(error);
-
 		return {
 			code: error.response.status,
 			body: error.response.data,
@@ -135,65 +131,80 @@ export const httpRequest = async <T = any>(
 	}
 };
 
-export const getOAuthUser = async (
+/**
+ * @summary Retrieve the contract with ID equal to the `actorId` parameter.
+ * If this contract does not contain an entry for the specified provider
+ * within the `data.oath` object, try to return a default user contract instead.
+ * If the argument `defaultUser` is missing, or in case the default user contract
+ * does not contain an entry for the specificed oauth provider within the `data.oauth`
+ * object, throw an error.
+ * @function
+ * @private
+ *
+ * @param {Object} context - object
+ * @param {string} provider - name of the required oauth provider
+ * @param {string} actorId - ID of the requested actor contract
+ * @param {string} defaultUser - name (?) of the default user to return in case the requested
+ * actor is not associated with the required oauth provider. This will be used to perform a
+ * search by contract slug, so in case `defaultActor` is 'foo', the contract with slug 'user-foo@latest'
+ * will be returned.
+ */
+export const getOAuthUserContract = async (
 	context: {
-		getElementById: (arg0: any) => any;
-		getElementBySlug: (arg0: string, arg1?: boolean) => any;
+		getElementById: (id: any) => Promise<Contract | null>;
+		getElementBySlug: (
+			slug: string,
+			usePrivilegedSession?: boolean,
+		) => Promise<Contract | null>;
 	},
-	provider: any,
-	actor: any,
-	options: { defaultUser: any },
-) => {
-	const userCard = await context.getElementById(actor);
+	provider: string,
+	actorId: string,
+	defaultUser?: string,
+): Promise<Contract | null> => {
+	const userContract = await context.getElementById(actorId);
+
 	assert.INTERNAL(
 		null,
-		userCard,
+		userContract,
 		errors.SyncNoActor,
-		`No such actor: ${actor}`,
+		`No such actor: ${actorId}`,
 	);
 
+	// If the card already has a token for the requested provider, return it.
 	const tokenPath = ['data', 'oauth', provider];
-	if (_.has(userCard, tokenPath)) {
-		return userCard;
+	if (_.has(userContract, tokenPath)) {
+		return userContract;
 	}
 
 	assert.INTERNAL(
 		null,
-		options.defaultUser,
+		defaultUser,
 		errors.SyncOAuthNoUserError,
-		`No default integrations actor to act as ${actor} for ${provider}`,
+		`No default integrations actor to act as ${actorId} for ${provider}`,
 	);
 
-	const defaultUserCard = await context.getElementBySlug(
-		`user-${options.defaultUser}@latest`,
+	// If the user corresponding to the provided actor ID does not have an
+	// OAuth token for the requested provider, return a default user.
+	const defaultUserContract = await context.getElementBySlug(
+		`user-${defaultUser}@latest`,
 		true,
 	);
 
 	assert.INTERNAL(
 		null,
-		defaultUserCard,
+		defaultUserContract,
 		errors.SyncNoActor,
-		`No such actor: ${options.defaultUser}`,
+		`Contract not found for the default user: ${defaultUser}`,
 	);
 
 	assert.USER(
 		null,
-		_.has(defaultUserCard, tokenPath),
+		_.has(defaultUserContract, tokenPath),
 		errors.SyncOAuthNoUserError,
-		`Default actor ${options.defaultUser} does not support ${provider}`,
+		`Default actor ${defaultUser} does not support ${provider}`,
 	);
 
-	return defaultUserCard;
-};
-
-export const setContractProperty = (
-	contract: any,
-	object: any,
-	path: _.Many<string | number | symbol>,
-) => {
-	if (_.has(object, path)) {
-		_.set(contract, path, _.get(object, path) || _.get(contract, path));
-	}
+	return defaultUserContract;
 };
 
 export const getOrCreateActorContractFromFragment = async (
@@ -287,4 +298,14 @@ export const getOrCreateActorContractFromFragment = async (
 	}
 
 	return result.id;
+};
+
+export const setContractProperty = (
+	contract: any,
+	object: any,
+	path: _.Many<string | number | symbol>,
+) => {
+	if (_.has(object, path)) {
+		_.set(contract, path, _.get(object, path) || _.get(contract, path));
+	}
 };

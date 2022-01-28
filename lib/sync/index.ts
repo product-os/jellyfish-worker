@@ -435,11 +435,6 @@ export class Sync {
 				},
 			);
 
-			console.warn(
-				'==> results obtained by executeIntegrationAndImportResultsAsContracts',
-				results,
-			);
-
 			const contracts = this.importIntegrationExecutionResultsAsContracts(
 				options.syncActionContext,
 				results,

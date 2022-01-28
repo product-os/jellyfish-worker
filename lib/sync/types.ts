@@ -45,7 +45,7 @@ export interface IntegrationInitializationOptions {
 			options: { usePattern?: boolean },
 		) => Promise<Contract | null>;
 		request: <T>(
-			actor: boolean,
+			actorId: string,
 			requestOptions: any,
 		) => Promise<{ code: number; body: T }>;
 		getActorId: (information: ActorInformation) => Promise<string>;
