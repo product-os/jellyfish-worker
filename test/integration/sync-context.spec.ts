@@ -2,13 +2,14 @@ import { strict } from 'assert';
 import _ from 'lodash';
 import * as uuid from 'uuid';
 import { testUtils } from '../../lib';
+import { getSyncActionContext } from '../../lib/sync/context';
 
 let ctx: testUtils.TestContext;
 let actionContext: any;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
-	actionContext = ctx.worker.sync!.getActionContext(
+	actionContext = getSyncActionContext(
 		'foobar',
 		ctx.worker.getActionContext(ctx.logContext),
 		ctx.logContext,
