@@ -10,8 +10,8 @@ let actionContext: any;
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 	actionContext = getSyncActionContext(
-		'foobar',
 		ctx.worker.getActionContext(ctx.logContext),
+		'foobar',
 		ctx.logContext,
 		ctx.worker.session,
 	);
