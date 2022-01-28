@@ -491,7 +491,6 @@ const setupBalenaCloudInterceptors = (
 					},
 				]);
 			}
-
 			return callback(null, [
 				400,
 				{
@@ -515,7 +514,6 @@ const setupBalenaCloudInterceptors = (
 					},
 				]);
 			}
-
 			return callback(null, [401, 'Invalid access token']);
 		});
 };
@@ -547,27 +545,30 @@ class OAuthTokenRefreshTestIntegration implements Integration {
 		this.context = this.options.context;
 	}
 
-	async translate(_event: any, options: { actor: string }) {
+	translate = async (
+		_event: any,
+		options: { actor: string },
+	): Promise<IntegrationExecutionResult[]> => {
 		const result = await this.context.request(options.actor, {
 			method: 'GET',
 			baseUrl: 'https://api.balena-cloud.com',
 			json: true,
-			uri: '/users/41',
+			url: '/users/41',
 		});
 		return [result];
-	}
+	};
 
-	async mirror() {
+	mirror = async (): Promise<IntegrationExecutionResult[]> => {
 		return [];
-	}
+	};
 
-	async getFile() {
+	getFile = async () => {
 		return Buffer.from('hello world', 'utf8');
-	}
+	};
 
-	async destroy() {
+	destroy = async () => {
 		return Bluebird.resolve();
-	}
+	};
 }
 
 const getElementBySlugFromCollection = async (data: any, slug: string) => {

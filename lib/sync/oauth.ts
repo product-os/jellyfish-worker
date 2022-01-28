@@ -1,79 +1,13 @@
 import * as assert from '@balena/jellyfish-assert';
-import axios from 'axios';
-import Bluebird from 'bluebird';
 import _ from 'lodash';
 import qs from 'qs';
 import { TypedError } from 'typed-error';
+import * as utils from './utils';
 import url from 'url';
-import * as errors from './errors';
 
 export class OAuthInvalidOption extends TypedError {}
 export class OAuthRequestError extends TypedError {}
 export class OAuthUnsuccessfulResponse extends TypedError {}
-
-/**
- * @summary Send an HTTP request
- * @function
- * @public
- *
- * @description
- * If the access token is passed, then we set the
- * "Authorization" header out of the box, and then
- * delegate to the `request` module.
- *
- * @param {(Object|Undefined)} accessToken - Access token
- * @param {Object} options - Request options
- * @param {Number} [retries] - Number of retries
- * @returns {Object} HTTP response (code, body)
- */
-export const request = async (
-	accessToken: { access_token: any } | null,
-	options: {
-		baseUrl: string;
-		uri: string;
-		form: string;
-		headers?: {
-			[key: string]: string;
-		};
-	},
-	retries = 10,
-): Promise<{ code: number; body: any }> => {
-	// Use access token if available
-	const headers = options.headers || {};
-	if (accessToken) {
-		headers['Authorization'] = `Bearer ${accessToken.access_token}`;
-	}
-
-	try {
-		const result = await axios.post(
-			`${options.baseUrl}${options.uri}`,
-			options.form,
-			{
-				headers,
-			},
-		);
-		return {
-			code: result.status,
-			body: result.data,
-		};
-	} catch (error) {
-		if (axios.isAxiosError(error) && error.response) {
-			// Automatically retry on server failures
-			if (error.response.status >= 500) {
-				assert.USER(
-					null,
-					retries > 0,
-					errors.SyncExternalRequestError,
-					`External service responded with ${error.response.status} to OAuth request`,
-				);
-
-				await Bluebird.delay(2000);
-				return request(accessToken, options, retries - 1);
-			}
-		}
-		throw error;
-	}
-};
 
 /**
  * @summary Get external authorize URL
@@ -140,10 +74,12 @@ const oauthPost = async (
 		refresh_token?: any;
 	},
 ) => {
-	const { code, body } = await request(null, {
+	const { code, body } = await utils.httpRequest({
+		method: 'POST',
 		baseUrl,
-		uri: path,
-		form: qs.stringify(data),
+		url: path,
+		data: qs.stringify(data),
+		headers: {},
 	});
 
 	assert.INTERNAL(null, code < 500, OAuthRequestError, () => {
@@ -179,7 +115,7 @@ const oauthPost = async (
  * @public
  *
  * @description
- * This function takes a short lived token an exchanges it
+ * This function takes a short lived token and exchanges it
  * for a proper access token that looks like this:
  *
  * {

@@ -6,6 +6,24 @@ import _ from 'lodash';
 import { SyncActionContext } from './context';
 import { Contract } from '@balena/jellyfish-types/build/core';
 import axiosRetry from 'axios-retry';
+export interface HttpRequestOptions {
+	method: Method;
+	baseUrl: string;
+	url: string;
+	headers?: {
+		[key: string]: string;
+	};
+	data?:
+		| string
+		| {
+				[key: string]: any;
+		  };
+}
+
+export interface HttpResponse<T> {
+	code: number;
+	body: T;
+}
 
 /**
  * @summary Evaluate $eval attributes in an object based on the provided context.
@@ -64,27 +82,19 @@ export const evaluateObjectWithContext = (object: any, context: any) => {
 
 	return object;
 };
-
+/**
+ * @summary Make an HTTP request, retyring on error up to `retries`.
+ * @function
+ * @param options
+ * @param retries
+ * @returns
+ */
 export const httpRequest = async <T = any>(
-	options: {
-		method: Method;
-		baseUrl: string;
-		json?: boolean;
-		uri: string;
-		headers?: {
-			[key: string]: string;
-		};
-		data?: {
-			[key: string]: any;
-		};
-	},
+	options: HttpRequestOptions,
 	retries = 30,
-): Promise<{ code: number; body: T }> => {
+): Promise<HttpResponse<T>> => {
 	const client = axios.create({
-		method: options.method,
 		baseURL: options.baseUrl,
-		headers: options.headers || {},
-		data: options.data || {},
 	});
 
 	axiosRetry(client, {
@@ -118,16 +128,24 @@ export const httpRequest = async <T = any>(
 	});
 
 	try {
-		const result = await client.request({ url: options.uri });
+		const result = await client.request({
+			method: options.method || 'GET',
+			url: options.url,
+			data: options.data || {},
+			headers: options.headers || {},
+		});
 		return {
 			code: result.status,
 			body: result.data,
 		};
 	} catch (error: any) {
-		return {
-			code: error.response.status,
-			body: error.response.data,
-		};
+		if (axios.isAxiosError(error) && error.response) {
+			return {
+				code: error.response.status,
+				body: error.response.data,
+			};
+		}
+		throw error;
 	}
 };
 

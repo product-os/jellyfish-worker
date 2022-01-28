@@ -159,9 +159,7 @@ export class Worker {
 	session: string;
 	library: Map<Action>;
 	id: string = '0';
-	// TS-TODO: use correct sync typings.
-	// Starts off undefined, set to Sync with initialize().
-	sync: undefined | Sync;
+	sync: Sync | undefined;
 
 	/**
 	 * @summary The Jellyfish Actions Worker

@@ -90,12 +90,12 @@ export interface IntegrationExecutionContext {
 }
 
 /**
- * @name getActionContext
- * @description This function generates a "context" object that provides a common interface for use by sync integrations.
- *
+ * @name getSyncActionContext
+ * @description This function generates a "context" object that provides a common interface
+ *  for use by sync integrations.
  * @param {String} provider - The name of the integration e.g. 'github', 'discourse'
  * @param {Object} workerContext - Context object provided to action functions by
- * the jellyfish worker
+ * the Jellyfish worker
  * @param {Object} context - Logging context object
  * @param {String} session - session token used to interact with Jellyfish
  *
@@ -118,11 +118,9 @@ export const getSyncActionContext = (
 ): SyncActionContext => {
 	const getDefaultActor = async (): Promise<null | string> => {
 		const sessionCard = await workerContext.getCardById(session, session);
-
 		if (!sessionCard) {
 			return null;
 		}
-
 		// TODO: Replace this return type with the session contract interface
 		return sessionCard.data.actor as string;
 	};
@@ -364,7 +362,7 @@ export const getIntegrationExecutionContext = (
 	getElementByMirrorId: options.syncActionContext.getElementByMirrorId,
 	request: async (
 		actorId: string,
-		requestOptions: any,
+		requestOptions: utils.HttpRequestOptions,
 	): Promise<{ code: number; body: any }> => {
 		assert.INTERNAL(null, actorId, errors.SyncNoActor, 'Missing request actor');
 
@@ -381,6 +379,7 @@ export const getIntegrationExecutionContext = (
 		options.syncActionContext.logger.info('Sync: OAuth origin URL', {
 			origin: options.origin,
 		});
+
 		assert.INTERNAL(
 			null,
 			!!options.origin,
