@@ -125,34 +125,30 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} context - execution context
+	 * @param {Object} context - log context
 	 * @param {String} name - integration name
 	 * @param {String} credentials - access token for external provider api
 	 * @returns {Object} external user
 	 */
-	async whoami(
-		context: syncContext.SyncActionContext,
-		name: string,
-		credentials: any,
-	) {
+	async whoami(logContext: LogContext, name: string, credentials: any) {
 		const integration = this.integrations[name];
 
 		assert.INTERNAL(
-			context,
+			logContext,
 			!!integration,
 			errors.SyncNoCompatibleIntegration,
 			`There is no compatible integration for provider: ${name}`,
 		);
 
 		assert.INTERNAL(
-			context,
+			logContext,
 			!!integration.whoami,
 			errors.SyncNoCompatibleIntegration,
 			`Integration for ${name} does not provide a whoami() function`,
 		);
 
 		strict.ok(integration.whoami);
-		return integration.whoami(context, credentials);
+		return integration.whoami(logContext, credentials);
 	}
 
 	/**

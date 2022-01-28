@@ -92,7 +92,7 @@ export interface IntegrationDefinition {
 		headers: Map<string>,
 	) => Promise<boolean> | boolean;
 
-	whoami?: (context: SyncActionContext, credentials: any) => Promise<any>;
+	whoami?: (logContext: LogContext, credentials: any) => Promise<any>;
 
 	match?: (
 		context: SyncActionContext,
@@ -104,4 +104,11 @@ export interface IntegrationDefinition {
 		logContext: LogContext,
 		externalUser: any,
 	) => Promise<any>;
+
+	mergeCardWithPayload?: (
+		preExistingCard: any,
+		payload: any,
+		resourceType: string,
+		cardType: string,
+	) => any;
 }
