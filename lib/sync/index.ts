@@ -337,7 +337,7 @@ export class Sync {
 		},
 	) {
 		if (!token) {
-			context.log.warn('Ignoring mirror as there is no token', {
+			context.logger.warn('Ignoring mirror as there is no token', {
 				integration: name,
 			});
 
@@ -346,7 +346,7 @@ export class Sync {
 
 		const integrationDefinition = this.integrationDefinitions[name];
 		if (!integrationDefinition) {
-			context.log.warn(
+			context.logger.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
 					integration: name,
@@ -357,10 +357,10 @@ export class Sync {
 		}
 
 		const contracts = await metrics.measureMirror(name, async () => {
-			return this.executeIntegration(
+			return this.executeIntegrationAndImportResultsAsContracts(
 				integrationDefinition,
 				{
-					context,
+					syncActionContext: context,
 					token,
 					provider: name,
 					actor: options.actor,
@@ -372,7 +372,7 @@ export class Sync {
 			);
 		});
 
-		context.log.info('Mirrored external event', {
+		context.logger.info('Mirrored external event', {
 			slugs: contracts.map((mirroredContract) => {
 				return mirroredContract.slug;
 			}),
@@ -386,35 +386,70 @@ export class Sync {
 		options: IntegrationExecutionOptions,
 		fn: 'translate' | 'mirror',
 		contract: Contract,
-	): Promise<Contract[]> => {
+	): Promise<IntegrationExecutionResult[]> => {
 		const integration = await integrationDefinition.initialize({
 			token: options.token,
 			defaultUser: options.defaultUser,
 			context: getIntegrationExecutionContext(integrationDefinition, options),
 		});
 
+		let results: IntegrationExecutionResult[] = [];
+
 		try {
-			const results = await integration[fn](contract, {
+			results = await integration[fn](contract, {
 				actor: options.actor,
 			});
 
-			options.context.log.debug('Processing integration execution results:', {
+			options.syncActionContext.logger.debug('Integration execution results:', {
 				type: fn,
 				results,
 			});
+		} catch (error) {
+			throw error;
+		} finally {
+			await integration.destroy();
+		}
+
+		return results;
+	};
+
+	executeIntegrationAndImportResultsAsContracts = async (
+		integrationDefinition: IntegrationDefinition,
+		options: IntegrationExecutionOptions,
+		fn: 'translate' | 'mirror',
+		contract: Contract,
+	): Promise<Contract[]> => {
+		try {
+			const results = await this.executeIntegration(
+				integrationDefinition,
+				options,
+				fn,
+				contract,
+			);
+
+			options.syncActionContext.logger.debug(
+				'Importing integration execution results as contracts:',
+				{
+					type: fn,
+					results,
+				},
+			);
+
+			console.warn(
+				'==> results obtained by executeIntegrationAndImportResultsAsContracts',
+				results,
+			);
 
 			const contracts = this.importIntegrationExecutionResultsAsContracts(
-				options.context,
+				options.syncActionContext,
 				results,
 				{
 					origin: contract,
 				},
 			);
 
-			await integration.destroy();
 			return contracts;
 		} catch (error) {
-			await integration.destroy();
 			throw error;
 		}
 	};
@@ -595,7 +630,7 @@ export class Sync {
 		},
 	) => {
 		if (!token) {
-			context.log.warn('Ignoring translate as there is no token', {
+			context.logger.warn('Ignoring translate as there is no token', {
 				integration: name,
 			});
 
@@ -604,7 +639,7 @@ export class Sync {
 
 		const integrationDefinition = this.integrationDefinitions[name];
 		if (!integrationDefinition) {
-			context.log.warn(
+			context.logger.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
 					integration: name,
@@ -614,29 +649,29 @@ export class Sync {
 			return [];
 		}
 
-		context.log.info('Translating external event', {
+		context.logger.info('Translating external event', {
 			id: contract.id,
 			slug: contract.slug,
 			integration: name,
 		});
 
 		const contracts = await metrics.measureTranslate(name, async () => {
-			return this.executeIntegration(
+			return this.executeIntegrationAndImportResultsAsContracts(
 				integrationDefinition,
 				{
+					token,
 					actor: options.actor,
 					origin: options.origin,
 					defaultUser: options.defaultUser,
 					provider: name,
-					token,
-					context,
+					syncActionContext: context,
 				},
 				'translate',
 				contract,
 			);
 		});
 
-		context.log.info('Translated external event', {
+		context.logger.info('Translated external event', {
 			slugs: contracts.map((translatedCard) => {
 				return translatedCard.slug;
 			}),
@@ -668,7 +703,7 @@ export class Sync {
 		},
 	): Promise<Buffer | null> {
 		if (!token) {
-			context.log.warn('Not fetching file due to missing token', {
+			context.logger.warn('Not fetching file due to missing token', {
 				integration: name,
 			});
 			return null;
@@ -676,7 +711,7 @@ export class Sync {
 
 		const integrationDefinition = this.integrationDefinitions[name];
 		if (!integrationDefinition) {
-			context.log.warn(
+			context.logger.warn(
 				'Ignoring mirror as there is no compatible integration',
 				{
 					integration: name,
@@ -695,18 +730,18 @@ export class Sync {
 				provider: name,
 				origin: '',
 				defaultUser: '',
-				context,
+				syncActionContext: context,
 			}),
 		});
 
-		context.log.info('Retrieving external file', {
+		context.logger.info('Retrieving external file', {
 			file,
 			integration: name,
 		});
 
 		try {
 			if (!integration.getFile) {
-				context.log.warn(
+				context.logger.warn(
 					'Not fetching file as the integration does not support this feature',
 					{
 						integration: name,

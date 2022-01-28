@@ -2,7 +2,7 @@ import type { LogContext } from '@balena/jellyfish-logger';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { Operation } from 'fast-json-patch';
 import type { Map } from '../types';
-import type { SyncActionContext } from './context';
+import type { Logger, SyncActionContext } from './context';
 export interface IntegrationDefinition {
 	OAUTH_BASE_URL?: string;
 	OAUTH_SCOPES?: string[];
@@ -31,16 +31,23 @@ export interface IntegrationInitializationOptions {
 	token: any;
 	defaultUser: string;
 	context: {
-		log: SyncActionContext['log'];
-		getRemoteUsername: SyncActionContext['getRemoteUsername'];
-		getLocalUsername: SyncActionContext['getLocalUsername'];
-		getElementBySlug: SyncActionContext['getElementBySlug'];
-		getElementById: SyncActionContext['getElementById'];
-		getElementByMirrorId: SyncActionContext['getElementByMirrorId'];
-		request: (
+		logger: Logger;
+		getLocalUsername: (username: string) => string;
+		getRemoteUsername: (username: string) => string;
+		getElementBySlug: (
+			slug: string,
+			usePrivilegedSession?: boolean,
+		) => Promise<Contract | null>;
+		getElementById: (id: string) => Promise<Contract | null>;
+		getElementByMirrorId: (
+			type: string,
+			mirrorId: string,
+			options: { usePattern?: boolean },
+		) => Promise<Contract | null>;
+		request: <T>(
 			actor: boolean,
 			requestOptions: any,
-		) => Promise<{ code: number; body: any }>;
+		) => Promise<{ code: number; body: T }>;
 		getActorId: (information: ActorInformation) => Promise<string>;
 	};
 }
@@ -60,12 +67,12 @@ export interface Integration {
 }
 
 export interface IntegrationExecutionOptions {
+	syncActionContext: SyncActionContext;
 	actor: string;
 	origin: string;
 	defaultUser: string;
 	provider: string;
 	token: any;
-	context: SyncActionContext;
 }
 
 export interface IntegrationExecutionResult {

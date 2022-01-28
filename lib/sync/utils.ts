@@ -80,10 +80,11 @@ export const httpRequest = async <T = any>(
 	},
 	retries = 30,
 ): Promise<{ code: number; body: T }> => {
+	console.warn('===> utils.httpRequest called:', options);
+
 	const client = axios.create({
 		method: options.method,
 		baseURL: options.baseUrl,
-		url: options.uri,
 		headers: options.headers || {},
 		data: options.data || {},
 	});
@@ -119,12 +120,14 @@ export const httpRequest = async <T = any>(
 	});
 
 	try {
-		const result = await client.request({});
+		const result = await client.request({ url: options.uri });
 		return {
 			code: result.status,
 			body: result.data,
 		};
 	} catch (error: any) {
+		console.warn(error);
+
 		return {
 			code: error.response.status,
 			body: error.response.data,
@@ -196,7 +199,7 @@ export const setContractProperty = (
 export const getOrCreateActorContractFromFragment = async (
 	context: SyncActionContext,
 	fragment: Partial<Contract> & { type: string },
-) => {
+): Promise<string> => {
 	// TODO: Attempt to unify user cards based on
 	// their e-mails. i.e. if two user cards have
 	// the same e-mail then they are likely the
@@ -240,7 +243,7 @@ export const getOrCreateActorContractFromFragment = async (
 		setContractProperty(contract, fragment, ['data', 'profile', 'country']);
 		setContractProperty(contract, fragment, ['data', 'profile', 'city']);
 
-		context.log.info('Unifying actor contracts', {
+		context.logger.info('Unifying actor contracts', {
 			target: contract,
 			source: fragment,
 		});
@@ -252,7 +255,7 @@ export const getOrCreateActorContractFromFragment = async (
 		return contract.id;
 	}
 
-	context.log.info('Creating new actor', {
+	context.logger.info('Creating new actor', {
 		slug: fragment.slug,
 		data: fragment.data,
 	});

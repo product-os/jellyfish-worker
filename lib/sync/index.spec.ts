@@ -1,10 +1,18 @@
-import * as errors from './errors';
+import { Contract } from '@balena/jellyfish-types/build/core';
+import Bluebird from 'bluebird';
+import _, { constant } from 'lodash';
+import nock from 'nock';
+import querystring from 'querystring';
+import sinon from 'sinon';
 import { Sync } from '.';
 import { SyncActionContext } from './context';
-import type { IntegrationDefinition } from './types';
-import sinon from 'sinon';
-import { constant } from 'lodash';
-import _ from 'lodash';
+import * as errors from './errors';
+import type {
+	Integration,
+	IntegrationDefinition,
+	IntegrationExecutionResult,
+	IntegrationInitializationOptions,
+} from './types';
 
 const sync = new Sync({
 	integrationsDefinitions: {},
@@ -18,7 +26,7 @@ describe('sync.importContracts()', () => {
 			}),
 		);
 
-		const results = [
+		const mockResults: IntegrationExecutionResult[] = [
 			{
 				time: new Date(),
 				actor: '46a045b8-95f6-42b5-bf7f-aa0a1365b9ee',
@@ -35,7 +43,7 @@ describe('sync.importContracts()', () => {
 
 		const contracts = await sync.importIntegrationExecutionResultsAsContracts(
 			context,
-			results,
+			mockResults,
 			{},
 		);
 
@@ -63,7 +71,7 @@ describe('sync.importContracts()', () => {
 			}),
 		);
 
-		const results = [
+		const mockResults: IntegrationExecutionResult[] = [
 			{
 				time: new Date(),
 				actor: '46a045b8-95f6-42b5-bf7f-aa0a1365b9ee',
@@ -88,17 +96,16 @@ describe('sync.importContracts()', () => {
 
 		const contracts = await sync.importIntegrationExecutionResultsAsContracts(
 			context,
-			results,
+			mockResults,
 			{},
 		);
-
-		console.log(contracts);
 
 		expect(contracts.length).toBe(1);
 		expect(upsertElementSpy.calledOnce).toBe(true);
 		expect((upsertElementSpy.args as any)[0][0]).toBe('card');
 		expect((upsertElementSpy.args as any)[0][1]).toEqual({
 			id: '78a1dfd7-21ea-405a-b269-de0b0e587975',
+			slug: 'card-78a1dfd7-21ea-405a-b269-de0b0e587975',
 			type: 'card',
 			patch: [
 				{
@@ -122,7 +129,6 @@ describe('.isValidEvent()', () => {
 			},
 			{},
 		);
-
 		expect(result).toBe(false);
 	});
 });
@@ -453,714 +459,711 @@ describe('.associate()', () => {
 	});
 });
 
-// const firstNock = () => {
-// 	nock.disableNetConnect();
+const setupBalenaCloudOauthTokenInterceptor = () => {
+	nock.disableNetConnect();
+	nock('https://api.balena-cloud.com')
+		.post('/oauth/token')
+		.reply((_uri, request, callback) => {
+			const body = querystring.decode(request as string);
 
-// 	nock('https://api.balena-cloud.com')
-// 		.post('/oauth/token')
-// 		.reply((_uri, request, callback) => {
-// 			const body = querystring.decode(request as string);
+			if (
+				_.isEqual(body, {
+					grant_type: 'refresh_token',
+					client_id: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+					client_secret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+					redirect_uri: 'https://jel.ly.fish/oauth/balena-cloud',
+					refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
+				})
+			) {
+				return callback(null, [
+					200,
+					{
+						access_token: 'xgrdUPAZ+nZfz91uxB4Qhv1oDpDp1oQh',
+						token_type: 'bearer',
+						expires_in: 3600,
+						refresh_token: 'hQLGLkzZJ4ft3GLP63Z/ruA8o5YeJNsk3I',
+						scope: 'users',
+					},
+				]);
+			}
 
-// 			if (
-// 				_.isEqual(body, {
-// 					grant_type: 'refresh_token',
-// 					client_id: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-// 					client_secret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-// 					redirect_uri: 'https://jel.ly.fish/oauth/balena-cloud',
-// 					refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
-// 				})
-// 			) {
-// 				return callback(null, [
-// 					200,
-// 					{
-// 						access_token: 'xgrdUPAZ+nZfz91uxB4Qhv1oDpDp1oQh',
-// 						token_type: 'bearer',
-// 						expires_in: 3600,
-// 						refresh_token: 'hQLGLkzZJ4ft3GLP63Z/ruA8o5YeJNsk3I',
-// 						scope: 'users',
-// 					},
-// 				]);
-// 			}
+			return callback(null, [
+				400,
+				{
+					error: 'invalid_request',
+					error_description: 'Something went wrong',
+				},
+			]);
+		})
+		.persist()
+		.get('/users/41')
+		.reply(function (_uri, _request, callback) {
+			if (
+				this.req.headers.authorization ===
+				'Bearer xgrdUPAZ+nZfz91uxB4Qhv1oDpDp1oQh'
+			) {
+				return callback(null, [
+					200,
+					{
+						id: 41,
+						name: 'johndoe',
+					},
+				]);
+			}
 
-// 			return callback(null, [
-// 				400,
-// 				{
-// 					error: 'invalid_request',
-// 					error_description: 'Something went wrong',
-// 				},
-// 			]);
-// 		})
-// 		.persist()
-// 		.get('/users/41')
-// 		.reply(function (_uri, _request, callback) {
-// 			if (
-// 				this.req.headers.authorization ===
-// 				'Bearer xgrdUPAZ+nZfz91uxB4Qhv1oDpDp1oQh'
-// 			) {
-// 				return callback(null, [
-// 					200,
-// 					{
-// 						id: 41,
-// 						name: 'johndoe',
-// 					},
-// 				]);
-// 			}
+			return callback(null, [401, 'Invalid access token']);
+		});
+};
 
-// 			return callback(null, [401, 'Invalid access token']);
-// 		});
-// };
+const setupBalenaCloudUsersInterceptor = () => {
+	nock.disableNetConnect();
+	nock('https://api.balena-cloud.com')
+		.get('/users/41')
+		.reply(function (_uri, _request, callback) {
+			if (
+				this.req.headers.authorization ===
+				'Bearer KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3'
+			) {
+				return callback(null, [
+					200,
+					{
+						id: 41,
+						name: 'johndoe',
+					},
+				]);
+			}
 
-// const secondNock = () => {
-// 	nock.disableNetConnect();
+			return callback(null, [401, 'Invalid access token']);
+		});
+};
 
-// 	nock('https://api.balena-cloud.com')
-// 		.get('/users/41')
-// 		.reply(function (_uri, _request, callback) {
-// 			if (
-// 				this.req.headers.authorization ===
-// 				'Bearer KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3'
-// 			) {
-// 				return callback(null, [
-// 					200,
-// 					{
-// 						id: 41,
-// 						name: 'johndoe',
-// 					},
-// 				]);
-// 			}
+const setupBalenaCloudInterceptors = () => {
+	setupBalenaCloudOauthTokenInterceptor();
+	setupBalenaCloudUsersInterceptor();
+};
 
-// 			return callback(null, [401, 'Invalid access token']);
-// 		});
-// };
+beforeEach(() => {
+	nock.cleanAll();
+});
 
-// beforeEach(() => {
-// 	nock.cleanAll();
-// });
+afterAll(() => {
+	nock.cleanAll();
+});
 
-// afterAll(() => {
-// 	nock.cleanAll();
-// });
+const oAuthTokenRefreshTestIntegration = {
+	OAUTH_BASE_URL: 'https://api.balena-cloud.com',
+	OAUTH_SCOPES: ['users'],
 
-// const oAuthTokenRefreshTestIntegration = {
-// 	OAUTH_BASE_URL: 'https://api.balena-cloud.com',
-// 	OAUTH_SCOPES: ['users'],
+	initialize: async (options: IntegrationInitializationOptions) =>
+		new OAuthTokenRefreshTestIntegration(options),
 
-// 	initialize: async (options: IntegrationInitializationOptions) =>
-// 		new OAuthTokenRefreshTestIntegration(options),
+	isEventValid: () => true,
+};
 
-// 	isEventValid: () => true,
-// };
+class OAuthTokenRefreshTestIntegration implements Integration {
+	options: IntegrationInitializationOptions;
+	context: any;
 
-// class OAuthTokenRefreshTestIntegration implements Integration {
-// 	options: IntegrationInitializationOptions;
-// 	context: any;
+	constructor(options: IntegrationInitializationOptions) {
+		this.options = options;
+		this.context = this.options.context;
+	}
 
-// 	constructor(options: IntegrationInitializationOptions) {
-// 		this.options = options;
-// 		this.context = this.options.context;
-// 	}
+	async translate(_event: any, options: { actor: string }) {
+		const result = await this.context.request(options.actor, {
+			method: 'GET',
+			baseUrl: 'https://api.balena-cloud.com',
+			json: true,
+			uri: '/users/41',
+		});
 
-// 	// eslint-disable-next-line class-methods-use-this
-// 	async destroy() {
-// 		return Bluebird.resolve();
-// 	}
+		console.warn('===> translate result', result);
 
-// 	async translate(_event: any, options: { actor: string }) {
-// 		const result = await this.context.request(options.actor, {
-// 			method: 'GET',
-// 			baseUrl: 'https://api.balena-cloud.com',
-// 			json: true,
-// 			uri: '/users/41',
-// 		});
+		return [result];
+	}
 
-// 		return [result];
-// 	}
+	async mirror() {
+		return [];
+	}
 
-// 	async mirror() {
-// 		return [];
-// 	}
+	async getFile() {
+		return Buffer.from('hello world', 'utf8');
+	}
 
-// 	async getFile() {
-// 		return Buffer.from('hello world', 'utf8');
-// 	}
-// }
+	// eslint-disable-next-line class-methods-use-this
+	async destroy() {
+		return Bluebird.resolve();
+	}
+}
 
-// const getElementBySlugFromCollection = async (data: any, slug: string) => {
-// 	const [base, version] = slug.split('@');
+const getElementBySlugFromCollection = async (data: any, slug: string) => {
+	const [base, version] = slug.split('@');
 
-// 	if (version !== 'latest') {
-// 		return _.find(_.values(data), {
-// 			slug: base,
-// 			version,
-// 		});
-// 	}
+	if (version !== 'latest') {
+		return _.find(_.values(data), {
+			slug: base,
+			version,
+		});
+	}
 
-// 	return _.last(
-// 		_.sortBy(
-// 			_.filter(_.values(data), {
-// 				slug: base,
-// 			}),
-// 			['version'],
-// 		),
-// 	);
-// };
+	return _.last(
+		_.sortBy(
+			_.filter(_.values(data), {
+				slug: base,
+			}),
+			['version'],
+		),
+	);
+};
 
-// describe('instance', () => {
-// 	test('should be able to refresh an expired OAuth token and retry if needed', async () => {
+describe('instance', () => {
+	test('should be able to refresh an expired OAuth token and retry if needed', async () => {
+		setupBalenaCloudInterceptors();
 
-// 		firstNock();
+		const data: { [key: string]: Partial<Contract> } = {
+			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+				version: '1.0.0',
+				type: 'user',
+				slug: 'user-synctest',
+				data: {
+					oauth: {
+						'balena-cloud': {
+							access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
+							token_type: 'bearer',
+							expires_in: 3600,
+							refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
+							scope: 'users',
+						},
+					},
+				},
+			},
+		};
 
-// 		const data: { [key: string]: Partial<Contract> } = {
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				version: '1.0.0',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				data: {
-// 					oauth: {
-// 						'balena-cloud': {
-// 							access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
-// 							token_type: 'bearer',
-// 							expires_in: 3600,
-// 							refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
-// 							scope: 'users',
-// 						},
-// 					},
-// 				},
-// 			},
-// 		};
+		const results = await sync.executeIntegration(
+			oAuthTokenRefreshTestIntegration,
+			{
+				token: {
+					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+				},
+				actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+				defaultUser: 'bar',
+				origin: 'https://jel.ly.fish/oauth/balena-cloud',
+				provider: 'balena-cloud',
+				syncActionContext: {
+					logger: {
+						info: _.noop,
+						warn: _.noop,
+						debug: _.noop,
+					},
+					getElementById: async (id: string) => {
+						return data[id] as Contract;
+					},
+					upsertElement: async (type: string, object: any) => {
+						data[object.id] = { ...object, type };
+						return data[object.id] as Contract;
+					},
+				} as any as SyncActionContext,
+			},
+			'translate',
+			{} as any as Contract,
+		);
 
-// 		const results = sync.executeIntegration(
-// 			oAuthTokenRefreshTestIntegration,
-// 			{
-// 				token: {
-// 					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-// 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-// 				},
-// 				actor: 'foo',
-// 				defaultUser: 'bar',
-// 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
-// 				provider: 'balena-cloud',
-// 				context: {
-// 					log: {
-// 						info: _.noop,
-// 						warn: _.noop,
-// 						error: _.noop,
-// 						debug: _.noop,
-// 						exception: _.noop,
-// 					},
-// 					getDefaultActor: async (): Promise<null | string> => {
-// 						return null
-// 					}
-// 					getElementById: async (id: string) => {
-// 						return data[id];
-// 					},
-// 					upsertElement: async (type: string, object: any) => {
-// 						data[object.id] = {...object, type: type};
-// 						return data[object.id];
-// 					},
-// 				}
-// 			},
-// 			'translate',
-// 			{},
-// 		)
+		expect(results).toEqual([
+			{
+				code: 200,
+				body: {
+					id: 41,
+					name: 'johndoe',
+				},
+			},
+		]);
 
-// 		expect(results).toEqual([
-// 			{
-// 				code: 200,
-// 				body: {
-// 					id: 41,
-// 					name: 'johndoe',
-// 				},
-// 			},
-// 		]);
+		expect(data).toEqual({
+			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+				type: 'user',
+				slug: 'user-synctest',
+				version: '1.0.0',
+				data: {
+					oauth: {
+						'balena-cloud': {
+							access_token: 'xgrdUPAZ+nZfz91uxB4Qhv1oDpDp1oQh',
+							token_type: 'bearer',
+							expires_in: 3600,
+							refresh_token: 'hQLGLkzZJ4ft3GLP63Z/ruA8o5YeJNsk3I',
+							scope: 'users',
+						},
+					},
+				},
+			},
+		});
+	});
 
-// 		expect(data).toEqual({
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {
-// 					oauth: {
-// 						'balena-cloud': {
-// 							access_token: 'xgrdUPAZ+nZfz91uxB4Qhv1oDpDp1oQh',
-// 							token_type: 'bearer',
-// 							expires_in: 3600,
-// 							refresh_token: 'hQLGLkzZJ4ft3GLP63Z/ruA8o5YeJNsk3I',
-// 							scope: 'users',
-// 						},
-// 					},
-// 				},
-// 			},
-// 		});
-// 	});
+	test('should be able to refresh an expired OAuth token and retry if needed using the default user', async () => {
+		setupBalenaCloudInterceptors();
 
-// 	test('should be able to refresh an expired OAuth token and retry if needed using the default user', async () => {
-// 		firstNock();
-// 		const data: { [key: string]: Partial<Contract> } = {
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {},
-// 			},
-// 			'ecc47582-bc08-45dc-ac8b-16072a843835': {
-// 				id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
-// 				type: 'user',
-// 				slug: 'user-jellysync',
-// 				version: '1.0.0',
-// 				data: {
-// 					oauth: {
-// 						'balena-cloud': {
-// 							access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
-// 							token_type: 'bearer',
-// 							expires_in: 3600,
-// 							refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
-// 							scope: 'users',
-// 						},
-// 					},
-// 				},
-// 			},
-// 		};
+		const data: { [key: string]: Partial<Contract> } = {
+			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+				type: 'user',
+				slug: 'user-synctest',
+				version: '1.0.0',
+				data: {},
+			},
+			'ecc47582-bc08-45dc-ac8b-16072a843835': {
+				id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
+				type: 'user',
+				slug: 'user-jellysync',
+				version: '1.0.0',
+				data: {
+					oauth: {
+						'balena-cloud': {
+							access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
+							token_type: 'bearer',
+							expires_in: 3600,
+							refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
+							scope: 'users',
+						},
+					},
+				},
+			},
+		};
 
-// 		const result = await instance.run(
-// 			oAuthTokenRefreshTestIntegration,
-// 			{
-// 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-// 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-// 			},
-// 			(object) => {
-// 				return object.translate({} as Contract, {
-// 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				});
-// 			},
-// 			{
-// 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
-// 				actor: 'foo',
-// 				defaultUser: 'jellysync',
-// 				provider: 'balena-cloud',
-// 				context: {
-// 					log: {
-// 						info: _.noop,
-// 						warn: _.noop,
-// 					},
-// 					getElementBySlug: async (slug: any) => {
-// 						return getElementBySlugFromCollection(data, slug);
-// 					},
-// 					getElementById: async (id: string) => {
-// 						return data[id];
-// 					},
-// 					upsertElement: async (type: string, object: any) => {
-// 						data[object.id] = object;
-// 						data[object.id].type = type;
-// 						return data[object.id];
-// 					},
-// 				} as any as SyncActionContext,
-// 			},
-// 		);
+		const results = await sync.executeIntegration(
+			oAuthTokenRefreshTestIntegration,
+			{
+				token: {
+					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+				},
+				origin: 'https://jel.ly.fish/oauth/balena-cloud',
+				actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+				defaultUser: 'jellysync',
+				provider: 'balena-cloud',
+				syncActionContext: {
+					logger: {
+						info: _.noop,
+						warn: _.noop,
+						debug: _.noop,
+					},
+					getElementById: async (id: string) => {
+						return data[id] as Contract;
+					},
+					getElementBySlug: async (slug: any) => {
+						return getElementBySlugFromCollection(data, slug);
+					},
+					upsertElement: async (type: string, object: any) => {
+						data[object.id] = { ...object, type };
+						return data[object.id] as Contract;
+					},
+				} as any as SyncActionContext,
+			},
+			'translate',
+			{} as any as Contract,
+		);
 
-// 		expect(result).toEqual([
-// 			{
-// 				code: 200,
-// 				body: {
-// 					id: 41,
-// 					name: 'johndoe',
-// 				},
-// 			},
-// 		]);
+		expect(results).toEqual([
+			{
+				code: 200,
+				body: {
+					id: 41,
+					name: 'johndoe',
+				},
+			},
+		]);
 
-// 		expect(data).toEqual({
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {},
-// 			},
-// 			'ecc47582-bc08-45dc-ac8b-16072a843835': {
-// 				id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
-// 				type: 'user',
-// 				slug: 'user-jellysync',
-// 				version: '1.0.0',
-// 				data: {
-// 					oauth: {
-// 						'balena-cloud': {
-// 							access_token: 'xgrdUPAZ+nZfz91uxB4Qhv1oDpDp1oQh',
-// 							token_type: 'bearer',
-// 							expires_in: 3600,
-// 							refresh_token: 'hQLGLkzZJ4ft3GLP63Z/ruA8o5YeJNsk3I',
-// 							scope: 'users',
-// 						},
-// 					},
-// 				},
-// 			},
-// 		});
-// 	});
+		expect(data).toEqual({
+			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+				type: 'user',
+				slug: 'user-synctest',
+				version: '1.0.0',
+				data: {},
+			},
+			'ecc47582-bc08-45dc-ac8b-16072a843835': {
+				id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
+				type: 'user',
+				slug: 'user-jellysync',
+				version: '1.0.0',
+				data: {
+					oauth: {
+						'balena-cloud': {
+							access_token: 'xgrdUPAZ+nZfz91uxB4Qhv1oDpDp1oQh',
+							token_type: 'bearer',
+							expires_in: 3600,
+							refresh_token: 'hQLGLkzZJ4ft3GLP63Z/ruA8o5YeJNsk3I',
+							scope: 'users',
+						},
+					},
+				},
+			},
+		});
+	});
 
-// 	test('should not refresh an OAuth token if not needed', async () => {
-// 		secondNock();
-// 		const data: { [key: string]: Partial<Contract> } = {
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {
-// 					oauth: {
-// 						'balena-cloud': {
-// 							access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
-// 							token_type: 'bearer',
-// 							expires_in: 3600,
-// 							refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
-// 							scope: 'users',
-// 						},
-// 					},
-// 				},
-// 			},
-// 		};
+	// test('should not refresh an OAuth token if not needed', async () => {
+	// 	secondNock();
+	// 	const data: { [key: string]: Partial<Contract> } = {
+	// 		'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+	// 			id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			type: 'user',
+	// 			slug: 'user-synctest',
+	// 			version: '1.0.0',
+	// 			data: {
+	// 				oauth: {
+	// 					'balena-cloud': {
+	// 						access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
+	// 						token_type: 'bearer',
+	// 						expires_in: 3600,
+	// 						refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
+	// 						scope: 'users',
+	// 					},
+	// 				},
+	// 			},
+	// 		},
+	// 	};
 
-// 		/*
-// 		Nock.cleanAll()
-// 		nock.disableNetConnect()
+	// 	/*
+	// 	Nock.cleanAll()
+	// 	nock.disableNetConnect()
 
-// 		nock('https://api.balena-cloud.com')
-// 			.get('/users/41')
-// 			.reply(function (uri, request, callback) {
-// 				if (this.req.headers.authorization ===
-// 					'Bearer KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3') {
-// 					return callback(null, [ 200, {
-// 						id: 41,
-// 						name: 'johndoe'
-// 					} ])
-// 				}
+	// 	nock('https://api.balena-cloud.com')
+	// 		.get('/users/41')
+	// 		.reply(function (uri, request, callback) {
+	// 			if (this.req.headers.authorization ===
+	// 				'Bearer KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3') {
+	// 				return callback(null, [ 200, {
+	// 					id: 41,
+	// 					name: 'johndoe'
+	// 				} ])
+	// 			}
 
-// 				return callback(null, [ 401, 'Invalid access token' ])
-// 			})
-// 			*/
+	// 			return callback(null, [ 401, 'Invalid access token' ])
+	// 		})
+	// 		*/
 
-// 		const result = await instance.run(
-// 			oAuthTokenRefreshTestIntegration,
-// 			{
-// 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-// 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-// 			},
-// 			(object) => {
-// 				return object.translate({} as Contract, {
-// 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				});
-// 			},
-// 			{
-// 				actor: 'foo',
-// 				defaultUser: 'bar',
-// 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
-// 				provider: 'balena-cloud',
-// 				context: {
-// 					log: {
-// 						info: _.noop,
-// 						warn: _.noop,
-// 					},
-// 					getElementById: async (id: string) => {
-// 						return data[id];
-// 					},
-// 					upsertElement: async (type: string, object: any) => {
-// 						data[object.id] = object;
-// 						data[object.id].type = type;
-// 						return data[object.id];
-// 					},
-// 				} as any as SyncActionContext,
-// 			},
-// 		);
+	// 	const result = await instance.run(
+	// 		oAuthTokenRefreshTestIntegration,
+	// 		{
+	// 			appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+	// 			appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+	// 		},
+	// 		(object) => {
+	// 			return object.translate({} as Contract, {
+	// 				actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			});
+	// 		},
+	// 		{
+	// 			actor: 'foo',
+	// 			defaultUser: 'bar',
+	// 			origin: 'https://jel.ly.fish/oauth/balena-cloud',
+	// 			provider: 'balena-cloud',
+	// 			context: {
+	// 				log: {
+	// 					info: _.noop,
+	// 					warn: _.noop,
+	// 				},
+	// 				getElementById: async (id: string) => {
+	// 					return data[id];
+	// 				},
+	// 				upsertElement: async (type: string, object: any) => {
+	// 					data[object.id] = object;
+	// 					data[object.id].type = type;
+	// 					return data[object.id];
+	// 				},
+	// 			} as any as SyncActionContext,
+	// 		},
+	// 	);
 
-// 		expect(result).toEqual([
-// 			{
-// 				code: 200,
-// 				body: {
-// 					id: 41,
-// 					name: 'johndoe',
-// 				},
-// 			},
-// 		]);
+	// 	expect(result).toEqual([
+	// 		{
+	// 			code: 200,
+	// 			body: {
+	// 				id: 41,
+	// 				name: 'johndoe',
+	// 			},
+	// 		},
+	// 	]);
 
-// 		expect(data).toEqual({
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {
-// 					oauth: {
-// 						'balena-cloud': {
-// 							access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
-// 							token_type: 'bearer',
-// 							expires_in: 3600,
-// 							refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
-// 							scope: 'users',
-// 						},
-// 					},
-// 				},
-// 			},
-// 		});
-// 	});
+	// 	expect(data).toEqual({
+	// 		'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+	// 			id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			type: 'user',
+	// 			slug: 'user-synctest',
+	// 			version: '1.0.0',
+	// 			data: {
+	// 				oauth: {
+	// 					'balena-cloud': {
+	// 						access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
+	// 						token_type: 'bearer',
+	// 						expires_in: 3600,
+	// 						refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
+	// 						scope: 'users',
+	// 					},
+	// 				},
+	// 			},
+	// 		},
+	// 	});
+	// });
 
-// 	test('should not refresh an OAuth token if not needed when using the default user', async () => {
-// 		secondNock();
-// 		const data: { [key: string]: Partial<Contract> } = {
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {},
-// 			},
-// 			'ecc47582-bc08-45dc-ac8b-16072a843835': {
-// 				id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
-// 				type: 'user',
-// 				slug: 'user-jellysync',
-// 				version: '1.0.0',
-// 				data: {
-// 					oauth: {
-// 						'balena-cloud': {
-// 							access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
-// 							token_type: 'bearer',
-// 							expires_in: 3600,
-// 							refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
-// 							scope: 'users',
-// 						},
-// 					},
-// 				},
-// 			},
-// 		};
+	// test('should not refresh an OAuth token if not needed when using the default user', async () => {
+	// 	secondNock();
+	// 	const data: { [key: string]: Partial<Contract> } = {
+	// 		'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+	// 			id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			type: 'user',
+	// 			slug: 'user-synctest',
+	// 			version: '1.0.0',
+	// 			data: {},
+	// 		},
+	// 		'ecc47582-bc08-45dc-ac8b-16072a843835': {
+	// 			id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
+	// 			type: 'user',
+	// 			slug: 'user-jellysync',
+	// 			version: '1.0.0',
+	// 			data: {
+	// 				oauth: {
+	// 					'balena-cloud': {
+	// 						access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
+	// 						token_type: 'bearer',
+	// 						expires_in: 3600,
+	// 						refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
+	// 						scope: 'users',
+	// 					},
+	// 				},
+	// 			},
+	// 		},
+	// 	};
 
-// 		const result = await instance.run(
-// 			oAuthTokenRefreshTestIntegration,
-// 			{
-// 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-// 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-// 			},
-// 			(object) => {
-// 				return object.translate({} as Contract, {
-// 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				});
-// 			},
-// 			{
-// 				actor: 'foobar',
-// 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
-// 				defaultUser: 'jellysync',
-// 				provider: 'balena-cloud',
-// 				context: {
-// 					log: {
-// 						info: _.noop,
-// 						warn: _.noop,
-// 					},
-// 					getElementBySlug: async (slug: string) => {
-// 						return getElementBySlugFromCollection(data, slug);
-// 					},
-// 					getElementById: async (id: string) => {
-// 						return data[id];
-// 					},
-// 					upsertElement: async (type: string, object: any) => {
-// 						data[object.id] = object;
-// 						data[object.id].type = type;
-// 						return data[object.id];
-// 					},
-// 				} as any as SyncActionContext,
-// 			},
-// 		);
+	// 	const result = await instance.run(
+	// 		oAuthTokenRefreshTestIntegration,
+	// 		{
+	// 			appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+	// 			appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+	// 		},
+	// 		(object) => {
+	// 			return object.translate({} as Contract, {
+	// 				actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			});
+	// 		},
+	// 		{
+	// 			actor: 'foobar',
+	// 			origin: 'https://jel.ly.fish/oauth/balena-cloud',
+	// 			defaultUser: 'jellysync',
+	// 			provider: 'balena-cloud',
+	// 			context: {
+	// 				log: {
+	// 					info: _.noop,
+	// 					warn: _.noop,
+	// 				},
+	// 				getElementBySlug: async (slug: string) => {
+	// 					return getElementBySlugFromCollection(data, slug);
+	// 				},
+	// 				getElementById: async (id: string) => {
+	// 					return data[id];
+	// 				},
+	// 				upsertElement: async (type: string, object: any) => {
+	// 					data[object.id] = object;
+	// 					data[object.id].type = type;
+	// 					return data[object.id];
+	// 				},
+	// 			} as any as SyncActionContext,
+	// 		},
+	// 	);
 
-// 		expect(result).toEqual([
-// 			{
-// 				code: 200,
-// 				body: {
-// 					id: 41,
-// 					name: 'johndoe',
-// 				},
-// 			},
-// 		]);
+	// 	expect(result).toEqual([
+	// 		{
+	// 			code: 200,
+	// 			body: {
+	// 				id: 41,
+	// 				name: 'johndoe',
+	// 			},
+	// 		},
+	// 	]);
 
-// 		expect(data).toEqual({
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {},
-// 			},
-// 			'ecc47582-bc08-45dc-ac8b-16072a843835': {
-// 				id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
-// 				type: 'user',
-// 				slug: 'user-jellysync',
-// 				version: '1.0.0',
-// 				data: {
-// 					oauth: {
-// 						'balena-cloud': {
-// 							access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
-// 							token_type: 'bearer',
-// 							expires_in: 3600,
-// 							refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
-// 							scope: 'users',
-// 						},
-// 					},
-// 				},
-// 			},
-// 		});
-// 	});
+	// 	expect(data).toEqual({
+	// 		'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+	// 			id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			type: 'user',
+	// 			slug: 'user-synctest',
+	// 			version: '1.0.0',
+	// 			data: {},
+	// 		},
+	// 		'ecc47582-bc08-45dc-ac8b-16072a843835': {
+	// 			id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
+	// 			type: 'user',
+	// 			slug: 'user-jellysync',
+	// 			version: '1.0.0',
+	// 			data: {
+	// 				oauth: {
+	// 					'balena-cloud': {
+	// 						access_token: 'KSTWMqidua67hjM2NDE1ZTZjNGZmZjI3',
+	// 						token_type: 'bearer',
+	// 						expires_in: 3600,
+	// 						refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
+	// 						scope: 'users',
+	// 					},
+	// 				},
+	// 			},
+	// 		},
+	// 	});
+	// });
 
-// 	test('should throw if actor is not associated with service and there is no default user', async () => {
-// 		firstNock();
-// 		const data: { [key: string]: Partial<Contract> } = {
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {},
-// 			},
-// 		};
+	// test('should throw if actor is not associated with service and there is no default user', async () => {
+	// 	firstNock();
+	// 	const data: { [key: string]: Partial<Contract> } = {
+	// 		'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+	// 			id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			type: 'user',
+	// 			slug: 'user-synctest',
+	// 			version: '1.0.0',
+	// 			data: {},
+	// 		},
+	// 	};
 
-// 		await expect(
-// 			instance.run(
-// 				oAuthTokenRefreshTestIntegration,
-// 				{
-// 					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-// 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-// 				},
-// 				(object) => {
-// 					return object.translate({} as Contract, {
-// 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 					});
-// 				},
-// 				{
-// 					origin: 'https://jel.ly.fish/oauth/balena-cloud',
-// 					provider: 'balena-cloud',
-// 					context: {
-// 						log: {
-// 							info: _.noop,
-// 							warn: _.noop,
-// 						},
-// 						getElementBySlug: async (slug: string) => {
-// 							return getElementBySlugFromCollection(data, slug);
-// 						},
-// 						getElementById: async (id: string) => {
-// 							return data[id];
-// 						},
-// 						upsertElement: async (type: string, object: any) => {
-// 							data[object.id] = object;
-// 							data[object.id].type = type;
-// 							return data[object.id];
-// 						},
-// 					} as any as SyncActionContext,
-// 				} as any,
-// 			),
-// 		).rejects.toThrow(errors.SyncOAuthNoUserError);
-// 	});
+	// 	await expect(
+	// 		instance.run(
+	// 			oAuthTokenRefreshTestIntegration,
+	// 			{
+	// 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+	// 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+	// 			},
+	// 			(object) => {
+	// 				return object.translate({} as Contract, {
+	// 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 				});
+	// 			},
+	// 			{
+	// 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
+	// 				provider: 'balena-cloud',
+	// 				context: {
+	// 					log: {
+	// 						info: _.noop,
+	// 						warn: _.noop,
+	// 					},
+	// 					getElementBySlug: async (slug: string) => {
+	// 						return getElementBySlugFromCollection(data, slug);
+	// 					},
+	// 					getElementById: async (id: string) => {
+	// 						return data[id];
+	// 					},
+	// 					upsertElement: async (type: string, object: any) => {
+	// 						data[object.id] = object;
+	// 						data[object.id].type = type;
+	// 						return data[object.id];
+	// 					},
+	// 				} as any as SyncActionContext,
+	// 			} as any,
+	// 		),
+	// 	).rejects.toThrow(errors.SyncOAuthNoUserError);
+	// });
 
-// 	test('should throw if actor is not associated with service and the default user is invalid', async () => {
-// 		firstNock();
-// 		const data: { [key: string]: Partial<Contract> } = {
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {},
-// 			},
-// 		};
+	// test('should throw if actor is not associated with service and the default user is invalid', async () => {
+	// 	firstNock();
+	// 	const data: { [key: string]: Partial<Contract> } = {
+	// 		'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+	// 			id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			type: 'user',
+	// 			slug: 'user-synctest',
+	// 			version: '1.0.0',
+	// 			data: {},
+	// 		},
+	// 	};
 
-// 		await expect(
-// 			instance.run(
-// 				oAuthTokenRefreshTestIntegration,
-// 				{
-// 					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-// 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-// 				},
-// 				(object) => {
-// 					return object.translate({} as Contract, {
-// 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 					});
-// 				},
-// 				{
-// 					actor: 'foo',
-// 					origin: 'https://jel.ly.fish/oauth/balena-cloud',
-// 					provider: 'balena-cloud',
-// 					defaultUser: 'foobar',
-// 					context: {
-// 						log: {
-// 							info: _.noop,
-// 							warn: _.noop,
-// 						},
-// 						getElementBySlug: async (slug: string) => {
-// 							return getElementBySlugFromCollection(data, slug);
-// 						},
-// 						getElementById: async (id: string) => {
-// 							return data[id];
-// 						},
-// 						upsertElement: async (type: string, object: any) => {
-// 							data[object.id] = object;
-// 							data[object.id].type = type;
-// 							return data[object.id];
-// 						},
-// 					} as any as SyncActionContext,
-// 				},
-// 			),
-// 		).rejects.toThrow(errors.SyncNoActor);
-// 	});
+	// 	await expect(
+	// 		instance.run(
+	// 			oAuthTokenRefreshTestIntegration,
+	// 			{
+	// 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+	// 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+	// 			},
+	// 			(object) => {
+	// 				return object.translate({} as Contract, {
+	// 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 				});
+	// 			},
+	// 			{
+	// 				actor: 'foo',
+	// 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
+	// 				provider: 'balena-cloud',
+	// 				defaultUser: 'foobar',
+	// 				context: {
+	// 					log: {
+	// 						info: _.noop,
+	// 						warn: _.noop,
+	// 					},
+	// 					getElementBySlug: async (slug: string) => {
+	// 						return getElementBySlugFromCollection(data, slug);
+	// 					},
+	// 					getElementById: async (id: string) => {
+	// 						return data[id];
+	// 					},
+	// 					upsertElement: async (type: string, object: any) => {
+	// 						data[object.id] = object;
+	// 						data[object.id].type = type;
+	// 						return data[object.id];
+	// 					},
+	// 				} as any as SyncActionContext,
+	// 			},
+	// 		),
+	// 	).rejects.toThrow(errors.SyncNoActor);
+	// });
 
-// 	test('should throw if neither the actor nor the default user are associated with the service', async () => {
-// 		firstNock();
-// 		const data: { [key: string]: Partial<Contract> } = {
-// 			'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
-// 				id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 				type: 'user',
-// 				slug: 'user-synctest',
-// 				version: '1.0.0',
-// 				data: {},
-// 			},
-// 			'ecc47582-bc08-45dc-ac8b-16072a843835': {
-// 				id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
-// 				type: 'user',
-// 				slug: 'user-jellysync',
-// 				version: '1.0.0',
-// 				data: {},
-// 			},
-// 		};
+	// test('should throw if neither the actor nor the default user are associated with the service', async () => {
+	// 	firstNock();
+	// 	const data: { [key: string]: Partial<Contract> } = {
+	// 		'b5fc8487-cd6b-46aa-84ec-2407d5989e92': {
+	// 			id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 			type: 'user',
+	// 			slug: 'user-synctest',
+	// 			version: '1.0.0',
+	// 			data: {},
+	// 		},
+	// 		'ecc47582-bc08-45dc-ac8b-16072a843835': {
+	// 			id: 'ecc47582-bc08-45dc-ac8b-16072a843835',
+	// 			type: 'user',
+	// 			slug: 'user-jellysync',
+	// 			version: '1.0.0',
+	// 			data: {},
+	// 		},
+	// 	};
 
-// 		await expect(
-// 			instance.run(
-// 				oAuthTokenRefreshTestIntegration,
-// 				{
-// 					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-// 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-// 				},
-// 				(object) => {
-// 					return object.translate({} as Contract, {
-// 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
-// 					});
-// 				},
-// 				{
-// 					origin: 'https://jel.ly.fish/oauth/balena-cloud',
-// 					provider: 'balena-cloud',
-// 					defaultUser: 'jellysync',
-// 					context: {
-// 						log: {
-// 							info: _.noop,
-// 							warn: _.noop,
-// 						},
-// 						getElementBySlug: async (slug: string) => {
-// 							return getElementBySlugFromCollection(data, slug);
-// 						},
-// 						getElementById: async (id: string) => {
-// 							return data[id];
-// 						},
-// 						upsertElement: async (type: string, object: any) => {
-// 							data[object.id] = object;
-// 							data[object.id].type = type;
-// 							return data[object.id];
-// 						},
-// 					} as any as SyncActionContext,
-// 				} as any,
-// 			),
-// 		).rejects.toThrow(errors.SyncOAuthNoUserError);
-// 	});
-// });
+	// 	await expect(
+	// 		instance.run(
+	// 			oAuthTokenRefreshTestIntegration,
+	// 			{
+	// 				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+	// 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+	// 			},
+	// 			(object) => {
+	// 				return object.translate({} as Contract, {
+	// 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
+	// 				});
+	// 			},
+	// 			{
+	// 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
+	// 				provider: 'balena-cloud',
+	// 				defaultUser: 'jellysync',
+	// 				context: {
+	// 					log: {
+	// 						info: _.noop,
+	// 						warn: _.noop,
+	// 					},
+	// 					getElementBySlug: async (slug: string) => {
+	// 						return getElementBySlugFromCollection(data, slug);
+	// 					},
+	// 					getElementById: async (id: string) => {
+	// 						return data[id];
+	// 					},
+	// 					upsertElement: async (type: string, object: any) => {
+	// 						data[object.id] = object;
+	// 						data[object.id].type = type;
+	// 						return data[object.id];
+	// 					},
+	// 				} as any as SyncActionContext,
+	// 			} as any,
+	// 		),
+	// 	).rejects.toThrow(errors.SyncOAuthNoUserError);
+	// });
+});

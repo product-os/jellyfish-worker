@@ -38,8 +38,56 @@ const ACTOR_TRANSLATORS: { [key: string]: ActorTranslatorMap[] } = {
 		},
 	],
 };
+export interface Logger {
+	warn: (message: string, data: any) => void;
+	error: (message: string, data: any) => void;
+	debug: (message: string, data: any) => void;
+	info: (message: string, data: any) => void;
+	exception: (message: string, error: any) => void;
+}
+export interface SyncActionContext {
+	logger: Logger;
+	getLocalUsername: (username: string) => string;
+	getRemoteUsername: (username: string) => string;
+	upsertElement: (
+		type: string,
+		object:
+			| Partial<Contract>
+			| { id: string; type: string; patch: Operation[] },
+		options: { actor?: string; timestamp?: Date; originator?: string },
+	) => Promise<Contract | null>;
+	getElementBySlug: (
+		slug: string,
+		usePrivilegedSession?: boolean,
+	) => Promise<Contract | null>;
+	getElementById: (id: string) => Promise<Contract | null>;
+	getElementByMirrorId: (
+		type: string,
+		mirrorId: string,
+		options: { usePattern?: boolean },
+	) => Promise<Contract | null>;
+}
 
-export type SyncActionContext = ReturnType<typeof getActionContext>;
+export interface IntegrationExecutionContext {
+	logger: Logger;
+	getLocalUsername: (username: string) => string;
+	getRemoteUsername: (username: string) => string;
+	getElementBySlug: (
+		slug: string,
+		usePrivilegedSession?: boolean,
+	) => Promise<Contract | null>;
+	getElementById: (id: string) => Promise<Contract | null>;
+	getElementByMirrorId: (
+		type: string,
+		mirrorId: string,
+		options: { usePattern?: boolean },
+	) => Promise<Contract | null>;
+	request: <T>(
+		actor: boolean,
+		requestOptions: any,
+	) => Promise<{ code: number; body: T }>;
+	getActorId: (information: ActorInformation) => Promise<string>;
+}
 
 /**
  * @name getActionContext
@@ -62,12 +110,12 @@ export type SyncActionContext = ReturnType<typeof getActionContext>;
  * 	.....
  * }
  */
-export const getActionContext = (
+export const getSyncActionContext = (
 	provider: string,
 	workerContext: WorkerContext,
 	context: any,
 	session: string,
-) => {
+): SyncActionContext => {
 	const getDefaultActor = async (): Promise<null | string> => {
 		const sessionCard = await workerContext.getCardById(session, session);
 
@@ -79,8 +127,8 @@ export const getActionContext = (
 		return sessionCard.data.actor as string;
 	};
 
-	const contextObject = {
-		log: {
+	const contextObject: SyncActionContext = {
+		logger: {
 			warn: (message: string, data: any) => {
 				logger.warn(context, message, data);
 			},
@@ -206,16 +254,13 @@ export const getActionContext = (
 							if (error.name === 'JellyfishElementAlreadyExists') {
 								return contextObject.upsertElement(type, object, options);
 							}
-
 							throw error;
 						});
 				}
 			}
-
 			logger.info(context, 'Patching card from sync context', {
 				patch,
 			});
-
 			// If the only thing being updated is the origin, skip the update as
 			// it is a meaningless change.
 			// TODO: refactor the "origin" to be a link to the origin instead of hard coded value
@@ -240,20 +285,23 @@ export const getActionContext = (
 				patch,
 			);
 		},
-		getElementBySlug: async (slug: string, usePrivilegedSession = false) => {
+		getElementBySlug: async (
+			slug: string,
+			usePrivilegedSession?,
+		): Promise<Contract | null> => {
 			return workerContext.getCardBySlug(
 				usePrivilegedSession ? workerContext.privilegedSession : session,
 				slug,
 			);
 		},
-		getElementById: async (id: string) => {
+		getElementById: async (id: string): Promise<Contract | null> => {
 			return workerContext.getCardById(session, id);
 		},
 		getElementByMirrorId: async (
 			type: string,
 			mirrorId: string,
 			options: { usePattern?: boolean } = {},
-		) => {
+		): Promise<Contract | null> => {
 			assert.INTERNAL(
 				context,
 				!!mirrorId,
@@ -301,32 +349,37 @@ export const getActionContext = (
 			return elements[0];
 		},
 	};
-
 	return contextObject;
 };
 
 export const getIntegrationExecutionContext = (
 	integrationDefinition: IntegrationDefinition,
 	options: IntegrationExecutionOptions,
-) => ({
-	log: options.context.log,
-	getRemoteUsername: options.context.getRemoteUsername,
-	getLocalUsername: options.context.getLocalUsername,
-	getElementBySlug: options.context.getElementBySlug,
-	getElementById: options.context.getElementById,
-	getElementByMirrorId: options.context.getElementByMirrorId,
-	request: async (actor: boolean, requestOptions: any) => {
+): IntegrationExecutionContext => ({
+	logger: options.syncActionContext.logger,
+	getRemoteUsername: options.syncActionContext.getRemoteUsername,
+	getLocalUsername: options.syncActionContext.getLocalUsername,
+	getElementBySlug: options.syncActionContext.getElementBySlug,
+	getElementById: options.syncActionContext.getElementById,
+	getElementByMirrorId: options.syncActionContext.getElementByMirrorId,
+	request: async (
+		actor: boolean,
+		requestOptions: any,
+	): Promise<{ code: number; body: any }> => {
 		assert.INTERNAL(null, actor, errors.SyncNoActor, 'Missing request actor');
 
+		// If the integration definition does not contain all required
+		// OAuth information, simply make the http request as usual.
 		if (
 			!integrationDefinition.OAUTH_BASE_URL ||
 			!options.token.appId ||
 			!options.token.appSecret
 		) {
+			console.info('====> making standard http request');
 			return utils.httpRequest(requestOptions);
 		}
 
-		options.context.log.info('Sync: OAuth origin URL', {
+		options.syncActionContext.logger.info('Sync: OAuth origin URL', {
 			origin: options.origin,
 		});
 		assert.INTERNAL(
@@ -336,20 +389,20 @@ export const getIntegrationExecutionContext = (
 			'Missing OAuth origin URL',
 		);
 
-		options.context.log.info('Sync: Getting OAuth user', {
+		options.syncActionContext.logger.info('Sync: Getting OAuth user', {
 			actor,
 			provider: options.provider,
 			defaultUser: options.defaultUser,
 		});
 		const userCard = await utils.getOAuthUser(
-			options.context,
+			options.syncActionContext,
 			options.provider,
 			actor,
 			{
 				defaultUser: options.defaultUser,
 			},
 		);
-		options.context.log.info('Sync OAuth user', {
+		options.syncActionContext.logger.info('Sync OAuth user', {
 			id: userCard.id,
 		});
 
@@ -367,7 +420,7 @@ export const getIntegrationExecutionContext = (
 
 		// Lets try refreshing the token and retry if so
 		if (result.code === 401 && tokenData) {
-			options.context.log.info('Refreshing OAuth token', {
+			options.syncActionContext.logger.info('Refreshing OAuth token', {
 				provider: options.provider,
 				user: userCard.slug,
 				origin: options.origin,
@@ -392,7 +445,7 @@ export const getIntegrationExecutionContext = (
 				},
 			);
 			_.set(userCard, tokenPath, newToken);
-			await options.context.upsertElement(
+			await options.syncActionContext.upsertElement(
 				userCard.type,
 				_.omit(userCard, ['type']),
 				{
@@ -411,12 +464,12 @@ export const getIntegrationExecutionContext = (
 
 		return result;
 	},
-	getActorId: async (information: ActorInformation) => {
-		options.context.log.info('Creating sync actor', information);
+	getActorId: async (information: ActorInformation): Promise<string> => {
+		options.syncActionContext.logger.info('Creating sync actor', information);
 		const username = information.handle || information.email;
-		const translatedUsername = (options.context.getLocalUsername || _.identity)(
-			username.toLowerCase(),
-		);
+		const translatedUsername = (
+			options.syncActionContext.getLocalUsername || _.identity
+		)(username.toLowerCase());
 		const slug = translatedUsername.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
 		// There is a known Front/Intercom issue where some messages
@@ -426,7 +479,10 @@ export const getIntegrationExecutionContext = (
 		// We declared this as a "can't fix", but this log line will be
 		// useful to get a pulse of the problem.
 		if (slug === 'intercom') {
-			options.context.log.warn('Using "intercom" actor', information);
+			options.syncActionContext.logger.warn(
+				'Using "intercom" actor',
+				information,
+			);
 		}
 
 		const profile: {
@@ -475,12 +531,15 @@ export const getIntegrationExecutionContext = (
 			(data as any).email = information.email;
 		}
 
-		return utils.getOrCreateActorContractFromFragment(options.context, {
-			slug: `user-${slug}`,
-			active: _.isBoolean(information.active) ? information.active : true,
-			type: 'user@1.0.0',
-			version: '1.0.0',
-			data,
-		});
+		return utils.getOrCreateActorContractFromFragment(
+			options.syncActionContext,
+			{
+				slug: `user-${slug}`,
+				active: _.isBoolean(information.active) ? information.active : true,
+				type: 'user@1.0.0',
+				version: '1.0.0',
+				data,
+			},
+		);
 	},
 });

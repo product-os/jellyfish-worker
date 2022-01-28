@@ -38,6 +38,8 @@ export const request = async (
 	},
 	retries = 10,
 ): Promise<{ code: number; body: any }> => {
+	console.warn('===> oauth.request called:', options);
+
 	// Use access token if available
 	const headers = options.headers || {};
 	if (accessToken) {
