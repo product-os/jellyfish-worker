@@ -358,9 +358,9 @@ export class Sync {
 
 		const contracts = await metrics.measureMirror(name, async () => {
 			return this.executeIntegrationAndImportResultsAsContracts(
+				context,
 				integrationDefinition,
 				{
-					syncActionContext: context,
 					token,
 					provider: name,
 					actor: options.actor,
@@ -382,6 +382,7 @@ export class Sync {
 	}
 
 	executeIntegration = async (
+		context: SyncActionContext,
 		integrationDefinition: IntegrationDefinition,
 		options: IntegrationExecutionOptions,
 		fn: 'translate' | 'mirror',
@@ -390,7 +391,11 @@ export class Sync {
 		const integration = await integrationDefinition.initialize({
 			token: options.token,
 			defaultUser: options.defaultUser,
-			context: getIntegrationExecutionContext(integrationDefinition, options),
+			context: getIntegrationExecutionContext(
+				context,
+				integrationDefinition,
+				options,
+			),
 		});
 
 		let results: IntegrationExecutionResult[] = [];
@@ -399,8 +404,7 @@ export class Sync {
 			results = await integration[fn](contract, {
 				actor: options.actor,
 			});
-
-			options.syncActionContext.logger.debug('Integration execution results:', {
+			context.logger.debug('Integration execution results:', {
 				type: fn,
 				results,
 			});
@@ -414,6 +418,7 @@ export class Sync {
 	};
 
 	executeIntegrationAndImportResultsAsContracts = async (
+		context: SyncActionContext,
 		integrationDefinition: IntegrationDefinition,
 		options: IntegrationExecutionOptions,
 		fn: 'translate' | 'mirror',
@@ -421,13 +426,14 @@ export class Sync {
 	): Promise<Contract[]> => {
 		try {
 			const results = await this.executeIntegration(
+				context,
 				integrationDefinition,
 				options,
 				fn,
 				contract,
 			);
 
-			options.syncActionContext.logger.debug(
+			context.logger.debug(
 				'Importing integration execution results as contracts:',
 				{
 					type: fn,
@@ -436,7 +442,7 @@ export class Sync {
 			);
 
 			const contracts = this.importIntegrationExecutionResultsAsContracts(
-				options.syncActionContext,
+				context,
 				results,
 				{
 					origin: contract,
@@ -652,6 +658,7 @@ export class Sync {
 
 		const contracts = await metrics.measureTranslate(name, async () => {
 			return this.executeIntegrationAndImportResultsAsContracts(
+				context,
 				integrationDefinition,
 				{
 					token,
@@ -659,7 +666,6 @@ export class Sync {
 					origin: options.origin,
 					defaultUser: options.defaultUser,
 					provider: name,
-					syncActionContext: context,
 				},
 				'translate',
 				contract,
@@ -719,13 +725,12 @@ export class Sync {
 		const integration = await integrationDefinition.initialize({
 			token,
 			defaultUser: '',
-			context: getIntegrationExecutionContext(integrationDefinition, {
+			context: getIntegrationExecutionContext(context, integrationDefinition, {
 				token,
 				actor: options.actor,
 				provider: name,
 				origin: '',
 				defaultUser: '',
-				syncActionContext: context,
 			}),
 		});
 

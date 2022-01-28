@@ -49,13 +49,6 @@ export interface SyncActionContext {
 	logger: Logger;
 	getLocalUsername: (username: string) => string;
 	getRemoteUsername: (username: string) => string;
-	upsertElement: (
-		type: string,
-		object:
-			| Partial<Contract>
-			| { id: string; type: string; patch: Operation[] },
-		options: { actor?: string; timestamp?: Date; originator?: string },
-	) => Promise<Contract | null>;
 	getElementBySlug: (
 		slug: string,
 		usePrivilegedSession?: boolean,
@@ -65,6 +58,13 @@ export interface SyncActionContext {
 		type: string,
 		mirrorId: string,
 		options: { usePattern?: boolean },
+	) => Promise<Contract | null>;
+	upsertElement: (
+		type: string,
+		object:
+			| Partial<Contract>
+			| { id: string; type: string; patch: Operation[] },
+		options: { actor?: string; timestamp?: Date; originator?: string },
 	) => Promise<Contract | null>;
 }
 
@@ -111,8 +111,8 @@ export interface IntegrationExecutionContext {
  * }
  */
 export const getSyncActionContext = (
-	provider: string,
 	workerContext: WorkerContext,
+	provider: string,
 	context: any,
 	session: string,
 ): SyncActionContext => {
@@ -145,19 +145,17 @@ export const getSyncActionContext = (
 				logger.exception(context, message, error);
 			},
 		},
-		getLocalUsername: (username: string): string => {
+		getLocalUsername: (remoteUsername: string): string => {
 			const map = _.find(ACTOR_TRANSLATORS[provider] || [], {
-				remote: username,
+				remote: remoteUsername,
 			});
-
-			return map ? map.local : username;
+			return map ? map.local : remoteUsername;
 		},
-		getRemoteUsername: (username: string): string => {
+		getRemoteUsername: (localUsername: string): string => {
 			const map = _.find(ACTOR_TRANSLATORS[provider] || [], {
-				local: username,
+				local: localUsername,
 			});
-
-			return map ? map.remote : username;
+			return map ? map.remote : localUsername;
 		},
 
 		// The upsertElement function has the property of being eventually
@@ -351,15 +349,16 @@ export const getSyncActionContext = (
 };
 
 export const getIntegrationExecutionContext = (
+	syncActionContext: SyncActionContext,
 	integrationDefinition: IntegrationDefinition,
 	options: IntegrationExecutionOptions,
 ): IntegrationExecutionContext => ({
-	logger: options.syncActionContext.logger,
-	getRemoteUsername: options.syncActionContext.getRemoteUsername,
-	getLocalUsername: options.syncActionContext.getLocalUsername,
-	getElementBySlug: options.syncActionContext.getElementBySlug,
-	getElementById: options.syncActionContext.getElementById,
-	getElementByMirrorId: options.syncActionContext.getElementByMirrorId,
+	logger: syncActionContext.logger,
+	getRemoteUsername: syncActionContext.getRemoteUsername,
+	getLocalUsername: syncActionContext.getLocalUsername,
+	getElementBySlug: syncActionContext.getElementBySlug,
+	getElementById: syncActionContext.getElementById,
+	getElementByMirrorId: syncActionContext.getElementByMirrorId,
 	request: async (
 		actorId: string,
 		requestOptions: utils.HttpRequestOptions,
@@ -376,7 +375,7 @@ export const getIntegrationExecutionContext = (
 			return utils.httpRequest(requestOptions);
 		}
 
-		options.syncActionContext.logger.info('Sync: OAuth origin URL', {
+		syncActionContext.logger.info('Sync: OAuth origin URL', {
 			origin: options.origin,
 		});
 
@@ -387,20 +386,20 @@ export const getIntegrationExecutionContext = (
 			'Missing OAuth origin URL',
 		);
 
-		options.syncActionContext.logger.info('Sync: Getting OAuth user', {
+		syncActionContext.logger.info('Sync: Getting OAuth user', {
 			actorId,
 			provider: options.provider,
 			defaultUser: options.defaultUser,
 		});
 
 		const userContract = await utils.getOAuthUserContract(
-			options.syncActionContext,
+			syncActionContext,
 			options.provider,
 			actorId,
 			options.defaultUser,
 		);
 
-		options.syncActionContext.logger.info('Sync OAuth user', {
+		syncActionContext.logger.info('Sync OAuth user', {
 			id: userContract!.id,
 		});
 
@@ -418,7 +417,7 @@ export const getIntegrationExecutionContext = (
 
 		// Lets try refreshing the token and retry if so
 		if (result.code === 401 && tokenData) {
-			options.syncActionContext.logger.info('Refreshing OAuth token', {
+			syncActionContext.logger.info('Refreshing OAuth token', {
 				provider: options.provider,
 				user: userContract!.slug,
 				origin: options.origin,
@@ -443,7 +442,7 @@ export const getIntegrationExecutionContext = (
 				},
 			);
 			_.set(userContract as any, tokenPath, newToken);
-			await options.syncActionContext.upsertElement(
+			await syncActionContext.upsertElement(
 				userContract!.type,
 				_.omit(userContract, ['type']),
 				{
@@ -461,10 +460,10 @@ export const getIntegrationExecutionContext = (
 		return result;
 	},
 	getActorId: async (information: ActorInformation): Promise<string> => {
-		options.syncActionContext.logger.info('Creating sync actor', information);
+		syncActionContext.logger.info('Creating sync actor', information);
 		const username = information.handle || information.email;
 		const translatedUsername = (
-			options.syncActionContext.getLocalUsername || _.identity
+			syncActionContext.getLocalUsername || _.identity
 		)(username.toLowerCase());
 		const slug = translatedUsername.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
@@ -475,10 +474,7 @@ export const getIntegrationExecutionContext = (
 		// We declared this as a "can't fix", but this log line will be
 		// useful to get a pulse of the problem.
 		if (slug === 'intercom') {
-			options.syncActionContext.logger.warn(
-				'Using "intercom" actor',
-				information,
-			);
+			syncActionContext.logger.warn('Using "intercom" actor', information);
 		}
 
 		const profile: {
@@ -527,15 +523,12 @@ export const getIntegrationExecutionContext = (
 			(data as any).email = information.email;
 		}
 
-		return utils.getOrCreateActorContractFromFragment(
-			options.syncActionContext,
-			{
-				slug: `user-${slug}`,
-				active: _.isBoolean(information.active) ? information.active : true,
-				type: 'user@1.0.0',
-				version: '1.0.0',
-				data,
-			},
-		);
+		return utils.getOrCreateActorContractFromFragment(syncActionContext, {
+			slug: `user-${slug}`,
+			active: _.isBoolean(information.active) ? information.active : true,
+			type: 'user@1.0.0',
+			version: '1.0.0',
+			data,
+		});
 	},
 });

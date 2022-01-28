@@ -618,7 +618,23 @@ describe('instance', () => {
 			},
 		};
 
+		const context = {
+			logger: {
+				info: _.noop,
+				warn: _.noop,
+				debug: _.noop,
+			},
+			getElementById: async (id: string) => {
+				return data[id] as Contract;
+			},
+			upsertElement: async (type: string, object: any) => {
+				data[object.id] = { ...object, type };
+				return data[object.id] as Contract;
+			},
+		} as any as SyncActionContext;
+
 		const results = await sync.executeIntegration(
+			context,
 			oAuthTokenRefreshTestIntegration,
 			{
 				token: {
@@ -629,20 +645,6 @@ describe('instance', () => {
 				defaultUser: 'bar',
 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
 				provider: 'balena-cloud',
-				syncActionContext: {
-					logger: {
-						info: _.noop,
-						warn: _.noop,
-						debug: _.noop,
-					},
-					getElementById: async (id: string) => {
-						return data[id] as Contract;
-					},
-					upsertElement: async (type: string, object: any) => {
-						data[object.id] = { ...object, type };
-						return data[object.id] as Contract;
-					},
-				} as any as SyncActionContext,
 			},
 			'translate',
 			{} as any as Contract,
@@ -712,7 +714,26 @@ describe('instance', () => {
 			},
 		};
 
+		const context = {
+			logger: {
+				info: _.noop,
+				warn: _.noop,
+				debug: _.noop,
+			},
+			getElementById: async (id: string) => {
+				return data[id] as Contract;
+			},
+			getElementBySlug: async (slug: any) => {
+				return getElementBySlugFromCollection(data, slug);
+			},
+			upsertElement: async (type: string, object: any) => {
+				data[object.id] = { ...object, type };
+				return data[object.id] as Contract;
+			},
+		} as any as SyncActionContext;
+
 		const results = await sync.executeIntegration(
+			context,
 			oAuthTokenRefreshTestIntegration,
 			{
 				token: {
@@ -723,23 +744,6 @@ describe('instance', () => {
 				actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 				defaultUser: 'jellysync',
 				provider: 'balena-cloud',
-				syncActionContext: {
-					logger: {
-						info: _.noop,
-						warn: _.noop,
-						debug: _.noop,
-					},
-					getElementById: async (id: string) => {
-						return data[id] as Contract;
-					},
-					getElementBySlug: async (slug: any) => {
-						return getElementBySlugFromCollection(data, slug);
-					},
-					upsertElement: async (type: string, object: any) => {
-						data[object.id] = { ...object, type };
-						return data[object.id] as Contract;
-					},
-				} as any as SyncActionContext,
 			},
 			'translate',
 			{} as any as Contract,
@@ -809,7 +813,26 @@ describe('instance', () => {
 			},
 		};
 
+		const context = {
+			logger: {
+				info: _.noop,
+				warn: _.noop,
+				debug: _.noop,
+			},
+			getElementById: async (id: string) => {
+				return data[id] as Contract;
+			},
+			getElementBySlug: async (slug: any) => {
+				return getElementBySlugFromCollection(data, slug);
+			},
+			upsertElement: async (type: string, object: any) => {
+				data[object.id] = { ...object, type };
+				return data[object.id] as Contract;
+			},
+		} as any as SyncActionContext;
+
 		const results = await sync.executeIntegration(
+			context,
 			oAuthTokenRefreshTestIntegration,
 			{
 				token: {
@@ -820,23 +843,6 @@ describe('instance', () => {
 				actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 				defaultUser: 'bar',
 				provider: 'balena-cloud',
-				syncActionContext: {
-					logger: {
-						info: _.noop,
-						warn: _.noop,
-						debug: _.noop,
-					},
-					getElementById: async (id: string) => {
-						return data[id] as Contract;
-					},
-					getElementBySlug: async (slug: any) => {
-						return getElementBySlugFromCollection(data, slug);
-					},
-					upsertElement: async (type: string, object: any) => {
-						data[object.id] = { ...object, type };
-						return data[object.id] as Contract;
-					},
-				} as any as SyncActionContext,
 			},
 			'translate',
 			{} as any as Contract,
@@ -906,7 +912,26 @@ describe('instance', () => {
 			},
 		};
 
+		const context = {
+			logger: {
+				info: _.noop,
+				warn: _.noop,
+				debug: _.noop,
+			},
+			getElementById: async (id: string) => {
+				return data[id] as Contract;
+			},
+			getElementBySlug: async (slug: any) => {
+				return getElementBySlugFromCollection(data, slug);
+			},
+			upsertElement: async (type: string, object: any) => {
+				data[object.id] = { ...object, type };
+				return data[object.id] as Contract;
+			},
+		} as any as SyncActionContext;
+
 		const results = await sync.executeIntegration(
+			context,
 			oAuthTokenRefreshTestIntegration,
 			{
 				token: {
@@ -917,23 +942,6 @@ describe('instance', () => {
 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
 				defaultUser: 'jellysync',
 				provider: 'balena-cloud',
-				syncActionContext: {
-					logger: {
-						info: _.noop,
-						warn: _.noop,
-						debug: _.noop,
-					},
-					getElementById: async (id: string) => {
-						return data[id] as Contract;
-					},
-					getElementBySlug: async (slug: any) => {
-						return getElementBySlugFromCollection(data, slug);
-					},
-					upsertElement: async (type: string, object: any) => {
-						data[object.id] = { ...object, type };
-						return data[object.id] as Contract;
-					},
-				} as any as SyncActionContext,
 			},
 			'translate',
 			{} as any as Contract,
@@ -993,8 +1001,27 @@ describe('instance', () => {
 			},
 		};
 
+		const context = {
+			logger: {
+				info: _.noop,
+				warn: _.noop,
+				debug: _.noop,
+			},
+			getElementById: async (id: string) => {
+				return data[id] as Contract;
+			},
+			getElementBySlug: async (slug: any) => {
+				return getElementBySlugFromCollection(data, slug);
+			},
+			upsertElement: async (type: string, object: any) => {
+				data[object.id] = { ...object, type };
+				return data[object.id] as Contract;
+			},
+		} as any as SyncActionContext;
+
 		await expect(
 			sync.executeIntegration(
+				context,
 				oAuthTokenRefreshTestIntegration,
 				{
 					token: {
@@ -1005,23 +1032,6 @@ describe('instance', () => {
 					provider: 'balena-cloud',
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 					defaultUser: '',
-					syncActionContext: {
-						logger: {
-							info: _.noop,
-							warn: _.noop,
-							debug: _.noop,
-						},
-						getElementById: async (id: string) => {
-							return data[id] as Contract;
-						},
-						getElementBySlug: async (slug: any) => {
-							return getElementBySlugFromCollection(data, slug);
-						},
-						upsertElement: async (type: string, object: any) => {
-							data[object.id] = { ...object, type };
-							return data[object.id] as Contract;
-						},
-					} as any as SyncActionContext,
 				},
 				'translate',
 				{} as any as Contract,
@@ -1047,6 +1057,23 @@ describe('instance', () => {
 
 		await expect(
 			sync.executeIntegration(
+				{
+					logger: {
+						info: _.noop,
+						warn: _.noop,
+						debug: _.noop,
+					},
+					getElementById: async (id: string) => {
+						return data[id] as Contract;
+					},
+					getElementBySlug: async (slug: any) => {
+						return getElementBySlugFromCollection(data, slug);
+					},
+					upsertElement: async (type: string, object: any) => {
+						data[object.id] = { ...object, type };
+						return data[object.id] as Contract;
+					},
+				} as any as SyncActionContext,
 				oAuthTokenRefreshTestIntegration,
 				{
 					token: {
@@ -1057,23 +1084,6 @@ describe('instance', () => {
 					provider: 'balena-cloud',
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 					defaultUser: 'jellysync',
-					syncActionContext: {
-						logger: {
-							info: _.noop,
-							warn: _.noop,
-							debug: _.noop,
-						},
-						getElementById: async (id: string) => {
-							return data[id] as Contract;
-						},
-						getElementBySlug: async (slug: any) => {
-							return getElementBySlugFromCollection(data, slug);
-						},
-						upsertElement: async (type: string, object: any) => {
-							data[object.id] = { ...object, type };
-							return data[object.id] as Contract;
-						},
-					} as any as SyncActionContext,
 				},
 				'translate',
 				{} as any as Contract,
@@ -1104,8 +1114,27 @@ describe('instance', () => {
 			},
 		};
 
+		const context = {
+			logger: {
+				info: _.noop,
+				warn: _.noop,
+				debug: _.noop,
+			},
+			getElementById: async (id: string) => {
+				return data[id] as Contract;
+			},
+			getElementBySlug: async (slug: any) => {
+				return getElementBySlugFromCollection(data, slug);
+			},
+			upsertElement: async (type: string, object: any) => {
+				data[object.id] = { ...object, type };
+				return data[object.id] as Contract;
+			},
+		} as any as SyncActionContext;
+
 		await expect(
 			sync.executeIntegration(
+				context,
 				oAuthTokenRefreshTestIntegration,
 				{
 					token: {
@@ -1116,23 +1145,6 @@ describe('instance', () => {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 					origin: 'https://jel.ly.fish/oauth/balena-cloud',
 					provider: 'balena-cloud',
-					syncActionContext: {
-						logger: {
-							info: _.noop,
-							warn: _.noop,
-							debug: _.noop,
-						},
-						getElementById: async (id: string) => {
-							return data[id] as Contract;
-						},
-						getElementBySlug: async (slug: any) => {
-							return getElementBySlugFromCollection(data, slug);
-						},
-						upsertElement: async (type: string, object: any) => {
-							data[object.id] = { ...object, type };
-							return data[object.id] as Contract;
-						},
-					} as any as SyncActionContext,
 				},
 				'translate',
 				{} as any as Contract,

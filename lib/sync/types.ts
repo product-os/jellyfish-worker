@@ -67,7 +67,6 @@ export interface Integration {
 }
 
 export interface IntegrationExecutionOptions {
-	syncActionContext: SyncActionContext;
 	actor: string;
 	origin: string;
 	defaultUser: string;
