@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update external-major Docker tags
+      hash: 34ccb3e3c1659dca0f6f2c8e78a1ce21d1b3c590
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 16.2.1
+  title: Update external-major Docker tags (major)
+  date: 2022-01-29T05:09:20.786Z
+- commits:
     - subject: Add translate test framework
       hash: a092e90b788b83a410365212acba96b3cd33c2ac
       body: ""
