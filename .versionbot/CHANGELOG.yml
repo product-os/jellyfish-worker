@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add translate test framework
+      hash: a092e90b788b83a410365212acba96b3cd33c2ac
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 16.2.0
+  title: Add translate test framework
+  date: 2022-01-29T04:50:25.046Z
+- commits:
     - subject: Update balena/balena-redis Docker tag to v0.0.4
       hash: 341c8efd09efd81d77a6a36c23210316c1fc767e
       body: ""
