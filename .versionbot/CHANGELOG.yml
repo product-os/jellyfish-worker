@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update external-non-major
+      hash: c15239d2345f1bb6420d2470245e91e5126dd191
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 16.2.2
+  title: Update external-non-major
+  date: 2022-01-29T07:29:27.503Z
+- commits:
     - subject: Update external-major Docker tags
       hash: 34ccb3e3c1659dca0f6f2c8e78a1ce21d1b3c590
       body: ""
