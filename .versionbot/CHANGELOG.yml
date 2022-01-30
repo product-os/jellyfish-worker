@@ -1,4 +1,18 @@
 - commits:
+    - subject: Export SequenceItem type
+      hash: 2d3cc43a699252d4d6ce9c99c576b45fe65bc0e7
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 16.3.0
+  title: Export SequenceItem type
+  date: 2022-01-30T13:53:41.708Z
+- commits:
     - subject: Update dependencies (external non-major bumps)
       hash: 8e6c398afb7619a0324b7c14a675e04dadc07b28
       body: ""
