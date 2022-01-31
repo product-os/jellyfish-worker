@@ -1,4 +1,16 @@
 - commits:
+    - subject: Fix whoami types
+      hash: ec5e4e2c0486dca921d9e614ee6898811da17fc2
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: karaxuna
+      nested: []
+  version: 18.0.0
+  title: Fix whoami types
+  date: 2022-01-31T11:19:49.755Z
+- commits:
     - subject: Update translate test function options/types
       hash: cdb3123a1395753557083fbf11ea685f677a3772
       body: ""
