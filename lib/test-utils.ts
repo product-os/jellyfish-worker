@@ -393,8 +393,6 @@ export const destroyContext = async (context: TestContext) => {
 	await queueTestUtils.destroyContext(context);
 };
 
-// =============== TRANSLATE SCENARIO RUNNER
-
 interface Variation {
 	name: string;
 	combination: any[];
@@ -557,24 +555,43 @@ export async function translateAfterEach(context: TestContext) {
  * translate results against expected values.
  *
  * @param context - test context
- * @param testCase
- * @param integration
- * @param stub
+ * @param testCase - test case
+ * @param options - test options
  */
 export async function webhookScenario(
 	context: TestContext,
-	testCase: any,
-	integration: any,
-	stub: any,
+	testCase: {
+		steps: any[];
+		prepareEvent: (event: any) => Promise<any>;
+		offset: number;
+		headIndex: number;
+		original: any[];
+		ignoreUpdateEvents: boolean;
+		expected: any;
+		name: string;
+		variant: string;
+	},
+	options: {
+		source: string;
+		baseUrl: string;
+		uriPath: RegExp;
+		basePath: string;
+		isAuthorized: (request: any) => any;
+		head?: {
+			ignore: {
+				[key: string]: string[];
+			};
+		};
+	},
 ): Promise<void> {
 	let webhookOffset = testCase.offset;
 
-	nock(stub.baseUrl)
+	nock(options.baseUrl)
 		.persist()
-		.get(stub.uriPath)
+		.get(options.uriPath)
 		.query(true)
 		.reply(function (uri: string, _request: any, callback: any) {
-			if (!stub.isAuthorized(this.req)) {
+			if (!options.isAuthorized(this.req)) {
 				return callback(null, [401, this.req.headers]);
 			}
 
@@ -594,7 +611,7 @@ export async function webhookScenario(
 
 			const jsonPath = _.kebabCase(`${baseUri}-${queryString}`);
 			const content = requireStub(
-				path.join(stub.basePath, testCase.name, 'stubs'),
+				path.join(options.basePath, testCase.name, 'stubs'),
 				webhookOffset,
 				jsonPath,
 			);
@@ -610,7 +627,7 @@ export async function webhookScenario(
 		);
 
 		const data = {
-			source: integration.source,
+			source: options.source,
 			headers: step.headers,
 			payload: step.payload,
 		};
@@ -710,10 +727,10 @@ export async function webhookScenario(
 	// Pick and merge any other fields explicitly marked to ignore
 	// This should be used rarely, usually for unpredictable evaluated field values
 	const headType = head.type.split('@')[0];
-	if (integration.options?.head?.ignore[headType]) {
+	if (options.head?.ignore[headType]) {
 		expectedHead = _.merge(
 			expectedHead,
-			_.pick(head, integration.options.head.ignore[headType]),
+			_.pick(head, options.head.ignore[headType]),
 		);
 	}
 	assert.deepEqual(head, expectedHead);
