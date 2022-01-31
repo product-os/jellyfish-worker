@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update translate test function options/types
+      hash: cdb3123a1395753557083fbf11ea685f677a3772
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 17.0.0
+  title: Update translate test function options/types
+  date: 2022-01-31T03:43:43.454Z
+- commits:
     - subject: Export SequenceItem type
       hash: 2d3cc43a699252d4d6ce9c99c576b45fe65bc0e7
       body: ""
