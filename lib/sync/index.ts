@@ -12,7 +12,7 @@ import * as pipeline from './pipeline';
 import * as syncContext from './sync-context';
 import type { Integration, IntegrationDefinition, SequenceItem } from './types';
 
-export { Integration, IntegrationDefinition, SequenceItem };
+export { errors, Integration, IntegrationDefinition, SequenceItem };
 
 /**
  * Jellyfish sync library module.

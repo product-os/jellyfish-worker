@@ -38,7 +38,12 @@ import type {
 import * as utils from './utils';
 
 export { actions, triggersLib, errors, CARDS, utils };
-export { Integration, IntegrationDefinition, SequenceItem } from './sync';
+export {
+	errors as syncErrors,
+	Integration,
+	IntegrationDefinition,
+	SequenceItem,
+} from './sync';
 export {
 	ActionContractDefinition,
 	ActionDefinition,
