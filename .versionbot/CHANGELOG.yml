@@ -1,4 +1,18 @@
 - commits:
+    - subject: Export sync errors
+      hash: 580b2dacc6c3293a9fbef03182deaf62bceaa446
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.1.0
+  title: Export sync errors
+  date: 2022-02-01T04:55:17.931Z
+- commits:
     - subject: Update resinci/jellyfish-test Docker tag to v1.4.22
       hash: ab9f2a12a870ce77b5edf3aa5602329cfc8637c5
       body: ""
