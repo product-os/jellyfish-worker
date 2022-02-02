@@ -1,7 +1,10 @@
 import * as assert from '@balena/jellyfish-assert';
 import type { LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type {
+	Contract,
+	EventContract,
+} from '@balena/jellyfish-types/build/core';
 import { strict } from 'assert';
 import _ from 'lodash';
 import type { Map, WorkerContext } from '../types';
@@ -325,7 +328,7 @@ export class Sync {
 	async mirror(
 		name: string,
 		token: any,
-		card: Contract,
+		card: EventContract,
 		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;
@@ -381,7 +384,7 @@ export class Sync {
 	async translate(
 		name: string,
 		token: string,
-		card: Contract,
+		card: EventContract,
 		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;

@@ -1,5 +1,8 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type {
+	Contract,
+	EventContract,
+} from '@balena/jellyfish-types/build/core';
 import Bluebird from 'bluebird';
 import jsone from 'json-e';
 import _ from 'lodash';
@@ -16,7 +19,7 @@ const runIntegration = async (
 	integration: IntegrationDefinition,
 	options: PipelineOpts,
 	fn: 'translate' | 'mirror',
-	card: Contract,
+	card: EventContract,
 ): Promise<Contract[]> => {
 	return instance.run(
 		integration,
@@ -259,7 +262,7 @@ export const importCards = async (
  */
 export const translateExternalEvent = async (
 	integration: IntegrationDefinition,
-	externalEvent: Contract,
+	externalEvent: EventContract,
 	options: PipelineOpts,
 ) => {
 	return runIntegration(integration, options, 'translate', externalEvent);
@@ -288,7 +291,7 @@ export const translateExternalEvent = async (
  */
 export const mirrorCard = async (
 	integration: IntegrationDefinition,
-	card: Contract,
+	card: EventContract,
 	options: PipelineOpts,
 ) => {
 	return runIntegration(integration, options, 'mirror', card);

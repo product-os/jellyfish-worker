@@ -1,5 +1,8 @@
 import type { LogContext } from '@balena/jellyfish-logger';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type {
+	Contract,
+	EventContract,
+} from '@balena/jellyfish-types/build/core';
 import type { Operation } from 'fast-json-patch';
 import type { Map } from '../types';
 import type { SyncActionContext } from './sync-context';
@@ -47,12 +50,12 @@ export interface Integration {
 	destroy: () => Promise<any>;
 
 	translate: (
-		contract: Contract,
+		contract: EventContract,
 		options: { actor: string },
 	) => Promise<SequenceItem[]>;
 
 	mirror: (
-		contract: Contract,
+		contract: EventContract,
 		options: { actor: string },
 	) => Promise<SequenceItem[]>;
 

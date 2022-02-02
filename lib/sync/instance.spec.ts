@@ -1,4 +1,7 @@
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type {
+	Contract,
+	EventContract,
+} from '@balena/jellyfish-types/build/core';
 import Bluebird from 'bluebird';
 import _ from 'lodash';
 import nock from 'nock';
@@ -190,7 +193,7 @@ describe('instance', () => {
 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
 			},
 			(object) => {
-				return object.translate({} as Contract, {
+				return object.translate({} as EventContract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 				});
 			},
@@ -283,7 +286,7 @@ describe('instance', () => {
 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
 			},
 			(object) => {
-				return object.translate({} as Contract, {
+				return object.translate({} as EventContract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 				});
 			},
@@ -398,7 +401,7 @@ describe('instance', () => {
 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
 			},
 			(object) => {
-				return object.translate({} as Contract, {
+				return object.translate({} as EventContract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 				});
 			},
@@ -491,7 +494,7 @@ describe('instance', () => {
 				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
 			},
 			(object) => {
-				return object.translate({} as Contract, {
+				return object.translate({} as EventContract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 				});
 			},
@@ -578,7 +581,7 @@ describe('instance', () => {
 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
 				},
 				(object) => {
-					return object.translate({} as Contract, {
+					return object.translate({} as EventContract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 					});
 				},
@@ -627,7 +630,7 @@ describe('instance', () => {
 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
 				},
 				(object) => {
-					return object.translate({} as Contract, {
+					return object.translate({} as EventContract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 					});
 				},
@@ -685,7 +688,7 @@ describe('instance', () => {
 					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
 				},
 				(object) => {
-					return object.translate({} as Contract, {
+					return object.translate({} as EventContract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 					});
 				},
