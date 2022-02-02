@@ -1,4 +1,16 @@
 - commits:
+    - subject: Allow regexp in base url (webhookScenario)
+      hash: 156292362f08e39c7273ee3db731b9f5e78e89c0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: karaxuna
+      nested: []
+  version: 18.2.3
+  title: Allow regexp in base url (webhookScenario)
+  date: 2022-02-02T12:15:07.366Z
+- commits:
     - subject: Update internal-patch
       hash: 59448537026fbba99937e472c06a0e5ff8571242
       body: ""
