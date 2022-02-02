@@ -1,4 +1,5 @@
 import { TypedError } from 'typed-error';
+export * from './sync/errors';
 
 export class WorkerAuthenticationError extends TypedError {}
 export class WorkerInvalidAction extends TypedError {}
