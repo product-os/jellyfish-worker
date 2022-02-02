@@ -3,6 +3,7 @@ import type { Contract } from '@balena/jellyfish-types/build/core';
 import type { Operation } from 'fast-json-patch';
 import type { Map } from '../types';
 import type { Logger, SyncActionContext } from './context';
+
 export interface IntegrationDefinition {
 	OAUTH_BASE_URL?: string;
 	OAUTH_SCOPES?: string[];

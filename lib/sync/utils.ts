@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { SyncActionContext } from './context';
 import { Contract } from '@balena/jellyfish-types/build/core';
 import axiosRetry from 'axios-retry';
+
 export interface HttpRequestOptions {
 	method: Method;
 	baseUrl: string;
