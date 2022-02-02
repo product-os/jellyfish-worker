@@ -320,7 +320,9 @@ export class Worker {
 					patch,
 				);
 			},
-			enqueueAction: this.enqueueAction,
+			enqueueAction: (...args) => {
+				return this.enqueueAction(...args);
+			},
 		};
 	}
 
