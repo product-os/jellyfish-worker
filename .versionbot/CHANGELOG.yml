@@ -1,4 +1,16 @@
 - commits:
+    - subject: Export sync errors alongside worker errors
+      hash: f47604310a95183b3f58b5587193e21d4c371752
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: karaxuna
+      nested: []
+  version: 18.3.0
+  title: Export sync errors alongside worker errors
+  date: 2022-02-02T14:45:36.041Z
+- commits:
     - subject: Allow regexp in base url (webhookScenario)
       hash: 156292362f08e39c7273ee3db731b9f5e78e89c0
       body: ""
