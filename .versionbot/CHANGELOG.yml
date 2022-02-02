@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-core from 14.1.5 to 14.2.0
+      hash: d711efc5fee234fb9bd6e93ccf9df6c7602fe29a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 18.2.1
+  title: Update @balena/jellyfish-core from 14.1.5 to 14.2.0
+  date: 2022-02-02T04:09:14.295Z
+- commits:
     - subject: Add retry to test-utils
       hash: a485ddbc1b19ff424692c34e2f1569216111d918
       body: ""
