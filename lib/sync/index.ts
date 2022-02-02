@@ -619,7 +619,7 @@ export class Sync {
 	 * @param {String} [options.origin] - OAuth origin URL
 	 * @returns {Object[]} inserted cards
 	 */
-	translate = async (
+	async translate(
 		name: string,
 		token: string,
 		contract: Contract,
@@ -629,7 +629,7 @@ export class Sync {
 			defaultUser: string;
 			origin: string;
 		},
-	) => {
+	) {
 		if (!token) {
 			context.logger.warn('Ignoring translate as there is no token', {
 				integration: name,
@@ -679,7 +679,7 @@ export class Sync {
 		});
 
 		return contracts;
-	};
+	}
 
 	/**
 	 * @summary Fetch a file synced in an external service
