@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add retry to test-utils
+      hash: a485ddbc1b19ff424692c34e2f1569216111d918
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.2.0
+  title: Add retry to test-utils
+  date: 2022-02-02T03:57:21.907Z
+- commits:
     - subject: Export sync errors
       hash: 580b2dacc6c3293a9fbef03182deaf62bceaa446
       body: ""
