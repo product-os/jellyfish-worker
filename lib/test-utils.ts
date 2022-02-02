@@ -594,7 +594,7 @@ export async function webhookScenario(
 	},
 	options: {
 		source: string;
-		baseUrl: string;
+		baseUrl: string | RegExp;
 		uriPath: RegExp;
 		basePath: string;
 		isAuthorized: (request: any) => any;
