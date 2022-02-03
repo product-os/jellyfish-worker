@@ -1,4 +1,18 @@
 - commits:
+    - subject: Export `sync/oauth`
+      hash: 012d3a4b92404b5c34f344e323ad7d48ce74fc29
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 18.4.0
+  title: Export `sync/oauth`
+  date: 2022-02-03T12:23:45.649Z
+- commits:
     - subject: Export sync errors alongside worker errors
       hash: f47604310a95183b3f58b5587193e21d4c371752
       body: ""
