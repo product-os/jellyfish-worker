@@ -42,6 +42,7 @@ export {
 	errors as syncErrors,
 	Integration,
 	IntegrationDefinition,
+	oauth,
 	SequenceItem,
 } from './sync';
 export {
