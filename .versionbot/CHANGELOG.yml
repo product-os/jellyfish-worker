@@ -1,4 +1,18 @@
 - commits:
+    - subject: Allow querystring requests
+      hash: feb5a7aa31d5c04d64b44a4b34d0ebd818f0694c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.4.3
+  title: "'Allow querystring requests'"
+  date: 2022-02-04T05:33:11.855Z
+- commits:
     - subject: Update internal-patch
       hash: 1a70e478a1e00b3afb333037e01272cbccf7fd96
       body: ""
