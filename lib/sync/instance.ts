@@ -25,17 +25,24 @@ const httpRequest = async <T = any>(
 		data?: {
 			[key: string]: any;
 		};
+		useQuerystring?: boolean;
 	},
 	retries = 30,
 ): Promise<{ code: number; body: T }> => {
 	try {
+		const path =
+			options.useQuerystring && options.data
+				? `${options.uri}?${new URLSearchParams(options.data).toString()}`
+				: options.uri;
+		const url = new URL(path, options.baseUrl);
+
 		const result = await axios({
 			method: options.method,
-			baseURL: options.baseUrl,
-			url: options.uri,
-			headers: options.headers || {},
-			data: options.data || {},
+			url: url.href,
+			headers: options.headers,
+			data: options.useQuerystring ? undefined : options.data,
 		});
+
 		return {
 			code: result.status,
 			body: result.data,
