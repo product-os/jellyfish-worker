@@ -48,9 +48,9 @@
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.13",
     "@balena/jellyfish-core": "^14.2.3",
-    "@balena/jellyfish-jellyscript": "^5.1.28",
+    "@balena/jellyfish-jellyscript": "^5.1.29",
     "@balena/jellyfish-logger": "^4.0.32",
-    "@balena/jellyfish-queue": "^4.0.28",
+    "@balena/jellyfish-queue": "^4.0.29",
     "axios": "^0.25.0",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
