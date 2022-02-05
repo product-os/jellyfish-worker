@@ -283,14 +283,13 @@ export const newContext = async (
 			},
 		});
 
-		await flushAll(session);
+		await flush(session);
 		const result: any = await queueTestContext.queue.producer.waitResults(
 			queueTestContext.logContext,
 			req,
 		);
 		expect(result.error).toBe(false);
 		assert(result.data);
-		await flushAll(session);
 		const contract = (await queueTestContext.kernel.getContractById(
 			queueTestContext.logContext,
 			queueTestContext.session,
@@ -342,7 +341,7 @@ export const newContext = async (
 			},
 		);
 		assert(inserted);
-		await flushAll(session);
+		await flush(session);
 
 		const link = await queueTestContext.kernel.getContractById<LinkContract>(
 			queueTestContext.logContext,
