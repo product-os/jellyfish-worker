@@ -1,4 +1,18 @@
 - commits:
+    - subject: Speed up translate test runner
+      hash: 2bfd0852fc288db79ec98f5b38413fe495437a38
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.4.4
+  title: "'Speed up translate test runner'"
+  date: 2022-02-05T01:34:37.835Z
+- commits:
     - subject: Allow querystring requests
       hash: feb5a7aa31d5c04d64b44a4b34d0ebd818f0694c
       body: ""
