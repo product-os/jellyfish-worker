@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add translateAfterAll
+      hash: 6cbd70915807e235decde8c9740efdb2c38ab5e7
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.5.0
+  title: "'Add translateAfterAll'"
+  date: 2022-02-05T10:44:33.065Z
+- commits:
     - subject: Simplify test:integration npm script
       hash: 48c4385b9ef48eb2145007862bbf35ca7abb85e6
       body: |
