@@ -572,6 +572,14 @@ export async function translateAfterEach(context: TestContext) {
 }
 
 /**
+ * @summary Tasks to be executed after all translate tests
+ * @function
+ */
+export function translateAfterAll() {
+	nock.enableNetConnect();
+}
+
+/**
  * Simulate a webhook against a nocked endpoint and check
  * translate results against expected values.
  *
