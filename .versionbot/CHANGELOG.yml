@@ -1,4 +1,20 @@
 - commits:
+    - subject: Simplify test:integration npm script
+      hash: 48c4385b9ef48eb2145007862bbf35ca7abb85e6
+      body: |
+        Recent changes make the extra
+        jest flags unnecessary
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.4.8
+  title: "'Simplify test:integration npm script'"
+  date: 2022-02-05T09:04:40.229Z
+- commits:
     - subject: Update internal-patch
       hash: 5277767d05d85c4622ae4deea58f63d77003a0ef
       body: ""
