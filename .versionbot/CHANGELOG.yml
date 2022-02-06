@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch
+      hash: 5a0f7e696612424ce39f810de426872c9faf6634
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 18.5.5
+  title: "'Update internal-patch'"
+  date: 2022-02-06T14:26:54.338Z
+- commits:
     - subject: Set LOGLEVEL=error for sut
       hash: 881cd764083ec451dc9c7194f1ef93c27eba2f10
       body: ""
