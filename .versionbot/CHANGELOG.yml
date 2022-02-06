@@ -1,4 +1,18 @@
 - commits:
+    - subject: Set LOGLEVEL=error for sut
+      hash: 881cd764083ec451dc9c7194f1ef93c27eba2f10
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.5.4
+  title: "'Set LOGLEVEL=error for sut'"
+  date: 2022-02-06T12:17:31.493Z
+- commits:
     - subject: Optimize postgres for tests
       hash: 97542aa58ca8250fbb0cdf76260b295854779600
       body: ""
