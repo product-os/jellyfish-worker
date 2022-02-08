@@ -37,7 +37,7 @@ import type {
 } from './types';
 import * as utils from './utils';
 
-export { actions, triggersLib, errors, CARDS, utils, Transformer };
+export { actions, triggersLib, errors, CARDS, utils, Transformer, Sync };
 export {
 	errors as syncErrors,
 	Integration,
