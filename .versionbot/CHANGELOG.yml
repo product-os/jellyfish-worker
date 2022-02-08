@@ -1,4 +1,16 @@
 - commits:
+    - subject: Export Transformer type
+      hash: 12dc0372218f8a89de764384e86ca93b2abfebae
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: karaxuna
+      nested: []
+  version: 18.6.0
+  title: "'Export Transformer and Sync types'"
+  date: 2022-02-08T15:50:57.879Z
+- commits:
     - subject: Update internal-patch
       hash: 5a0f7e696612424ce39f810de426872c9faf6634
       body: ""
