@@ -27,7 +27,7 @@ import CARDS from './contracts';
 import * as errors from './errors';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
-import * as transformerLib from './transformers';
+import { Transformer, evaluate as evaluateTransformers } from './transformers';
 import * as triggersLib from './triggers';
 import type {
 	Action,
@@ -37,7 +37,7 @@ import type {
 } from './types';
 import * as utils from './utils';
 
-export { actions, triggersLib, errors, CARDS, utils };
+export { actions, triggersLib, errors, CARDS, utils, Transformer };
 export {
 	errors as syncErrors,
 	Integration,
@@ -159,8 +159,8 @@ export class Worker {
 	consumer: Consumer;
 	producer: Producer;
 	triggers: TriggeredActionContract[];
-	transformers: transformerLib.Transformer[];
-	latestTransformers: transformerLib.Transformer[];
+	transformers: Transformer[];
+	latestTransformers: Transformer[];
 	typeContracts: { [key: string]: TypeContract };
 	session: string;
 	library: Map<Action>;
@@ -717,7 +717,7 @@ export class Worker {
 	 * this.updateLatestTransformers()
 	 */
 	updateLatestTransformers() {
-		const transformersMap: { [slug: string]: transformerLib.Transformer } = {};
+		const transformersMap: { [slug: string]: Transformer } = {};
 		this.transformers.forEach((tf) => {
 			const majorV = semver.major(tf.version) || 1; // we treat 0.x.y versions as "drafts" of 1.x.y versions
 			const slugMajV = `${tf.slug}@${majorV}`;
@@ -747,10 +747,7 @@ export class Worker {
 	 * worker.settransformers([ ... ])
 	 */
 	// TS-TODO: Make transformers a core cotnract and type them correctly here
-	setTransformers(
-		logContext: LogContext,
-		transformerContracts: transformerLib.Transformer[],
-	) {
+	setTransformers(logContext: LogContext, transformerContracts: Transformer[]) {
 		logger.info(logContext, 'Setting transformers', {
 			count: transformerContracts.length,
 		});
@@ -808,10 +805,7 @@ export class Worker {
 	 * const worker = new Worker({ ... })
 	 * worker.upserttransformer({ ... })
 	 */
-	upsertTransformer(
-		logContext: LogContext,
-		transformer: transformerLib.Transformer,
-	) {
+	upsertTransformer(logContext: LogContext, transformer: Transformer) {
 		logger.info(logContext, 'Upserting transformer', {
 			slug: transformer.slug,
 		});
@@ -1194,7 +1188,7 @@ export class Worker {
 			return null;
 		}
 
-		transformerLib.evaluate({
+		evaluateTransformers({
 			transformers: this.latestTransformers,
 			oldCard: current,
 			newCard: insertedCard,
