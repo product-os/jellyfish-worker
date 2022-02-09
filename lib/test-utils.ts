@@ -10,7 +10,7 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import { ExecuteContract } from '@balena/jellyfish-types/build/queue';
 import _ from 'lodash';
-import Combinatorics = require('js-combinatorics/commonjs/combinatorics');
+import permutations from 'just-permutations';
 import nock from 'nock';
 import path from 'path';
 import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
@@ -419,22 +419,6 @@ interface Variation {
 	combination: any[];
 }
 
-class PermutationCombination {
-	public seed: string[];
-
-	constructor(seed: string[]) {
-		this.seed = [...seed];
-	}
-
-	[Symbol.iterator]() {
-		return (function* (it) {
-			for (let index = 1, l = it.length; index <= l; index++) {
-				yield* new Combinatorics.Permutation(it, index);
-			}
-		})(this.seed);
-	}
-}
-
 export const tailSort = [
 	(card: Contract) => {
 		return card.data.timestamp;
@@ -455,7 +439,7 @@ export const tailSort = [
 export function getVariations(sequence: any, options: any): Variation[] {
 	const invariant = _.last(sequence);
 	return (
-		Array.from(new PermutationCombination(sequence))
+		permutations(sequence)
 			.filter((combination) => {
 				return _.includes(combination, invariant);
 			})
