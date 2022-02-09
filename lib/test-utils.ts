@@ -9,8 +9,8 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import { ExecuteContract } from '@balena/jellyfish-types/build/queue';
-import { Permutation } from 'js-combinatorics/commonjs/combinatorics';
 import _ from 'lodash';
+import Combinatorics = require('js-combinatorics/commonjs/combinatorics');
 import nock from 'nock';
 import path from 'path';
 import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
@@ -429,7 +429,7 @@ class PermutationCombination {
 	[Symbol.iterator]() {
 		return (function* (it) {
 			for (let index = 1, l = it.length; index <= l; index++) {
-				yield* new Permutation(it, index);
+				yield* new Combinatorics.Permutation(it, index);
 			}
 		})(this.seed);
 	}
