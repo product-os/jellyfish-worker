@@ -1,4 +1,21 @@
 - commits:
+    - subject: "test-utils: Use different permutation module"
+      hash: 8ccb2df12ca9c542eb0009b9a9cc513ce6d54be8
+      body: |
+        JS-combinatorics has a number of issues when trying to use the work
+        inside a service, due to its variable interface (commonjs vs umd).
+        Switching to a simpler module should help with this issue.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 18.6.4
+  title: "'test-utils: Use different permutation module'"
+  date: 2022-02-09T14:22:47.675Z
+- commits:
     - subject: Update @balena/jellyfish-core from 14.2.4 to 14.3.0
       hash: 3fee44601c8139033933432883ec22e46f30744f
       body: ""
