@@ -1,4 +1,18 @@
 - commits:
+    - subject: ACTUALLY import from the root of `js-combinatorics`
+      hash: ed2b7ab52ae72ba54e4ce5ba2b6af586e5c535ee
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 18.6.2
+  title: "'ACTUALLY import from the root of '"
+  date: 2022-02-09T13:40:38.830Z
+- commits:
     - subject: Import from the root of `js-combinatorics`
       hash: 46ebc976d37f5524fb067dafe1eabdf8acfe33a1
       body: ""
