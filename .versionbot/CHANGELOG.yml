@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update resinci/jellyfish-test Docker tag to v1.4.24
+      hash: 3e87fd22475e021ec0ae7ec67ad925f98f3af413
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 18.6.5
+  title: "'Update resinci/jellyfish-test Docker tag to v1.4.24'"
+  date: 2022-02-10T08:40:19.233Z
+- commits:
     - subject: "test-utils: Use different permutation module"
       hash: 8ccb2df12ca9c542eb0009b9a9cc513ce6d54be8
       body: |
