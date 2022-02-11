@@ -1,5 +1,6 @@
 import type { LogContext } from '@balena/jellyfish-logger';
 import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { Method } from 'axios';
 import type { Operation } from 'fast-json-patch';
 import type { Map } from '../types';
 import type { SyncActionContext } from './sync-context';
@@ -59,6 +60,20 @@ export interface Integration {
 	getFile?: (file: string) => Promise<Buffer>;
 }
 
+export interface HttpRequestOptions {
+	method: Method;
+	baseUrl: string;
+	json?: boolean;
+	uri: string;
+	headers?: {
+		[key: string]: string;
+	};
+	data?: {
+		[key: string]: any;
+	};
+	useQuerystring?: boolean;
+}
+
 export interface IntegrationInitializationOptions {
 	token: any;
 	defaultUser: string;
@@ -70,8 +85,8 @@ export interface IntegrationInitializationOptions {
 		getElementById: SyncActionContext['getElementById'];
 		getElementByMirrorId: SyncActionContext['getElementByMirrorId'];
 		request: (
-			actor: boolean,
-			requestOptions: any,
+			actor: string,
+			requestOptions: HttpRequestOptions,
 		) => Promise<{ code: number; body: any }>;
 		getActorId: (information: ActorInformation) => Promise<string>;
 	};

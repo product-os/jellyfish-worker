@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import type { Contract } from '@balena/jellyfish-types/build/core';
-import axios, { Method } from 'axios';
+import axios from 'axios';
 import Bluebird from 'bluebird';
 import _ from 'lodash';
 import * as errors from './errors';
@@ -8,26 +8,15 @@ import * as oauth from './oauth';
 import type { SyncActionContext } from './sync-context';
 import type {
 	ActorInformation,
+	HttpRequestOptions,
 	Integration,
 	IntegrationDefinition,
 	PipelineOpts,
 } from './types';
 
 const httpRequest = async <T = any>(
-	options: {
-		method: Method;
-		baseUrl: string;
-		json?: boolean;
-		uri: string;
-		headers?: {
-			[key: string]: string;
-		};
-		data?: {
-			[key: string]: any;
-		};
-		useQuerystring?: boolean;
-	},
-	retries = 30,
+	options: HttpRequestOptions,
+	retries: number = 30,
 ): Promise<{ code: number; body: T }> => {
 	try {
 		const path =
@@ -247,7 +236,7 @@ export const run = async (
 			getElementBySlug: options.context.getElementBySlug,
 			getElementById: options.context.getElementById,
 			getElementByMirrorId: options.context.getElementByMirrorId,
-			request: async (actor: boolean, requestOptions: any) => {
+			request: async (actor: string, requestOptions: HttpRequestOptions) => {
 				assert.INTERNAL(
 					null,
 					actor,
