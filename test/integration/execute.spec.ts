@@ -65,6 +65,79 @@ describe('.execute()', () => {
 		expect(card.data.foo).toBe('bar');
 	});
 
+	test('should safely handle circular references in action handler errors', async () => {
+		const typeCard = await ctx.kernel.getContractBySlug(
+			ctx.logContext,
+			ctx.session,
+			'card@latest',
+		);
+
+		assert(typeCard !== null);
+
+		// Add our test action and handler function
+		const slug = 'action-throw-circular-error';
+		await ctx.kernel.replaceContract(ctx.logContext, ctx.session, {
+			slug,
+			version: '1.0.0',
+			type: 'action@1.0.0',
+			name: 'Action Throw Circular Error',
+			data: {
+				filter: {
+					type: 'object',
+				},
+				arguments: {
+					reason: {
+						type: ['null', 'string'],
+					},
+					properties: {
+						type: 'object',
+					},
+				},
+			},
+		});
+
+		ctx.worker.library[slug] = {
+			handler: async (_session, _context, _typeContract, _request) => {
+				const err = new Error('circular error');
+				(err as any).circularRef = err;
+				throw err;
+			},
+		};
+
+		const request = await ctx.queue.producer.enqueue(
+			ctx.worker.getId(),
+			ctx.session,
+			{
+				action: `${slug}@1.0.0`,
+				logContext: ctx.logContext,
+				card: typeCard.id,
+				type: typeCard.type,
+				arguments: {
+					reason: null,
+					properties: {
+						slug: coreTestUtils.generateRandomSlug({ prefix: 'execute-test' }),
+						version: '1.0.0',
+						data: {
+							foo: 'bar',
+						},
+					},
+				},
+			},
+		);
+
+		try {
+			await ctx.flush(ctx.session);
+		} catch (err) {
+			// we're expecting an error here, so just ignore it
+		}
+		const result: any = await ctx.queue.producer.waitResults(
+			ctx.logContext,
+			request,
+		);
+
+		expect(result.error).toBe(true);
+	});
+
 	test('should execute a triggered action given a matching mode', async () => {
 		const typeCard = await ctx.kernel.getContractBySlug(
 			ctx.logContext,

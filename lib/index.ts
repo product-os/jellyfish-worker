@@ -15,7 +15,7 @@ import type {
 	ContractData,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import * as errio from 'errio';
+import { serializeError } from 'serialize-error';
 import * as _ from 'lodash';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -1073,9 +1073,7 @@ export class Worker {
 			};
 		} catch (error: any) {
 			const endDate = new Date();
-			const errorObject = errio.toObject(error, {
-				stack: true,
-			});
+			const errorObject = serializeError(error, { maxDepth: 5 });
 
 			const logData = {
 				error: errorObject,
@@ -1260,9 +1258,7 @@ export class Worker {
 				},
 			})
 			.catch((error) => {
-				const errorObject = errio.toObject(error, {
-					stack: true,
-				});
+				const errorObject = serializeError(error, { maxDepth: 5 });
 
 				const logData = {
 					error: errorObject,
@@ -1349,9 +1345,7 @@ export class Worker {
 						}),
 					);
 				} catch (error: any) {
-					const errorObject = errio.toObject(error, {
-						stack: true,
-					});
+					const errorObject = serializeError(error, { maxDepth: 5 });
 
 					const logData = {
 						error: errorObject,
