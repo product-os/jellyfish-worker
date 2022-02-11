@@ -6,13 +6,13 @@ import type { Map } from '../types';
 import type { SyncActionContext } from './sync-context';
 
 export interface ActorInformation {
-	handle: any;
-	email: any;
-	title: any;
-	company: any;
-	country: any;
-	city: any;
-	active: any;
+	handle: string;
+	email?: string;
+	title?: string;
+	company?: string;
+	country?: string;
+	city?: string;
+	active?: boolean;
 }
 
 export interface PipelineOpts {

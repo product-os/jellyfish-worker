@@ -337,6 +337,9 @@ export const run = async (
 				options.context.log.info('Creating sync actor', information);
 
 				const username = information.handle || information.email;
+				if (!username) {
+					throw new Error("Can't get an actor id without a handle or email");
+				}
 				const translatedUsername = getUsername(username.toLowerCase());
 				const slug = translatedUsername
 					.toLowerCase()
