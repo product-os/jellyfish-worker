@@ -1,4 +1,29 @@
 - commits:
+    - subject: "oauth: Fix bug where http request failures are not handled correctly"
+      hash: 2f969635c767f505a213b3828836aab9c85401b9
+      body: >
+        If a request to an external resource returns a failure code, the code
+
+        should be returned as-is. The axios behaviour is to throw on a status
+
+        code > 300, compared to the deprecated request package, which would just
+
+        return the status code in its callback params.
+
+        The rest of the code actually expects the >= 300 error codes and even has
+
+        logic to handle them sanely.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 18.6.9
+  title: "'Oauth: Fix bug where http request failures are not handled correctly'"
+  date: 2022-02-11T13:59:57.372Z
+- commits:
     - subject: Fix error when handling circular references in error objects
       hash: b129cde1400bbc0eb61ef0a8adabb868828f105e
       body: >
