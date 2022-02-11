@@ -1,4 +1,22 @@
 - commits:
+    - subject: "Sync: Improve type safety of SyncContext.request method"
+      hash: f5fb1bfe6db1a71e700036170e15ecd7c6f12802
+      body: |
+        Previously, the `request` method incorrectly typed the `actor` parameter
+        as a boolean, when it's actually a string, and even worse, cast the
+        request options argument as `any`.
+        This change also exports useful types for use by integrations.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 18.6.10
+  title: "'Sync: Improve type safety of SyncContext.request method'"
+  date: 2022-02-11T17:00:14.884Z
+- commits:
     - subject: "oauth: Fix bug where http request failures are not handled correctly"
       hash: 2f969635c767f505a213b3828836aab9c85401b9
       body: >
