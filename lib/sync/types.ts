@@ -13,6 +13,10 @@ export interface ActorInformation {
 	country?: string;
 	city?: string;
 	active?: boolean;
+	name?: {
+		first?: string;
+		last?: string;
+	};
 }
 
 export interface PipelineOpts {
