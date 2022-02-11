@@ -935,7 +935,9 @@ export class Worker {
 	 * console.log(result.data)
 	 */
 	async execute(session: string, request: ActionRequestContract) {
-		const logContext = { id: request.data.context || `EXECUTE-${request.id}` };
+		const logContext: LogContext = request.data.context || {
+			id: `EXECUTE-${request.id}`,
+		};
 		logger.info(logContext, 'Executing request', {
 			request: {
 				id: request.id,
