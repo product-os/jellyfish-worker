@@ -10,9 +10,23 @@ import * as instance from './instance';
 import * as oauth from './oauth';
 import * as pipeline from './pipeline';
 import * as syncContext from './sync-context';
-import type { Integration, IntegrationDefinition, SequenceItem } from './types';
+import type {
+	Integration,
+	IntegrationDefinition,
+	IntegrationInitializationOptions,
+	HttpRequestOptions,
+	SequenceItem,
+} from './types';
 
-export { errors, Integration, IntegrationDefinition, oauth, SequenceItem };
+export {
+	errors,
+	Integration,
+	IntegrationDefinition,
+	IntegrationInitializationOptions,
+	HttpRequestOptions,
+	oauth,
+	SequenceItem,
+};
 
 /**
  * Jellyfish sync library module.
