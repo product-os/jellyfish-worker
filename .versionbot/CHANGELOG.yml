@@ -1,4 +1,44 @@
 - commits:
+    - subject: Fix error when handling circular references in error objects
+      hash: b129cde1400bbc0eb61ef0a8adabb868828f105e
+      body: >
+        Previously, if an action handler threw an error containing a circular
+        reference,
+
+        because errio doesn't handle circular references when serializing the
+
+        error, the kernel would attempt to insert the circular object and cause
+
+        a fatal error.
+
+        Switching from errio to serialize-error makes this code much safer, as
+
+        well as moving us away from errio, which has been deprecated (the GitHub
+
+        repo is actually archived). A confounder is that serialize-error@9.x is
+
+        an esm module, which makes integrating it into our dependency tree a bit
+
+        of a pain. For now I've opted to use serialize-error@8.x which is
+
+        a commonJS package and should play nicely. I would definitely consider
+
+        upgrading the tree to esm modules in the future.
+
+        See:
+
+        - https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 18.6.8
+  title: "'Fix error when handling circular references in error objects'"
+  date: 2022-02-11T13:35:54.246Z
+- commits:
     - subject: Update internal-patch
       hash: 6b3075957c210cf19ed827e117ad7bfe1094a8c3
       body: ""
