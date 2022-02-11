@@ -369,4 +369,20 @@ describe('oauth', () => {
 			).rejects.toThrow(oauth.OAuthInvalidOption);
 		});
 	});
+
+	describe('.request()', () => {
+		it('should not throw when given a stauts code > 300', async () => {
+			const code = 401;
+			const body = 'Unauthorized';
+			nock('http://www.example.com').post('/resource').reply(code, body);
+
+			const result = await oauth.request(null, {
+				baseUrl: 'http://www.example.com',
+				uri: '/resource',
+				form: 'foobar',
+			});
+
+			expect(result.code).toEqual(code);
+		});
+	});
 });
