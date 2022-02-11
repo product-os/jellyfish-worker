@@ -5,7 +5,6 @@ import _ from 'lodash';
 import qs from 'qs';
 import { TypedError } from 'typed-error';
 import url from 'url';
-import * as errors from './errors';
 
 export class OAuthInvalidOption extends TypedError {}
 export class OAuthRequestError extends TypedError {}
@@ -59,17 +58,16 @@ export const request = async (
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {
 			// Automatically retry on server failures
-			if (error.response.status >= 500) {
-				assert.USER(
-					null,
-					retries > 0,
-					errors.SyncExternalRequestError,
-					`External service responded with ${error.response.status} to OAuth request`,
-				);
-
+			if (error.response.status >= 500 && retries > 0) {
 				await Bluebird.delay(2000);
 				return request(accessToken, options, retries - 1);
 			}
+
+			// Return the status code and result body for the calling function to handle
+			return {
+				code: error.response.status,
+				body: error.response.data,
+			};
 		}
 		throw error;
 	}
