@@ -77,7 +77,6 @@
     "@types/bluebird": "^3.5.36",
     "@types/is-uuid": "^1.0.0",
     "@types/jest": "^27.4.0",
-    "@types/js-combinatorics": "^1.2.0",
     "@types/lodash": "^4.14.178",
     "@types/semver": "^7.3.9",
     "@types/sinon": "^10.0.11",
