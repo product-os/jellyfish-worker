@@ -51,7 +51,7 @@
     "@balena/jellyfish-jellyscript": "^5.1.32",
     "@balena/jellyfish-logger": "^4.0.35",
     "@balena/jellyfish-queue": "^4.0.38",
-    "axios": "^0.25.0",
+    "axios": "^0.26.0",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
     "fast-equals": "^2.0.4",
