@@ -1441,4 +1441,213 @@ describe('.insertCard()', () => {
 
 		expect(testContractAfterUpdate.data.linkedProperty).toEqual(magicNumber);
 	});
+
+	test('should correctly evaluate formula that consumes contract.links["..."] formula field', async () => {
+		// This test
+		// * creates a new type with a link formula and a formula that references this field
+		// * creates two contracts
+		// * links the two contracts
+		// * updates the contract that was linked from
+		// * checks if formula in linked to contract was updated
+
+		const typeType = await ctx.kernel.getContractBySlug<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			'type@latest',
+		);
+		const linkType = (await ctx.kernel.getContractBySlug<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			'link@latest',
+		))!;
+
+		assert(typeType !== null);
+
+		const typeSlug = coreTestUtils.generateRandomSlug();
+		const initialValue = 1;
+		const propValueBeforeUpdate = 2;
+		const magicNumber = 13;
+
+		const newType = (await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			typeType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				slug: typeSlug,
+				version: '1.0.0',
+				data: {
+					schema: {
+						type: 'object',
+						properties: {
+							type: {
+								type: 'string',
+								const: `${typeSlug}@1.0.0`,
+							},
+							data: {
+								type: 'object',
+								properties: {
+									dependentProperty: {
+										type: 'string',
+										$$formula: `
+												(contract.data.linkedProperty || 0) > 10 ? 
+													'greater than 10!' : 
+													'less than 10!'
+											`,
+									},
+									linkedProperty: {
+										type: 'number',
+										$$formula:
+											'contract.links["was built from"].length && contract.links["was built from"][0].data.prop',
+									},
+								},
+								additionalProperties: true,
+							},
+						},
+						additionalProperties: true,
+						required: ['type', 'data'],
+					},
+				},
+			},
+		))! as TypeContract;
+
+		// Wait for the formula trigger to be registered
+		await ctx.waitForMatch({
+			type: 'object',
+			additionalProperties: true,
+			required: ['active', 'type'],
+			properties: {
+				active: {
+					type: 'boolean',
+					const: true,
+				},
+				type: {
+					type: 'string',
+					const: 'triggered-action@1.0.0',
+				},
+				data: {
+					type: 'object',
+					required: ['type'],
+					properties: {
+						type: {
+							type: 'string',
+							const: `${typeSlug}@1.0.0`,
+						},
+					},
+				},
+			},
+		});
+
+		const testContract = (await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			newType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				data: {
+					otherProp: 42,
+					linkedProperty: initialValue, // should get overwritten immediately
+				},
+			},
+		))!;
+
+		const linkedContract = (await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			newType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				data: {
+					otherProp: 23,
+					prop: propValueBeforeUpdate,
+				},
+			},
+		))!;
+
+		await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			linkType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				name: 'was built into',
+				data: {
+					inverseName: 'was built from',
+					from: {
+						id: linkedContract.id,
+						slug: linkedContract.slug,
+						type: linkedContract.type,
+					},
+					to: {
+						id: testContract.id,
+						slug: testContract.slug,
+						type: testContract.type,
+					},
+				},
+			},
+		);
+
+		await ctx.worker.patchCard(
+			ctx.logContext,
+			ctx.session,
+			newType,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				attachEvents: false,
+				reason: 'random change that should cause triggered action to run',
+			},
+			linkedContract,
+			[{ op: 'replace', path: '/data/prop', value: magicNumber }],
+		);
+
+		await ctx.flushAll(ctx.session);
+
+		const testContractAfterUpdate = await ctx.waitForMatch({
+			type: 'object',
+			additionalProperties: true,
+			required: ['id'],
+			properties: {
+				id: {
+					type: 'string',
+					const: testContract.id,
+				},
+				data: {
+					type: 'object',
+					required: ['linkedProperty'],
+					properties: {
+						linkedProperty: {
+							type: 'number',
+							const: magicNumber,
+						},
+					},
+				},
+			},
+		});
+
+		expect(testContractAfterUpdate.data.linkedProperty).toEqual(magicNumber);
+		expect(testContractAfterUpdate.data.dependentProperty).toEqual(
+			'greater than 10!',
+		);
+	});
 });
