@@ -1,4 +1,24 @@
 - commits:
+    - subject: Update resinci/jellyfish-test from v1.4.25 to v1.4.26
+      hash: ce6b50aad4bdeda112807aa904481f3d45202ba1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Update dependencies (external v0 minor bumps)
+      hash: 2a139cc7601ed9627ea99452d4d07654b9d0d656
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 18.6.19
+  title: "'Update resinci/jellyfish-test from v1.4.25 to v1.4.26'"
+  date: 2022-02-15T01:03:30.792Z
+- commits:
     - subject: Remove unused js-combinatorics types package
       hash: a4ef2d1f670b8434acb9b4ab9fb92947c5fc9836
       body: |
