@@ -1,4 +1,22 @@
 - commits:
+    - subject: Ensure that formulas are evaluated in the correct order
+      hash: 936753854e78b391a619ac602d2b66576b8a1cf5
+      body: |
+        Fixes https://github.com/product-os/jellyfish-worker/issues/1360
+
+        This change fixes a bug where formulas that have output dependent on
+        another formula field don't update correctly.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 18.6.22
+  title: "'Ensure that formulas are evaluated in the correct order '"
+  date: 2022-02-15T12:21:07.395Z
+- commits:
     - subject: Update internal-patch
       hash: 2f35f71f334884091e7798bc6e7d020252907552
       body: ""
