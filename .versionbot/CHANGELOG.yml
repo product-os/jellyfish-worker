@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update resinci/jellyfish-test from v1.4.26 to v1.4.27
+      hash: f6073980b81a387ef2981bd8cd886b6c7210559c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 18.6.23
+  title: "'Update resinci/jellyfish-test from v1.4.26 to v1.4.27'"
+  date: 2022-02-15T21:12:24.654Z
+- commits:
     - subject: Ensure that formulas are evaluated in the correct order
       hash: 936753854e78b391a619ac602d2b66576b8a1cf5
       body: |
