@@ -104,7 +104,6 @@ export const getActionContext = (
 
 			return map ? map.remote : username;
 		},
-
 		// The upsertElement function has the property of being eventually
 		// consistent, sanely handling two seperate sync events on a new
 		// object with the same slug. If an ID is provided we don't need to do any
@@ -234,6 +233,43 @@ export const getActionContext = (
 				current,
 				patch,
 			);
+		},
+		getContactByEmail: async (email: string): Promise<Contract | null> => {
+			const [contact] = await workerContext.query(
+				workerContext.privilegedSession,
+				{
+					type: 'object',
+					required: ['active', 'type', 'data'],
+					properties: {
+						type: {
+							const: 'contact@1.0.0',
+						},
+						active: {
+							const: true,
+						},
+						data: {
+							type: 'object',
+							required: ['profile'],
+							properties: {
+								profile: {
+									type: 'object',
+									required: ['email'],
+									properties: {
+										email: {
+											const: email,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					limit: 1,
+				},
+			);
+
+			return contact || null;
 		},
 		getElementBySlug: async (slug: string, usePrivilegedSession = false) => {
 			return workerContext.getCardBySlug(
