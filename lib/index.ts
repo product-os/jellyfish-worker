@@ -15,23 +15,26 @@ import type {
 	ContractData,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import { serializeError } from 'serialize-error';
-import * as _ from 'lodash';
+import { parseExpression } from 'cron-parser';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
+import _ from 'lodash';
+import * as semver from 'semver';
+import { serializeError } from 'serialize-error';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
-import * as semver from 'semver';
 import { actions } from './actions';
 import CARDS from './contracts';
 import * as errors from './errors';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
-import { Transformer, evaluate as evaluateTransformers } from './transformers';
+import { evaluate as evaluateTransformers, Transformer } from './transformers';
 import * as triggersLib from './triggers';
 import type {
 	Action,
 	Map,
+	ScheduledActionContract,
+	ScheduledActionData,
 	TriggeredActionContract,
 	WorkerContext,
 } from './types';
@@ -149,6 +152,59 @@ export async function getObjectWithLinks<
 	});
 
 	return cardWithLinks as PContract;
+}
+
+/**
+ * @summary Get the next execute date-time for a scheduled action
+ *
+ * @param {ScheduledActionData['schedule']} schedule - schedule configuration
+ * @returns {Date | null} next execution date, or null if no future date was found
+ */
+export function getNextExecutionDate(
+	schedule: ScheduledActionData['schedule'],
+): Date | null {
+	const now = new Date();
+	if (schedule.once) {
+		const next = new Date(schedule.once.date);
+		if (next > now) {
+			return schedule.once.date;
+		}
+	} else if (schedule.recurring) {
+		const endDate = new Date(schedule.recurring.end);
+		const startDate = new Date(schedule.recurring.start);
+
+		// Ignore anything that will have already ended
+		if (endDate > now) {
+			try {
+				// Handle future start dates
+				const options =
+					startDate > now
+						? {
+								currentDate: startDate,
+						  }
+						: {
+								startDate,
+						  };
+
+				// Create iterator based on provided configuration
+				const iterator = parseExpression(schedule.recurring.interval, {
+					endDate,
+					...options,
+				});
+
+				// Return next execution date if available
+				if (iterator.hasNext()) {
+					return iterator.next().toDate();
+				}
+			} catch (error) {
+				throw new errors.WorkerInvalidActionRequest(
+					`Invalid recurring schedule configuration: ${error}`,
+				);
+			}
+		}
+	}
+
+	return null;
 }
 
 /**
@@ -1069,6 +1125,13 @@ export class Worker {
 				time: endDate.getTime() - startDate.getTime(),
 			});
 
+			// Schedule actions for future execution
+			if (data && (data as any).type.split('@')[0] === 'scheduled-action') {
+				await this.scheduleAction(logContext, session, (data as any).id);
+			} else if (request.data.schedule) {
+				await this.scheduleAction(logContext, session, request.data.schedule);
+			}
+
 			result = {
 				error: false,
 				data,
@@ -1139,7 +1202,7 @@ export class Worker {
 	 * @param {Object} options - Options object
 	 * @param {Function} fn - an asynchronous function that will perform the operation
 	 */
-	// TS-TODO: Improve the tpyings for the `options` parameter
+	// TS-TODO: Improve the typings for the `options` parameter
 	private async commit(
 		logContext: LogContext,
 		session: string,
@@ -1514,5 +1577,46 @@ export class Worker {
 		}
 
 		return insertedCard;
+	}
+
+	/**
+	 * @sumary Enqueue an action to be executed later, using schedule configuration
+	 * @function
+	 *
+	 * @param {LogContext} logContext - log context
+	 * @param {String} session - session id
+	 * @param {String} id - scheduled action contract ID
+	 */
+	async scheduleAction(
+		logContext: LogContext,
+		session: string,
+		id: string,
+	): Promise<void> {
+		// Remove any already enqueued jobs
+		await this.producer.deleteJob(logContext, id);
+
+		// Enqueue request if schedule configuration results in future date
+		const scheduledAction =
+			await this.kernel.getContractById<ScheduledActionContract>(
+				logContext,
+				session,
+				id,
+			);
+		if (scheduledAction && scheduledAction.active) {
+			const runAt = getNextExecutionDate(scheduledAction.data.schedule);
+			if (runAt) {
+				await this.enqueueAction(session, {
+					logContext,
+					action: scheduledAction.data.options.action,
+					card: scheduledAction.data.options.card,
+					type: scheduledAction.data.options.type,
+					arguments: scheduledAction.data.options.arguments,
+					schedule: {
+						contract: id,
+						runAt,
+					},
+				});
+			}
+		}
 	}
 }
