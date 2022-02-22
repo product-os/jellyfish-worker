@@ -1,4 +1,18 @@
 - commits:
+    - subject: Fix execute success data checks
+      hash: 6f59ef095a8789bcf44e088118c631c27ec1ee89
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.7.1
+  title: "'Fix execute success data checks'"
+  date: 2022-02-22T06:53:55.195Z
+- commits:
     - subject: Add support for scheduled actions
       hash: 895eeb93477c954c113067431ce8dc3c80ece8c9
       body: ""
