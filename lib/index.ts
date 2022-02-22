@@ -1105,7 +1105,7 @@ export class Worker {
 
 			// TS-TODO: `input` gets verified as non-null by a jellyfish-assert
 			// call above, but Typescript doesn't understand this.
-			const data = await actionFunction(session, actionContext, input!, {
+			const data: any = await actionFunction(session, actionContext, input!, {
 				action: actionCard,
 				card: request.data.input.id,
 				actor: request.data.actor,
@@ -1126,8 +1126,13 @@ export class Worker {
 			});
 
 			// Schedule actions for future execution
-			if (data && (data as any).type.split('@')[0] === 'scheduled-action') {
-				await this.scheduleAction(logContext, session, (data as any).id);
+			if (
+				data &&
+				data.id &&
+				data.type &&
+				data.type.split('@')[0] === 'scheduled-action'
+			) {
+				await this.scheduleAction(logContext, session, data.id);
 			} else if (request.data.schedule) {
 				await this.scheduleAction(logContext, session, request.data.schedule);
 			}
