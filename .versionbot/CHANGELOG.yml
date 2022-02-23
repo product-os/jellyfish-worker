@@ -1,4 +1,32 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 7.0.0 to 8.0.0
+      hash: df442c3e0d9c4c6206287d135071d60a8124654a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Update external-major
+      hash: c7316ce8dbc7be7077a406820a6ae45334c0388d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Update internal-patch
+      hash: 0a1b8cd85676a56729231009683dd3b9e5140b7e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 18.8.2
+  title: "'Update @balena/jellyfish-environment from 7.0.0 to 8.0.0'"
+  date: 2022-02-23T20:32:33.699Z
+- commits:
     - subject: Update resinci/jellyfish-test from v2.0.2 to v2.0.4
       hash: 09ee3ecded8b0186d4ad34c8317c36507d13631c
       body: ""
