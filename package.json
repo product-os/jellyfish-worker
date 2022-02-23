@@ -55,7 +55,7 @@
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
     "cron-parser": "^4.2.0",
-    "fast-equals": "^2.0.4",
+    "fast-equals": "^3.0.0",
     "fast-json-patch": "^3.1.0",
     "iso8601-duration": "^1.3.0",
     "json-e": "^4.4.3",
@@ -64,7 +64,7 @@
     "nock": "^13.2.4",
     "qs": "^6.10.3",
     "semver": "^7.3.5",
-    "serialize-error": "^8.1.0",
+    "serialize-error": "^9.1.0",
     "skhema": "^6.0.3",
     "typed-error": "^3.2.1",
     "uuid": "^8.3.2"
