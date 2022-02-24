@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump internal jellyfish dependencies
+      hash: a61fb13c4f224e4389383c5070f456421023a070
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 18.8.3
+  title: "'Bump internal jellyfish dependencies'"
+  date: 2022-02-24T03:19:02.548Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 7.0.0 to 8.0.0
       hash: df442c3e0d9c4c6206287d135071d60a8124654a
       body: ""
