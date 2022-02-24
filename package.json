@@ -64,7 +64,7 @@
     "nock": "^13.2.4",
     "qs": "^6.10.3",
     "semver": "^7.3.5",
-    "serialize-error": "^9.1.0",
+    "serialize-error": "8.1.0",
     "skhema": "^6.0.3",
     "typed-error": "^3.2.1",
     "uuid": "^8.3.2"
