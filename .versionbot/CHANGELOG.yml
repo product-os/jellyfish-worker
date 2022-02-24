@@ -1,4 +1,27 @@
 - commits:
+    - subject: Pin serialize-error to 8.x
+      hash: 2fa065d1e41c387c47e310ed68d63af5ca31bf61
+      body: >
+        As described in
+
+        https://github.com/product-os/jellyfish-worker/pull/1348/commits/b129cde1400bbc0eb61ef0a8adabb868828f105e
+
+        serialize-error is an esm module as of v9.x which will be a big lift for
+
+        us to support across our stack. The original PR didn't pin the version,
+
+        which meant that renovate auto-updated it.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 18.8.4
+  title: "'Pin serialize-error to 8.x'"
+  date: 2022-02-24T09:30:38.732Z
+- commits:
     - subject: Bump internal jellyfish dependencies
       hash: a61fb13c4f224e4389383c5070f456421023a070
       body: ""
