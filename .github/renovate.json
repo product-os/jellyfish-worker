@@ -15,6 +15,10 @@
     {
       "matchPackageNames": ["resinci/jellyfish-test"],
       "groupName": "jellyfish-test-image"
+    },
+    {
+      "matchPackageNames": ["serialize-error"],
+      "enabled": false
     }
   ]
 }
