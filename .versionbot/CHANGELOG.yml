@@ -1,4 +1,24 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 8.0.0 to 9.1.0
+      hash: d26dd29a9fda93a3385875a7d9b0e6aa78f5fa32
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+    - subject: Update resinci/jellyfish-test from v2.0.4 to v2.0.5
+      hash: ec1170b7db3bb69a40d22d56ed961873c7e07797
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 18.8.5
+  title: "'Update @balena/jellyfish-environment from 8.0.0 to 9.1.0'"
+  date: 2022-02-25T05:49:41.972Z
+- commits:
     - subject: Pin serialize-error to 8.x
       hash: 2fa065d1e41c387c47e310ed68d63af5ca31bf61
       body: >
