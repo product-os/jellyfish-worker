@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump jellyfish-core, replace createLink helper
+      hash: 2fdd4bc1bc92d4b106e99c01fba8484e1f8775ec
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.0.0
+  title: "'Bump jellyfish-core, replace createLink helper'"
+  date: 2022-03-01T05:39:32.235Z
+- commits:
     - subject: Update internal-patch
       hash: 6d46d43db7597c8f9e06c14ad1315cafa41ae64a
       body: ""
