@@ -29,7 +29,7 @@ test.skip('Should generate a notification if an event is attached to a contract'
 		'Subscription to foo',
 		{},
 	);
-	await ctx.createLink(
+	await ctx.createLinkThroughWorker(
 		user.id,
 		session.id,
 		root,
