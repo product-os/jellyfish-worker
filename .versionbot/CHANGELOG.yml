@@ -1,4 +1,19 @@
 - commits:
+    - subject: "Renovate: Ignore serialize-error bumps for now"
+      hash: 5aef4be942c44568043024e271c3884cdc072c3f
+      body: |
+        Ignoring for now as serialize-error has moved to ESM
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.0.1
+  title: "'Renovate: Ignore serialize-error bumps for now'"
+  date: 2022-03-01T07:55:47.615Z
+- commits:
     - subject: Bump jellyfish-core, replace createLink helper
       hash: 2fdd4bc1bc92d4b106e99c01fba8484e1f8775ec
       body: ""
