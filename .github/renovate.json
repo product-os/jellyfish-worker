@@ -2,6 +2,7 @@
   "extends": [
     "github>product-os/renovate-config"
   ],
+  "ignoreDeps": ["serialize-error"],
   "packageRules": [
     {
       "matchDepTypes": [
