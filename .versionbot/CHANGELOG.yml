@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove jest esm transforms
+      hash: 28412a7c225a986cf1d305a482944e73e39f4139
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.0.2
+  title: "'Remove jest esm transforms'"
+  date: 2022-03-01T08:42:01.049Z
+- commits:
     - subject: "Renovate: Ignore serialize-error bumps for now"
       hash: 5aef4be942c44568043024e271c3884cdc072c3f
       body: |
