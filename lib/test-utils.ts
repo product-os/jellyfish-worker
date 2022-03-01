@@ -1,4 +1,3 @@
-import { strict as assert } from 'assert';
 import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
 import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
 import type {
@@ -9,14 +8,15 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import { ExecuteContract } from '@balena/jellyfish-types/build/queue';
-import _ from 'lodash';
+import { strict as assert } from 'assert';
 import permutations from 'just-permutations';
+import _ from 'lodash';
 import nock from 'nock';
 import path from 'path';
+import { CARDS, Worker } from '.';
 import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
 import { Sync } from './sync';
 import { Action, Map } from './types';
-import { CARDS, Worker } from '.';
 
 /**
  * Context that can be used in tests against the worker.
@@ -42,7 +42,7 @@ export interface TestContext extends queueTestUtils.TestContext {
 		body: string,
 		type: string,
 	) => Promise<any>;
-	createLink: (
+	createLinkThroughWorker: (
 		actor: string,
 		session: string,
 		fromCard: Contract,
@@ -301,7 +301,7 @@ export const newContext = async (
 		return contract;
 	};
 
-	const createLink = async (
+	const createLinkThroughWorker = async (
 		actor: string,
 		session: string,
 		fromCard: Contract,
@@ -400,7 +400,7 @@ export const newContext = async (
 		processAction,
 		retry,
 		createEvent,
-		createLink,
+		createLinkThroughWorker,
 		createContract,
 		worker,
 		...queueTestContext,
