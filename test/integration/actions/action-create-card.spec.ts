@@ -446,7 +446,7 @@ describe('action-create-card', () => {
 					},
 				} as any,
 			),
-		).rejects.toThrow(coreErrors.JellyfishPermissionsError);
+		).rejects.toThrow(coreErrors.JellyfishUnknownCardType);
 	});
 
 	test('users with no roles should not be able to create sessions for other users', async () => {
