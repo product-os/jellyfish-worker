@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump core and queue
+      hash: 18fc41896ee7eacf10d905c9c66571a7f0e1b814
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.0.6
+  title: "'Bump core and queue'"
+  date: 2022-03-04T08:56:46.177Z
+- commits:
     - subject: Bump types
       hash: f71d51d52e098f0e98bfce847afb3a324f7a4137
       body: ""
