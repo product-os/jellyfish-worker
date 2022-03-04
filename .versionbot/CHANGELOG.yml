@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update cron-parser from 4.2.0 to 4.2.1
+      hash: 837228b312e29b33d6f621111703d79f886aff0b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 19.0.4
+  title: "'Update cron-parser from 4.2.0 to 4.2.1'"
+  date: 2022-03-04T05:33:01.385Z
+- commits:
     - subject: Update guest user test
       hash: dd998f42f39c38ddfb3e80a9751708c4063d9c53
       body: ""
