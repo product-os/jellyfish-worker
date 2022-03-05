@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch
+      hash: b11fe8e368011e332a78a36c9fa984e5636e94f0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.0.8
+  title: "'Update internal-patch'"
+  date: 2022-03-05T12:52:36.147Z
+- commits:
     - subject: Update skhema from 6.0.3 to 6.0.6
       hash: d0c5c5bdd15c4017f1a44011a6f71df023fe18c5
       body: ""
