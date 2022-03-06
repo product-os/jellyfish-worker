@@ -47,10 +47,10 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.17",
-    "@balena/jellyfish-core": "^16.0.4",
+    "@balena/jellyfish-core": "^16.0.5",
     "@balena/jellyfish-jellyscript": "^5.1.46",
     "@balena/jellyfish-logger": "^5.0.4",
-    "@balena/jellyfish-queue": "^4.1.15",
+    "@balena/jellyfish-queue": "^4.1.16",
     "axios": "^0.26.0",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
