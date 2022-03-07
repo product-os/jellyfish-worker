@@ -48,7 +48,7 @@
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.18",
     "@balena/jellyfish-core": "^16.0.6",
-    "@balena/jellyfish-jellyscript": "^5.1.48",
+    "@balena/jellyfish-jellyscript": "5.2.0-switch-to-safe-eval-919de362035022c0a6b9c09bc1b66413ae4905b0",
     "@balena/jellyfish-logger": "^5.0.5",
     "@balena/jellyfish-queue": "^4.1.17",
     "axios": "^0.26.0",
