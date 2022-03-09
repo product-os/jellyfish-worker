@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update axios from 0.26.0 to 0.26.1
+      hash: 77d91d26f77125e2f9f4c3d889b1d20ed648e8d8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.0.20
+  title: "'Update axios from 0.26.0 to 0.26.1'"
+  date: 2022-03-09T23:16:44.931Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 5.1.51 to 5.2.1
       hash: 6bc2e3659980d1ab7c6548456eebc50653bd58ed
       body: ""
