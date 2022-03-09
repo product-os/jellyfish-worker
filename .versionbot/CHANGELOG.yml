@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 5.1.51 to 5.2.1
+      hash: 6bc2e3659980d1ab7c6548456eebc50653bd58ed
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 19.0.19
+  title: "'Update @balena/jellyfish-jellyscript from 5.1.51 to 5.2.1'"
+  date: 2022-03-09T13:54:09.914Z
+- commits:
     - subject: Update internal-patch
       hash: 472501170acc5e0f76838f58670e18913a187cd8
       body: ""
