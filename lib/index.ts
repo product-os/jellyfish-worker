@@ -23,6 +23,7 @@ import * as semver from 'semver';
 import { serializeError } from 'serialize-error';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
+import * as formulas from './formulas';
 import { actions } from './actions';
 import CARDS from './contracts';
 import * as errors from './errors';
@@ -62,6 +63,10 @@ export * from './types';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
+
+const formulaParser = new jellyscript.Jellyscript({
+	formulas,
+});
 
 /**
  * @summary The "type" card type
@@ -486,7 +491,7 @@ export class Worker {
 					object,
 					typeCard,
 				);
-				const result = jellyscript.evaluateObject(
+				const result = formulaParser.evaluateObject(
 					typeCard.data.schema,
 					objectWithLinks as any,
 				);
@@ -567,7 +572,7 @@ export class Worker {
 					object,
 					typeCard,
 				);
-				const newPatch = jellyscript.evaluatePatch(
+				const newPatch = formulaParser.evaluatePatch(
 					typeCard.data.schema,
 					objectWithLinks as any,
 					patch,
@@ -670,7 +675,7 @@ export class Worker {
 				);
 
 				// Add the expanded links to the new contract object being inserted
-				const result = jellyscript.evaluateObject(typeCard.data.schema, {
+				const result = formulaParser.evaluateObject(typeCard.data.schema, {
 					...object,
 					links: links || {},
 				} as any);

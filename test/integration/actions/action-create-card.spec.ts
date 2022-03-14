@@ -107,8 +107,6 @@ describe('action-create-card', () => {
 										properties: {
 											mentions: {
 												type: 'array',
-												$$formula:
-													'AGGREGATE($events, "data.payload.mentions")',
 											},
 										},
 										additionalProperties: true,
