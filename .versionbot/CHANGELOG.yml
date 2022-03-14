@@ -1,4 +1,28 @@
 - commits:
+    - subject: Hoist transformer specific formulas from jellyscript
+      hash: 062f50f582835e502dab2c915b7dee720786b087
+      body: >
+        This is a part of the ongoing effort to clean up jellyscript and to
+        colocate
+
+        transformers behaviour in a single place.
+
+        The transformers specific formulas `NEEDS` and `NEEDS_ALL` are now
+
+        custom formulas that live in this repo and are injected into the
+
+        Jellyscript parser at runtime.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 19.0.23
+  title: "'Hoist transformer specific formulas from jellyscript'"
+  date: 2022-03-14T14:49:29.641Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 5.2.2 to 5.3.0
       hash: 7f8e72d4489d7ee28e88c746f7ece27e891e0303
       body: ""
