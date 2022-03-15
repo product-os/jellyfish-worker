@@ -1,5 +1,9 @@
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import type { LinkConstraint } from '@balena/jellyfish-client-sdk';
+import type { Dictionary } from 'lodash';
+import type { TriggeredActionContract } from './types';
+import { reverseLink } from './link-traversal';
 
 enum NEEDS_STATUS {
 	PENDING = 'pending',
@@ -71,4 +75,119 @@ export const getReferencedLinkVerbs = (typeCard: TypeContract): string[] => {
 		'links',
 	);
 	return linkVerbs;
+};
+
+const slugify = (str: string): string => {
+	return str
+		.trim()
+		.toLowerCase()
+		.replace(/[^a-z0-9-]/g, '-')
+		.replace(/-{1,}/g, '-');
+};
+
+type PartialTriggeredActionContract = Omit<
+	TriggeredActionContract,
+	'id' | 'created_at' | 'updated_at'
+>;
+
+// TS-TODO: use TypeContract interface instead of Contract
+export const getTypeTriggers = (typeCard: TypeContract) => {
+	// TS-TODO: use TriggeredActionDefinition interface instead of ContractDefinition
+	const triggers: PartialTriggeredActionContract[] = [];
+
+	// We create empty updates to cards that reference other cards in links
+	// whenever those linked cards change.
+	// This forces a reevaluation of formulas in the referencing card.
+	const linkVerbs = getReferencedLinkVerbs(typeCard as TypeContract);
+	triggers.push(
+		...linkVerbs.flatMap((lv) =>
+			createLinkTrigger(reverseLink(typeCard.slug, lv), typeCard),
+		),
+	);
+
+	return triggers;
+};
+
+/**
+ * Creates a triggered action that fires when a card gets changed that is linked
+ * with the given link verb to a card of the given type
+ *
+ * @param linkVerb the verb that should trigger
+ * @param typeCard the type containing the formula that needs the trigger
+ * @returns the triggered action
+ */
+const createLinkTrigger = (
+	linkGroups: Dictionary<LinkConstraint[]>,
+	typeCard: TypeContract,
+): PartialTriggeredActionContract[] => {
+	if (Object.keys(linkGroups).length === 0) {
+		return [];
+	}
+	return Object.entries(linkGroups)
+		.filter(([, links]) => links.length)
+		.map(([linkVerb, links]) => {
+			// We try to optimize query speed by limiting to valid types or,
+			// if all are allowed, by excluding some high frequency internal cards
+			const typeFilter =
+				links.filter((l) => l.data.from === '*').length === 0
+					? {
+							enum: links.map((t) => `${t.data.from}@1.0.0`),
+					  }
+					: {
+							not: {
+								enum: ['create@1.0.0', 'update@1.0.0', 'link@1.0.0'],
+							},
+					  };
+			return {
+				slug: slugify(
+					`triggered-action-formula-update-${typeCard.slug}-${linkVerb}`,
+				),
+				type: 'triggered-action@1.0.0',
+				version: typeCard.version,
+				active: true,
+				requires: [],
+				capabilities: [],
+				markers: [],
+				tags: [],
+				data: {
+					action: 'action-update-card@1.0.0',
+					type: `${typeCard.slug}@${typeCard.version}`,
+					target: {
+						$map: {
+							$eval: `source.links['${linkVerb}']`, // there was a [0:] at the end... :-/
+						},
+						'each(card)': {
+							$eval: 'card.id',
+						},
+					},
+					arguments: {
+						reason: 'formula re-evaluation',
+						patch: [],
+					},
+					filter: {
+						type: 'object',
+						required: ['type', 'data'],
+						$$links: {
+							[linkVerb]: {
+								type: 'object',
+								required: ['type'],
+								properties: {
+									type: {
+										type: 'string',
+										const: `${typeCard.slug}@${typeCard.version}`,
+									},
+								},
+							},
+						},
+						properties: {
+							type: {
+								type: 'string',
+								...typeFilter,
+							},
+							updated_at: true,
+						},
+					},
+				},
+			};
+		});
 };
