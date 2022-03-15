@@ -1,3 +1,6 @@
+import { Jellyscript } from '@balena/jellyfish-jellyscript';
+import type { TypeContract } from '@balena/jellyfish-types/build/core';
+
 enum NEEDS_STATUS {
 	PENDING = 'pending',
 	MERGEABLE = 'mergeable',
@@ -59,4 +62,13 @@ export const NEEDS = (
 	}
 
 	return NEEDS_STATUS.PENDING;
+};
+
+export const getReferencedLinkVerbs = (typeCard: TypeContract): string[] => {
+	const linkVerbs = Jellyscript.getObjectMemberExpressions(
+		typeCard.data.schema,
+		'contract',
+		'links',
+	);
+	return linkVerbs;
 };

@@ -138,7 +138,7 @@ export async function getObjectWithLinks<
 	card: PContract,
 	typeCard: TypeContract,
 ): Promise<PContract> {
-	const linkVerbs = jellyscript.getReferencedLinkVerbs(typeCard);
+	const linkVerbs = formulas.getReferencedLinkVerbs(typeCard);
 	if (!linkVerbs.length) {
 		return card;
 	}
