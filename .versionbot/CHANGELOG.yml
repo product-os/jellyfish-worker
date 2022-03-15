@@ -1,4 +1,21 @@
 - commits:
+    - subject: Fix contract export
+      hash: bceea4396bf7a93a297071166c33a3579651585d
+      body: |
+        We should avoid exporting with default and
+        instead match other modules by exporting
+        a typed, named variable.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.0.0
+  title: "'Fix contract export'"
+  date: 2022-03-15T04:05:10.958Z
+- commits:
     - subject: Hoist transformer specific formulas from jellyscript
       hash: 062f50f582835e502dab2c915b7dee720786b087
       body: >
