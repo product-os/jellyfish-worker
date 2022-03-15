@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 6.1.0 to 7.0.0
+      hash: 123b7699b7da1eaf231f35e7b3e716ee52948c2b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 20.0.2
+  title: "'Update @balena/jellyfish-jellyscript from 6.1.0 to 7.0.0'"
+  date: 2022-03-15T17:11:03.629Z
+- commits:
     - subject: Migrate link formula triggered actions from Jellyscript to worker
       hash: b8ad26044f6c40d73d009ff0f358d7fdeaa8d772
       body: |
