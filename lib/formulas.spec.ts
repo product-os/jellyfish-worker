@@ -1,7 +1,10 @@
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import * as formulas from './formulas';
 const parser = new Jellyscript({
-	formulas,
+	formulas: {
+		NEEDS: formulas.NEEDS,
+		NEEDS_ALL: formulas.NEEDS_ALL,
+	},
 });
 
 describe('NEEDS', () => {

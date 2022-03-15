@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { CARDS as CORE_CARDS, Kernel } from '@balena/jellyfish-core';
-import * as jellyscript from '@balena/jellyfish-jellyscript';
+import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import {
 	ActionContract,
@@ -64,8 +64,11 @@ export * from './types';
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
 
-const formulaParser = new jellyscript.Jellyscript({
-	formulas,
+const formulaParser = new Jellyscript({
+	formulas: {
+		NEEDS: formulas.NEEDS,
+		NEEDS_ALL: formulas.NEEDS_ALL,
+	},
 });
 
 /**
@@ -138,7 +141,7 @@ export async function getObjectWithLinks<
 	card: PContract,
 	typeCard: TypeContract,
 ): Promise<PContract> {
-	const linkVerbs = jellyscript.getReferencedLinkVerbs(typeCard);
+	const linkVerbs = formulas.getReferencedLinkVerbs(typeCard);
 	if (!linkVerbs.length) {
 		return card;
 	}
@@ -1563,9 +1566,7 @@ export class Worker {
 			);
 
 			await Promise.all(
-				(
-					jellyscript.getTypeTriggers(insertedCard) as TriggeredActionContract[]
-				).map(
+				formulas.getTypeTriggers(insertedCard as TypeContract).map(
 					async (trigger) => {
 						// We don't want to use the actions queue here
 						// so that watchers are applied right away
