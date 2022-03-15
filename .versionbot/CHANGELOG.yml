@@ -1,4 +1,32 @@
 - commits:
+    - subject: Migrate link formula triggered actions from Jellyscript to worker
+      hash: b8ad26044f6c40d73d009ff0f358d7fdeaa8d772
+      body: |
+        Fixes https://github.com/product-os/jellyfish-jellyscript/issues/837
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Hoist link verb introspection from jellyscript to worker
+      hash: 4c50966a82ecbc7db0e3d7d524a7586965126c83
+      body: |
+        The `getReferencedLinkVerbs()` utility function in jellyscript will be
+        deprecated soon. Contract and Jellyfish specific functionality needs to
+        be migrated into the worker.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 20.0.1
+  title: "'hoist formula link introspection from Jellyscript to worker'"
+  date: 2022-03-15T13:07:48.570Z
+- commits:
     - subject: Fix contract export
       hash: bceea4396bf7a93a297071166c33a3579651585d
       body: |
