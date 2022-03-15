@@ -25,7 +25,7 @@ import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
 import * as formulas from './formulas';
 import { actions } from './actions';
-import CARDS from './contracts';
+import { contracts } from './contracts';
 import * as errors from './errors';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
@@ -41,7 +41,7 @@ import type {
 } from './types';
 import * as utils from './utils';
 
-export { actions, triggersLib, errors, CARDS, utils, Transformer, Sync };
+export { actions, triggersLib, errors, contracts, utils, Transformer, Sync };
 export {
 	errors as syncErrors,
 	Integration,
@@ -310,8 +310,8 @@ export class Worker {
 
 		// Insert worker specific cards
 		await Promise.all(
-			Object.values(CARDS).map(async (card) => {
-				return this.kernel.replaceContract(logContext, this.session, card);
+			Object.values(contracts).map(async (contract) => {
+				return this.kernel.replaceContract(logContext, this.session, contract);
 			}),
 		);
 		await Promise.all(
@@ -698,12 +698,15 @@ export class Worker {
 	 * const worker = new Worker({ ... })
 	 * worker.setTriggers([ ... ])
 	 */
-	setTriggers(logContext: LogContext, contracts: TriggeredActionContract[]) {
+	setTriggers(
+		logContext: LogContext,
+		triggerContracts: TriggeredActionContract[],
+	) {
 		logger.info(logContext, 'Setting triggers', {
 			count: contracts.length,
 		});
 
-		this.triggers = contracts;
+		this.triggers = triggerContracts;
 	}
 
 	/**

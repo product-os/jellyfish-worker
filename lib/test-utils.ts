@@ -13,7 +13,7 @@ import permutations from 'just-permutations';
 import _ from 'lodash';
 import nock from 'nock';
 import path from 'path';
-import { CARDS, Worker } from '.';
+import { contracts, Worker } from '.';
 import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
 import { Sync } from './sync';
 import { Action, Map } from './types';
@@ -90,18 +90,19 @@ export const newContext = async (
 	const pluginManager = new PluginManager(options.plugins || []);
 
 	// Prepare and insert all contracts, including those from plugins.
-	const contracts = pluginManager.getCards();
+	const pluginContracts = pluginManager.getCards();
 	const actionLibrary = pluginManager.getActions();
-	const bootstrapContracts: ContractDefinition[] = [
-		CARDS.create,
-		CARDS.update,
-		CARDS['triggered-action'],
-	];
 
 	// Make sure any loop contracts are initialized, as they can be a prerequisite
-	Object.keys(contracts).forEach((slug: string) => {
-		if (slug.startsWith('loop-') || slug.startsWith('action-')) {
-			bootstrapContracts.push(contracts[slug]);
+	const bootstrapContracts: ContractDefinition[] = [];
+	contracts.forEach((contract) => {
+		if (contract.slug.match(/^(create|update|triggered-action)$/)) {
+			bootstrapContracts.push(contract);
+		}
+	});
+	Object.keys(pluginContracts).forEach((slug: string) => {
+		if (slug.match(/^(loop-|action-)/)) {
+			bootstrapContracts.push(pluginContracts[slug]);
 		}
 	});
 
@@ -122,7 +123,7 @@ export const newContext = async (
 	}
 
 	// Any remaining contracts from plugins can now be added to the sequence
-	const remainder = _.filter(contracts, (contract: Contract) => {
+	const remainder = _.filter(pluginContracts, (contract: Contract) => {
 		return !_.find(bootstrapContracts, { slug: contract.slug });
 	});
 	for (const contract of remainder) {
