@@ -1,4 +1,4 @@
-import type { Kernel } from '@balena/jellyfish-core';
+import type { Kernel } from 'autumndb';
 import type * as queue from '@balena/jellyfish-queue';
 import * as errors from './errors';
 import { getNextExecutionDate, Worker } from './index';

@@ -1,4 +1,4 @@
-import type { Kernel } from '@balena/jellyfish-core';
+import type { Kernel } from 'autumndb';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import type { ActionContract } from '@balena/jellyfish-queue';
 import type { JsonSchema } from '@balena/jellyfish-types';

@@ -1,5 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import { Kernel } from '@balena/jellyfish-core';
+import { Kernel } from 'autumndb';
 import { getLogger } from '@balena/jellyfish-logger';
 import type {
 	Contract,
