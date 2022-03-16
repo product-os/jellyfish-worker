@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import { testUtils as coreTestUtils } from 'autumndb';
 import _ from 'lodash';
 import { actionSetAdd } from '../../../lib/actions/action-set-add';
 import { testUtils, WorkerContext } from '../../../lib';

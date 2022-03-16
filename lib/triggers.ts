@@ -1,5 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { Kernel } from '@balena/jellyfish-core';
+import type { Kernel } from 'autumndb';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {

@@ -1,5 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import { CARDS as CORE_CARDS, Kernel } from '@balena/jellyfish-core';
+import { CARDS as CORE_CARDS, Kernel } from 'autumndb';
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import {

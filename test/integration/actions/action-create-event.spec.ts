@@ -3,7 +3,7 @@ import {
 	errors as coreErrors,
 	Kernel,
 	testUtils as coreTestUtils,
-} from '@balena/jellyfish-core';
+} from 'autumndb';
 import { testUtils, WorkerContext } from '../../../lib';
 import { actionCreateEvent } from '../../../lib/actions/action-create-event';
 

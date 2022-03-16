@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { Kernel, testUtils as coreTestUtils } from '@balena/jellyfish-core';
+import { Kernel, testUtils as coreTestUtils } from 'autumndb';
 import type { ActionRequestContract } from '@balena/jellyfish-queue';
 import _ from 'lodash';
 import {

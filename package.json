@@ -48,10 +48,10 @@
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.18",
     "@balena/jellyfish-client-sdk": "^10.1.10",
-    "@balena/jellyfish-core": "^16.0.10",
     "@balena/jellyfish-jellyscript": "^7.0.0",
     "@balena/jellyfish-logger": "^5.0.6",
     "@balena/jellyfish-queue": "^4.1.20",
+    "autumndb": "^17.0.3",
     "axios": "^0.26.1",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",

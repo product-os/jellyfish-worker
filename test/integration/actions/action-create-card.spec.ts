@@ -1,8 +1,5 @@
 import { strict as assert } from 'assert';
-import {
-	errors as coreErrors,
-	testUtils as coreTestUtils,
-} from '@balena/jellyfish-core';
+import { errors as coreErrors, testUtils as coreTestUtils } from 'autumndb';
 import { testUtils, WorkerContext } from '../../../lib';
 import { actionCreateCard } from '../../../lib/actions/action-create-card';
 import { makeRequest } from './helpers';
