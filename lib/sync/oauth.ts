@@ -283,7 +283,7 @@ export const refreshAccessToken = async (
 		'Missing refresh token',
 	);
 
-	return oauthPost(baseUrl, '/oauth/token', {
+	return oauthPost(baseUrl, '/oauth2/token', {
 		grant_type: 'refresh_token',
 		client_id: options.appId,
 		client_secret: options.appSecret,
