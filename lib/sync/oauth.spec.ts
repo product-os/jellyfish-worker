@@ -5,7 +5,7 @@ import * as oauth from './oauth';
 
 const authorizationNock = () => {
 	nock('https://api.balena-cloud.com')
-		.post('/oauth/token')
+		.post('/oauth2/token')
 		.reply((_uri, request, callback) => {
 			const body = querystring.decode(request as string);
 
@@ -42,7 +42,7 @@ const authorizationNock = () => {
 
 const refreshNock = () => {
 	nock('https://api.balena-cloud.com')
-		.post('/oauth/token')
+		.post('/oauth2/token')
 		.reply((_uri, request, callback) => {
 			const body = querystring.decode(request as string);
 

@@ -221,7 +221,7 @@ export const getAccessToken = async (
 	);
 	assert.INTERNAL(null, Boolean(code), OAuthInvalidOption, 'Missing code');
 
-	return oauthPost(baseUrl, '/oauth/token', {
+	return oauthPost(baseUrl, '/oauth2/token', {
 		grant_type: 'authorization_code',
 		client_id: options.appId,
 		client_secret: options.appSecret,
