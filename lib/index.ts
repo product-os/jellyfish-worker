@@ -1,5 +1,4 @@
 import * as assert from '@balena/jellyfish-assert';
-import { CARDS as CORE_CARDS, Kernel } from 'autumndb';
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import {
@@ -15,6 +14,7 @@ import type {
 	ContractData,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
+import { CARDS as CORE_CARDS, Kernel } from 'autumndb';
 import { parseExpression } from 'cron-parser';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -23,10 +23,10 @@ import * as semver from 'semver';
 import { serializeError } from 'serialize-error';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
-import * as formulas from './formulas';
 import { actions } from './actions';
 import { contracts } from './contracts';
 import * as errors from './errors';
+import * as formulas from './formulas';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
 import { evaluate as evaluateTransformers, Transformer } from './transformers';
@@ -42,6 +42,7 @@ import type {
 import * as utils from './utils';
 
 export { actions, triggersLib, errors, contracts, utils, Transformer, Sync };
+export * as contractMixins from './contracts/mixins';
 export {
 	errors as syncErrors,
 	Integration,
