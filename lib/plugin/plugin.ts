@@ -1,9 +1,9 @@
-import { cardMixins } from 'autumndb';
 import type {
 	ActionContract,
 	Contract,
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
+import { contractMixins } from 'autumndb';
 import _ from 'lodash';
 import type { IntegrationDefinition } from '../sync';
 import type { Action, Map } from '../types';
@@ -48,7 +48,7 @@ export class Plugin {
 	public getCards(): Map<Contract> {
 		const contractMap = {};
 		for (const contractDefinition of this.contracts) {
-			const contract = cardMixins.initialize(contractDefinition);
+			const contract = contractMixins.initialize(contractDefinition);
 
 			const slug = contract.slug;
 			if (slug in contractMap) {
