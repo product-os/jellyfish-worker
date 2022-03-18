@@ -1,4 +1,18 @@
 - commits:
+    - subject: Replace cardMixins with contractMixins
+      hash: 2a359feca90c8c96ad5080477727cd2fbf2afd97
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.0.7
+  title: "'Replace cardMixins with contractMixins'"
+  date: 2022-03-18T01:09:40.097Z
+- commits:
     - subject: Update internal-patch
       hash: c16ed04ea3bd687af068ffebd038792a9319bd9b
       body: ""
