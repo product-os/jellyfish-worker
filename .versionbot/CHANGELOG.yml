@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add pipeline and events mixins
+      hash: 894d2884be711ddacf69f7dedb77b83d8f0dea99
+      body: |
+        Moving these in from autumndb
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.1.0
+  title: "'Add pipeline and events mixins'"
+  date: 2022-03-18T03:02:37.036Z
+- commits:
     - subject: Replace cardMixins with contractMixins
       hash: 2a359feca90c8c96ad5080477727cd2fbf2afd97
       body: ""
