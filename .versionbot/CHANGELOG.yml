@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add events mixin formula test
+      hash: 878d433c51d4b77d1d8e79ce89b08c98358b0716
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.2.1
+  title: "'Add events mixin formula test'"
+  date: 2022-03-18T10:05:47.600Z
+- commits:
     - subject: Add and export mixin function
       hash: f716824465baa52b6e1aea3384bb17d0280f6bf0
       body: |
