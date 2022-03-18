@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add and export mixin function
+      hash: f716824465baa52b6e1aea3384bb17d0280f6bf0
+      body: |
+        Bringing in from autumndb
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.2.0
+  title: "'Add and export mixin function'"
+  date: 2022-03-18T05:04:26.482Z
+- commits:
     - subject: Add pipeline and events mixins
       hash: 894d2884be711ddacf69f7dedb77b83d8f0dea99
       body: |
