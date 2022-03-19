@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update external-non-major
+      hash: ecf4c05a184cd23b1356e73e2b838dce549b28dc
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 20.2.3
+  title: "'Update external-non-major'"
+  date: 2022-03-19T02:33:35.004Z
+- commits:
     - subject: Add missing dependencies
       hash: 378b49761015401dde3518450c25952e8db7422b
       body: ""
