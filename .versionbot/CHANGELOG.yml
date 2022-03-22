@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update upstreams in repo.yml
+      hash: 407cefe651a93b51be917625c4e8d9386865f3e5
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 20.2.5
+  title: "'Update upstreams in repo.yml'"
+  date: 2022-03-22T04:24:53.039Z
+- commits:
     - subject: Update internal-patch
       hash: e41251a791398e19da8194b1affd6a91e53777b6
       body: ""
