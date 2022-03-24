@@ -37,6 +37,7 @@ import type {
 	ScheduledActionContract,
 	ScheduledActionData,
 	TriggeredActionContract,
+	TriggeredActionContractDefinition,
 	WorkerContext,
 } from './types';
 import * as utils from './utils';
