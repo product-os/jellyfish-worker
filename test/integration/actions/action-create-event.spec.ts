@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
 import {
-	errors as coreErrors,
+	errors as autumndbErrors,
 	Kernel,
-	testUtils as coreTestUtils,
+	testUtils as autumndbTestUtils,
 } from 'autumndb';
 import { testUtils, WorkerContext } from '../../../lib';
 import { actionCreateEvent } from '../../../lib/actions/action-create-event';
@@ -25,16 +25,16 @@ describe('action-create-event', () => {
 			ctx.adminUserId,
 			ctx.session,
 			'card@1.0.0',
-			coreTestUtils.generateRandomSlug(),
+			autumndbTestUtils.generateRandomSlug(),
 			{ payload: 'test' },
 		);
 		const request = {
 			context: {
-				id: `TEST-${coreTestUtils.generateRandomId()}`,
+				id: `TEST-${autumndbTestUtils.generateRandomId()}`,
 			},
 			timestamp: new Date().toISOString(),
 			actor: ctx.adminUserId,
-			originator: coreTestUtils.generateRandomId(),
+			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				type: 'foobar',
 				payload: card.data.payload,
@@ -56,16 +56,16 @@ describe('action-create-event', () => {
 			ctx.adminUserId,
 			ctx.session,
 			'card@1.0.0',
-			coreTestUtils.generateRandomSlug(),
+			autumndbTestUtils.generateRandomSlug(),
 			{ payload: 'test' },
 		);
 		const request = {
 			context: {
-				id: `TEST-${coreTestUtils.generateRandomId()}`,
+				id: `TEST-${autumndbTestUtils.generateRandomId()}`,
 			},
 			timestamp: new Date().toISOString(),
 			actor: ctx.adminUserId,
-			originator: coreTestUtils.generateRandomId(),
+			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				type: 'card',
 				payload: card.data.payload,
@@ -86,16 +86,16 @@ describe('action-create-event', () => {
 			ctx.adminUserId,
 			ctx.session,
 			'card@1.0.0',
-			coreTestUtils.generateRandomSlug(),
+			autumndbTestUtils.generateRandomSlug(),
 			{ payload: 'test' },
 		);
 		const request = {
 			context: {
-				id: `TEST-${coreTestUtils.generateRandomId()}`,
+				id: `TEST-${autumndbTestUtils.generateRandomId()}`,
 			},
 			timestamp: new Date().toISOString(),
 			actor: ctx.adminUserId,
-			originator: coreTestUtils.generateRandomId(),
+			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				type: 'card',
 				slug: card.slug,
@@ -110,7 +110,7 @@ describe('action-create-event', () => {
 				card,
 				request as any,
 			),
-		).rejects.toThrow(coreErrors.JellyfishElementAlreadyExists);
+		).rejects.toThrow(autumndbErrors.JellyfishElementAlreadyExists);
 	});
 
 	test('should create a link card', async () => {
@@ -122,7 +122,7 @@ describe('action-create-event', () => {
 			{ payload: 'test' },
 		);
 
-		const eventRequest = await ctx.queue.producer.enqueue(
+		const eventRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -140,7 +140,7 @@ describe('action-create-event', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const eventResult: any = await ctx.queue.producer.waitResults(
+		const eventResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			eventRequest,
 		);
@@ -205,7 +205,7 @@ describe('action-create-event', () => {
 			{ payload: 'test' },
 		);
 
-		const eventRequest = await ctx.queue.producer.enqueue(
+		const eventRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -224,7 +224,7 @@ describe('action-create-event', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const eventResult: any = await ctx.queue.producer.waitResults(
+		const eventResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			eventRequest,
 		);
@@ -250,8 +250,8 @@ describe('action-create-event', () => {
 				actor: ctx.adminUserId,
 			},
 			{
-				name: coreTestUtils.generateRandomSlug(),
-				slug: coreTestUtils.generateRandomSlug({
+				name: autumndbTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'card',
 				}),
 				version: '1.0.0',
@@ -263,7 +263,7 @@ describe('action-create-event', () => {
 		);
 		assert(card);
 
-		const request = await ctx.queue.producer.enqueue(
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -281,7 +281,7 @@ describe('action-create-event', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const cardResult: any = await ctx.queue.producer.waitResults(
+		const cardResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);

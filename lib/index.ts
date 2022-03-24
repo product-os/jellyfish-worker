@@ -1,13 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import {
-	ActionContract,
-	ActionRequestContract,
-	Consumer,
-	Producer,
-	ProducerOptions,
-} from '@balena/jellyfish-queue';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	Contract,
@@ -19,6 +12,7 @@ import { parseExpression } from 'cron-parser';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
 import _ from 'lodash';
+import type { Pool } from 'pg';
 import * as semver from 'semver';
 import { serializeError } from 'serialize-error';
 import * as skhema from 'skhema';
@@ -27,6 +21,14 @@ import { actions } from './actions';
 import { contracts } from './contracts';
 import * as errors from './errors';
 import * as formulas from './formulas';
+import {
+	ActionContract,
+	ActionRequestContract,
+	Consumer,
+	Producer,
+	ProducerOptions,
+} from './queue';
+import type { OnMessageEventHandler } from './queue/consumer';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
 import { evaluate as evaluateTransformers, Transformer } from './transformers';
@@ -59,6 +61,21 @@ export {
 	PluginIdentity,
 	PluginManager,
 } from './plugin';
+export {
+	ActionContract,
+	ActionData,
+	ActionRequestContract,
+	ActionRequestData,
+	Consumer,
+	contracts as queueContracts,
+	errors as queueErrors,
+	events,
+	ExecuteContract,
+	ExecuteData,
+	Producer,
+	ProducerOptions,
+	ProducerResults,
+} from './queue';
 export * as testUtils from './test-utils';
 export * from './types';
 
@@ -241,27 +258,24 @@ export class Worker {
 	 * @class
 	 * @public
 	 *
-	 * @param {Object} jellyfish - jellyfish instance
+	 * @param {Object} kernel - kernel instance
 	 * @param {String} session - worker privileged session id
 	 * @param {Object} actionLibrary - action library
-	 * @param {Object} consumer - action consumer
-	 * @param {Object} producer - action producer
+	 * @param {Object} pool - postgres pool
 	 *
 	 * @example
 	 * const worker = new Worker({ ... }, '4a962ad9-20b5-4dd8-a707-bf819593cc84', {
 	 *     'action-create-card': { ... },
 	 *     'action-update-card': { ... },
 	 *   },
-	 *   consumer,
-	 *   producer
-	 * )
+	 *   pool,
+	 * );
 	 */
 	constructor(
 		kernel: Kernel,
 		session: string,
 		actionLibrary: Map<Action>,
-		consumer: Consumer,
-		producer: Producer,
+		pool: Pool,
 	) {
 		this.kernel = kernel;
 		this.triggers = [];
@@ -270,8 +284,8 @@ export class Worker {
 		this.typeContracts = {};
 		this.session = session;
 		this.library = actionLibrary;
-		this.consumer = consumer;
-		this.producer = producer;
+		this.consumer = new Consumer(kernel, pool, session);
+		this.producer = new Producer(kernel, pool, session);
 
 		// Add actions defined in this repo
 		Object.keys(actions).forEach((name) => {
@@ -301,16 +315,29 @@ export class Worker {
 	 * @public
 	 *
 	 * @param {LogContext} logContext - log context
+	 * @param {Sync} sync - sync instance
+	 * @param {OnMessageEventHandler} onMessageEventHandler - consumer event handler
 	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * await worker.initialize(logContext)
+	 * const worker = new Worker({ ... });
+	 * await worker.initialize(logContext, sync, eventHandlerFunction);
 	 */
 	// TS-TODO: this signature
-	async initialize(logContext: LogContext, sync: Sync) {
+	async initialize(
+		logContext: LogContext,
+		sync: Sync,
+		onMessageEventHandler: OnMessageEventHandler,
+	) {
 		// TS-TODO: type this correctly
 		this.id = uuidv4();
 		this.sync = sync;
+
+		// Initialize producer and consumer
+		await this.producer.initialize(logContext);
+		await this.consumer.initializeWithEventHandler(
+			logContext,
+			onMessageEventHandler,
+		);
 
 		// Insert worker specific cards
 		await Promise.all(

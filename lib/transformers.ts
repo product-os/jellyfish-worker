@@ -1,11 +1,11 @@
 import { getLogger } from '@balena/jellyfish-logger';
 import type { LogContext } from '@balena/jellyfish-logger';
-import type { ProducerResults } from '@balena/jellyfish-queue';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
+import type { ProducerResults } from './queue';
 import type { EnqueueOptions } from './types';
 
 const logger = getLogger('worker');

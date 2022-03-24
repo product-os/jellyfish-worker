@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
-import { testUtils as coreTestUtils } from 'autumndb';
+import { testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
-import { actionSetAdd } from '../../../lib/actions/action-set-add';
 import { testUtils, WorkerContext } from '../../../lib';
+import { actionSetAdd } from '../../../lib/actions/action-set-add';
 
 const handler = actionSetAdd.handler;
 let ctx: testUtils.TestContext;
@@ -11,7 +11,7 @@ let actionContext: WorkerContext;
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 	actionContext = ctx.worker.getActionContext({
-		id: `test-${coreTestUtils.generateRandomId()}`,
+		id: `test-${autumndbTestUtils.generateRandomId()}`,
 	});
 });
 
@@ -33,11 +33,11 @@ describe('action-set-add', () => {
 
 		const request: any = {
 			context: {
-				id: `TEST-${coreTestUtils.generateRandomId()}`,
+				id: `TEST-${autumndbTestUtils.generateRandomId()}`,
 			},
 			timestamp: new Date().toISOString(),
 			actor: ctx.adminUserId,
-			originator: coreTestUtils.generateRandomId(),
+			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				property: ['data', 'tags'],
 				value: 'foo',
@@ -72,11 +72,11 @@ describe('action-set-add', () => {
 
 		const request: any = {
 			context: {
-				id: `TEST-${coreTestUtils.generateRandomId()}`,
+				id: `TEST-${autumndbTestUtils.generateRandomId()}`,
 			},
 			timestamp: new Date().toISOString(),
 			actor: ctx.adminUserId,
-			originator: coreTestUtils.generateRandomId(),
+			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				property: ['data', 'tags'],
 				value: ['foo', 'bar'],
@@ -111,11 +111,11 @@ describe('action-set-add', () => {
 
 		const request: any = {
 			context: {
-				id: `TEST-${coreTestUtils.generateRandomId()}`,
+				id: `TEST-${autumndbTestUtils.generateRandomId()}`,
 			},
 			timestamp: new Date().toISOString(),
 			actor: ctx.adminUserId,
-			originator: coreTestUtils.generateRandomId(),
+			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				property: 'data.tags',
 				value: 'foo',

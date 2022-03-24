@@ -1,9 +1,9 @@
-import { strict as assert } from 'assert';
-import { Kernel, testUtils as coreTestUtils } from 'autumndb';
 import type {
 	Contract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
+import { strict as assert } from 'assert';
+import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
 import {
 	ActionDefinition,
@@ -56,17 +56,17 @@ describe('.insertCard()', () => {
 
 		assert(typeCard !== null);
 
-		const command = coreTestUtils.generateRandomSlug({
+		const command = autumndbTestUtils.generateRandomSlug({
 			prefix: 'originator-test',
 		});
-		const id = coreTestUtils.generateRandomId();
+		const id = autumndbTestUtils.generateRandomId();
 
 		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
 			Kernel.defaults<TriggeredActionData>({
 				id,
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				data: {
@@ -110,7 +110,7 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				slug: coreTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command,
@@ -139,13 +139,13 @@ describe('.insertCard()', () => {
 
 		assert(typeCard !== null);
 
-		const command = coreTestUtils.generateRandomSlug();
-		const id = coreTestUtils.generateRandomId();
+		const command = autumndbTestUtils.generateRandomSlug();
+		const id = autumndbTestUtils.generateRandomId();
 		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
 			Kernel.defaults<TriggeredActionData>({
 				id,
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -178,7 +178,7 @@ describe('.insertCard()', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const originatorId = coreTestUtils.generateRandomId();
+		const originatorId = autumndbTestUtils.generateRandomId();
 
 		await ctx.worker.insertCard(
 			ctx.logContext,
@@ -192,7 +192,7 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				slug: coreTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command,
@@ -220,12 +220,12 @@ describe('.insertCard()', () => {
 
 		assert(typeCard !== null);
 
-		const command = coreTestUtils.generateRandomSlug();
+		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
 			Kernel.defaults<TriggeredActionData>({
-				id: coreTestUtils.generateRandomId(),
-				slug: coreTestUtils.generateRandomSlug({
+				id: autumndbTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -269,7 +269,7 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				slug: coreTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command,
@@ -321,11 +321,11 @@ describe('.insertCard()', () => {
 
 		assert(typeCard !== null);
 
-		const command = coreTestUtils.generateRandomSlug();
+		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.logContext, [
 			Kernel.defaults<TriggeredActionData>({
-				id: coreTestUtils.generateRandomId(),
-				slug: coreTestUtils.generateRandomSlug({
+				id: autumndbTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -368,10 +368,10 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				slug: coreTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
-					command: coreTestUtils.generateRandomSlug(),
+					command: autumndbTestUtils.generateRandomSlug(),
 				},
 			},
 		);
@@ -397,12 +397,12 @@ describe('.insertCard()', () => {
 		assert(typeCard !== null);
 
 		const prefix = 'triggered-action-test';
-		const command1 = coreTestUtils.generateRandomSlug({ prefix });
-		const command2 = coreTestUtils.generateRandomSlug({ prefix });
+		const command1 = autumndbTestUtils.generateRandomSlug({ prefix });
+		const command2 = autumndbTestUtils.generateRandomSlug({ prefix });
 		ctx.worker.setTriggers(ctx.logContext, [
 			Kernel.defaults<TriggeredActionData>({
-				id: coreTestUtils.generateRandomId(),
-				slug: coreTestUtils.generateRandomSlug({
+				id: autumndbTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -434,8 +434,8 @@ describe('.insertCard()', () => {
 				},
 			}) as TriggeredActionContract,
 			Kernel.defaults<TriggeredActionData>({
-				id: coreTestUtils.generateRandomId(),
-				slug: coreTestUtils.generateRandomSlug({
+				id: autumndbTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -479,7 +479,7 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				slug: coreTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command: command1,
@@ -514,12 +514,12 @@ describe('.insertCard()', () => {
 
 		assert(typeCard !== null);
 
-		const command1 = coreTestUtils.generateRandomSlug();
-		const command2 = coreTestUtils.generateRandomSlug();
+		const command1 = autumndbTestUtils.generateRandomSlug();
+		const command2 = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.logContext, [
 			Kernel.defaults<TriggeredActionData>({
-				id: coreTestUtils.generateRandomId(),
-				slug: coreTestUtils.generateRandomSlug({
+				id: autumndbTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -551,8 +551,8 @@ describe('.insertCard()', () => {
 				},
 			}) as TriggeredActionContract,
 			Kernel.defaults<TriggeredActionData>({
-				id: coreTestUtils.generateRandomId(),
-				slug: coreTestUtils.generateRandomSlug({
+				id: autumndbTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				type: 'triggered-action@1.0.0',
@@ -596,7 +596,7 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				slug: coreTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug(),
 				version: '1.0.0',
 				data: {
 					command: command1,
@@ -631,16 +631,16 @@ describe('.insertCard()', () => {
 
 		assert(typeCard !== null);
 
-		const fooType = coreTestUtils.generateRandomSlug({
+		const fooType = autumndbTestUtils.generateRandomSlug({
 			prefix: 'foo',
 		});
-		const barType = coreTestUtils.generateRandomSlug({
+		const barType = autumndbTestUtils.generateRandomSlug({
 			prefix: 'bar',
 		});
 		const cards = [
 			{
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -682,7 +682,7 @@ describe('.insertCard()', () => {
 			},
 			{
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -836,7 +836,7 @@ describe('.insertCard()', () => {
 
 		assert(typeType !== null);
 
-		const typeSlug = coreTestUtils.generateRandomSlug();
+		const typeSlug = autumndbTestUtils.generateRandomSlug();
 		const initialValue = 1;
 		const propValueBeforeUpdate = 2;
 		const magicNumber = 3;
@@ -1079,7 +1079,7 @@ describe('.insertCard()', () => {
 
 		assert(typeType !== null);
 
-		const typeSlug = coreTestUtils.generateRandomSlug();
+		const typeSlug = autumndbTestUtils.generateRandomSlug();
 		const initialValue = 1;
 		const propValueBeforeUpdate = 2;
 		const magicNumber = 13;

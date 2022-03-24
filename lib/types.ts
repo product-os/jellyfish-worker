@@ -1,10 +1,4 @@
-import type { Kernel } from 'autumndb';
 import type { LogContext } from '@balena/jellyfish-logger';
-import type {
-	ActionContract,
-	ActionRequestContract,
-	ProducerOptions,
-} from '@balena/jellyfish-queue';
 import type {
 	Contract,
 	ContractData,
@@ -12,7 +6,13 @@ import type {
 	ContractSummary,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
+import type { Kernel } from 'autumndb';
 import type { Operation } from 'fast-json-patch';
+import type {
+	ActionContract,
+	ActionRequestContract,
+	ProducerOptions,
+} from './queue';
 
 export interface Action {
 	handler: <TData = ContractData>(

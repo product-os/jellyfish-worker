@@ -1,4 +1,4 @@
-import { testUtils as coreTestUtils } from 'autumndb';
+import { testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
 import { testUtils } from '../../lib';
 
@@ -13,7 +13,7 @@ afterAll(() => {
 });
 
 test.skip('Should generate a notification if an event is attached to a contract', async () => {
-	const user = await ctx.createUser(coreTestUtils.generateRandomSlug());
+	const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 	const session = await ctx.createSession(user);
 	const root = await ctx.createContract(
 		user.id,
@@ -73,7 +73,9 @@ test.skip('Should generate a notification if an event is attached to a contract'
 	).rejects.toThrowError(new Error('The wait query did not resolve'));
 
 	// Add another event by a second user
-	const otherUser = await ctx.createUser(coreTestUtils.generateRandomSlug());
+	const otherUser = await ctx.createUser(
+		autumndbTestUtils.generateRandomSlug(),
+	);
 	const otherUserSession = await ctx.createSession(otherUser);
 	const response = await ctx.createEvent(
 		otherUser.id,

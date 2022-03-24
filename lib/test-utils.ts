@@ -1,5 +1,3 @@
-import { testUtils as coreTestUtils } from 'autumndb';
-import { testUtils as queueTestUtils } from '@balena/jellyfish-queue';
 import type {
 	Contract,
 	ContractDefinition,
@@ -9,19 +7,24 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import { ExecuteContract } from '@balena/jellyfish-types/build/queue';
 import { strict as assert } from 'assert';
+import { testUtils as autumndbTestUtils } from 'autumndb';
 import permutations from 'just-permutations';
 import _ from 'lodash';
 import nock from 'nock';
 import path from 'path';
-import { contracts, Worker } from '.';
+import { v4 as uuid } from 'uuid';
+import { Worker } from '.';
 import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
+import type { ActionRequestContract } from './queue/types';
 import { Sync } from './sync';
 import { Action, Map } from './types';
 
 /**
  * Context that can be used in tests against the worker.
  */
-export interface TestContext extends queueTestUtils.TestContext {
+export interface TestContext extends autumndbTestUtils.TestContext {
+	actor: string;
+	dequeue: (times?: number) => Promise<ActionRequestContract | null>;
 	worker: Worker;
 	adminUserId: string;
 	actionLibrary: Map<Action>;
@@ -63,7 +66,7 @@ export interface TestContext extends queueTestUtils.TestContext {
 /**
  * Options accepted by `newContext`.
  */
-export interface NewContextOptions extends coreTestUtils.NewContextOptions {
+export interface NewContextOptions extends autumndbTestUtils.NewContextOptions {
 	/**
 	 * Set of plugins needed to run tests.
 	 */
@@ -77,13 +80,31 @@ export interface NewContextOptions extends coreTestUtils.NewContextOptions {
 export const newContext = async (
 	options: NewContextOptions = {},
 ): Promise<TestContext> => {
-	const queueTestContext = await queueTestUtils.newContext(options);
+	const autumndbTestContext = await autumndbTestUtils.newContext(options);
 
-	const adminSessionContract = (await queueTestContext.kernel.getContractById(
-		queueTestContext.logContext,
-		queueTestContext.session,
-		queueTestContext.session,
-	)) as SessionContract;
+	const consumedActionRequests: ActionRequestContract[] = [];
+	const dequeue = async (
+		times: number = 50,
+	): Promise<ActionRequestContract | null> => {
+		for (let i = 0; i < times; i++) {
+			if (consumedActionRequests.length > 0) {
+				return consumedActionRequests.shift()!;
+			}
+
+			await new Promise((resolve) => {
+				setTimeout(resolve, 10);
+			});
+		}
+
+		return null;
+	};
+
+	const adminSessionContract =
+		(await autumndbTestContext.kernel.getContractById(
+			autumndbTestContext.logContext,
+			autumndbTestContext.session,
+			autumndbTestContext.session,
+		)) as SessionContract;
 	assert(adminSessionContract);
 
 	// Initialize plugins.
@@ -93,13 +114,28 @@ export const newContext = async (
 	const pluginContracts = pluginManager.getCards();
 	const actionLibrary = pluginManager.getActions();
 
+	// Initialize sync.
+	const sync = new Sync({
+		integrations: pluginManager.getSyncIntegrations(),
+	});
+
+	// Initialize worker instance.
+	const worker = new Worker(
+		autumndbTestContext.kernel,
+		autumndbTestContext.session,
+		actionLibrary,
+		autumndbTestContext.pool,
+	);
+	await worker.initialize(
+		autumndbTestContext.logContext,
+		sync,
+		async (payload: ActionRequestContract) => {
+			consumedActionRequests.push(payload);
+		},
+	);
+
 	// Make sure any loop contracts are initialized, as they can be a prerequisite
 	const bootstrapContracts: ContractDefinition[] = [];
-	contracts.forEach((contract) => {
-		if (contract.slug.match(/^(create|update|triggered-action)$/)) {
-			bootstrapContracts.push(contract);
-		}
-	});
 	Object.keys(pluginContracts).forEach((slug: string) => {
 		if (slug.match(/^(loop-|action-)/)) {
 			bootstrapContracts.push(pluginContracts[slug]);
@@ -114,9 +150,9 @@ export const newContext = async (
 					handler: action.handler,
 				},
 			});
-			await queueTestContext.kernel.insertContract(
-				queueTestContext.logContext,
-				queueTestContext.session,
+			await autumndbTestContext.kernel.insertContract(
+				autumndbTestContext.logContext,
+				autumndbTestContext.session,
 				action.contract,
 			);
 		}
@@ -130,30 +166,15 @@ export const newContext = async (
 		bootstrapContracts.push(contract);
 	}
 	for (const contract of bootstrapContracts) {
-		await queueTestContext.kernel.insertContract(
-			queueTestContext.logContext,
-			queueTestContext.session,
+		await autumndbTestContext.kernel.replaceContract(
+			autumndbTestContext.logContext,
+			autumndbTestContext.session,
 			contract,
 		);
 	}
 
-	// Initialize sync.
-	const sync = new Sync({
-		integrations: pluginManager.getSyncIntegrations(),
-	});
-
-	// Initialize worker instance.
-	const worker = new Worker(
-		queueTestContext.kernel,
-		queueTestContext.session,
-		actionLibrary,
-		queueTestContext.queue.consumer,
-		queueTestContext.queue.producer,
-	);
-	await worker.initialize(queueTestContext.logContext, sync);
-
-	const types = await queueTestContext.kernel.query<TypeContract>(
-		queueTestContext.logContext,
+	const types = await autumndbTestContext.kernel.query<TypeContract>(
+		autumndbTestContext.logContext,
 		worker.session,
 		{
 			type: 'object',
@@ -164,12 +185,12 @@ export const newContext = async (
 			},
 		},
 	);
-	worker.setTypeContracts(queueTestContext.logContext, types);
+	worker.setTypeContracts(autumndbTestContext.logContext, types);
 
 	// Update type cards through the worker for generated triggers, etc
 	for (const contract of types) {
 		await worker.replaceCard(
-			queueTestContext.logContext,
+			autumndbTestContext.logContext,
 			worker.session,
 			worker.typeContracts['type@1.0.0'],
 			{
@@ -179,8 +200,8 @@ export const newContext = async (
 		);
 	}
 
-	const triggers = await queueTestContext.kernel.query<TypeContract>(
-		queueTestContext.logContext,
+	const triggers = await autumndbTestContext.kernel.query<TypeContract>(
+		autumndbTestContext.logContext,
 		worker.session,
 		{
 			type: 'object',
@@ -191,10 +212,10 @@ export const newContext = async (
 			},
 		},
 	);
-	worker.setTriggers(queueTestContext.logContext, triggers);
+	worker.setTriggers(autumndbTestContext.logContext, triggers);
 
 	const flush = async (session: string) => {
-		const request = await queueTestContext.dequeue();
+		const request = await dequeue();
 		if (!request) {
 			throw new Error('No message dequeued');
 		}
@@ -212,9 +233,9 @@ export const newContext = async (
 		if (times === 0) {
 			throw new Error('The wait query did not resolve');
 		}
-		const results = await queueTestContext.kernel.query<T>(
-			queueTestContext.logContext,
-			queueTestContext.session,
+		const results = await autumndbTestContext.kernel.query<T>(
+			autumndbTestContext.logContext,
+			autumndbTestContext.session,
 			waitQuery,
 		);
 		if (results.length > 0) {
@@ -238,14 +259,14 @@ export const newContext = async (
 	};
 
 	const processAction = async (session: string, action: any) => {
-		const createRequest = await queueTestContext.queue.producer.enqueue(
+		const createRequest = await worker.producer.enqueue(
 			worker.getId(),
 			session,
 			action,
 		);
 		await flush(session);
-		return queueTestContext.queue.producer.waitResults(
-			queueTestContext.logContext,
+		return worker.producer.waitResults(
+			autumndbTestContext.logContext,
 			createRequest,
 		);
 	};
@@ -271,9 +292,9 @@ export const newContext = async (
 		body: string,
 		type: string,
 	) => {
-		const req = await queueTestContext.queue.producer.enqueue(actor, session, {
+		const req = await worker.producer.enqueue(actor, session, {
 			action: 'action-create-event@1.0.0',
-			logContext: queueTestContext.logContext,
+			logContext: autumndbTestContext.logContext,
 			card: target.id,
 			type: target.type,
 			arguments: {
@@ -285,16 +306,16 @@ export const newContext = async (
 		});
 
 		await flushAll(session);
-		const result: any = await queueTestContext.queue.producer.waitResults(
-			queueTestContext.logContext,
+		const result: any = await worker.producer.waitResults(
+			autumndbTestContext.logContext,
 			req,
 		);
 		expect(result.error).toBe(false);
 		assert(result.data);
 		await flushAll(session);
-		const contract = (await queueTestContext.kernel.getContractById(
-			queueTestContext.logContext,
-			queueTestContext.session,
+		const contract = (await autumndbTestContext.kernel.getContractById(
+			autumndbTestContext.logContext,
+			autumndbTestContext.session,
 			result.data.id,
 		)) as Contract;
 		assert(contract);
@@ -311,7 +332,7 @@ export const newContext = async (
 		inverseVerb: string,
 	) => {
 		const inserted = await worker.insertCard(
-			queueTestContext.logContext,
+			autumndbTestContext.logContext,
 			session,
 			worker.typeContracts['link@1.0.0'],
 			{
@@ -321,7 +342,7 @@ export const newContext = async (
 			{
 				slug: `link-${fromCard.id}-${verb.replace(/\s/g, '-')}-${
 					toCard.id
-				}-${coreTestUtils.generateRandomId()}`,
+				}-${autumndbTestUtils.generateRandomId()}`,
 				tags: [],
 				version: '1.0.0',
 				links: {},
@@ -345,9 +366,9 @@ export const newContext = async (
 		assert(inserted);
 		await flushAll(session);
 
-		const link = await queueTestContext.kernel.getContractById<LinkContract>(
-			queueTestContext.logContext,
-			queueTestContext.session,
+		const link = await autumndbTestContext.kernel.getContractById<LinkContract>(
+			autumndbTestContext.logContext,
+			autumndbTestContext.session,
 			inserted.id,
 		);
 		assert(link);
@@ -363,7 +384,7 @@ export const newContext = async (
 		markers = [],
 	) => {
 		const inserted = await worker.insertCard(
-			queueTestContext.logContext,
+			autumndbTestContext.logContext,
 			session,
 			worker.typeContracts[type],
 			{
@@ -372,7 +393,7 @@ export const newContext = async (
 			},
 			{
 				name,
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: type.split('@')[0],
 				}),
 				version: '1.0.0',
@@ -383,9 +404,9 @@ export const newContext = async (
 		assert(inserted);
 		await flushAll(session);
 
-		const contract = await queueTestContext.kernel.getContractById(
-			queueTestContext.logContext,
-			queueTestContext.session,
+		const contract = await autumndbTestContext.kernel.getContractById(
+			autumndbTestContext.logContext,
+			autumndbTestContext.session,
 			inserted.id,
 		);
 		assert(contract);
@@ -393,6 +414,8 @@ export const newContext = async (
 	};
 
 	return {
+		actor: uuid(),
+		dequeue,
 		adminUserId: adminSessionContract.data.actor,
 		actionLibrary,
 		flush,
@@ -404,15 +427,16 @@ export const newContext = async (
 		createLinkThroughWorker,
 		createContract,
 		worker,
-		...queueTestContext,
+		...autumndbTestContext,
 	};
 };
 
 /**
- * Deinitialize the queue.
+ * Deinitialize the worker.
  */
 export const destroyContext = async (context: TestContext) => {
-	await queueTestUtils.destroyContext(context);
+	await context.worker.consumer.cancel();
+	await autumndbTestUtils.destroyContext(context);
 };
 
 interface Variation {
@@ -651,7 +675,7 @@ export async function webhookScenario(
 			context.session,
 			{
 				type: 'external-event@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'external-event',
 				}),
 				version: '1.0.0',
@@ -659,7 +683,7 @@ export async function webhookScenario(
 			},
 		);
 
-		const request = await context.queue.producer.enqueue(
+		const request = await context.worker.producer.enqueue(
 			context.worker.getId(),
 			context.session,
 			{
@@ -672,7 +696,7 @@ export async function webhookScenario(
 		);
 
 		await context.flush(context.session);
-		const result = await context.queue.producer.waitResults(
+		const result = await context.worker.producer.waitResults(
 			context.logContext,
 			request,
 		);
