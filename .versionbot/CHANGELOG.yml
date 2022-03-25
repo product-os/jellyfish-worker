@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update usage example in readme
+      hash: e0e620f09344ce1ecc87cae9a9ebbbe99427cd51
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 21.0.1
+  title: "'Update usage example in readme'"
+  date: 2022-03-25T09:43:26.544Z
+- commits:
     - subject: Bring in queue
       hash: a1359ca68c09abba2e14cea8ee833f76282f3a2f
       body: ""
