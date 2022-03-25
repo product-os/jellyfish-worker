@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { testUtils as coreTestUtils } from 'autumndb';
+import { testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
 import { contractMixins, PluginDefinition, testUtils } from '../../../../lib';
 
@@ -98,7 +98,7 @@ afterAll(() => {
 
 describe('with-events mixin', () => {
 	test('formulas work as expected', async () => {
-		const username = coreTestUtils.generateRandomId();
+		const username = autumndbTestUtils.generateRandomId();
 		const testUser = await ctx.createUser(username);
 		const testSession = await ctx.createSession(testUser);
 
@@ -140,22 +140,22 @@ describe('with-events mixin', () => {
 				{
 					op: 'add',
 					path: '/data/payload/mentionsUser',
-					value: [coreTestUtils.generateRandomId()],
+					value: [autumndbTestUtils.generateRandomId()],
 				},
 				{
 					op: 'add',
 					path: '/data/payload/alertsUser',
-					value: [coreTestUtils.generateRandomId()],
+					value: [autumndbTestUtils.generateRandomId()],
 				},
 				{
 					op: 'add',
 					path: '/data/payload/mentionsGroup',
-					value: [coreTestUtils.generateRandomId()],
+					value: [autumndbTestUtils.generateRandomId()],
 				},
 				{
 					op: 'add',
 					path: '/data/payload/alertsGroup',
-					value: [coreTestUtils.generateRandomId()],
+					value: [autumndbTestUtils.generateRandomId()],
 				},
 			],
 		);

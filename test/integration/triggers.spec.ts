@@ -1,9 +1,9 @@
-import { strict as assert } from 'assert';
-import { Kernel, testUtils as coreTestUtils } from 'autumndb';
 import type {
 	Contract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
+import { strict as assert } from 'assert';
+import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
 import {
 	errors,
@@ -105,7 +105,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -165,7 +165,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'foo@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -232,7 +232,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -299,7 +299,7 @@ describe('.getRequest()', () => {
 				name: 'x2',
 				type: 'foo@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -380,7 +380,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'foo@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -458,7 +458,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'foo@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -533,7 +533,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -623,7 +623,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -713,7 +713,7 @@ describe('.getRequest()', () => {
 			{
 				type: 'card@1.0.0',
 				version: '1.0.0',
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				active: true,
 				links: {},
 				tags: [],
@@ -801,7 +801,7 @@ describe('.getRequest()', () => {
 			ctx.logContext,
 			ctx.session,
 			{
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				active: true,
@@ -865,7 +865,7 @@ describe('.getRequest()', () => {
 			ctx.logContext,
 			ctx.session,
 			{
-				slug: coreTestUtils.generateRandomId(),
+				slug: autumndbTestUtils.generateRandomId(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				active: true,
@@ -953,7 +953,7 @@ describe('.getRequest()', () => {
 			ctx.logContext,
 			ctx.session,
 			{
-				slug: coreTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug(),
 				type: 'card@1.0.0',
 				version: '1.0.0',
 				active: true,
@@ -989,7 +989,7 @@ describe('.getTypeTriggers()', () => {
 		const cards = [
 			{
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1060,11 +1060,11 @@ describe('.getTypeTriggers()', () => {
 	});
 
 	it('should not return inactive cards', async () => {
-		const typeSlug = coreTestUtils.generateRandomSlug();
+		const typeSlug = autumndbTestUtils.generateRandomSlug();
 		const cards = [
 			{
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1124,11 +1124,11 @@ describe('.getTypeTriggers()', () => {
 	});
 
 	it('should ignore non-matching cards', async () => {
-		const typeSlug = coreTestUtils.generateRandomSlug();
+		const typeSlug = autumndbTestUtils.generateRandomSlug();
 		const cards = [
 			{
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1168,7 +1168,7 @@ describe('.getTypeTriggers()', () => {
 			},
 			{
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1239,11 +1239,11 @@ describe('.getTypeTriggers()', () => {
 	});
 
 	it('should ignore cards that are not triggered actions', async () => {
-		const typeSlug = coreTestUtils.generateRandomSlug();
+		const typeSlug = autumndbTestUtils.generateRandomSlug();
 		const cards = [
 			{
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1283,7 +1283,7 @@ describe('.getTypeTriggers()', () => {
 			},
 			{
 				type: 'card@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'card',
 				}),
 				version: '1.0.0',
@@ -1357,7 +1357,7 @@ describe('.getTypeTriggers()', () => {
 		const cards = [
 			{
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1408,7 +1408,7 @@ describe('.getTypeTriggers()', () => {
 			ctx.logContext,
 			ctx.kernel,
 			ctx.session,
-			`${coreTestUtils.generateRandomSlug()}@1.0.0`,
+			`${autumndbTestUtils.generateRandomSlug()}@1.0.0`,
 		);
 		expect(result).toEqual([]);
 	});
@@ -1420,7 +1420,7 @@ describe('.getStartDate()', () => {
 		const result = triggers.getStartDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1451,7 +1451,7 @@ describe('.getStartDate()', () => {
 		const result = triggers.getStartDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1484,7 +1484,7 @@ describe('.getStartDate()', () => {
 		const result = triggers.getStartDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1520,7 +1520,7 @@ describe('.getNextExecutionDate()', () => {
 		const result = triggers.getNextExecutionDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1552,7 +1552,7 @@ describe('.getNextExecutionDate()', () => {
 		const result = triggers.getNextExecutionDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1581,7 +1581,7 @@ describe('.getNextExecutionDate()', () => {
 		const result = triggers.getNextExecutionDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1611,7 +1611,7 @@ describe('.getNextExecutionDate()', () => {
 		const result = triggers.getNextExecutionDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1644,7 +1644,7 @@ describe('.getNextExecutionDate()', () => {
 			triggers.getNextExecutionDate(
 				Kernel.defaults<TriggeredActionData>({
 					type: 'triggered-action@1.0.0',
-					slug: coreTestUtils.generateRandomSlug({
+					slug: autumndbTestUtils.generateRandomSlug({
 						prefix: 'triggered-action',
 					}),
 					version: '1.0.0',
@@ -1673,7 +1673,7 @@ describe('.getNextExecutionDate()', () => {
 		const result = triggers.getNextExecutionDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1704,7 +1704,7 @@ describe('.getNextExecutionDate()', () => {
 		const result = triggers.getNextExecutionDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1735,7 +1735,7 @@ describe('.getNextExecutionDate()', () => {
 		const result = triggers.getNextExecutionDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',
@@ -1766,7 +1766,7 @@ describe('.getNextExecutionDate()', () => {
 		const result = triggers.getNextExecutionDate(
 			Kernel.defaults<TriggeredActionData>({
 				type: 'triggered-action@1.0.0',
-				slug: coreTestUtils.generateRandomSlug({
+				slug: autumndbTestUtils.generateRandomSlug({
 					prefix: 'triggered-action',
 				}),
 				version: '1.0.0',

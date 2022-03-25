@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
-import { Kernel, testUtils as coreTestUtils } from 'autumndb';
-import type { ActionRequestContract } from '@balena/jellyfish-queue';
+import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
 import {
+	ActionRequestContract,
 	testUtils,
 	TriggeredActionContract,
 	TriggeredActionData,
@@ -28,7 +28,7 @@ describe('.execute()', () => {
 
 		assert(typeCard !== null);
 
-		const request = await ctx.queue.producer.enqueue(
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -39,7 +39,9 @@ describe('.execute()', () => {
 				arguments: {
 					reason: null,
 					properties: {
-						slug: coreTestUtils.generateRandomSlug({ prefix: 'execute-test' }),
+						slug: autumndbTestUtils.generateRandomSlug({
+							prefix: 'execute-test',
+						}),
 						version: '1.0.0',
 						data: {
 							foo: 'bar',
@@ -50,7 +52,7 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result: any = await ctx.queue.producer.waitResults(
+		const result: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
@@ -104,7 +106,7 @@ describe('.execute()', () => {
 			},
 		};
 
-		const request = await ctx.queue.producer.enqueue(
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -115,7 +117,9 @@ describe('.execute()', () => {
 				arguments: {
 					reason: null,
 					properties: {
-						slug: coreTestUtils.generateRandomSlug({ prefix: 'execute-test' }),
+						slug: autumndbTestUtils.generateRandomSlug({
+							prefix: 'execute-test',
+						}),
 						version: '1.0.0',
 						data: {
 							foo: 'bar',
@@ -130,7 +134,7 @@ describe('.execute()', () => {
 		} catch (err) {
 			// we're expecting an error here, so just ignore it
 		}
-		const result: any = await ctx.queue.producer.waitResults(
+		const result: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
@@ -153,7 +157,7 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const command = coreTestUtils.generateRandomSlug();
+		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
 			Kernel.defaults<TriggeredActionData>({
@@ -191,8 +195,8 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const slug = coreTestUtils.generateRandomSlug();
-		const request = await ctx.queue.producer.enqueue(
+		const slug = autumndbTestUtils.generateRandomSlug();
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -214,7 +218,7 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(
+		const result = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
@@ -268,7 +272,7 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const command = coreTestUtils.generateRandomSlug();
+		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
 			Kernel.defaults<TriggeredActionData>({
@@ -306,8 +310,8 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const slug = coreTestUtils.generateRandomSlug();
-		const request = await ctx.queue.producer.enqueue(
+		const slug = autumndbTestUtils.generateRandomSlug();
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -329,7 +333,7 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(
+		const result = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
@@ -370,12 +374,12 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const command = coreTestUtils.generateRandomSlug();
+		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
 			Kernel.defaults<TriggeredActionData>({
-				id: coreTestUtils.generateRandomId(),
-				slug: `triggered-action-${coreTestUtils.generateRandomId()}`,
+				id: autumndbTestUtils.generateRandomId(),
+				slug: `triggered-action-${autumndbTestUtils.generateRandomId()}`,
 				type: 'triggered-action@1.0.0',
 				data: {
 					filter: {
@@ -418,13 +422,13 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const slug = coreTestUtils.generateRandomSlug();
+		const slug = autumndbTestUtils.generateRandomSlug();
 
 		await new Promise((resolve) => {
 			setTimeout(resolve, 5000);
 		});
 
-		const request = await ctx.queue.producer.enqueue(
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -447,7 +451,7 @@ describe('.execute()', () => {
 
 		await ctx.flush(ctx.session);
 
-		const result = await ctx.queue.producer.waitResults(
+		const result = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
@@ -479,8 +483,8 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const slug = coreTestUtils.generateRandomSlug();
-		const request = await ctx.queue.producer.enqueue(
+		const slug = autumndbTestUtils.generateRandomSlug();
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -502,7 +506,7 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result: any = await ctx.queue.producer.waitResults(
+		const result: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
@@ -541,8 +545,8 @@ describe('.execute()', () => {
 
 		assert(typeType !== null);
 
-		const slug = coreTestUtils.generateRandomSlug();
-		const request = await ctx.queue.producer.enqueue(
+		const slug = autumndbTestUtils.generateRandomSlug();
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -574,13 +578,13 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const typeResult: any = await ctx.queue.producer.waitResults(
+		const typeResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
 		expect(typeResult.error).toBe(false);
 
-		const threadRequest = await ctx.queue.producer.enqueue(
+		const threadRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -591,7 +595,7 @@ describe('.execute()', () => {
 				arguments: {
 					reason: null,
 					properties: {
-						slug: coreTestUtils.generateRandomSlug(),
+						slug: autumndbTestUtils.generateRandomSlug(),
 						version: '1.0.0',
 					},
 				},
@@ -599,13 +603,13 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const threadResult: any = await ctx.queue.producer.waitResults(
+		const threadResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			threadRequest,
 		);
 		expect(threadResult.error).toBe(false);
 
-		const messageRequest = await ctx.queue.producer.enqueue(
+		const messageRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -625,7 +629,7 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const messageResult: any = await ctx.queue.producer.waitResults(
+		const messageResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			messageRequest,
 		);
@@ -657,7 +661,7 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const request = await ctx.queue.producer.enqueue(
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -668,7 +672,7 @@ describe('.execute()', () => {
 				arguments: {
 					reason: null,
 					properties: {
-						slug: coreTestUtils.generateRandomSlug(),
+						slug: autumndbTestUtils.generateRandomSlug(),
 						version: '1.0.0',
 						data: {
 							foo: 'bar',
@@ -679,7 +683,7 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(
+		const result = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
@@ -722,7 +726,7 @@ describe('.execute()', () => {
 		assert(typeCard !== null);
 		assert(actionCard !== null);
 
-		const command = coreTestUtils.generateRandomSlug();
+		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
 			Kernel.defaults<TriggeredActionData>({
@@ -759,8 +763,8 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const slug = coreTestUtils.generateRandomSlug();
-		const request = await ctx.queue.producer.enqueue(
+		const slug = autumndbTestUtils.generateRandomSlug();
+		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -782,7 +786,7 @@ describe('.execute()', () => {
 		);
 
 		await ctx.flush(ctx.session);
-		const result = await ctx.queue.producer.waitResults(
+		const result = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
@@ -821,12 +825,12 @@ describe('.execute()', () => {
 
 		assert(typeCard !== null);
 
-		const slug = coreTestUtils.generateRandomSlug();
+		const slug = autumndbTestUtils.generateRandomSlug();
 		const actionRequest = await ctx.kernel.insertCard<ActionRequestContract>(
 			ctx.logContext,
 			ctx.session,
 			{
-				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				slug: `action-request-${autumndbTestUtils.generateRandomId()}`,
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
@@ -864,7 +868,7 @@ describe('.execute()', () => {
 			ctx.logContext,
 			ctx.session,
 			{
-				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				slug: `action-request-${autumndbTestUtils.generateRandomId()}`,
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
@@ -874,13 +878,13 @@ describe('.execute()', () => {
 					timestamp: '2018-07-04T00:22:52.247Z',
 					input: {
 						// Make up a new UUID that doesn't correspond to any contract
-						id: coreTestUtils.generateRandomId(),
+						id: autumndbTestUtils.generateRandomId(),
 						type: 'card@1.0.0',
 					},
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug(),
+							slug: autumndbTestUtils.generateRandomSlug(),
 							version: '1.0.0',
 						},
 					},
@@ -906,7 +910,7 @@ describe('.execute()', () => {
 			ctx.logContext,
 			ctx.session,
 			{
-				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				slug: `action-request-${autumndbTestUtils.generateRandomId()}`,
 				type: 'action-request@1.0.0',
 				data: {
 					actor: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
@@ -921,7 +925,7 @@ describe('.execute()', () => {
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug(),
+							slug: autumndbTestUtils.generateRandomSlug(),
 							version: '1.0.0',
 						},
 					},
@@ -947,7 +951,7 @@ describe('.execute()', () => {
 			ctx.logContext,
 			ctx.session,
 			{
-				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				slug: `action-request-${autumndbTestUtils.generateRandomId()}`,
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
@@ -962,7 +966,7 @@ describe('.execute()', () => {
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug(),
+							slug: autumndbTestUtils.generateRandomSlug(),
 							version: '1.0.0',
 						},
 					},
@@ -990,7 +994,7 @@ describe('.execute()', () => {
 			ctx.logContext,
 			ctx.session,
 			{
-				slug: `action-request-${coreTestUtils.generateRandomId()}`,
+				slug: `action-request-${autumndbTestUtils.generateRandomId()}`,
 				type: 'action-request@1.0.0',
 				data: {
 					actor: ctx.adminUserId,
@@ -1037,7 +1041,7 @@ describe('.execute()', () => {
 				localCtx.logContext,
 				localCtx.session,
 				{
-					slug: `action-request-${coreTestUtils.generateRandomId()}`,
+					slug: `action-request-${autumndbTestUtils.generateRandomId()}`,
 					type: 'action-request@1.0.0',
 					data: {
 						actor: localCtx.adminUserId,
@@ -1052,7 +1056,7 @@ describe('.execute()', () => {
 						arguments: {
 							reason: null,
 							properties: {
-								slug: coreTestUtils.generateRandomSlug(),
+								slug: autumndbTestUtils.generateRandomSlug(),
 								version: '1.0.0',
 							},
 						},

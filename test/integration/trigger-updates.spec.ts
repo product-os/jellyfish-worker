@@ -1,4 +1,4 @@
-import { Kernel, testUtils as coreTestUtils } from 'autumndb';
+import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
 import {
 	testUtils,
 	TriggeredActionContract,
@@ -18,8 +18,8 @@ afterAll(() => {
 describe('.setTriggers()', () => {
 	it('should be able to set triggers', () => {
 		const trigger1 = Kernel.defaults<TriggeredActionData>({
-			id: coreTestUtils.generateRandomId(),
-			slug: coreTestUtils.generateRandomSlug({
+			id: autumndbTestUtils.generateRandomId(),
+			slug: autumndbTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
 			}),
 			type: 'triggered-action@1.0.0',
@@ -36,8 +36,8 @@ describe('.setTriggers()', () => {
 		}) as TriggeredActionContract;
 
 		const trigger2 = Kernel.defaults<TriggeredActionData>({
-			id: coreTestUtils.generateRandomId(),
-			slug: coreTestUtils.generateRandomSlug({
+			id: autumndbTestUtils.generateRandomId(),
+			slug: autumndbTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
 			}),
 			type: 'triggered-action@1.0.0',
@@ -64,8 +64,8 @@ describe('.setTriggers()', () => {
 describe('.upsertTrigger()', () => {
 	it('should be able to add a trigger', () => {
 		const trigger1 = Kernel.defaults<TriggeredActionData>({
-			id: coreTestUtils.generateRandomId(),
-			slug: coreTestUtils.generateRandomSlug({
+			id: autumndbTestUtils.generateRandomId(),
+			slug: autumndbTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
 			}),
 			type: 'triggered-action@1.0.0',
@@ -82,8 +82,8 @@ describe('.upsertTrigger()', () => {
 		}) as TriggeredActionContract;
 
 		const trigger2 = Kernel.defaults<TriggeredActionData>({
-			id: coreTestUtils.generateRandomId(),
-			slug: coreTestUtils.generateRandomSlug({
+			id: autumndbTestUtils.generateRandomId(),
+			slug: autumndbTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
 			}),
 			type: 'triggered-action@1.0.0',
@@ -110,8 +110,8 @@ describe('.upsertTrigger()', () => {
 
 	it('should be able to modify an existing trigger', () => {
 		const trigger1 = Kernel.defaults<TriggeredActionData>({
-			id: coreTestUtils.generateRandomId(),
-			slug: coreTestUtils.generateRandomSlug({
+			id: autumndbTestUtils.generateRandomId(),
+			slug: autumndbTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
 			}),
 			type: 'triggered-action@1.0.0',
@@ -128,8 +128,8 @@ describe('.upsertTrigger()', () => {
 		}) as TriggeredActionContract;
 
 		const trigger2 = Kernel.defaults<TriggeredActionData>({
-			id: coreTestUtils.generateRandomId(),
-			slug: coreTestUtils.generateRandomSlug({
+			id: autumndbTestUtils.generateRandomId(),
+			slug: autumndbTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
 			}),
 			type: 'triggered-action@1.0.0',
@@ -177,8 +177,8 @@ describe('.upsertTrigger()', () => {
 describe('.removeTrigger()', () => {
 	it('should be able to remove an existing trigger', () => {
 		const trigger1 = Kernel.defaults<TriggeredActionData>({
-			id: coreTestUtils.generateRandomId(),
-			slug: coreTestUtils.generateRandomSlug({
+			id: autumndbTestUtils.generateRandomId(),
+			slug: autumndbTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
 			}),
 			type: 'triggered-action@1.0.0',
@@ -195,8 +195,8 @@ describe('.removeTrigger()', () => {
 		}) as TriggeredActionContract;
 
 		const trigger2 = Kernel.defaults<TriggeredActionData>({
-			id: coreTestUtils.generateRandomId(),
-			slug: coreTestUtils.generateRandomSlug({
+			id: autumndbTestUtils.generateRandomId(),
+			slug: autumndbTestUtils.generateRandomSlug({
 				prefix: 'triggered-action',
 			}),
 			type: 'triggered-action@1.0.0',

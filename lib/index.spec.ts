@@ -1,5 +1,5 @@
 import type { Kernel } from 'autumndb';
-import type * as queue from '@balena/jellyfish-queue';
+import type { Pool } from 'pg';
 import * as errors from './errors';
 import { getNextExecutionDate, Worker } from './index';
 import type { Transformer } from './transformers';
@@ -44,8 +44,7 @@ describe('Worker.updateCurrentTransformers()', () => {
 			{} as any as Kernel,
 			'session-foo',
 			{},
-			{} as any as queue.Consumer,
-			{} as any as queue.Producer,
+			{} as any as Pool,
 		);
 		worker.transformers = transformers;
 		worker.updateLatestTransformers();

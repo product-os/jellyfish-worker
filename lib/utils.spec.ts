@@ -1,6 +1,6 @@
-import type { ActionContract } from '@balena/jellyfish-queue';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { ActionContract } from '.';
 import * as utils from './utils';
 
 describe('.durationToMs()', () => {

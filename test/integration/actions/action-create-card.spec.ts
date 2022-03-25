@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { errors as coreErrors, testUtils as coreTestUtils } from 'autumndb';
+import { errors as coreErrors, testUtils as autumndbTestUtils } from 'autumndb';
 import { testUtils, WorkerContext } from '../../../lib';
 import { actionCreateCard } from '../../../lib/actions/action-create-card';
 import { makeRequest } from './helpers';
@@ -15,7 +15,7 @@ beforeAll(async () => {
 	actionContext = ctx.worker.getActionContext(ctx.logContext);
 
 	guestUser = await ctx.createUser(
-		coreTestUtils.generateRandomSlug(),
+		autumndbTestUtils.generateRandomSlug(),
 		undefined,
 		['user-guest'],
 	);
@@ -31,7 +31,7 @@ describe('action-create-card', () => {
 	test('should use provided slug', async () => {
 		const request = makeRequest(ctx, {
 			properties: {
-				slug: coreTestUtils.generateRandomSlug(),
+				slug: autumndbTestUtils.generateRandomSlug(),
 				type: 'card@1.0.0',
 			},
 		});
@@ -78,7 +78,7 @@ describe('action-create-card', () => {
 		);
 		assert(typeType);
 
-		const id = await ctx.queue.producer.enqueue(
+		const id = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -118,10 +118,13 @@ describe('action-create-card', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const typeResult = await ctx.queue.producer.waitResults(ctx.logContext, id);
+		const typeResult = await ctx.worker.producer.waitResults(
+			ctx.logContext,
+			id,
+		);
 		expect(typeResult.error).toBe(false);
 
-		const threadId = await ctx.queue.producer.enqueue(
+		const threadId = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -133,7 +136,7 @@ describe('action-create-card', () => {
 					reason: null,
 					properties: {
 						version: '1.0.0',
-						slug: coreTestUtils.generateRandomSlug(),
+						slug: autumndbTestUtils.generateRandomSlug(),
 						data: {
 							mentions: [],
 						},
@@ -143,13 +146,13 @@ describe('action-create-card', () => {
 		);
 
 		await ctx.flushAll(ctx.session);
-		const threadResult = await ctx.queue.producer.waitResults(
+		const threadResult = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			threadId,
 		);
 		expect(threadResult.error).toBe(false);
 
-		await ctx.queue.producer.enqueue(ctx.worker.getId(), ctx.session, {
+		await ctx.worker.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-card@1.0.0',
 			card: cardType.id,
 			logContext: ctx.logContext,
@@ -183,7 +186,7 @@ describe('action-create-card', () => {
 			'card@latest',
 		);
 		assert(typeCard);
-		const createRequest = await ctx.queue.producer.enqueue(
+		const createRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -194,14 +197,14 @@ describe('action-create-card', () => {
 				arguments: {
 					reason: 'My new card',
 					properties: {
-						slug: coreTestUtils.generateRandomSlug(),
+						slug: autumndbTestUtils.generateRandomSlug(),
 						version: '1.0.0',
 					},
 				},
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const createResult = await ctx.queue.producer.waitResults(
+		const createResult = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			createRequest,
 		);
@@ -277,8 +280,8 @@ describe('action-create-card', () => {
 			'card@latest',
 		);
 		assert(typeCard);
-		const slug = coreTestUtils.generateRandomSlug();
-		const createRequest = await ctx.queue.producer.enqueue(
+		const slug = autumndbTestUtils.generateRandomSlug();
+		const createRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
@@ -297,7 +300,7 @@ describe('action-create-card', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const createResult = await ctx.queue.producer.waitResults(
+		const createResult = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			createRequest,
 		);
@@ -316,12 +319,12 @@ describe('action-create-card', () => {
 
 	test('a community user cannot create a session that points to another user', async () => {
 		const user = await ctx.createUser(
-			coreTestUtils.generateRandomId().split('-')[0],
+			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
 		expect(user.data.roles).toEqual(['user-community']);
 		const session = await ctx.createSession(user);
 
-		const otherUser = coreTestUtils.generateRandomId();
+		const otherUser = autumndbTestUtils.generateRandomId();
 		assert(user.id !== otherUser);
 
 		await expect(
@@ -333,11 +336,11 @@ describe('action-create-card', () => {
 					context: ctx.logContext,
 					timestamp: new Date().toISOString(),
 					actor: user.id,
-					originator: coreTestUtils.generateRandomId(),
+					originator: autumndbTestUtils.generateRandomId(),
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug({
+							slug: autumndbTestUtils.generateRandomSlug({
 								prefix: 'session',
 							}),
 							data: {
@@ -352,7 +355,7 @@ describe('action-create-card', () => {
 
 	test('creating a role with a community user session should fail', async () => {
 		const user = await ctx.createUser(
-			coreTestUtils.generateRandomId().split('-')[0],
+			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
 		expect(user.data.roles).toEqual(['user-community']);
 		const session = await ctx.createSession(user);
@@ -366,11 +369,11 @@ describe('action-create-card', () => {
 					context: ctx.logContext,
 					timestamp: new Date().toISOString(),
 					actor: user.id,
-					originator: coreTestUtils.generateRandomId(),
+					originator: autumndbTestUtils.generateRandomId(),
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug({
+							slug: autumndbTestUtils.generateRandomSlug({
 								prefix: 'role',
 							}),
 							data: {
@@ -396,11 +399,11 @@ describe('action-create-card', () => {
 					context: ctx.logContext,
 					timestamp: new Date().toISOString(),
 					actor: guestUser.id,
-					originator: coreTestUtils.generateRandomId(),
+					originator: autumndbTestUtils.generateRandomId(),
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug({
+							slug: autumndbTestUtils.generateRandomSlug({
 								prefix: 'role',
 							}),
 							data: {
@@ -426,16 +429,16 @@ describe('action-create-card', () => {
 					context: ctx.logContext,
 					timestamp: new Date().toISOString(),
 					actor: guestUser.id,
-					originator: coreTestUtils.generateRandomId(),
+					originator: autumndbTestUtils.generateRandomId(),
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug({
+							slug: autumndbTestUtils.generateRandomSlug({
 								prefix: 'user',
 							}),
 							data: {
 								roles: [],
-								hash: coreTestUtils.generateRandomId(),
+								hash: autumndbTestUtils.generateRandomId(),
 							},
 						},
 					},
@@ -446,11 +449,11 @@ describe('action-create-card', () => {
 
 	test('users with no roles should not be able to create sessions for other users', async () => {
 		const user = await ctx.createUser(
-			coreTestUtils.generateRandomId().split('-')[0],
+			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
 		const session = await ctx.createSession(user);
 		const targetUser = await ctx.createUser(
-			coreTestUtils.generateRandomId().split('-')[0],
+			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
 
 		await ctx.worker.patchCard(
@@ -480,11 +483,11 @@ describe('action-create-card', () => {
 					context: ctx.logContext,
 					timestamp: new Date().toISOString(),
 					actor: user.id,
-					originator: coreTestUtils.generateRandomId(),
+					originator: autumndbTestUtils.generateRandomId(),
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug({
+							slug: autumndbTestUtils.generateRandomSlug({
 								prefix: 'session',
 							}),
 							data: {
@@ -499,7 +502,7 @@ describe('action-create-card', () => {
 
 	test('users should not be able to create action requests', async () => {
 		const user = await ctx.createUser(
-			coreTestUtils.generateRandomId().split('-')[0],
+			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
 		const session = await ctx.createSession(user);
 
@@ -512,11 +515,11 @@ describe('action-create-card', () => {
 					context: ctx.logContext,
 					timestamp: new Date().toISOString(),
 					actor: user.id,
-					originator: coreTestUtils.generateRandomId(),
+					originator: autumndbTestUtils.generateRandomId(),
 					arguments: {
 						reason: null,
 						properties: {
-							slug: coreTestUtils.generateRandomSlug({
+							slug: autumndbTestUtils.generateRandomSlug({
 								prefix: 'action-request',
 							}),
 							data: {
@@ -526,13 +529,13 @@ describe('action-create-card', () => {
 									id: 'REQUEST-17.21.6-237c6999-64bb-4df0-ba7f-2f303003a609',
 									api: 'SERVER-17.21.6-localhost-e0f6fe9b-60e3-4d41-b575-1e719febe55b',
 								},
-								actor: coreTestUtils.generateRandomId(),
+								actor: autumndbTestUtils.generateRandomId(),
 								action: 'action-create-session@1.0.0',
 								input: {
-									id: coreTestUtils.generateRandomId(),
+									id: autumndbTestUtils.generateRandomId(),
 								},
 								arguments: {
-									password: coreTestUtils.generateRandomId(),
+									password: autumndbTestUtils.generateRandomId(),
 								},
 							},
 						},
