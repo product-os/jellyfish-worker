@@ -10,19 +10,62 @@ framework.
 
 Below is an example how to use this library:
 
-```js
-import { Worker } from '@balena/jellyfish-worker';
+```typescript
+import { foobarPlugin } from '@balena/jellyfish-plugin-foobar';
+import { PluginManager, Worker } from '@balena/jellyfish-worker';
+import * as autumndb from 'autumndb';
+import { v4 as uuidv4 } from 'uuid';
 
-const worker = new Worker(
-	jellyfish,
-	jellyfish.sessions.admin,
-	actionLibrary,
-	consumer,
-);
-await worker.initialize(context);
+const bootstrap = async () => {
+	// Define common log context
+	const logContext = {
+		id: `SERVER-${uuidv4()}`,
+	};
 
-const id = worker.getId();
-console.log(`Worker ID: ${worker.getId()}`);
+	// Set up plugins
+	const pluginManager = new PluginManager([
+		foobarPlugin(),
+	]);
+	const integrations = pluginManager.getSyncIntegrations(logContext);
+	const actionLibrary = pluginManager.getActions(logContext);
+
+	// Set up cache
+	const cache = new autumndb.Cache(environment.redis);
+	await cache.connect();
+
+	// Set up database
+	const { kernel, pool } = await autumndb.Kernel.withPostgres(
+		logContext,
+		cache,
+		environment.database.options,
+	);
+
+	// Create and new worker instance
+	const worker = new Worker(
+		kernel,
+		kernel.adminSession()!,
+		actionLibrary,
+		pool,
+	);
+
+	// Set up a sync instance using integrations from plugins
+	const sync = new Sync({
+		integrations,
+	});
+
+	// Initialize worker instance
+	await worker.initialize(context, sync, async (actionRequest) => {
+		console.log('actionRequest:', JSON.stringify(actionRequest, null, 4));
+	});
+
+	// Check that the worker instance is functioning
+	console.log('Worker ID:', worker.getId());
+
+	// Close everything down cleanly
+	await worker.consumer.cancel();
+	await kernel.disconnect(logContext);
+	await cache.disconnect();
+}
 ```
 
 # Documentation
