@@ -16,7 +16,7 @@ const handler: ActionDefinition['handler'] = async (
 			request.arguments.properties,
 		),
 		Error,
-		'You may not use card actions to create an event',
+		'You may not use contract actions to create an event',
 	);
 
 	const result = await context.insertCard(
@@ -50,7 +50,7 @@ export const actionCreateCard: ActionDefinition = {
 		slug: 'action-create-card',
 		version: '1.0.0',
 		type: 'action@1.0.0',
-		name: 'Create a new card',
+		name: 'Create a new contract',
 		data: {
 			filter: {
 				type: 'object',

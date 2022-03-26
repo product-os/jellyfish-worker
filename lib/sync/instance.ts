@@ -74,12 +74,12 @@ const httpRequest = async <T = any>(
 };
 
 const setProperty = (
-	card: any,
+	contract: any,
 	object: any,
 	path: _.Many<string | number | symbol>,
 ) => {
 	if (_.has(object, path)) {
-		_.set(card, path, _.get(object, path) || _.get(card, path));
+		_.set(contract, path, _.get(object, path) || _.get(contract, path));
 	}
 };
 
@@ -87,49 +87,49 @@ const getOrCreate = async (
 	context: SyncActionContext,
 	object: Partial<Contract> & { type: string },
 ) => {
-	// TODO: Attempt to unify user cards based on
-	// their e-mails. i.e. if two user cards have
+	// TODO: Attempt to unify user contracts based on
+	// their e-mails. i.e. if two user contracts have
 	// the same e-mail then they are likely the
 	// same user.
-	const card = await context.getElementBySlug(
+	const contract = await context.getElementBySlug(
 		`${object.slug}@${object.version}`,
 	);
-	if (card) {
+	if (contract) {
 		// Set union of all known e-mails
 		const emailPropertyPath = ['data', 'email'];
 		if (_.has(object, emailPropertyPath)) {
 			const emails = _.sortBy(
 				_.compact(
 					_.union(
-						_.castArray(_.get(card, emailPropertyPath)),
+						_.castArray(_.get(contract, emailPropertyPath)),
 						_.castArray(_.get(object, emailPropertyPath)),
 					),
 				),
 			);
 			_.set(
-				card,
+				contract,
 				emailPropertyPath,
 				emails.length === 1 ? _.first(emails) : emails,
 			);
 		}
 
-		setProperty(card, object, ['data', 'profile', 'company']);
-		setProperty(card, object, ['data', 'profile', 'name', 'first']);
-		setProperty(card, object, ['data', 'profile', 'name', 'last']);
-		setProperty(card, object, ['data', 'profile', 'title']);
-		setProperty(card, object, ['data', 'profile', 'country']);
-		setProperty(card, object, ['data', 'profile', 'city']);
+		setProperty(contract, object, ['data', 'profile', 'company']);
+		setProperty(contract, object, ['data', 'profile', 'name', 'first']);
+		setProperty(contract, object, ['data', 'profile', 'name', 'last']);
+		setProperty(contract, object, ['data', 'profile', 'title']);
+		setProperty(contract, object, ['data', 'profile', 'country']);
+		setProperty(contract, object, ['data', 'profile', 'city']);
 
-		context.log.info('Unifying actor cards', {
-			target: card,
+		context.log.info('Unifying actor contracts', {
+			target: contract,
 			source: object,
 		});
 
-		await context.upsertElement(card.type, _.omit(card, ['type']), {
+		await context.upsertElement(contract.type, _.omit(contract, ['type']), {
 			timestamp: new Date(),
 		});
 
-		return card.id;
+		return contract.id;
 	}
 
 	context.log.info('Inserting non-existent actor', {
@@ -147,20 +147,20 @@ const getOrCreate = async (
 
 	// The result of an upsert might be null if the upsert
 	// didn't change anything (a no-op update), so in that
-	// case we can fetch the user card from the database.
+	// case we can fetch the user contract from the database.
 	if (!result) {
-		const existentCard = await context.getElementBySlug(
+		const existentContract = await context.getElementBySlug(
 			`${object.slug}@${object.version}`,
 		);
 
 		// If the contract can't be loaded something weird has happened
-		if (!existentCard) {
+		if (!existentContract) {
 			throw Error(
 				`Upsert returned null, but can't retrieve contract: ${object.slug}@${object.version}`,
 			);
 		}
 
-		return existentCard.id;
+		return existentContract.id;
 	}
 
 	return result.id;
@@ -175,17 +175,17 @@ const getOAuthUser = async (
 	actor: any,
 	options: { defaultUser: any },
 ) => {
-	const userCard = await context.getElementById(actor);
+	const userContract = await context.getElementById(actor);
 	assert.INTERNAL(
 		null,
-		userCard,
+		userContract,
 		errors.SyncNoActor,
 		`No such actor: ${actor}`,
 	);
 
 	const tokenPath = ['data', 'oauth', provider];
-	if (_.has(userCard, tokenPath)) {
-		return userCard;
+	if (_.has(userContract, tokenPath)) {
+		return userContract;
 	}
 
 	assert.INTERNAL(
@@ -195,26 +195,26 @@ const getOAuthUser = async (
 		`No default integrations actor to act as ${actor} for ${provider}`,
 	);
 
-	const defaultUserCard = await context.getElementBySlug(
+	const defaultUserContract = await context.getElementBySlug(
 		`user-${options.defaultUser}@latest`,
 		true,
 	);
 
 	assert.INTERNAL(
 		null,
-		defaultUserCard,
+		defaultUserContract,
 		errors.SyncNoActor,
 		`No such actor: ${options.defaultUser}`,
 	);
 
 	assert.USER(
 		null,
-		_.has(defaultUserCard, tokenPath),
+		_.has(defaultUserContract, tokenPath),
 		errors.SyncOAuthNoUserError,
 		`Default actor ${options.defaultUser} does not support ${provider}`,
 	);
 
-	return defaultUserCard;
+	return defaultUserContract;
 };
 
 export const run = async (
@@ -263,7 +263,7 @@ export const run = async (
 					provider: options.provider,
 					defaultUser: options.defaultUser,
 				});
-				const userCard = await getOAuthUser(
+				const userContract = await getOAuthUser(
 					options.context,
 					options.provider,
 					actor,
@@ -272,11 +272,11 @@ export const run = async (
 					},
 				);
 				options.context.log.info('Sync OAuth user', {
-					id: userCard.id,
+					id: userContract.id,
 				});
 
 				const tokenPath = ['data', 'oauth', options.provider];
-				const tokenData = _.get(userCard, tokenPath);
+				const tokenData = _.get(userContract, tokenPath);
 				if (tokenData) {
 					_.set(
 						requestOptions,
@@ -291,7 +291,7 @@ export const run = async (
 				if (result.code === 401 && tokenData) {
 					options.context.log.info('Refreshing OAuth token', {
 						provider: options.provider,
-						user: userCard.slug,
+						user: userContract.slug,
 						origin: options.origin,
 						appId: token.appId,
 						oldToken: tokenData.access_token,
@@ -301,7 +301,7 @@ export const run = async (
 					 * Keep in mind that there exists the possibility
 					 * that we refresh the token on the provider's API
 					 * but we fail to save the result to the user's
-					 * card, in which case the user will need to re-link
+					 * contract, in which case the user will need to re-link
 					 * his account.
 					 */
 					const newToken = await oauth.refreshAccessToken(
@@ -313,10 +313,10 @@ export const run = async (
 							redirectUri: options.origin,
 						},
 					);
-					_.set(userCard, tokenPath, newToken);
+					_.set(userContract, tokenPath, newToken);
 					await options.context.upsertElement(
-						userCard.type,
-						_.omit(userCard, ['type']),
+						userContract.type,
+						_.omit(userContract, ['type']),
 						{
 							timestamp: new Date(),
 						},

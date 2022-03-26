@@ -6,24 +6,24 @@ import type { ActionDefinition } from '../plugin';
 const handler: ActionDefinition['handler'] = async (
 	session,
 	context,
-	card,
+	contract,
 	request,
 ) => {
-	const typeCard = (await context.getCardBySlug(
+	const typeContract = (await context.getCardBySlug(
 		session,
-		card.type,
+		contract.type,
 	))! as TypeContract;
 
 	assert.USER(
 		request.logContext,
-		typeCard,
+		typeContract,
 		WorkerNoElement,
-		`No such type: ${card.type}`,
+		`No such type: ${contract.type}`,
 	);
 
 	const result = await context.patchCard(
 		session,
-		typeCard,
+		typeContract,
 		{
 			timestamp: request.timestamp,
 			reason: request.arguments.reason,
@@ -31,16 +31,16 @@ const handler: ActionDefinition['handler'] = async (
 			originator: request.originator,
 			attachEvents: true,
 		},
-		card,
+		contract,
 		request.arguments.patch,
 	);
 
 	if (!result) {
 		return {
-			id: card.id,
-			type: card.type,
-			version: card.version,
-			slug: card.slug,
+			id: contract.id,
+			type: contract.type,
+			version: contract.version,
+			slug: contract.slug,
 		};
 	}
 
@@ -58,7 +58,7 @@ export const actionUpdateCard: ActionDefinition = {
 		slug: 'action-update-card',
 		version: '1.0.0',
 		type: 'action@1.0.0',
-		name: 'Update properties of a card',
+		name: 'Update properties of a contract',
 		data: {
 			arguments: {
 				reason: {

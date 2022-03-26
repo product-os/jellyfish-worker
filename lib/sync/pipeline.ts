@@ -16,13 +16,13 @@ const runIntegration = async (
 	integration: IntegrationDefinition,
 	options: PipelineOpts,
 	fn: 'translate' | 'mirror',
-	card: Contract,
+	contract: Contract,
 ): Promise<Contract[]> => {
 	return instance.run(
 		integration,
 		options.token,
 		async (integrationInstance: Integration) => {
-			const sequence = await integrationInstance[fn](card, {
+			const sequence = await integrationInstance[fn](contract, {
 				actor: options.actor,
 			});
 
@@ -32,7 +32,7 @@ const runIntegration = async (
 			});
 
 			return importCards(options.context, sequence, {
-				origin: card,
+				origin: contract,
 			});
 		},
 		{
@@ -50,20 +50,20 @@ const runIntegration = async (
  * @function
  * @private
  *
- * @param {Object} object - object
- * @param {Object} environment - evaluation context
- * @returns {(Object|Null)} evaluated object
+ * @param object - object
+ * @param environment - evaluation context
+ * @returns evaluated object
  *
  * @example
  * const result = evaluateObject({
  *   foo: {
- *     $eval: 'hello'
+ *     $eval: 'hello',
  *   }
  * }, {
- *   hello: 1
- * })
+ *   hello: 1,
+ * });
  *
- * console.log(result)
+ * console.log(result);
  * > {
  * >   foo: 1
  * > }
@@ -104,33 +104,33 @@ const evaluateObject = (object: any, environment: any) => {
 };
 
 /**
- * @summary Import a sequence of cards
+ * @summary Import a sequence of contracts
  * @function
  * @public
  *
- * @param {Object} context - worker execution context
- * @param {Array} sequence - card sequence
- * @param {Object} options - options
- * @param {String} options.origin - origin id
- * @returns {Object[]} inserted cards
+ * @param context - worker execution context
+ * @param sequence - card sequence
+ * @param options - options object
+ * @param options.origin - origin id
+ * @returns inserted cards
  *
  * @example
  * const result = await pipeline.importCards({ ... }, [
  *   {
  *     time: new Date(),
- *     card: { ... }
+ *     card: { ... },
  *   },
  *   {
  *     time: new Date(),
- *     card: { ... }
+ *     card: { ... },
  *   },
  *   {
  *     time: new Date(),
- *     card: { ... }
- *   }
+ *     card: { ... },
+ *   },
  * ], {
- *   origin: 'e9b74e2a-3553-4188-8ab8-a67e92aedbe2'
- * })
+ *   origin: 'e9b74e2a-3553-4188-8ab8-a67e92aedbe2',
+ * });
  */
 export const importCards = async (
 	context: PipelineOpts['context'],
@@ -139,7 +139,7 @@ export const importCards = async (
 ) => {
 	// TODO: AFAICT the references option is never provided and can probably be removed
 	const references = options.references || {};
-	const insertedCards: Contract[] = [];
+	const insertedContracts: Contract[] = [];
 
 	for (const [index, value] of sequence.entries()) {
 		const step = _.castArray(value);
@@ -224,7 +224,7 @@ export const importCards = async (
 				});
 
 				if (result) {
-					insertedCards.push(result);
+					insertedContracts.push(result);
 				}
 
 				_.set(references, path, result);
@@ -235,7 +235,7 @@ export const importCards = async (
 		);
 	}
 
-	return insertedCards;
+	return insertedContracts;
 };
 
 /**
@@ -243,19 +243,19 @@ export const importCards = async (
  * @function
  * @public
  *
- * @param {Object} integration - integration class
- * @param {Object} externalEvent - external event card
- * @param {Object} options - options
- * @param {Object} options.context - execution context
- * @returns {Object[]} inserted cards
+ * @param integration - integration class
+ * @param externalEvent - external event contract
+ * @param options - options
+ * @param options.context - execution context
+ * @returns inserted contracts
  *
  * @example
- * const cards = await pipeline.translateExternalEvent(MyIntegration, {
+ * const contracts = await pipeline.translateExternalEvent(MyIntegration, {
  *   type: 'external-event',
  *   ...
  * }, {
- *   context: { ... }
- * })
+ *   context: { ... },
+ * });
  */
 export const translateExternalEvent = async (
 	integration: IntegrationDefinition,
@@ -266,30 +266,30 @@ export const translateExternalEvent = async (
 };
 
 /**
- * @summary Mirror a card back
+ * @summary Mirror a contract back
  * @function
  * @public
  *
- * @param {Object} integration - integration class
- * @param {Object} card - local card
- * @param {Object} options - options
- * @param {Object} options.context - execution context
- * @param {String} options.actor - actor id
- * @returns {Object[]} inserted cards
+ * @param integration - integration class
+ * @param contract - local contract
+ * @param options - options object
+ * @param options.context - execution context
+ * @param options.actor - actor id
+ * @returns inserted contracts
  *
  * @example
- * const cards = await pipeline.mirrorCard(MyIntegration, {
+ * const contracts = await pipeline.mirrorCard(MyIntegration, {
  *   type: 'card',
  *   ...
  * }, {
  *   context: { ... },
- *   actor: 'b76a4589-cac6-4293-b448-0440b5c66498'
- * })
+ *   actor: 'b76a4589-cac6-4293-b448-0440b5c66498',
+ * });
  */
 export const mirrorCard = async (
 	integration: IntegrationDefinition,
-	card: Contract,
+	contract: Contract,
 	options: PipelineOpts,
 ) => {
-	return runIntegration(integration, options, 'mirror', card);
+	return runIntegration(integration, options, 'mirror', contract);
 };

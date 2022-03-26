@@ -19,7 +19,7 @@ afterAll(async () => {
 
 describe('events', () => {
 	describe('.post()', () => {
-		test('should insert an active execute card', async () => {
+		test('should insert an active execute contract', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			const event = await events.post(
 				context.logContext,
@@ -40,20 +40,20 @@ describe('events', () => {
 				},
 			);
 
-			const card = await context.kernel.getContractById(
+			const contract = await context.kernel.getContractById(
 				context.logContext,
 				context.session,
 				event.id,
 			);
-			expect(card!.active).toBe(true);
-			expect(card!.type).toBe('execute@1.0.0');
+			expect(contract!.active).toBe(true);
+			expect(contract!.type).toBe('execute@1.0.0');
 		});
 
 		test('should set a present timestamp', async () => {
 			const currentDate = new Date();
 			const id = autumndbTestUtils.generateRandomId();
 
-			const card = await events.post(
+			const contract = await events.post(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -72,12 +72,12 @@ describe('events', () => {
 				},
 			);
 
-			expect(new Date(card.data.timestamp) >= currentDate).toBe(true);
+			expect(new Date(contract.data.timestamp) >= currentDate).toBe(true);
 		});
 
 		test('should not use a passed id', async () => {
 			const id = autumndbTestUtils.generateRandomId();
-			const card = await events.post(
+			const contract = await events.post(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -96,7 +96,7 @@ describe('events', () => {
 				},
 			);
 
-			expect(card.id).not.toBe(id);
+			expect(contract.id).not.toBe(id);
 		});
 
 		test("should fail if the result doesn't contain an `error` field", async () => {
@@ -124,7 +124,7 @@ describe('events', () => {
 
 		test('should use the passed timestamp in the payload', async () => {
 			const id = autumndbTestUtils.generateRandomId();
-			const card = await events.post(
+			const contract = await events.post(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -143,12 +143,12 @@ describe('events', () => {
 				},
 			);
 
-			expect(card.data.payload.timestamp).toBe('2018-06-30T19:34:42.829Z');
-			expect(card.data.payload.timestamp).not.toBe(card.data.timestamp);
+			expect(contract.data.payload.timestamp).toBe('2018-06-30T19:34:42.829Z');
+			expect(contract.data.payload.timestamp).not.toBe(contract.data.timestamp);
 		});
 
 		test('should allow an object result', async () => {
-			const card = await events.post(
+			const contract = await events.post(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -167,7 +167,7 @@ describe('events', () => {
 				},
 			);
 
-			expect(card.data.payload.data).toEqual({
+			expect(contract.data.payload.data).toEqual({
 				value: 5,
 			});
 		});
@@ -221,7 +221,7 @@ describe('events', () => {
 			}, 500);
 		});
 
-		test('should return if the card already exists', async () => {
+		test('should return if the contract already exists', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			await events.post(
 				context.logContext,
@@ -242,7 +242,7 @@ describe('events', () => {
 				},
 			);
 
-			const card = await events.wait(
+			const contract = await events.wait(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -254,11 +254,11 @@ describe('events', () => {
 				},
 			);
 
-			assert(card);
-			expect(card.type).toBe('execute@1.0.0');
-			expect(card.data.target).toBe(id);
-			expect(card.data.actor).toBe('57692206-8da2-46e1-91c9-159b2c6928ef');
-			expect(card.data.payload.card).toBe(
+			assert(contract);
+			expect(contract.type).toBe('execute@1.0.0');
+			expect(contract.data.target).toBe(id);
+			expect(contract.data.actor).toBe('57692206-8da2-46e1-91c9-159b2c6928ef');
+			expect(contract.data.payload.card).toBe(
 				'033d9184-70b2-4ec9-bc39-9a249b186422',
 			);
 		});
@@ -274,9 +274,9 @@ describe('events', () => {
 					card: BIG_EXECUTE_CARD.data.target,
 					actor: BIG_EXECUTE_CARD.data.actor,
 				})
-				.then((card) => {
-					assert(card);
-					expect(card.data.payload).toEqual(BIG_EXECUTE_CARD.data.payload);
+				.then((contract) => {
+					assert(contract);
+					expect(contract.data.payload).toEqual(BIG_EXECUTE_CARD.data.payload);
 					done();
 				})
 				.catch(done);
@@ -323,7 +323,7 @@ describe('events', () => {
 				},
 			);
 
-			const card = await events.wait(
+			const contract = await events.wait(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -334,9 +334,9 @@ describe('events', () => {
 					actor: '57692206-8da2-46e1-91c9-159b2c6928ef',
 				},
 			);
-			assert(card);
+			assert(contract);
 
-			expect(card.data.payload).toEqual({
+			expect(contract.data.payload).toEqual({
 				action: '57692206-8da2-46e1-91c9-159b2c6928ef',
 				card: '033d9184-70b2-4ec9-bc39-9a249b186422',
 				timestamp: '2018-06-30T19:34:42.829Z',
@@ -345,7 +345,7 @@ describe('events', () => {
 			});
 		});
 
-		test('should ignore cards that do not match the id', (done) => {
+		test('should ignore contracts that do not match the id', (done) => {
 			expect.assertions(1);
 
 			const id1 = autumndbTestUtils.generateRandomId();
@@ -434,7 +434,7 @@ describe('events', () => {
 	describe('.getLastExecutionEvent', () => {
 		test('should return the last execution event given one event', async () => {
 			const id = autumndbTestUtils.generateRandomId();
-			const card = await events.post(
+			const contract = await events.post(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -461,8 +461,8 @@ describe('events', () => {
 
 			expect(event).toEqual(
 				Kernel.defaults({
-					created_at: card.created_at,
-					id: card.id,
+					created_at: contract.created_at,
+					id: contract.id,
 					name: null,
 					slug: event.slug,
 					type: 'execute@1.0.0',
@@ -487,7 +487,7 @@ describe('events', () => {
 		test('should return the last event given a matching and non-matching event', async () => {
 			const originator = autumndbTestUtils.generateRandomId();
 
-			const card1 = await events.post(
+			const contract1 = await events.post(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -536,8 +536,8 @@ describe('events', () => {
 
 			expect(event).toEqual(
 				Kernel.defaults({
-					created_at: card1.created_at,
-					id: card1.id,
+					created_at: contract1.created_at,
+					id: contract1.id,
 					slug: event.slug,
 					type: 'execute@1.0.0',
 					name: null,
@@ -545,12 +545,12 @@ describe('events', () => {
 					data: {
 						actor: '57692206-8da2-46e1-91c9-159b2c6928ef',
 						originator,
-						target: card1.data.target,
+						target: contract1.data.target,
 						timestamp: event.data.timestamp,
 						payload: {
 							action: '57692206-8da2-46e1-91c9-159b2c6928ef',
 							card: '033d9184-70b2-4ec9-bc39-9a249b186422',
-							data: card1.data.payload.data,
+							data: contract1.data.payload.data,
 							error: false,
 							timestamp: '2018-06-30T19:34:42.829Z',
 						},
@@ -562,7 +562,7 @@ describe('events', () => {
 		test('should return the last execution event given two matching events', async () => {
 			const originator = autumndbTestUtils.generateRandomId();
 
-			const card1 = await events.post(
+			const contract1 = await events.post(
 				context.logContext,
 				context.kernel,
 				context.session,
@@ -611,8 +611,8 @@ describe('events', () => {
 
 			expect(event).toEqual(
 				Kernel.defaults({
-					created_at: card1.created_at,
-					id: card1.id,
+					created_at: contract1.created_at,
+					id: contract1.id,
 					slug: event.slug,
 					name: null,
 					type: 'execute@1.0.0',
@@ -621,12 +621,12 @@ describe('events', () => {
 					data: {
 						actor: '57692206-8da2-46e1-91c9-159b2c6928ef',
 						originator,
-						target: card1.data.target,
+						target: contract1.data.target,
 						timestamp: event.data.timestamp,
 						payload: {
 							action: '57692206-8da2-46e1-91c9-159b2c6928ef',
 							card: '033d9184-70b2-4ec9-bc39-9a249b186422',
-							data: card1.data.payload.data,
+							data: contract1.data.payload.data,
 							error: false,
 							timestamp: '2018-06-30T19:34:42.829Z',
 						},
@@ -665,7 +665,7 @@ describe('events', () => {
 			expect(event).toBeNull();
 		});
 
-		test('should only consider execute cards', async () => {
+		test('should only consider execute contracts', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			await context.kernel.insertContract(context.logContext, context.session, {
 				type: 'card@1.0.0',

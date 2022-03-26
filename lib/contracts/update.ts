@@ -1,11 +1,12 @@
-export const update = {
+import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const update: ContractDefinition = {
 	slug: 'update',
 	type: 'type@1.0.0',
 	version: '1.0.0',
-	name: 'The card update event',
+	name: 'The contract update event',
 	markers: [],
 	tags: [],
-	links: {},
 	active: true,
 	data: {
 		schema: {

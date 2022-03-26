@@ -3,7 +3,17 @@ import _ from 'lodash';
 
 const defaultStatusOptions = ['open', 'closed', 'archived'];
 
-// Defines fields common to all items used in pipelines
+/**
+ * @summary Defines fields common to all items used in pipelines
+ * @function
+ *
+ * @param slug - contract slug
+ * @param type - contract type
+ * @param statusOptions - list of status names to fallback to
+ * @param defaultStatus - default status name
+ * @param statusNames - list of status names to override statusOptions
+ * @returns contract definition with pipeline properties
+ */
 export function asPipelineItem(
 	slug: string,
 	type: string,

@@ -131,20 +131,20 @@ describe('.getId()', () => {
 
 describe('Worker', () => {
 	it('should not re-enqueue requests after duplicated execute events', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		await ctx.worker.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -184,20 +184,20 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on insertion', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -271,25 +271,25 @@ describe('Worker', () => {
 		);
 		expect(insertResult.error).toBe(false);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			insertResult.data.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 
-		expect(card).toEqual({
-			id: card.id,
-			slug: card.slug,
+		expect(contract).toEqual({
+			id: contract.id,
+			slug: contract.slug,
 			capabilities: [],
 			requires: [],
 			markers: [],
 			name: null,
 			version: '1.0.0',
-			linked_at: card.linked_at,
-			updated_at: card.updated_at,
-			created_at: card.created_at,
+			linked_at: contract.linked_at,
+			updated_at: contract.updated_at,
+			created_at: contract.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
 			loop: null,
@@ -302,7 +302,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple SUM property on a insertAction', async () => {
-		const typeCard: any = await ctx.kernel.getContractBySlug(
+		const typeContract: any = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
@@ -312,8 +312,8 @@ describe('Worker', () => {
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -392,25 +392,25 @@ describe('Worker', () => {
 		);
 		expect(insertResult.error).toBe(false);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			insertResult.data.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 
-		expect(card).toEqual({
-			id: card.id,
-			slug: card.slug,
+		expect(contract).toEqual({
+			id: contract.id,
+			slug: contract.slug,
 			capabilities: [],
 			requires: [],
 			markers: [],
 			name: null,
 			version: '1.0.0',
-			linked_at: card.linked_at,
-			updated_at: card.updated_at,
-			created_at: card.created_at,
+			linked_at: contract.linked_at,
+			updated_at: contract.updated_at,
+			created_at: contract.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
 			loop: null,
@@ -425,20 +425,20 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch move', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -539,25 +539,25 @@ describe('Worker', () => {
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 
-		expect(card).toEqual({
-			id: card.id,
-			slug: card.slug,
+		expect(contract).toEqual({
+			id: contract.id,
+			slug: contract.slug,
 			capabilities: [],
 			requires: [],
 			markers: [],
 			name: null,
 			version: '1.0.0',
-			linked_at: card.linked_at,
-			updated_at: card.updated_at,
-			created_at: card.created_at,
+			linked_at: contract.linked_at,
+			updated_at: contract.updated_at,
+			created_at: contract.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
 			loop: null,
@@ -571,20 +571,20 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch copy', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -685,25 +685,25 @@ describe('Worker', () => {
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 
-		expect(card).toEqual({
-			id: card.id,
-			slug: card.slug,
+		expect(contract).toEqual({
+			id: contract.id,
+			slug: contract.slug,
 			capabilities: [],
 			requires: [],
 			markers: [],
 			name: null,
 			version: '1.0.0',
-			linked_at: card.linked_at,
-			updated_at: card.updated_at,
-			created_at: card.created_at,
+			linked_at: contract.linked_at,
+			updated_at: contract.updated_at,
+			created_at: contract.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
 			loop: null,
@@ -717,20 +717,20 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch replace', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -830,25 +830,25 @@ describe('Worker', () => {
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 
-		expect(card).toEqual({
-			id: card.id,
-			slug: card.slug,
+		expect(contract).toEqual({
+			id: contract.id,
+			slug: contract.slug,
 			capabilities: [],
 			requires: [],
 			markers: [],
 			name: null,
 			version: '1.0.0',
-			linked_at: card.linked_at,
-			updated_at: card.updated_at,
-			created_at: card.created_at,
+			linked_at: contract.linked_at,
+			updated_at: contract.updated_at,
+			created_at: contract.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
 			loop: null,
@@ -861,20 +861,20 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch addition', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -972,25 +972,25 @@ describe('Worker', () => {
 		);
 		expect(updateResult.error).toBe(false);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			updateResult.data.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 
-		expect(card).toEqual({
-			id: card.id,
-			slug: card.slug,
+		expect(contract).toEqual({
+			id: contract.id,
+			slug: contract.slug,
 			capabilities: [],
 			requires: [],
 			markers: [],
 			name: null,
 			version: '1.0.0',
-			linked_at: card.linked_at,
-			updated_at: card.updated_at,
-			created_at: card.created_at,
+			linked_at: contract.linked_at,
+			updated_at: contract.updated_at,
+			created_at: contract.created_at,
 			type: `${slug}@1.0.0`,
 			active: true,
 			loop: null,
@@ -1003,20 +1003,20 @@ describe('Worker', () => {
 	});
 
 	it('should throw if the result of the formula is incompatible with the given type', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const typeAction = {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -1084,19 +1084,19 @@ describe('Worker', () => {
 	});
 
 	it('should not re-enqueue requests after execute failure', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		await ctx.worker.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-card@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -1145,19 +1145,19 @@ describe('Worker', () => {
 	});
 
 	it('should be able to login as a user with a password', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'user@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const request1 = await ctx.worker.pre(ctx.session, {
 			action: 'action-create-user@1.0.0',
-			card: typeCard.id,
+			card: typeContract.id,
 			logContext: ctx.logContext,
-			type: typeCard.type,
+			type: typeContract.type,
 			arguments: {
 				email: 'johndoe@example.com',
 				username: autumndbTestUtils.generateRandomSlug({
@@ -1340,19 +1340,19 @@ describe('Worker', () => {
 	});
 
 	it('should fail if signing up with the wrong password', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'user@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const request1 = await ctx.worker.pre(ctx.session, {
 			action: 'action-create-user@1.0.0',
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				email: 'johndoe@example.com',
 				username: autumndbTestUtils.generateRandomSlug({
@@ -1391,20 +1391,20 @@ describe('Worker', () => {
 	});
 
 	it('should post an error execute event if logging in as a disallowed user', async () => {
-		const adminCard = await ctx.kernel.getContractBySlug(
+		const adminContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'user-admin@latest',
 		);
 
-		assert(adminCard !== null);
+		assert(adminContract !== null);
 
 		await expect(
 			ctx.worker.pre(ctx.session, {
 				action: 'action-create-session@1.0.0',
 				logContext: ctx.logContext,
-				card: adminCard.id,
-				type: adminCard.type,
+				card: adminContract.id,
+				type: adminContract.type,
 				arguments: {
 					password: 'foobarbaz',
 				},
@@ -1412,12 +1412,12 @@ describe('Worker', () => {
 		).rejects.toThrow(errors.WorkerAuthenticationError);
 	});
 
-	it('a triggered action can update a dynamic list of cards (ids as array of strings)', async () => {
-		const cardIds: string[] = [];
+	it('a triggered action can update a dynamic list of contracts (ids as array of strings)', async () => {
+		const contractIds: string[] = [];
 		const slug = autumndbTestUtils.generateRandomSlug();
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.kernel.insertContract(
+				const contract = await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
 					{
@@ -1429,7 +1429,7 @@ describe('Worker', () => {
 						},
 					},
 				);
-				cardIds.push(card.id);
+				contractIds.push(contract.id);
 			}),
 		);
 
@@ -1477,33 +1477,33 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getContractBySlug(
+		const actionContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
 
-		assert(actionCard !== null);
-		assert(typeCard !== null);
+		assert(actionContract !== null);
+		assert(typeContract !== null);
 
 		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
-				action: `${actionCard.slug}@${actionCard.version}`,
+				action: `${actionContract.slug}@${actionContract.version}`,
 				logContext: ctx.logContext,
-				card: typeCard.id,
-				type: typeCard.type,
+				card: typeContract.id,
+				type: typeContract.type,
 				arguments: {
 					reason: null,
 					properties: {
 						data: {
-							cards: cardIds,
+							cards: contractIds,
 						},
 					},
 				},
@@ -1521,23 +1521,23 @@ describe('Worker', () => {
 
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.kernel.getContractBySlug(
+				const contract = await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.session,
 					`${slug}${idx}@latest`,
 				);
-				assert(card !== null);
-				expect(card.data.updated).toBe(true);
+				assert(contract !== null);
+				expect(contract.data.updated).toBe(true);
 			}),
 		);
 	});
 
-	test('a triggered action can update a dynamic list of cards (ids as array of objects with field id)', async () => {
-		const cardsWithId: Array<{ [id: string]: string }> = [];
+	test('a triggered action can update a dynamic list of contracts (ids as array of objects with field id)', async () => {
+		const contractsWithId: Array<{ [id: string]: string }> = [];
 		const slug = autumndbTestUtils.generateRandomSlug();
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.kernel.insertContract(
+				const contract = await ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
 					{
@@ -1549,7 +1549,7 @@ describe('Worker', () => {
 						},
 					},
 				);
-				cardsWithId.push({ id: card.id });
+				contractsWithId.push({ id: contract.id });
 			}),
 		);
 
@@ -1606,33 +1606,33 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		const actionCard = await ctx.kernel.getContractBySlug(
+		const actionContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
 
-		assert(typeCard !== null);
-		assert(actionCard !== null);
+		assert(typeContract !== null);
+		assert(actionContract !== null);
 
 		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
-				action: `${actionCard.slug}@${actionCard.version}`,
+				action: `${actionContract.slug}@${actionContract.version}`,
 				logContext: ctx.logContext,
-				card: typeCard.id,
-				type: typeCard.type,
+				card: typeContract.id,
+				type: typeContract.type,
 				arguments: {
 					reason: null,
 					properties: {
 						data: {
-							cards: cardsWithId,
+							cards: contractsWithId,
 						},
 					},
 				},
@@ -1650,18 +1650,18 @@ describe('Worker', () => {
 
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
-				const card = await ctx.kernel.getContractBySlug(
+				const contract = await ctx.kernel.getContractBySlug(
 					ctx.logContext,
 					ctx.session,
 					`${slug}${idx}@latest`,
 				);
-				assert(card !== null);
-				expect(card.data.updated).toBe(true);
+				assert(contract !== null);
+				expect(contract.data.updated).toBe(true);
 			}),
 		);
 	});
 
-	it('should fail when attempting to insert a triggered-action card with duplicate targets', async () => {
+	it('should fail when attempting to insert a triggered-action contract with duplicate targets', async () => {
 		const trigger = {
 			id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			type: 'triggered-action@1.0.0',
@@ -1703,17 +1703,21 @@ describe('Worker', () => {
 		).rejects.toThrowError();
 	});
 
-	test('trigger should update card if triggered by a user not owning the card', async () => {
-		const card = await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
-			slug: autumndbTestUtils.generateRandomSlug({
-				prefix: 'user',
-			}),
-			type: 'card@1.0.0',
-			version: '1.0.0',
-			data: {
-				id: 'id-admin',
+	test('trigger should update contract if triggered by a user not owning the contract', async () => {
+		const contract = await ctx.kernel.insertContract(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'card@1.0.0',
+				version: '1.0.0',
+				data: {
+					id: 'id-admin',
+				},
 			},
-		});
+		);
 
 		ctx.worker.setTriggers(ctx.logContext, [
 			Kernel.defaults<TriggeredActionData>({
@@ -1770,19 +1774,19 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
-		const actionCard = await ctx.kernel.getContractBySlug(
+		const actionContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'action-create-card@latest',
 		);
 
-		assert(typeCard !== null);
-		assert(actionCard !== null);
+		assert(typeContract !== null);
+		assert(actionContract !== null);
 
 		const userJohnDoe = await ctx.kernel.insertContract(
 			ctx.logContext,
@@ -1816,17 +1820,17 @@ describe('Worker', () => {
 		const sessionIdOfJohnDoe = sessionOfJohnDoe.id;
 
 		await ctx.worker.producer.enqueue(ctx.worker.getId(), sessionIdOfJohnDoe, {
-			action: `${actionCard.slug}@${actionCard.version}`,
+			action: `${actionContract.slug}@${actionContract.version}`,
 			logContext: ctx.logContext,
-			card: typeCard.id,
-			type: typeCard.type,
+			card: typeContract.id,
+			type: typeContract.type,
 			arguments: {
 				reason: null,
 				properties: {
 					data: {
 						cards: [
 							{
-								id: card.id,
+								id: contract.id,
 							},
 						],
 						schema: {},
@@ -1843,7 +1847,7 @@ describe('Worker', () => {
 		const result = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
-			card.id,
+			contract.id,
 		);
 		assert(result !== null);
 		expect(result).toBeTruthy();
@@ -1860,19 +1864,19 @@ describe('.getTriggers()', () => {
 
 describe('.replaceCard()', () => {
 	test('should update type contract schema', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'type@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const result1 = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: true,
 				actor: ctx.adminUserId,
@@ -1896,7 +1900,7 @@ describe('.replaceCard()', () => {
 		await ctx.worker.replaceCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: true,
 				actor: ctx.adminUserId,
@@ -1917,32 +1921,32 @@ describe('.replaceCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result1!.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 		assert(result1! !== null);
 
-		expect((card.data.schema as any).data.foo.title).toEqual('Foobar2');
+		expect((contract.data.schema as any).data.foo.title).toEqual('Foobar2');
 	});
 
-	test('updating a card must have the correct tail', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+	test('updating a contract must have the correct tail', async () => {
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const result1 = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: true,
 				actor: ctx.adminUserId,
@@ -1959,7 +1963,7 @@ describe('.replaceCard()', () => {
 		await ctx.worker.replaceCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: true,
 				actor: ctx.adminUserId,
@@ -1973,20 +1977,20 @@ describe('.replaceCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result1!.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 		assert(result1! !== null);
 
-		expect(card).toEqual(
+		expect(contract).toEqual(
 			Kernel.defaults({
 				created_at: result1.created_at,
-				updated_at: card.updated_at,
-				linked_at: card.linked_at,
+				updated_at: contract.updated_at,
+				linked_at: contract.linked_at,
 				id: result1!.id,
 				name: null,
 				slug,
@@ -2030,20 +2034,20 @@ describe('.replaceCard()', () => {
 	});
 
 	test('should be able to disable event creation', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 
 		const result = await ctx.worker.replaceCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2083,20 +2087,20 @@ describe('.replaceCard()', () => {
 });
 
 describe('.insertCard()', () => {
-	test('should insert a card', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+	test('should insert a contract', async () => {
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2111,13 +2115,13 @@ describe('.insertCard()', () => {
 
 		assert(result !== null);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result.id,
 		);
 
-		expect(card).toEqual(
+		expect(contract).toEqual(
 			Kernel.defaults({
 				created_at: result!.created_at,
 				id: result!.id,
@@ -2132,19 +2136,19 @@ describe('.insertCard()', () => {
 	});
 
 	test('should ignore an explicit type property', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2165,28 +2169,28 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
 
-		assert(card !== null);
+		assert(contract !== null);
 
-		expect(card.type).toBe('card@1.0.0');
+		expect(contract.type).toBe('card@1.0.0');
 	});
 
 	test('should default active to true', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2197,26 +2201,26 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
-		assert(card !== null);
-		expect(card.active).toBe(true);
+		assert(contract !== null);
+		expect(contract.active).toBe(true);
 	});
 
 	test('should be able to set active to false', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2228,26 +2232,26 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
-		assert(card !== null);
-		expect(card.active).toBe(false);
+		assert(contract !== null);
+		expect(contract.active).toBe(false);
 	});
 
 	test('should provide sane defaults for links', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2258,26 +2262,26 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
-		assert(card !== null);
-		expect(card.links).toEqual({});
+		assert(contract !== null);
+		expect(contract.links).toEqual({});
 	});
 
 	test('should provide sane defaults for tags', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2288,26 +2292,26 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
-		assert(card !== null);
-		expect(card.tags).toEqual([]);
+		assert(contract !== null);
+		expect(contract.tags).toEqual([]);
 	});
 
 	test('should provide sane defaults for data', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2318,29 +2322,29 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
-		assert(card !== null);
-		expect(card.data).toEqual({});
+		assert(contract !== null);
+		expect(contract.data).toEqual({});
 	});
 
 	test('should be able to set a slug', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2351,26 +2355,26 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
-		assert(card !== null);
-		expect(card.slug).toBe(slug);
+		assert(contract !== null);
+		expect(contract.slug).toBe(slug);
 	});
 
 	test('should be able to set a name', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: false,
 				actor: ctx.adminUserId,
@@ -2382,16 +2386,16 @@ describe('.insertCard()', () => {
 			},
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result!.id,
 		);
-		assert(card !== null);
-		expect(card.name).toBe('Hello');
+		assert(contract !== null);
+		expect(contract.name).toBe('Hello');
 	});
 
-	test('throw if card already exists and override is false', async () => {
+	test('throw if contract already exists and override is false', async () => {
 		const slug = autumndbTestUtils.generateRandomSlug();
 		await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			slug,
@@ -2399,17 +2403,17 @@ describe('.insertCard()', () => {
 			version: '1.0.0',
 		});
 
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		await expect(
 			ctx.worker.insertCard(
 				ctx.logContext,
 				ctx.session,
-				typeCard,
+				typeContract,
 				{
 					attachEvents: false,
 					actor: ctx.adminUserId,
@@ -2424,16 +2428,16 @@ describe('.insertCard()', () => {
 	});
 
 	test('should add a create event if attachEvents is true', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: true,
 				actor: ctx.adminUserId,
@@ -2474,17 +2478,17 @@ describe('.insertCard()', () => {
 
 describe('.patchCard()', () => {
 	test('should ignore pointless updates', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
 
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result1 = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: true,
 				actor: ctx.adminUserId,
@@ -2501,7 +2505,7 @@ describe('.patchCard()', () => {
 		const result2 = await ctx.worker.patchCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				actor: ctx.adminUserId,
 			},
@@ -2512,7 +2516,7 @@ describe('.patchCard()', () => {
 		const result3 = await ctx.worker.patchCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				actor: ctx.adminUserId,
 			},
@@ -2530,13 +2534,13 @@ describe('.patchCard()', () => {
 		expect(result2).toBeFalsy();
 		expect(result3).toBeFalsy();
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			result1.id,
 		);
-		assert(card !== null);
-		expect(card.created_at).toBe(result1!.created_at);
+		assert(contract !== null);
+		expect(contract.created_at).toBe(result1!.created_at);
 	});
 
 	test('should not upsert if no changes were made', async () => {
@@ -2550,16 +2554,16 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		await ctx.worker.patchCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				actor: ctx.adminUserId,
 			},
@@ -2568,8 +2572,8 @@ describe('.patchCard()', () => {
 		);
 	});
 
-	test('should set a card to inactive', async () => {
-		const previousCard = await ctx.kernel.insertContract(
+	test('should set a contract to inactive', async () => {
+		const previousContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -2579,20 +2583,20 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		await ctx.worker.patchCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				actor: ctx.adminUserId,
 			},
-			previousCard,
+			previousContract,
 			[
 				{
 					op: 'replace',
@@ -2602,13 +2606,13 @@ describe('.patchCard()', () => {
 			],
 		);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
-			previousCard.id,
+			previousContract.id,
 		);
-		assert(card !== null);
-		expect(card.active).toBe(false);
+		assert(contract !== null);
+		expect(contract.active).toBe(false);
 	});
 
 	test('should add an update event if attachEvents is true', async () => {
@@ -2622,16 +2626,16 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		const result = await ctx.worker.patchCard(
 			ctx.logContext,
 			ctx.session,
-			typeCard,
+			typeContract,
 			{
 				attachEvents: true,
 				actor: ctx.adminUserId,
@@ -2684,12 +2688,12 @@ describe('.patchCard()', () => {
 			},
 		});
 
-		const typeCard = await ctx.kernel.getContractBySlug<TypeContract>(
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard !== null);
+		assert(typeContract !== null);
 		await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			type: 'triggered-action@1.0.0',
 			slug: autumndbTestUtils.generateRandomSlug({
@@ -2715,7 +2719,7 @@ describe('.patchCard()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				arguments: {
 					properties: {
 						slug: {

@@ -4,7 +4,7 @@ import * as pipeline from './pipeline';
 import type { SyncActionContext } from './sync-context';
 
 describe('pipeline.importCards()', () => {
-	test('should work with card partials', async () => {
+	test('should work with contract partials', async () => {
 		const upsertElementSpy = sinon.spy(
 			constant({
 				foo: 'bar',

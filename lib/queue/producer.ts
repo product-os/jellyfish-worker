@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import {
+import type {
 	ContractData,
 	SessionContract,
 } from '@balena/jellyfish-types/build/core';
@@ -107,10 +107,10 @@ export class Producer implements QueueProducer {
 	 * @param logContext - log context
 	 */
 	async initialize(logContext: LogContext): Promise<void> {
-		logger.info(logContext, 'Inserting essential cards');
+		logger.info(logContext, 'Inserting essential contracts');
 		await Promise.all(
-			Object.values(contracts).map(async (card) => {
-				return this.kernel.replaceContract(logContext, this.session, card);
+			Object.values(contracts).map(async (contract) => {
+				return this.kernel.replaceContract(logContext, this.session, contract);
 			}),
 		);
 
@@ -126,7 +126,7 @@ export class Producer implements QueueProducer {
 	 *
 	 * @param logContext - log context
 	 * @param retries - number of times to retry Graphile worker initialization
-	 * @returns Graphile worker utils instance
+	 * @returns graphile worker utils instance
 	 *
 	 * @example
 	 * ```typescript
@@ -179,27 +179,27 @@ export class Producer implements QueueProducer {
 			},
 		});
 
-		// Use the request session to retrieve the various cards, this ensures that
-		// the action cannot be run if the session doesn't have access to the cards.
-		const cards: any = await props({
+		// Use the request session to retrieve the various contracts, this ensures that
+		// the action cannot be run if the session doesn't have access to the contracts.
+		const propContracts: any = await props({
 			target: isUUID(options.card)
 				? {
 						id: options.card,
 
-						// TODO: Require users to be explicit on the card version
+						// TODO: Require users to be explicit on the contract version
 				  }
-				: this.kernel.getCardBySlug(
+				: this.kernel.getContractBySlug(
 						options.logContext,
 						session,
 						`${options.card}@latest`,
 				  ),
 
-			action: this.kernel.getCardBySlug<ActionContract>(
+			action: this.kernel.getContractBySlug<ActionContract>(
 				options.logContext,
 				session,
 				options.action,
 			),
-			session: this.kernel.getCardById<SessionContract>(
+			session: this.kernel.getContractById<SessionContract>(
 				options.logContext,
 				session,
 				session,
@@ -208,21 +208,21 @@ export class Producer implements QueueProducer {
 
 		assert.INTERNAL(
 			options.logContext,
-			cards.session,
+			propContracts.session,
 			QueueInvalidSession,
 			`No such session: ${session}`,
 		);
 		assert.USER(
 			options.logContext,
-			cards.action,
+			propContracts.action,
 			QueueInvalidAction,
 			`No such action: ${options.action}`,
 		);
 		assert.USER(
 			options.logContext,
-			cards.target,
+			propContracts.target,
 			QueueInvalidRequest,
-			`No such input card: ${options.card}`,
+			`No such input contract: ${options.card}`,
 		);
 
 		const date = options.currentDate || new Date();
@@ -240,10 +240,12 @@ export class Producer implements QueueProducer {
 					timestamp: date.toISOString(),
 					context: options.logContext,
 					originator: options.originator,
-					actor: cards.session!.data.actor,
-					action: `${cards.action!.slug}@${cards.action!.version}`,
+					actor: propContracts.session!.data.actor,
+					action: `${propContracts.action!.slug}@${
+						propContracts.action!.version
+					}`,
 					input: {
-						id: cards.target!.id,
+						id: propContracts.target!.id,
 					},
 					arguments: options.arguments,
 					schedule: options.schedule?.contract,
@@ -259,16 +261,10 @@ export class Producer implements QueueProducer {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} actor - actor
-	 * @param {String} session - session
-	 * @param {ProducerOptions} options - options
-	 * @param {String} options.action - action slug
-	 * @param {String} options.card - action input card id
-	 * @param {Object} options.arguments - action arguments
-	 * @param {Date} [options.currentDate] - current date
-	 * @param {String} [options.originator] - card id that originated this action
-	 * @param {LogContext} [options.logContext] - log context
-	 * @returns {Promise<ActionRequestContract>} action request
+	 * @param actor - actor id
+	 * @param session - session id
+	 * @param options - producer options
+	 * @returns action request contract
 	 */
 	async enqueue(
 		actor: string,
@@ -311,9 +307,9 @@ export class Producer implements QueueProducer {
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {ActionRequestContract} actionRequest - action request
-	 * @returns {Promise<ProducerResults>} results
+	 * @param logContext - log context
+	 * @param actionRequest - action request contract
+	 * @returns producer results
 	 */
 	async waitResults(
 		logContext: LogContext,
@@ -378,8 +374,8 @@ export class Producer implements QueueProducer {
 	 * @public
 	 *
 	 * @param {LogContext} logContext - log context
-	 * @param {String} originator - originator card id
-	 * @returns {Promise<ExecuteContract | null>} last execution event
+	 * @param {String} originator - originator contract id
+	 * @returns last execution event contract
 	 */
 	async getLastExecutionEvent(
 		logContext: LogContext,
@@ -395,11 +391,13 @@ export class Producer implements QueueProducer {
 
 	/**
 	 * @summary Delete a job from the queue using its job key
-	 * @param {Context} context - execution context
-	 * @param {String} key - job key to delete
+	 * @function
+	 *
+	 * @param logContext - execution context
+	 * @param key - job key to delete
 	 */
-	async deleteJob(context: LogContext, key: string): Promise<void> {
-		logger.debug(context, 'Deleting job from queue', {
+	async deleteJob(logContext: LogContext, key: string): Promise<void> {
+		logger.debug(logContext, 'Deleting job from queue', {
 			key,
 		});
 

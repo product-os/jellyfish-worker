@@ -1,11 +1,11 @@
 import type { LogContext } from '@balena/jellyfish-logger';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
+import { ActionDefinition, PluginDefinition } from '.';
 import type { Integration, IntegrationDefinition } from '../sync';
 import type { Map } from '../types';
-import { ActionDefinition, PluginDefinition } from '.';
 
-const commonCard = {
+const commonContract = {
 	tags: [],
 	markers: [],
 	links: {},
@@ -17,18 +17,18 @@ const commonCard = {
 	loop: null,
 };
 
-export const card1: Contract = {
-	...commonCard,
+export const contract1: Contract = {
+	...commonContract,
 	id: '1',
-	slug: 'card-1',
+	slug: 'contract-1',
 	type: 'card',
 	version: '1.0.0',
 };
 
-export const card2: Contract = {
-	...commonCard,
+export const contract2: Contract = {
+	...commonContract,
 	id: '2',
-	slug: 'card-2',
+	slug: 'contract-2',
 	type: 'card',
 	version: '1.0.0',
 };
@@ -103,5 +103,5 @@ export const action2: ActionDefinition = {
 		data: { arguments: {} },
 	},
 	pre: _.noop,
-	handler: async () => _.pick(card1, 'id', 'slug', 'type', 'version'),
+	handler: async () => _.pick(contract1, 'id', 'slug', 'type', 'version'),
 };

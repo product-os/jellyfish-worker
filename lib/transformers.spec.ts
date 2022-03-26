@@ -5,9 +5,9 @@ import { v4 as uuid } from 'uuid';
 import * as transformers from './transformers';
 
 const getEvaluateParamsStub = (
-	transformerCards: Array<Contract<transformers.TransformerData>>,
-	oldCard: Contract | null,
-	newCard: Contract,
+	transformerContracts: Array<Contract<transformers.TransformerData>>,
+	oldContract: Contract | null,
+	newContract: Contract,
 	returnActor: boolean = true,
 ) => {
 	const executeSpy = sinon.spy((actionRequest) => {
@@ -22,9 +22,9 @@ const getEvaluateParamsStub = (
 	});
 
 	const params: transformers.EvaluateOptions = {
-		transformers: _.castArray(transformerCards),
-		oldCard,
-		newCard,
+		transformers: _.castArray(transformerContracts),
+		oldContract,
+		newContract,
 		logContext: {
 			id: 'foobar',
 		},
@@ -56,7 +56,7 @@ const getEvaluateParamsStub = (
 };
 
 describe('.evaluate()', () => {
-	test('should create a task if a transformer matches a card that changed artifactReady:false->true', async () => {
+	test('should create a task if a transformer matches a contract that changed artifactReady:false->true', async () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
@@ -68,7 +68,7 @@ describe('.evaluate()', () => {
 			},
 		};
 
-		const oldCard = {
+		const oldContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -76,7 +76,7 @@ describe('.evaluate()', () => {
 				},
 			},
 		};
-		const newCard = {
+		const newContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -87,8 +87,8 @@ describe('.evaluate()', () => {
 
 		const { executeSpy, params } = getEvaluateParamsStub(
 			[transformer as any as Contract<transformers.TransformerData>],
-			oldCard as any as Contract,
-			newCard as any as Contract,
+			oldContract as any as Contract,
+			newContract as any as Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -97,7 +97,7 @@ describe('.evaluate()', () => {
 		expect(executeSpy.calledTwice).toBe(true);
 		// The first call was for a task
 		expect(executeSpy.firstCall.firstArg.card).toBe('task@1.0.0');
-		// The first call was to create a card
+		// The first call was to create a contract
 		expect(executeSpy.firstCall.firstArg.action).toBe(
 			'action-create-card@1.0.0',
 		);
@@ -105,13 +105,13 @@ describe('.evaluate()', () => {
 		// The second call was for a link
 		expect(executeSpy.secondCall.firstArg.card).toBe('link@1.0.0');
 
-		// The second call was to create a card
+		// The second call was to create a contract
 		expect(executeSpy.secondCall.firstArg.action).toBe(
 			'action-create-card@1.0.0',
 		);
 	});
 
-	test('should create a task if a transformer matches a card that changed artifactReady:truthy->other-truthy', async () => {
+	test('should create a task if a transformer matches a contract that changed artifactReady:truthy->other-truthy', async () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
@@ -123,7 +123,7 @@ describe('.evaluate()', () => {
 			},
 		};
 
-		const oldCard = {
+		const oldContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -131,7 +131,7 @@ describe('.evaluate()', () => {
 				},
 			},
 		};
-		const newCard = {
+		const newContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -142,8 +142,8 @@ describe('.evaluate()', () => {
 
 		const { executeSpy, params } = getEvaluateParamsStub(
 			[transformer as any as Contract<transformers.TransformerData>],
-			oldCard as any as Contract,
-			newCard as any as Contract,
+			oldContract as any as Contract,
+			newContract as any as Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -152,7 +152,7 @@ describe('.evaluate()', () => {
 		expect(executeSpy.calledTwice).toBe(true);
 		// The first call was for a task
 		expect(executeSpy.firstCall.firstArg.card).toBe('task@1.0.0');
-		// The first call was to create a card
+		// The first call was to create a contract
 		expect(executeSpy.firstCall.firstArg.action).toBe(
 			'action-create-card@1.0.0',
 		);
@@ -160,13 +160,13 @@ describe('.evaluate()', () => {
 		// The second call was for a link
 		expect(executeSpy.secondCall.firstArg.card).toBe('link@1.0.0');
 
-		// The second call was to create a card
+		// The second call was to create a contract
 		expect(executeSpy.secondCall.firstArg.action).toBe(
 			'action-create-card@1.0.0',
 		);
 	});
 
-	test('should create a task if a transformer matches a card that was ready before, but only matches now', async () => {
+	test('should create a task if a transformer matches a contract that was ready before, but only matches now', async () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-late-match-transformer',
@@ -189,7 +189,7 @@ describe('.evaluate()', () => {
 			},
 		};
 
-		const oldCard = {
+		const oldContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -197,7 +197,7 @@ describe('.evaluate()', () => {
 				},
 			},
 		};
-		const newCard = {
+		const newContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -209,8 +209,8 @@ describe('.evaluate()', () => {
 
 		const { executeSpy, params } = getEvaluateParamsStub(
 			[transformer as any as Contract<transformers.TransformerData>],
-			oldCard as any as Contract,
-			newCard as any as Contract,
+			oldContract as any as Contract,
+			newContract as any as Contract,
 		);
 
 		await transformers.evaluate(params as transformers.EvaluateOptions);
@@ -219,7 +219,7 @@ describe('.evaluate()', () => {
 		expect(executeSpy.calledTwice).toBe(true);
 		// The first call was for a task
 		expect(executeSpy.firstCall.firstArg.card).toBe('task@1.0.0');
-		// The first call was to create a card
+		// The first call was to create a contract
 		expect(executeSpy.firstCall.firstArg.action).toBe(
 			'action-create-card@1.0.0',
 		);
@@ -227,13 +227,13 @@ describe('.evaluate()', () => {
 		// The second call was for a link
 		expect(executeSpy.secondCall.firstArg.card).toBe('link@1.0.0');
 
-		// The second call was to create a card
+		// The second call was to create a contract
 		expect(executeSpy.secondCall.firstArg.action).toBe(
 			'action-create-card@1.0.0',
 		);
 	});
 
-	test('should only create a task when a transformer matches the input for an updated card', async () => {
+	test('should only create a task when a transformer matches the input for an updated contract', async () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
@@ -250,7 +250,7 @@ describe('.evaluate()', () => {
 				},
 			},
 		};
-		const oldCard = {
+		const oldContract = {
 			type: 'card@1.0.0',
 			name: 'foo',
 			data: {
@@ -259,7 +259,7 @@ describe('.evaluate()', () => {
 				},
 			},
 		};
-		const newCard = {
+		const newContract = {
 			type: 'card@1.0.0',
 			name: 'foo',
 			data: {
@@ -271,8 +271,8 @@ describe('.evaluate()', () => {
 
 		const { executeSpy, params } = getEvaluateParamsStub(
 			[transformer as any as Contract<transformers.TransformerData>],
-			oldCard as any as Contract,
-			newCard as any as Contract,
+			oldContract as any as Contract,
+			newContract as any as Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -281,7 +281,7 @@ describe('.evaluate()', () => {
 		expect(executeSpy.notCalled).toBe(true);
 	});
 
-	test('should create a task even when a there is no previous card', async () => {
+	test('should create a task even when a there is no previous contract', async () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
@@ -293,7 +293,7 @@ describe('.evaluate()', () => {
 			},
 		};
 
-		const newCard = {
+		const newContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -305,7 +305,7 @@ describe('.evaluate()', () => {
 		const { executeSpy, params } = getEvaluateParamsStub(
 			[transformer as any as Contract<transformers.TransformerData>],
 			null,
-			newCard as any as Contract,
+			newContract as any as Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -314,7 +314,7 @@ describe('.evaluate()', () => {
 		expect(executeSpy.calledTwice).toBe(true);
 		// The first call was for a task
 		expect(executeSpy.firstCall.firstArg.card).toBe('task@1.0.0');
-		// The first call was to create a card
+		// The first call was to create a contract
 		expect(executeSpy.firstCall.firstArg.action).toBe(
 			'action-create-card@1.0.0',
 		);
@@ -322,13 +322,13 @@ describe('.evaluate()', () => {
 		// The second call was for a link
 		expect(executeSpy.secondCall.firstArg.card).toBe('link@1.0.0');
 
-		// The second call was to create a card
+		// The second call was to create a contract
 		expect(executeSpy.secondCall.firstArg.action).toBe(
 			'action-create-card@1.0.0',
 		);
 	});
 
-	test('should not create a task when card change is not relevant', async () => {
+	test('should not create a task when contract change is not relevant', async () => {
 		const transformer = {
 			id: uuid(),
 			slug: 'test-transformer',
@@ -340,7 +340,7 @@ describe('.evaluate()', () => {
 			},
 		};
 
-		const oldCard = {
+		const oldContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -350,7 +350,7 @@ describe('.evaluate()', () => {
 			},
 		};
 
-		const newCard = {
+		const newContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -363,8 +363,8 @@ describe('.evaluate()', () => {
 
 		const { executeSpy, params } = getEvaluateParamsStub(
 			[transformer as any as Contract<transformers.TransformerData>],
-			oldCard as any as Contract,
-			newCard as any as Contract,
+			oldContract as any as Contract,
+			newContract as any as Contract,
 		);
 
 		await transformers.evaluate(params);
@@ -385,7 +385,7 @@ describe('.evaluate()', () => {
 			},
 		};
 
-		const oldCard = {
+		const oldContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -393,7 +393,7 @@ describe('.evaluate()', () => {
 				},
 			},
 		};
-		const newCard = {
+		const newContract = {
 			type: 'card@1.0.0',
 			data: {
 				$transformer: {
@@ -404,8 +404,8 @@ describe('.evaluate()', () => {
 
 		const { executeSpy, params } = getEvaluateParamsStub(
 			[transformer as any as Contract<transformers.TransformerData>],
-			oldCard as any as Contract,
-			newCard as any as Contract,
+			oldContract as any as Contract,
+			newContract as any as Contract,
 			false,
 		);
 

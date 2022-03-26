@@ -3,7 +3,7 @@ import { contractMixins } from 'autumndb';
 
 const eventsPartial = `FILTER(contract.links['has attached element'], function (c) { return c && c.type && c.type !== 'create@1.0.0' && c.type !== 'update@1.0.0' })`;
 
-// This mixin defines all common fields in cards that support
+// This mixin defines all common fields in contracts that support
 // attached events (i.e. 'timelines')
 export function withEvents(slug: string, type: string): ContractDefinition {
 	return {

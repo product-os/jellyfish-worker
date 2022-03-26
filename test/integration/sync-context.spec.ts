@@ -1,6 +1,6 @@
 import { strict } from 'assert';
 import _ from 'lodash';
-import * as uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { testUtils } from '../../lib';
 
 let ctx: testUtils.TestContext;
@@ -26,12 +26,12 @@ test('empty test', async () => {
 
 describe('context.getElementByMirrorId()', () => {
 	test('should match mirrors exactly', async () => {
-		const mirrorId = `test://${uuid.v4()}`;
+		const mirrorId = `test://${uuidv4()}`;
 		const foo = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.worker.session,
 			'card@1.0.0',
-			`card-${uuid.v4()}`,
+			`contract-${uuidv4()}`,
 			{
 				mirrors: [mirrorId],
 			},
@@ -40,9 +40,9 @@ describe('context.getElementByMirrorId()', () => {
 			ctx.adminUserId,
 			ctx.worker.session,
 			'card@1.0.0',
-			`card-${uuid.v4()}`,
+			`contract-${uuidv4()}`,
 			{
-				mirrors: [`test://${uuid.v4()}`],
+				mirrors: [`test://${uuidv4()}`],
 			},
 		);
 
@@ -54,12 +54,12 @@ describe('context.getElementByMirrorId()', () => {
 	});
 
 	test('should match by type', async () => {
-		const mirrorId = `test://${uuid.v4()}`;
+		const mirrorId = `test://${uuidv4()}`;
 		const foo = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.worker.session,
 			'card@1.0.0',
-			`card-${uuid.v4()}`,
+			`contract-${uuidv4()}`,
 			{
 				mirrors: [mirrorId],
 			},
@@ -68,7 +68,7 @@ describe('context.getElementByMirrorId()', () => {
 			ctx.adminUserId,
 			ctx.worker.session,
 			'org@1.0.0',
-			`card-${uuid.v4()}`,
+			`card-${uuidv4()}`,
 			{
 				mirrors: [mirrorId],
 			},
@@ -82,12 +82,12 @@ describe('context.getElementByMirrorId()', () => {
 	});
 
 	test('should not return anything if there is no match', async () => {
-		const mirrorId = `test://${uuid.v4()}`;
+		const mirrorId = `test://${uuidv4()}`;
 		await ctx.createContract(
 			ctx.adminUserId,
 			ctx.worker.session,
 			'card@1.0.0',
-			`card-${uuid.v4()}`,
+			`contract-${uuidv4()}`,
 			{
 				mirrors: [mirrorId],
 			},
@@ -96,9 +96,9 @@ describe('context.getElementByMirrorId()', () => {
 			ctx.adminUserId,
 			ctx.worker.session,
 			'card@1.0.0',
-			`card-${uuid.v4()}`,
+			`contract-${uuidv4()}`,
 			{
-				mirrors: [`test://${uuid.v4()}`],
+				mirrors: [`test://${uuidv4()}`],
 			},
 		);
 
@@ -114,7 +114,7 @@ describe('context.getElementByMirrorId()', () => {
 			ctx.adminUserId,
 			ctx.worker.session,
 			'card@1.0.0',
-			`card-${uuid.v4()}`,
+			`contract-${uuidv4()}`,
 			{
 				mirrors: ['test://foo/1'],
 			},
@@ -123,7 +123,7 @@ describe('context.getElementByMirrorId()', () => {
 			ctx.adminUserId,
 			ctx.worker.session,
 			'card@1.0.0',
-			`card-${uuid.v4()}`,
+			`contract-${uuidv4()}`,
 			{
 				mirrors: ['test://bar/2'],
 			},
@@ -142,19 +142,23 @@ describe('context.getElementByMirrorId()', () => {
 
 describe('context.upsertElement()', () => {
 	test('should create a new element', async () => {
-		const newCard = {
+		const newContract = {
 			type: 'card@1.0.0',
-			slug: `card-${uuid.v4()}`,
+			slug: `contract-${uuidv4()}`,
 			data: {
 				test: 1,
 			},
 		};
 
-		const result = await actionContext.upsertElement('card@1.0.0', newCard, {
-			actor: ctx.adminUserId,
-		});
+		const result = await actionContext.upsertElement(
+			'card@1.0.0',
+			newContract,
+			{
+				actor: ctx.adminUserId,
+			},
+		);
 		strict(result);
-		expect(result.slug).toBe(newCard.slug);
+		expect(result.slug).toBe(newContract.slug);
 	});
 
 	test('should patch an element if the slug exists but no id is provided', async () => {
@@ -162,7 +166,7 @@ describe('context.upsertElement()', () => {
 			'card@1.0.0',
 			{
 				type: 'card@1.0.0',
-				slug: `card-${uuid.v4()}`,
+				slug: `contract-${uuidv4()}`,
 				data: {
 					test: 1,
 				},
@@ -192,7 +196,7 @@ describe('context.upsertElement()', () => {
 			'card@1.0.0',
 			{
 				type: 'card@1.0.0',
-				slug: `card-${uuid.v4()}`,
+				slug: `contract-${uuidv4()}`,
 				data: {
 					test: 1,
 				},
@@ -203,20 +207,24 @@ describe('context.upsertElement()', () => {
 		);
 		strict(foo);
 
-		const newCard = {
+		const newContract = {
 			...foo,
 			slug: `${foo.slug}-fuzzbuzzfizz`,
 			data: {
 				test: 2,
 			},
 		};
-		const result = await actionContext.upsertElement('card@1.0.0', newCard, {
-			actor: ctx.adminUserId,
-		});
+		const result = await actionContext.upsertElement(
+			'card@1.0.0',
+			newContract,
+			{
+				actor: ctx.adminUserId,
+			},
+		);
 		strict(result);
 		expect(result.slug).toBe(foo.slug);
 		expect(result.id).toBe(foo.id);
-		expect(result.data.test).toBe(newCard.data.test);
+		expect(result.data.test).toBe(newContract.data.test);
 	});
 
 	test('should patch an element by id when the slugs are the same', async () => {
@@ -224,7 +232,7 @@ describe('context.upsertElement()', () => {
 			'card@1.0.0',
 			{
 				type: 'card@1.0.0',
-				slug: `card-${uuid.v4()}`,
+				slug: `contract-${uuidv4()}`,
 				data: {
 					test: 1,
 				},
@@ -235,19 +243,23 @@ describe('context.upsertElement()', () => {
 		);
 		strict(foo);
 
-		const newCard = {
+		const newContract = {
 			...foo,
 			data: {
 				test: 2,
 			},
 		};
-		const result = await actionContext.upsertElement('card@1.0.0', newCard, {
-			actor: ctx.adminUserId,
-		});
+		const result = await actionContext.upsertElement(
+			'card@1.0.0',
+			newContract,
+			{
+				actor: ctx.adminUserId,
+			},
+		);
 		strict(result);
 		expect(result.slug).toBe(foo.slug);
 		expect(result.id).toBe(foo.id);
-		expect(result.data.test).toBe(newCard.data.test);
+		expect(result.data.test).toBe(newContract.data.test);
 	});
 
 	test('should patch an element using a patch object', async () => {
@@ -255,7 +267,7 @@ describe('context.upsertElement()', () => {
 			'card@1.0.0',
 			{
 				type: 'card@1.0.0',
-				slug: `card-${uuid.v4()}`,
+				slug: `contract-${uuidv4()}`,
 				data: {
 					test: 1,
 				},

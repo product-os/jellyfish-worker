@@ -1,5 +1,5 @@
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import { JsonSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from '@balena/jellyfish-types';
 import { Kernel } from 'autumndb';
 import type { PostOptions, PostResults } from './consumer';
 import type { ExecuteContract, ExecuteContractDefinition } from './types';
@@ -7,14 +7,14 @@ import type { ExecuteContract, ExecuteContractDefinition } from './types';
 const logger = getLogger(__filename);
 
 /**
- * @summary The execution event card type slug
+ * @summary The execution event contract type slug
  * @type {String}
  * @private
  */
 const EXECUTION_EVENT_TYPE: string = 'execute';
 
 /**
- * @summary The execution event card version
+ * @summary The execution event contract version
  * @type {String}
  * @private
  * @description
@@ -24,13 +24,12 @@ const EXECUTION_EVENT_TYPE: string = 'execute';
 const EXECUTION_EVENT_VERSION: string = '1.0.0';
 
 /**
- * @summary Get the slug of an execute event card
+ * @summary Get the slug of an execute event contract
  * @function
  * @public
  *
- * @param {Object} options - options
- * @param {String} options.id - request id
- * @returns {String} slug
+ * @param options - options object
+ * @returns slug
  */
 export const getExecuteEventSlug = (options: { id: string }): string => {
 	return `${EXECUTION_EVENT_TYPE}-${options.id}`;
@@ -41,40 +40,32 @@ export const getExecuteEventSlug = (options: { id: string }): string => {
  * @function
  * @public
  *
- * @param {LogContext} logContext - log context
- * @param {Object} jellyfish - jellyfish instance
- * @param {String} session - session id
- * @param {Object} options - options
- * @param {String} options.id - request id
- * @param {String} options.actor - actor id
- * @param {String} options.action - action id
- * @param {String} options.timestamp - action timestamp
- * @param {String} options.card - action input card id
- * @param {String} [options.originator] - action originator card id
- * @param {Object} results - action results
- * @param {Boolean} results.error - whether the result is an error
- * @param {Any} results.data - action result
- * @returns {Object} event card
+ * @param logContext - log context
+ * @param kernel - jellyfish instance
+ * @param session - session id
+ * @param options - options object
+ * @param results - action results
+ * @returns event contract
  *
  * @example
- * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- * const card = await events.post({ ... }, jellyfish, session, {
+ * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84';
+ * const contract = await events.post({ ... }, kernel, session, {
  *   id: '414f2345-4f5e-4571-820f-28a49731733d',
  *   action: '57692206-8da2-46e1-91c9-159b2c6928ef',
  *   card: '033d9184-70b2-4ec9-bc39-9a249b186422',
  *   actor: '57692206-8da2-46e1-91c9-159b2c6928ef',
  *   originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
- *   timestamp: '2018-06-30T19:34:42.829Z'
+ *   timestamp: '2018-06-30T19:34:42.829Z',
  * }, {
  *   error: false,
- *   data: '414f2345-4f5e-4571-820f-28a49731733d'
- * })
+ *   data: '414f2345-4f5e-4571-820f-28a49731733d',
+ * });
  *
- * console.log(card.id)
+ * console.log(contract.id);
  */
 export const post = async (
 	logContext: LogContext,
-	jellyfish: Kernel,
+	kernel: Kernel,
 	session: string,
 	options: PostOptions,
 	results: PostResults,
@@ -111,7 +102,7 @@ export const post = async (
 		contents.data.originator = options.originator;
 	}
 
-	return jellyfish.insertCard<ExecuteContract>(logContext, session, contents);
+	return kernel.insertContract<ExecuteContract>(logContext, session, contents);
 };
 
 /**
@@ -119,27 +110,26 @@ export const post = async (
  * @function
  * @public
  *
- * @param {LogContext} logContext - log context
- * @param {Object} jellyfish - jellyfish instance
- * @param {String} session - session id
- * @param {String} originator - originator card id
- * @returns {(Object|Null)} last execution event
+ * @param logContext - log context
+ * @param kernel - kernel instance
+ * @param session - session id
+ * @param originator - originator contract id
+ * @returns last execution event
  *
  * @example
- * const originator = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- *
- * const executeEvent = await events.getLastExecutionEvent({ ... }, jellyfish, session, originator)
+ * const originator = '4a962ad9-20b5-4dd8-a707-bf819593cc84';
+ * const executeEvent = await events.getLastExecutionEvent({ ... }, kernel, session, originator);
  * if (executeEvent) {
- *   console.log(executeEvent.data.timestamp)
+ *   console.log(executeEvent.data.timestamp);
  * }
  */
 export const getLastExecutionEvent = async (
 	logContext: LogContext,
-	jellyfish: Kernel,
+	kernel: Kernel,
 	session: string,
 	originator: string,
 ): Promise<any> => {
-	const events = await jellyfish.query(
+	const events = await kernel.query(
 		logContext,
 		session,
 		{
@@ -189,26 +179,23 @@ export interface WaitOptions {
  * @function
  * @public
  *
- * @param {LogContext} logContext - log context
- * @param {Object} jellyfish - jellyfish instance
- * @param {String} session - session id
- * @param {Object} options - options
- * @param {String} options.id - request id
- * @param {String} options.actor - actor id
- * @returns {Object} execution request event
+ * @param logContext - log context
+ * @param kernel - kernel instance
+ * @param session - session id
+ * @param options - options
+ * @returns execution request event
  *
  * @example
- * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- * const card = await events.wait({ ... }, jellyfish, session, {
+ * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84';
+ * const contract = await events.wait({ ... }, kernel, session, {
  *   id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
- *   card: '033d9184-70b2-4ec9-bc39-9a249b186422'
- * })
- *
- * console.log(card.id)
+ *   card: '033d9184-70b2-4ec9-bc39-9a249b186422',
+ * });
+ * console.log(contract.id)
  */
 export const wait = async (
 	logContext: LogContext,
-	jellyfish: Kernel,
+	kernel: Kernel,
 	session: string,
 	options: WaitOptions,
 ): Promise<ExecuteContract> => {
@@ -246,7 +233,7 @@ export const wait = async (
 
 	let result: ExecuteContract;
 
-	const stream = await jellyfish.stream(logContext, session, schema);
+	const stream = await kernel.stream(logContext, session, schema);
 	logger.info(logContext, 'Wait stream opened', {
 		slug,
 	});
@@ -283,19 +270,23 @@ export const wait = async (
 			return;
 		}
 
-		jellyfish
-			.getCardBySlug(logContext, session, `${slug}@${EXECUTION_EVENT_VERSION}`)
-			.then((card) => {
-				if (!card) {
+		kernel
+			.getContractBySlug(
+				logContext,
+				session,
+				`${slug}@${EXECUTION_EVENT_VERSION}`,
+			)
+			.then((contract) => {
+				if (!contract) {
 					return;
 				}
 
 				logger.info(logContext, 'Found results on first slug query', {
-					slug: card.slug,
-					data: Object.keys(card.data),
+					slug: contract.slug,
+					data: Object.keys(contract.data),
 				});
 
-				result = result || (card as ExecuteContract);
+				result = result || (contract as ExecuteContract);
 				stream.close();
 			})
 			.catch((error) => {

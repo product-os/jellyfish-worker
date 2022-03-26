@@ -1,13 +1,13 @@
 import * as assert from '@balena/jellyfish-assert';
-import { Kernel } from 'autumndb';
-import { getLogger } from '@balena/jellyfish-logger';
+import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import type {
 	Contract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import { strict } from 'assert';
-import _ from 'lodash';
+import { Kernel } from 'autumndb';
 import jsonpatch, { Operation } from 'fast-json-patch';
+import _ from 'lodash';
 import * as workerErrors from '../errors';
 import type { WorkerContext } from '../types';
 
@@ -37,17 +37,16 @@ export type SyncActionContext = ReturnType<typeof getActionContext>;
  * @name getActionContext
  * @description This function generates a "context" object that provides a common interface for use by sync integrations.
  *
- * @param {String} provider - The name of the integration e.g. 'github', 'discourse'
- * @param {Object} workerContext - Context object provided to action functions by
- * the jellyfish worker
- * @param {Object} context - Logging context object
- * @param {String} session - session token used to interact with Jellyfish
+ * @param provider - the name of the integration e.g. 'github', 'discourse'
+ * @param workerContext - context object provided to action functions by the jellyfish worker
+ * @param logContext - log context
+ * @param session - session token used to interact with Jellyfish
  *
- * @returns {Object}
+ * @returns action context
  *
  * @example
  *
- * const handler = async (session, context, card, request) => {
+ * const handler = async (session, logContext, contract, request) => {
  * 	const syncContext = context.sync.getActionContext(request.arguments.provider,
  * 			context, request.context, context.privilegedSession)
  * 	)
@@ -57,38 +56,38 @@ export type SyncActionContext = ReturnType<typeof getActionContext>;
 export const getActionContext = (
 	provider: string,
 	workerContext: WorkerContext,
-	context: any,
+	logContext: LogContext,
 	session: string,
 ) => {
 	const getDefaultActor = async (): Promise<null | string> => {
-		const sessionCard = await workerContext.getCardById(session, session);
+		const sessionContract = await workerContext.getCardById(session, session);
 
-		if (!sessionCard) {
+		if (!sessionContract) {
 			return null;
 		}
 
 		// TODO: Replace this return type with the session contract interface
-		return sessionCard.data.actor as string;
+		return sessionContract.data.actor as string;
 	};
 
 	const contextObject = {
 		log: {
 			warn: (message: string, data: any) => {
-				logger.warn(context, message, data);
+				logger.warn(logContext, message, data);
 			},
 			error: (message: string, data: any) => {
-				logger.error(context, message, data);
+				logger.error(logContext, message, data);
 			},
 			debug: (message: string, data: any) => {
-				logger.debug(context, message, data);
+				logger.debug(logContext, message, data);
 			},
 			info: (message: string, data: any) => {
-				logger.info(context, message, data);
+				logger.info(logContext, message, data);
 			},
 
 			// "exception" will log to sentry if it's enabled
 			exception: (message: string, error: any) => {
-				logger.exception(context, message, error);
+				logger.exception(logContext, message, error);
 			},
 		},
 		getLocalUsername: (username: string): string => {
@@ -121,11 +120,11 @@ export const getActionContext = (
 				| { id: string; type: string; patch: Operation[] },
 			options: { actor?: string; timestamp?: Date; originator?: string },
 		): Promise<Contract | null> => {
-			const typeCard = await workerContext.getCardBySlug(session, type);
+			const typeContract = await workerContext.getCardBySlug(session, type);
 
 			assert.INTERNAL(
-				context,
-				typeCard !== null,
+				logContext,
+				typeContract !== null,
 				workerErrors.WorkerNoElement,
 				`No such type: ${type}`,
 			);
@@ -133,9 +132,9 @@ export const getActionContext = (
 			const actor = options.actor || (await getDefaultActor());
 			strict(actor);
 
-			// If an ID was passed in, use that ID to load the current card, this
+			// If an ID was passed in, use that ID to load the current contract, this
 			// prevents the situation where an integration may unintentionally
-			// generate a new slug for an existing card.
+			// generate a new slug for an existing contract.
 
 			// TS-TODO: tidy up this casting as its not quite correct.
 			// The main issue here is that "object" is union type and could be a partial contract, or a patch wrapper with a contract ID
@@ -179,11 +178,15 @@ export const getActionContext = (
 						),
 					);
 				} else {
-					logger.info(context, 'Inserting card from sync context', object);
+					logger.info(
+						logContext,
+						'Inserting contract from sync context',
+						object,
+					);
 					return workerContext
 						.insertCard(
 							session,
-							typeCard! as TypeContract,
+							typeContract! as TypeContract,
 							{
 								attachEvents: true,
 								timestamp: options.timestamp,
@@ -204,7 +207,7 @@ export const getActionContext = (
 				}
 			}
 
-			logger.info(context, 'Patching card from sync context', {
+			logger.info(logContext, 'Patching contract from sync context', {
 				patch,
 			});
 
@@ -221,7 +224,7 @@ export const getActionContext = (
 
 			return workerContext.patchCard(
 				session,
-				typeCard! as TypeContract,
+				typeContract! as TypeContract,
 				{
 					attachEvents: true,
 					timestamp: options.timestamp,
@@ -247,7 +250,7 @@ export const getActionContext = (
 			options: { usePattern?: boolean } = {},
 		) => {
 			assert.INTERNAL(
-				context,
+				logContext,
 				!!mirrorId,
 				Error,
 				'You must supply a mirrorId as key',

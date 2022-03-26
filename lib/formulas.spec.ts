@@ -1,5 +1,6 @@
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import * as formulas from './formulas';
+
 const parser = new Jellyscript({
 	formulas: {
 		NEEDS: formulas.NEEDS,

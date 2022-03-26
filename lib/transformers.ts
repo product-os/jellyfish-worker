@@ -12,8 +12,8 @@ const logger = getLogger('worker');
 
 export interface EvaluateOptions {
 	transformers: Transformer[];
-	oldCard: Contract<any> | null;
-	newCard: Contract<any>;
+	oldContract: Contract<any> | null;
+	newContract: Contract<any>;
 	logContext: LogContext;
 	query: (
 		schema: JsonSchema,
@@ -35,8 +35,8 @@ export type Transformer = Contract<TransformerData>;
 // TS-TODO: Transformers should be a default model and included in this module
 export const evaluate = async ({
 	transformers,
-	oldCard,
-	newCard,
+	oldContract,
+	newContract,
 	logContext,
 	query,
 	executeAndAwaitAction,
@@ -45,14 +45,14 @@ export const evaluate = async ({
 		return null;
 	}
 
-	// Only run transformers with cards with a valid artifact or which do not have artifacts at all
+	// Only run transformers with contracts with a valid artifact or which do not have artifacts at all
 	// and their input filter matches now, but didn't match before (or artifact wasn't ready)
-	const readyNow = newCard.data?.$transformer?.artifactReady;
+	const readyNow = newContract.data?.$transformer?.artifactReady;
 	if (readyNow === false) {
 		return null;
 	}
 	const artifactReadyChanged =
-		oldCard?.data?.$transformer?.artifactReady !== readyNow;
+		oldContract?.data?.$transformer?.artifactReady !== readyNow;
 
 	await Promise.all(
 		transformers.map(async (transformer: Transformer) => {
@@ -60,10 +60,13 @@ export const evaluate = async ({
 				return;
 			}
 			// TODO: Allow transformer input filter to match $$links, by re-using the trigger filter
-			const matchesNow = skhema.isValid(transformer.data.inputFilter, newCard);
+			const matchesNow = skhema.isValid(
+				transformer.data.inputFilter,
+				newContract,
+			);
 			const matchedPreviously = skhema.isValid(
 				transformer.data.inputFilter,
-				oldCard || {},
+				oldContract || {},
 			);
 
 			const shouldRun =
@@ -96,10 +99,10 @@ export const evaluate = async ({
 				arguments: {
 					reason: null,
 					properties: {
-						name: `Transform ${newCard.name} using transformer ${transformer.name}`,
+						name: `Transform ${newContract.name} using transformer ${transformer.name}`,
 						data: {
 							status: 'pending',
-							input: newCard,
+							input: newContract,
 							transformer,
 							actor: transformerActor.id,
 							workerFilter: {
@@ -110,7 +113,7 @@ export const evaluate = async ({
 				},
 			});
 
-			// TODO: Improve core API for linking cards
+			// TODO: Improve core API for linking contracts
 			await executeAndAwaitAction({
 				card: 'link@1.0.0',
 				type: 'type',

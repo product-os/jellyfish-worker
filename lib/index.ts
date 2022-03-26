@@ -7,7 +7,7 @@ import type {
 	ContractData,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import { CARDS as CORE_CARDS, Kernel } from 'autumndb';
+import { CONTRACTS, Kernel } from 'autumndb';
 import { parseExpression } from 'cron-parser';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -90,37 +90,35 @@ const formulaParser = new Jellyscript({
 });
 
 /**
- * @summary The "type" card type
- * @type {String}
+ * @summary The "type" contract type
  * @private
  */
-const CARD_TYPE_TYPE = 'type@1.0.0';
+const CONTRACT_TYPE_TYPE = 'type@1.0.0';
 
 /**
  * @summary Default insert concurrency
- * @type {Number}
  * @private
  */
 const INSERT_CONCURRENCY = 3;
 
 /**
- * @summary Get the request input card
+ * @summary Get the request input contract
  * @function
  * @private
  *
- * @param {LogContext} logContext - log context
- * @param {Object} kernel - kernel instance
- * @param {String} session - session id
- * @param {String} identifier - id or slug
- * @returns {(Object|Null)}
+ * @param logContext - log context
+ * @param kernel - kernel instance
+ * @param session - session id
+ * @param identifier - id or slug
+ * @returns request input contract or null
  *
  * @example
- * const card = await getInputCard({ ... }, kernel, session, 'foo-bar')
- * if (card) {
- *   console.log(card)
+ * const contract = await getInputContract({ ... }, kernel, session, 'foo-bar');
+ * if (contract) {
+ *   console.log(contract);
  * }
  */
-const getInputCard = async (
+const getInputContract = async (
 	logContext: LogContext,
 	kernel: Kernel,
 	session: string,
@@ -134,19 +132,19 @@ const getInputCard = async (
 
 /**
  * Returns an object that will include all links referenced in evaluated fields
- * in the type card's schema.
+ * in the type contract's schema.
  *
  * If no links are referenced in evaluated fields, the original object is returned
  * immediately.
  *
- * @param {LogContext} logContext - log context
- * @param {Object} kernel - kernel instance
- * @param {String} session - session id
- * @param {Object} card - card to fill with links
- * @param {Object} typeCard - type card
+ * @param logContext - log context
+ * @param kernel - kernel instance
+ * @param session - session id
+ * @param contract - contract to fill with links
+ * @param typeContract - type contract
  *
- * @returns {Object} - the card with any links referenced in the evaluated fields
- * of it's type card's schema.
+ * @returns the contract with any links referenced in the evaluated fields
+ * of it's type contract's schema.
  */
 export async function getObjectWithLinks<
 	PContract extends Partial<TContract> | TContract,
@@ -156,35 +154,39 @@ export async function getObjectWithLinks<
 	logContext: LogContext,
 	kernel: Kernel,
 	session: string,
-	card: PContract,
-	typeCard: TypeContract,
+	contract: PContract,
+	typeContract: TypeContract,
 ): Promise<PContract> {
-	const linkVerbs = formulas.getReferencedLinkVerbs(typeCard);
+	const linkVerbs = formulas.getReferencedLinkVerbs(typeContract);
 	if (!linkVerbs.length) {
-		return card;
+		return contract;
 	}
-	let queriedCard: TContract | null = null;
-	if ((card.slug && card.version) || card.id) {
-		const query = utils.getQueryWithOptionalLinks(card, linkVerbs);
-		[queriedCard] = await kernel.query<TContract>(logContext, session, query);
+	let queriedContract: TContract | null = null;
+	if ((contract.slug && contract.version) || contract.id) {
+		const query = utils.getQueryWithOptionalLinks(contract, linkVerbs);
+		[queriedContract] = await kernel.query<TContract>(
+			logContext,
+			session,
+			query,
+		);
 	}
-	const cardWithLinks = queriedCard || card;
+	const contractWithLinks = queriedContract || contract;
 
 	// Optional links may not be populated so explicitly set to an empty array here
 	linkVerbs.forEach((linkVerb) => {
-		if (!_.has(cardWithLinks, ['links', linkVerb])) {
-			_.set(cardWithLinks, ['links', linkVerb], []);
+		if (!_.has(contractWithLinks, ['links', linkVerb])) {
+			_.set(contractWithLinks, ['links', linkVerb], []);
 		}
 	});
 
-	return cardWithLinks as PContract;
+	return contractWithLinks as PContract;
 }
 
 /**
  * @summary Get the next execute date-time for a scheduled action
  *
- * @param {ScheduledActionData['schedule']} schedule - schedule configuration
- * @returns {Date | null} next execution date, or null if no future date was found
+ * @param schedule - schedule configuration
+ * @returns next execution date, or null if no future date was found
  */
 export function getNextExecutionDate(
 	schedule: ScheduledActionData['schedule'],
@@ -314,9 +316,9 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {Sync} sync - sync instance
-	 * @param {OnMessageEventHandler} onMessageEventHandler - consumer event handler
+	 * @param logContext - log context
+	 * @param sync - sync instance
+	 * @param onMessageEventHandler - consumer event handler
 	 *
 	 * @example
 	 * const worker = new Worker({ ... });
@@ -339,18 +341,18 @@ export class Worker {
 			onMessageEventHandler,
 		);
 
-		// Insert worker specific cards
+		// Insert worker specific contracts
 		await Promise.all(
 			Object.values(contracts).map(async (contract) => {
 				return this.kernel.replaceContract(logContext, this.session, contract);
 			}),
 		);
 		await Promise.all(
-			Object.values(actions).map(async (card) => {
+			Object.values(actions).map(async (action) => {
 				return this.kernel.replaceContract(
 					logContext,
 					this.session,
-					card.contract,
+					action.contract,
 				);
 			}),
 		);
@@ -361,11 +363,11 @@ export class Worker {
 	 * @function
 	 * @private
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @returns {Object} action context
+	 * @param logContext - log context
+	 * @returns action context
 	 *
 	 * @example
-	 * const actionContext = worker.getActionContext({ ... })
+	 * const actionContext = worker.getActionContext({ ... });
 	 */
 	getActionContext(logContext: LogContext): WorkerContext {
 		const self = this;
@@ -422,7 +424,7 @@ export class Worker {
 				return this.enqueueAction(...args);
 			},
 			cards: {
-				...CORE_CARDS,
+				...CONTRACTS,
 				...self.getTypeContracts(),
 			},
 		};
@@ -433,34 +435,35 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @param {Object} session - The session with which to enqueue the action
-	 * @param {Object} actionRequest - request values to be enqueued
-	 * @param {Object} card - The card that should be inserted
+	 * @param session - The session with which to enqueue the action
+	 * @param actionRequest - request values to be enqueued
 	 *
-	 * @returns {Object} The stored action request contract
+	 * @returns the stored action request contract
 	 */
-	async enqueueAction(session: string, actionRequest: ProducerOptions) {
+	async enqueueAction(
+		session: string,
+		actionRequest: ProducerOptions,
+	): Promise<ActionRequestContract> {
 		return this.producer.enqueue(this.getId(), session, actionRequest);
 	}
 
 	/**
-	 * @summary Insert a card
+	 * @summary Insert a contract
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {String} insertSession - The Jellyfish session to insert the card with
-	 * @param {Object} typeCard - The type card for the card that will be inserted
-	 * @param {Object} options - options
-	 * @param {Date} [options.timestamp] - Upsert timestamp
-	 * @param {Object} card - The card that should be inserted
+	 * @param logContext - log context
+	 * @param insertSession - the Jellyfish session to insert the card with
+	 * @param typeContract - the type card for the card that will be inserted
+	 * @param options - insert options
+	 * @param object - The contract that should be inserted
 	 *
-	 * @returns {Object} inserted card
+	 * @returns inserted contract
 	 */
 	async insertCard(
 		logContext: LogContext,
 		insertSession: string,
-		typeCard: TypeContract,
+		typeContract: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
 			timestamp?: any;
@@ -474,25 +477,29 @@ export class Worker {
 		const instance = this;
 		const kernel = instance.kernel;
 
-		logger.debug(logContext, 'Inserting card', {
+		logger.debug(logContext, 'Inserting contract', {
 			slug: object.slug,
-			type: typeCard.slug,
+			type: typeContract.slug,
 			attachEvents: options.attachEvents,
 		});
 
-		object.type = `${typeCard.slug}@${typeCard.version}`;
+		object.type = `${typeContract.slug}@${typeContract.version}`;
 
-		let card: Contract | null = null;
+		let contract: Contract | null = null;
 		if (object.slug) {
-			card = await kernel.getContractBySlug(
+			contract = await kernel.getContractBySlug(
 				logContext,
 				insertSession,
 				`${object.slug}@${object.version || 'latest'}`,
 			);
 		}
 
-		if (!card && object.id) {
-			card = await kernel.getContractById(logContext, insertSession, object.id);
+		if (!contract && object.id) {
+			contract = await kernel.getContractById(
+				logContext,
+				insertSession,
+				object.id,
+			);
 		}
 
 		if (typeof object.name !== 'string') {
@@ -502,8 +509,8 @@ export class Worker {
 		return this.commit(
 			logContext,
 			insertSession,
-			typeCard,
-			card,
+			typeContract,
+			contract,
 			{
 				eventPayload: _.omit(object, ['id']),
 				eventType: 'create',
@@ -514,16 +521,17 @@ export class Worker {
 				attachEvents: options.attachEvents,
 			},
 			async () => {
-				// TS-TODO: Fix these "any" castings
 				const objectWithLinks = await getObjectWithLinks(
 					logContext,
 					kernel,
 					insertSession,
 					object,
-					typeCard,
+					typeContract,
 				);
+
+				// TS-TODO: Fix these "any" castings
 				const result = formulaParser.evaluateObject(
-					typeCard.data.schema,
+					typeContract.data.schema,
 					objectWithLinks as any,
 				);
 				return kernel.insertContract(logContext, insertSession, result as any);
@@ -532,24 +540,23 @@ export class Worker {
 	}
 
 	/**
-	 * @summary Patch a card
+	 * @summary Patch a contract
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {String} insertSession - The Jellyfish session to insert the card with
-	 * @param {Object} typeCard - The type card for the card that will be inserted
-	 * @param {Object} options - options
-	 * @param {Date} [options.timestamp] - Upsert timestamp
-	 * @param {Object} card - The card that should be inserted
-	 * @param {Object[]} patch - JSON Patch
+	 * @param logContext - log context
+	 * @param insertSession - the Jellyfish session to insert the contract with
+	 * @param typeContract - the type contract for the contract that will be inserted
+	 * @param options - options
+	 * @param contract - The contract that should be inserted
+	 * @param patch - json patch
 	 *
-	 * @returns {Object} inserted card
+	 * @returns inserted contract
 	 */
 	patchCard(
 		logContext: LogContext,
 		insertSession: string,
-		typeCard: TypeContract,
+		typeContract: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
 			timestamp?: any;
@@ -558,13 +565,13 @@ export class Worker {
 			originator?: any;
 			attachEvents?: any;
 		},
-		card: Partial<Contract>,
+		contract: Partial<Contract>,
 		patch: Operation[],
 	) {
 		const instance = this;
 		const kernel = instance.kernel;
 		const session = insertSession;
-		const object = card;
+		const object = contract;
 		assert.INTERNAL(
 			logContext,
 			object.version,
@@ -572,10 +579,10 @@ export class Worker {
 			`Can't update without a version for: ${object.slug}`,
 		);
 
-		logger.debug(logContext, 'Patching card', {
+		logger.debug(logContext, 'Patching contract', {
 			slug: object.slug,
 			version: object.version,
-			type: typeCard.slug,
+			type: typeContract.slug,
 			attachEvents: options.attachEvents,
 			operations: patch.length,
 		});
@@ -583,7 +590,7 @@ export class Worker {
 		return this.commit(
 			logContext,
 			session,
-			typeCard,
+			typeContract,
 			object as Contract,
 			{
 				eventPayload: patch,
@@ -595,20 +602,20 @@ export class Worker {
 				attachEvents: options.attachEvents,
 			},
 			async () => {
-				// TS-TODO: Remove these any castings
 				const objectWithLinks = await getObjectWithLinks(
 					logContext,
 					kernel,
 					session,
 					object,
-					typeCard,
+					typeContract,
 				);
+				// TS-TODO: Remove this any casting
 				const newPatch = formulaParser.evaluatePatch(
-					typeCard.data.schema,
+					typeContract.data.schema,
 					objectWithLinks as any,
 					patch,
 				);
-				return kernel.patchCardBySlug(
+				return kernel.patchContractBySlug(
 					logContext,
 					session,
 					`${object.slug}@${object.version}`,
@@ -619,25 +626,24 @@ export class Worker {
 	}
 
 	/**
-	 * @summary Replace a card
+	 * @summary Replace a contract
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {String} insertSession - The Jellyfish session to insert the card with
-	 * @param {Object} typeCard - The type card for the card that will be inserted
-	 * @param {Object} options - options
-	 * @param {Date} [options.timestamp] - Upsert timestamp
-	 * @param {Object} card - The card that should be inserted
+	 * @param logContext - log context
+	 * @param insertSession - The Jellyfish session to insert the contract with
+	 * @param typeContract - The type contract for the contract that will be inserted
+	 * @param options - options
+	 * @param object - the contract that should be inserted
 	 *
-	 * @returns {Object} replaced card
+	 * @returns replaced contract
 	 */
 	// FIXME: This entire method should be replaced and all operations should
 	// be an insert or update.
 	async replaceCard(
 		logContext: LogContext,
 		insertSession: string,
-		typeCard: TypeContract,
+		typeContract: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
 			timestamp?: any;
@@ -650,31 +656,35 @@ export class Worker {
 	) {
 		const instance = this;
 		const kernel = instance.kernel;
-		logger.debug(logContext, 'Replacing card', {
+		logger.debug(logContext, 'Replacing contract', {
 			slug: object.slug,
-			type: typeCard.slug,
+			type: typeContract.slug,
 			attachEvents: options.attachEvents,
 		});
 
-		object.type = `${typeCard.slug}@${typeCard.version}`;
+		object.type = `${typeContract.slug}@${typeContract.version}`;
 
-		let card: Contract | null = null;
+		let contract: Contract | null = null;
 
 		if (object.slug) {
-			card = await kernel.getContractBySlug(
+			contract = await kernel.getContractBySlug(
 				logContext,
 				insertSession,
 				`${object.slug}@${object.version}`,
 			);
 		}
-		if (!card && object.id) {
-			card = await kernel.getContractById(logContext, insertSession, object.id);
+		if (!contract && object.id) {
+			contract = await kernel.getContractById(
+				logContext,
+				insertSession,
+				object.id,
+			);
 		}
 
 		let attachEvents = options.attachEvents;
 
 		// If a contract already exists don't attach events
-		if (card) {
+		if (contract) {
 			attachEvents = false;
 		}
 
@@ -685,12 +695,12 @@ export class Worker {
 		return this.commit(
 			logContext,
 			insertSession,
-			typeCard,
-			card,
+			typeContract,
+			contract,
 			{
 				attachEvents,
-				eventPayload: !!card ? null : _.omit(object, ['id']),
-				eventType: !!card ? null : 'create',
+				eventPayload: !!contract ? null : _.omit(object, ['id']),
+				eventType: !!contract ? null : 'create',
 				timestamp: options.timestamp,
 				reason: options.reason,
 				actor: options.actor,
@@ -702,11 +712,11 @@ export class Worker {
 					kernel,
 					insertSession,
 					object,
-					typeCard,
+					typeContract,
 				);
 
 				// Add the expanded links to the new contract object being inserted
-				const result = formulaParser.evaluateObject(typeCard.data.schema, {
+				const result = formulaParser.evaluateObject(typeContract.data.schema, {
 					...object,
 					links: links || {},
 				} as any);
@@ -722,12 +732,12 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {Object[]} objects - triggers
+	 * @param logContext - log context
+	 * @param triggerContracts - triggers
 	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.setTriggers([ ... ])
+	 * const worker = new Worker({ ... });
+	 * worker.setTriggers([ ... ]);
 	 */
 	setTriggers(
 		logContext: LogContext,
@@ -744,11 +754,13 @@ export class Worker {
 	 * @summary Upsert a single registered trigger
 	 * @function
 	 * @public
-	 * @param {LogContext} logContext - log context
-	 * @param {Object} contract - triggered action contract
+	 *
+	 * @param logContext - log context
+	 * @param contract - triggered action contract
+	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.upsertTrigger({ ... })
+	 * const worker = new Worker({ ... });
+	 * worker.upsertTrigger({ ... });
 	 */
 	upsertTrigger(logContext: LogContext, contract: TriggeredActionContract) {
 		logger.info(logContext, 'Upserting trigger', {
@@ -773,11 +785,13 @@ export class Worker {
 	 * @summary Remove a single registered trigger
 	 * @function
 	 * @public
-	 * @param {LogContext} logContext - log context
-	 * @param {Object} id - id of trigger card
+	 *
+	 * @param logContext - log context
+	 * @param id - id of trigger contract
+	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.removeTrigger('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
+	 * const worker = new Worker({ ... });
+	 * worker.removeTrigger('ed3c21f2-fa5e-4cdf-b862-392a2697abe4');
 	 */
 	removeTrigger(logContext: LogContext, id: string) {
 		logger.info(logContext, 'Removing trigger', {
@@ -794,12 +808,12 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @returns {Object[]} triggers
+	 * @returns trigger contracts
 	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * const triggers = worker.getTriggers()
-	 * console.log(triggers.length)
+	 * const worker = new Worker({ ... });
+	 * const triggers = worker.getTriggers();
+	 * console.log(triggers.length);
 	 */
 	getTriggers() {
 		return this.triggers;
@@ -811,7 +825,7 @@ export class Worker {
 	 * @private
 	 *
 	 * @example
-	 * this.updateLatestTransformers()
+	 * this.updateLatestTransformers();
 	 */
 	updateLatestTransformers() {
 		const transformersMap: { [slug: string]: Transformer } = {};
@@ -836,12 +850,12 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {Object[]} transformers - transformers
+	 * @param logContext - log context
+	 * @param transformerContracts - transformer contracts
 	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.settransformers([ ... ])
+	 * const worker = new Worker({ ... });
+	 * worker.settransformers([ ... ]);
 	 */
 	// TS-TODO: Make transformers a core cotnract and type them correctly here
 	setTransformers(logContext: LogContext, transformerContracts: Transformer[]) {
@@ -858,12 +872,12 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {Object[]} typeContracts - type contracts
+	 * @param logContext - log context
+	 * @param typeContracts - type contracts
 	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.setTypeContracts([ ... ])
+	 * const worker = new Worker({ ... });
+	 * worker.setTypeContracts([ ... ]);
 	 */
 	setTypeContracts(logContext: LogContext, typeContracts: TypeContract[]) {
 		logger.info(logContext, 'Setting type contracts', {
@@ -881,12 +895,12 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @returns {Object} type contract map
+	 * @returns type contract map
 	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * const typeContracts = worker.getTypeContracts()
-	 * console.log(typeContracts.length)
+	 * const worker = new Worker({ ... });
+	 * const typeContracts = worker.getTypeContracts();
+	 * console.log(typeContracts.length);
 	 */
 	getTypeContracts() {
 		return this.typeContracts;
@@ -896,11 +910,13 @@ export class Worker {
 	 * @summary Upsert a single registered transformer
 	 * @function
 	 * @public
-	 * @param {LogContext} logContext - log context
-	 * @param {Object} transformer - transformer card
+	 *
+	 * @param logContext - log context
+	 * @param transformer - transformer contract
+	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.upserttransformer({ ... })
+	 * const worker = new Worker({ ... });
+	 * worker.upserttransformer({ ... });
 	 */
 	upsertTransformer(logContext: LogContext, transformer: Transformer) {
 		logger.info(logContext, 'Upserting transformer', {
@@ -926,11 +942,13 @@ export class Worker {
 	 * @summary Remove a single registered transformer
 	 * @function
 	 * @public
-	 * @param {LogContext} logContext - log context
-	 * @param {Object} id - id of transformer card
+	 *
+	 * @param logContext - log context
+	 * @param id - id of transformer contract
+	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * worker.removetransformer('ed3c21f2-fa5e-4cdf-b862-392a2697abe4')
+	 * const worker = new Worker({ ... });
+	 * worker.removetransformer('ed3c21f2-fa5e-4cdf-b862-392a2697abe4');
 	 */
 	removeTransformer(logContext: LogContext, id: string) {
 		logger.info(logContext, 'Removing transformer', {
@@ -948,12 +966,12 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @returns {Object[]} transformers
+	 * @returns transformer contracts
 	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * const transformers = worker.getLatestTransformers()
-	 * console.log(transformers.length)
+	 * const worker = new Worker({ ... });
+	 * const transformers = worker.getLatestTransformers();
+	 * console.log(transformers.length);
 	 */
 	getLatestTransformers() {
 		return this.latestTransformers;
@@ -969,9 +987,9 @@ export class Worker {
 	 * the action request is enqueued. The hook may return a
 	 * modified set of arguments.
 	 *
-	 * @param {String} session - session id
-	 * @param {Object} request - action request options
-	 * @returns {(Object|Undefined)} request arguments
+	 * @param session - session id
+	 * @param request - action request options
+	 * @returns request arguments
 	 */
 	async pre(
 		session: string,
@@ -1014,22 +1032,16 @@ export class Worker {
 	 * You still need to make sure to post the execution event
 	 * upon completion.
 	 *
-	 * @param {String} session - session id
-	 * @param {Object} request - request
-	 * @param {String} request.actor - actor id
-	 * @param {Object} request.action - action card
-	 * @param {String} request.timestamp - action timestamp
-	 * @param {String} request.card - action input card id
-	 * @param {Object} request.arguments - action arguments
-	 * @param {String} [request.originator] - action originator card id]
-	 * @returns {Object} action result
+	 * @param session - session id
+	 * @param request - action request contract
+	 * @returns action result
 	 *
 	 * @example
-	 * const worker = new Worker({ ... })
-	 * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
-	 * const result = await worker.execute(kernel, session, { ... })
-	 * console.log(result.error)
-	 * console.log(result.data)
+	 * const worker = new Worker({ ... });
+	 * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84';
+	 * const result = await worker.execute(kernel, session, { ... });
+	 * console.log(result.error);
+	 * console.log(result.data);
 	 */
 	async execute(session: string, request: ActionRequestContract) {
 		const logContext: LogContext = request.data.context || {
@@ -1045,7 +1057,7 @@ export class Worker {
 			},
 		});
 
-		const actionCard = await this.kernel.getContractBySlug<ActionContract>(
+		const actionContract = await this.kernel.getContractBySlug<ActionContract>(
 			logContext,
 			session,
 			request.data.action,
@@ -1053,14 +1065,14 @@ export class Worker {
 
 		assert.USER(
 			logContext,
-			actionCard,
+			actionContract,
 			errors.WorkerInvalidAction,
 			`No such action: ${request.data.action}`,
 		);
 
 		// TS-TODO: Use asserts correctly so the `assert.USER` call above correctly
-		// validates that actionCard is non-null, so this double-check can be removed
-		if (!actionCard) {
+		// validates that actionContract is non-null, so this double-check can be removed
+		if (!actionContract) {
 			throw new errors.WorkerInvalidAction(
 				`No such action: ${request.data.action}`,
 			);
@@ -1068,11 +1080,17 @@ export class Worker {
 
 		const startDate = new Date();
 
-		let result;
+		// TS-TODO: Use proper type
+		let result: any;
 
 		try {
 			const [input, actor] = await Promise.all([
-				getInputCard(logContext, this.kernel, session, request.data.input.id),
+				getInputContract(
+					logContext,
+					this.kernel,
+					session,
+					request.data.input.id,
+				),
 				this.kernel.getContractById(logContext, session, request.data.actor),
 			]);
 
@@ -1080,7 +1098,7 @@ export class Worker {
 				logContext,
 				input,
 				errors.WorkerNoElement,
-				`No such input card: ${request.data.input.id}`,
+				`No such input contract: ${request.data.input.id}`,
 			);
 			assert.INTERNAL(
 				logContext,
@@ -1089,28 +1107,32 @@ export class Worker {
 				`No such actor: ${request.data.actor}`,
 			);
 
-			const actionInputCardFilter = _.get(actionCard, ['data', 'filter'], {
-				type: 'object',
-			});
+			const actionInputContractFilter = _.get(
+				actionContract,
+				['data', 'filter'],
+				{
+					type: 'object',
+				},
+			);
 
-			const results = skhema.match(actionInputCardFilter as any, input);
+			const results = skhema.match(actionInputContractFilter as any, input);
 			if (!results.valid) {
-				logger.error(logContext, 'Card schema mismatch!');
-				logger.error(logContext, JSON.stringify(actionInputCardFilter));
+				logger.error(logContext, 'Contract schema mismatch!');
+				logger.error(logContext, JSON.stringify(actionInputContractFilter));
 				for (const error of results.errors) {
 					logger.error(logContext, error);
 				}
 
 				throw new errors.WorkerSchemaMismatch(
-					`Input card does not match filter. Action:${actionCard.slug}, Card:${input?.slug}`,
+					`Input contract does not match filter. Action:${actionContract.slug}, Contract:${input?.slug}`,
 				);
 			}
 
 			// TODO: Action definition bodies are not versioned yet
-			// as they are not part of the action cards.
-			const actionName = actionCard.slug.split('@')[0];
+			// as they are not part of the action contracts.
+			const actionName = actionContract.slug.split('@')[0];
 
-			const argumentsSchema = utils.getActionArgumentsSchema(actionCard);
+			const argumentsSchema = utils.getActionArgumentsSchema(actionContract);
 
 			assert.USER(
 				logContext,
@@ -1145,7 +1167,7 @@ export class Worker {
 			// TS-TODO: `input` gets verified as non-null by a jellyfish-assert
 			// call above, but Typescript doesn't understand this.
 			const data: any = await actionFunction(session, actionContext, input!, {
-				action: actionCard,
+				action: actionContract,
 				card: request.data.input.id,
 				actor: request.data.actor,
 				logContext,
@@ -1160,7 +1182,7 @@ export class Worker {
 			logger.info(logContext, 'Execute success', {
 				data,
 				input: request.data.input,
-				action: actionCard.slug,
+				action: actionContract.slug,
 				time: endDate.getTime() - startDate.getTime(),
 			});
 
@@ -1187,7 +1209,7 @@ export class Worker {
 			const logData = {
 				error: errorObject,
 				input: request.data.input,
-				action: actionCard.slug,
+				action: actionContract.slug,
 				time: endDate.getTime() - startDate.getTime(),
 			};
 
@@ -1237,21 +1259,19 @@ export class Worker {
 	 * @function
 	 * @private
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {Object} kernel - kernel instance
-	 * @param {String} session - session id
-	 * @param {Object} typeCard - The full type contract for the card being
-	 * inserted or updated
-	 * @param {Object} current - The full contract prior to being updated, if it exists
-	 * @param {Object} options - Options object
-	 * @param {Function} fn - an asynchronous function that will perform the operation
+	 * @param logContext - log context
+	 * @param session - session id
+	 * @param typeContract - the full type contract for the contract being inserted or updated
+	 * @param currentContract - The full contract prior to being updated, if it exists
+	 * @param options - options object
+	 * @param fn - an asynchronous function that will perform the operation
 	 */
 	// TS-TODO: Improve the typings for the `options` parameter
 	private async commit(
 		logContext: LogContext,
 		session: string,
-		typeCard: TypeContract,
-		current: Contract | null,
+		typeContract: TypeContract,
+		currentContract: Contract | null,
 		options: {
 			actor: any;
 			originator: any;
@@ -1265,33 +1285,38 @@ export class Worker {
 	) {
 		assert.INTERNAL(
 			logContext,
-			typeCard && typeCard.data && typeCard.data.schema,
+			typeContract && typeContract.data && typeContract.data.schema,
 			errors.WorkerNoElement,
-			`Invalid type: ${typeCard}`,
+			`Invalid type: ${typeContract}`,
 		);
 
 		const currentTime = new Date();
 		const workerContext = this.getActionContext(logContext);
 
-		const insertedCard = await fn();
-		if (!insertedCard) {
+		const insertedContract = await fn();
+		if (!insertedContract) {
 			return null;
 		}
 
 		if (
-			current !== null &&
+			currentContract !== null &&
 			fastEquals.deepEqual(
-				_.omit(insertedCard, [
+				_.omit(insertedContract, [
 					'created_at',
 					'updated_at',
 					'linked_at',
 					'links',
 				]),
-				_.omit(current, ['created_at', 'updated_at', 'linked_at', 'links']),
+				_.omit(currentContract, [
+					'created_at',
+					'updated_at',
+					'linked_at',
+					'links',
+				]),
 			)
 		) {
 			logger.debug(logContext, 'Omitting pointless insertion', {
-				slug: current.slug,
+				slug: currentContract.slug,
 			});
 
 			return null;
@@ -1299,8 +1324,8 @@ export class Worker {
 
 		evaluateTransformers({
 			transformers: this.latestTransformers,
-			oldCard: current,
-			newCard: insertedCard,
+			oldContract: currentContract,
+			newContract: insertedContract,
 			logContext,
 			query: (querySchema, queryOpts) => {
 				return this.kernel.query(
@@ -1325,8 +1350,8 @@ export class Worker {
 
 		subscriptionsLib
 			.evaluate({
-				oldContract: current,
-				newContract: insertedCard,
+				oldContract: currentContract,
+				newContract: insertedContract,
 				getTypeContract: (type) => {
 					return this.typeContracts[type];
 				},
@@ -1371,7 +1396,7 @@ export class Worker {
 
 				const logData = {
 					error: errorObject,
-					input: insertedCard.slug,
+					input: insertedContract.slug,
 				};
 
 				if (error.expected) {
@@ -1392,11 +1417,11 @@ export class Worker {
 					const request = await triggersLib.getRequest(
 						this.kernel,
 						trigger,
-						current,
-						insertedCard,
+						currentContract,
+						insertedContract,
 						{
 							currentDate: new Date(),
-							mode: current ? 'update' : 'insert',
+							mode: currentContract ? 'update' : 'insert',
 							logContext,
 							session,
 						},
@@ -1406,27 +1431,27 @@ export class Worker {
 						return null;
 					}
 
-					// trigger.target might result in multiple cards in a single action request
+					// trigger.target might result in multiple contracts in a single action request
 					const identifiers = _.uniq(_.castArray(request.card));
 
 					await Promise.all(
 						identifiers.map(async (identifier) => {
-							const triggerCard = await getInputCard(
+							const triggerContract = await getInputContract(
 								logContext,
 								this.kernel,
 								session,
 								identifier,
 							);
 
-							if (!triggerCard) {
+							if (!triggerContract) {
 								throw new errors.WorkerNoElement(
-									`No such input card for trigger ${trigger.slug}: ${identifier}`,
+									`No such input contract for trigger ${trigger.slug}: ${identifier}`,
 								);
 							}
 							const actionRequest = {
-								// Re-enqueuing an action request expects the "card" option to be an
-								// id, not a full card.
-								card: triggerCard.id,
+								// Re-enqueuing an action request expects the "contract" option to be an
+								// id, not a full contract.
+								card: triggerContract.id,
 								action: request.action!,
 								actor: options.actor,
 								logContext: request.logContext,
@@ -1444,7 +1469,7 @@ export class Worker {
 								'Enqueing new action request due to triggered-action',
 								{
 									trigger: trigger.slug,
-									contract: triggerCard.id,
+									contract: triggerContract.id,
 									arguments: request.arguments,
 								},
 							);
@@ -1458,7 +1483,7 @@ export class Worker {
 
 					const logData = {
 						error: errorObject,
-						input: insertedCard.slug,
+						input: insertedContract.slug,
 						trigger: trigger.slug,
 					};
 
@@ -1482,7 +1507,7 @@ export class Worker {
 
 			const request = {
 				action: 'action-create-event@1.0.0',
-				card: insertedCard,
+				card: insertedContract,
 				actor: options.actor,
 				logContext,
 				timestamp: time.toISOString(),
@@ -1498,15 +1523,15 @@ export class Worker {
 			await this.library[request.action.split('@')[0]].handler(
 				session,
 				workerContext,
-				insertedCard,
+				insertedContract,
 				request as any,
 			);
 		}
 
-		// If the card markers have changed then update the timeline of the card
+		// If the contract markers have changed then update the timeline of the contract
 		if (
-			current &&
-			!fastEquals.deepEqual(current.markers, insertedCard.markers)
+			currentContract &&
+			!fastEquals.deepEqual(currentContract.markers, insertedContract.markers)
 		) {
 			const timeline = await this.kernel.query(logContext, session, {
 				$$links: {
@@ -1516,11 +1541,11 @@ export class Worker {
 						properties: {
 							slug: {
 								type: 'string',
-								const: insertedCard.slug,
+								const: insertedContract.slug,
 							},
 							type: {
 								type: 'string',
-								const: insertedCard.type,
+								const: insertedContract.type,
 							},
 						},
 					},
@@ -1541,8 +1566,8 @@ export class Worker {
 			});
 
 			for (const event of timeline) {
-				if (!fastEquals.deepEqual(event.markers, insertedCard.markers)) {
-					await this.kernel.patchCardBySlug(
+				if (!fastEquals.deepEqual(event.markers, insertedContract.markers)) {
+					await this.kernel.patchContractBySlug(
 						logContext,
 						session,
 						`${event.slug}@${event.version}`,
@@ -1550,7 +1575,7 @@ export class Worker {
 							{
 								op: 'replace',
 								path: '/markers',
-								value: insertedCard.markers,
+								value: insertedContract.markers,
 							},
 						],
 					);
@@ -1558,18 +1583,18 @@ export class Worker {
 			}
 		}
 
-		if (insertedCard.type === CARD_TYPE_TYPE) {
+		if (insertedContract.type === CONTRACT_TYPE_TYPE) {
 			// Remove any previously attached trigger for this type
 			const typeTriggers = await triggersLib.getTypeTriggers(
 				logContext,
 				this.kernel,
 				session,
-				`${insertedCard.slug}@${insertedCard.version}`,
+				`${insertedContract.slug}@${insertedContract.version}`,
 			);
 			await Promise.all(
 				typeTriggers.map(
 					async (trigger) => {
-						await this.kernel.patchCardBySlug(
+						await this.kernel.patchContractBySlug(
 							logContext,
 							session,
 							`${trigger.slug}@${trigger.version}`,
@@ -1594,7 +1619,7 @@ export class Worker {
 			);
 
 			await Promise.all(
-				formulas.getTypeTriggers(insertedCard as TypeContract).map(
+				formulas.getTypeTriggers(insertedContract as TypeContract).map(
 					async (trigger) => {
 						// We don't want to use the actions queue here
 						// so that watchers are applied right away
@@ -1618,16 +1643,16 @@ export class Worker {
 			);
 		}
 
-		return insertedCard;
+		return insertedContract;
 	}
 
 	/**
-	 * @sumary Enqueue an action to be executed later, using schedule configuration
+	 * Enqueue an action to be executed later, using schedule configuration
 	 * @function
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {String} session - session id
-	 * @param {String} id - scheduled action contract ID
+	 * @param logContext - log context
+	 * @param session - session id
+	 * @param id - scheduled action contract ID
 	 */
 	async scheduleAction(
 		logContext: LogContext,

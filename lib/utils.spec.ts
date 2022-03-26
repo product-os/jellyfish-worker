@@ -101,7 +101,7 @@ describe('.getQueryWithOptionalLinks()', () => {
 		]);
 		const expected: JsonSchema = {
 			type: 'object',
-			description: 'Get card with optional links',
+			description: 'Get contract with optional links',
 			anyOf: [
 				true,
 				{

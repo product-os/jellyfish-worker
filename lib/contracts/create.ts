@@ -1,11 +1,12 @@
-export const create = {
+import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const create: ContractDefinition = {
 	slug: 'create',
 	type: 'type@1.0.0',
 	version: '1.0.0',
-	name: 'The card create event',
+	name: 'The contract create event',
 	markers: [],
 	tags: [],
-	links: {},
 	active: true,
 	data: {
 		schema: {

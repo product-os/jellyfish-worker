@@ -1,11 +1,12 @@
-export const triggeredAction = {
+import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+
+export const triggeredAction: ContractDefinition = {
 	slug: 'triggered-action',
 	type: 'type@1.0.0',
 	version: '1.0.0',
 	name: 'Jellyfish Triggered Action',
 	markers: [],
 	tags: [],
-	links: {},
 	active: true,
 	data: {
 		schema: {

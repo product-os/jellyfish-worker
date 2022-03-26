@@ -14,7 +14,7 @@ import {
 } from '../../lib';
 
 let ctx: testUtils.TestContext;
-let typeCard: TypeContract;
+let typeContract: TypeContract;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
@@ -27,13 +27,13 @@ beforeAll(async () => {
 
 	assert(contract !== null);
 
-	typeCard = contract;
+	typeContract = contract;
 
 	await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 		slug: 'foo',
 		type: 'type@1.0.0',
 		version: '1.0.0',
-		name: 'The test foo card',
+		name: 'The test foo contract',
 		markers: [],
 		tags: [],
 		links: {},
@@ -90,7 +90,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				card: typeCard.id,
+				card: typeContract.id,
 				arguments: {
 					properties: {
 						slug: 'foo-bar-baz',
@@ -99,7 +99,7 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -119,7 +119,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: new Date(),
 				mode: 'insert',
@@ -148,7 +148,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				arguments: {
 					properties: {
 						slug: 'foo-bar-baz',
@@ -159,7 +159,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -178,7 +178,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: date,
 				mode: 'insert',
@@ -190,7 +190,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
-			card: typeCard.id,
+			card: typeContract.id,
 			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
@@ -217,7 +217,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				card: typeCard.id,
+				card: typeContract.id,
 				arguments: {
 					properties: {
 						slug: 'foo-bar-baz',
@@ -226,7 +226,7 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -240,15 +240,15 @@ describe('.getRequest()', () => {
 				data: {},
 			},
 		);
-		const oldCard = _.cloneDeep(insertedCard);
-		oldCard.data.randomField = 42;
+		const oldContract = _.cloneDeep(insertedContract);
+		oldContract.data.randomField = 42;
 
 		// TS-TODO: fix cast to any
 		const request = await triggers.getRequest(
 			ctx.kernel,
 			trigger,
-			oldCard,
-			insertedCard,
+			oldContract,
+			insertedContract,
 			{
 				currentDate: new Date(),
 				mode: 'insert',
@@ -281,7 +281,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				arguments: {
 					properties: {
 						slug: 'foo-bar-baz',
@@ -292,7 +292,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -307,14 +307,14 @@ describe('.getRequest()', () => {
 				data: {},
 			},
 		);
-		const oldCard = _.cloneDeep(insertedCard);
-		oldCard.name = 'x1';
+		const oldContract = _.cloneDeep(insertedContract);
+		oldContract.name = 'x1';
 
 		const request = await triggers.getRequest(
 			ctx.kernel,
 			trigger,
-			oldCard,
-			insertedCard,
+			oldContract,
+			insertedContract,
 			{
 				currentDate: date,
 				mode: 'insert',
@@ -326,7 +326,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
-			card: typeCard.id,
+			card: typeContract.id,
 			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
@@ -363,7 +363,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				arguments: {
 					properties: {
 						slug: 'foo-bar-baz',
@@ -374,7 +374,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -395,7 +395,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: date,
 				mode: 'insert',
@@ -407,7 +407,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			currentDate: date,
-			card: typeCard.id,
+			card: typeContract.id,
 			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
@@ -443,7 +443,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				arguments: {
 					properties: {
 						slug: 'foo-bar-baz',
@@ -452,7 +452,7 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -469,12 +469,11 @@ describe('.getRequest()', () => {
 			},
 		);
 
-		// TS-TODO: fix cast to any
 		const request = await triggers.getRequest(
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: new Date(),
 				mode: 'insert',
@@ -509,7 +508,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				arguments: {
 					properties: {
 						slug: {
@@ -527,7 +526,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -550,7 +549,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: date,
 				mode: 'insert',
@@ -561,7 +560,7 @@ describe('.getRequest()', () => {
 
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
-			card: typeCard.id,
+			card: typeContract.id,
 			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
@@ -598,7 +597,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				mode: 'update',
 				arguments: {
 					properties: {
@@ -617,7 +616,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -640,7 +639,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: date,
 				logContext: ctx.logContext,
@@ -651,7 +650,7 @@ describe('.getRequest()', () => {
 
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
-			card: typeCard.id,
+			card: typeContract.id,
 			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
@@ -688,7 +687,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				mode: 'insert',
 				arguments: {
 					properties: {
@@ -707,7 +706,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -730,7 +729,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: date,
 				logContext: ctx.logContext,
@@ -741,7 +740,7 @@ describe('.getRequest()', () => {
 
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
-			card: typeCard.id,
+			card: typeContract.id,
 			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			currentDate: date,
@@ -778,7 +777,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				mode: 'update',
 				arguments: {
 					properties: {
@@ -797,7 +796,7 @@ describe('.getRequest()', () => {
 
 		const date = new Date();
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -820,7 +819,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: date,
 				logContext: ctx.logContext,
@@ -846,7 +845,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				arguments: {
 					properties: {
 						data: {
@@ -861,7 +860,7 @@ describe('.getRequest()', () => {
 
 		const currentDate = new Date();
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -884,7 +883,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate,
 				mode: 'insert',
@@ -896,7 +895,7 @@ describe('.getRequest()', () => {
 		expect(request).toEqual({
 			action: 'action-create-card@1.0.0',
 			currentDate,
-			card: typeCard.id,
+			card: typeContract.id,
 			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			arguments: {
@@ -933,7 +932,7 @@ describe('.getRequest()', () => {
 					},
 				},
 				action: 'action-create-card@1.0.0',
-				target: typeCard.id,
+				target: typeContract.id,
 				arguments: {
 					properties: {
 						slug: {
@@ -949,7 +948,7 @@ describe('.getRequest()', () => {
 			},
 		}) as TriggeredActionContract;
 
-		const insertedCard = await ctx.kernel.insertContract(
+		const insertedContract = await ctx.kernel.insertContract(
 			ctx.logContext,
 			ctx.session,
 			{
@@ -971,7 +970,7 @@ describe('.getRequest()', () => {
 			ctx.kernel,
 			trigger,
 			null,
-			insertedCard,
+			insertedContract,
 			{
 				currentDate: new Date(),
 				mode: 'insert',
@@ -985,8 +984,8 @@ describe('.getRequest()', () => {
 });
 
 describe('.getTypeTriggers()', () => {
-	it('should return a trigger card with a matching type', async () => {
-		const cards = [
+	it('should return a trigger contract with a matching type', async () => {
+		const contracts = [
 			{
 				type: 'triggered-action@1.0.0',
 				slug: autumndbTestUtils.generateRandomSlug({
@@ -1012,7 +1011,7 @@ describe('.getTypeTriggers()', () => {
 						},
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: {
@@ -1027,22 +1026,22 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map((card) => Kernel.defaults<TriggeredActionData>(card));
+		].map((contract) => Kernel.defaults<TriggeredActionData>(contract));
 
-		const insertedCards = await Promise.all(
-			cards.map((card) => {
+		const insertedContracts = await Promise.all(
+			contracts.map((contract) => {
 				return ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
-					card as Contract,
+					contract as Contract,
 				);
 			}),
 		);
 
-		const updatedCard = await ctx.kernel.getContractById(
+		const updatedContract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
-			insertedCards[0].id,
+			insertedContracts[0].id,
 		);
 
 		const result = await triggers.getTypeTriggers(
@@ -1053,15 +1052,15 @@ describe('.getTypeTriggers()', () => {
 		);
 
 		expect(result).toEqual([
-			Object.assign({}, updatedCard, {
+			Object.assign({}, updatedContract, {
 				id: result[0].id,
 			}),
 		]);
 	});
 
-	it('should not return inactive cards', async () => {
+	it('should not return inactive contracts', async () => {
 		const typeSlug = autumndbTestUtils.generateRandomSlug();
-		const cards = [
+		const contracts = [
 			{
 				type: 'triggered-action@1.0.0',
 				slug: autumndbTestUtils.generateRandomSlug({
@@ -1088,7 +1087,7 @@ describe('.getTypeTriggers()', () => {
 						},
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: {
@@ -1103,13 +1102,13 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map((card) => Kernel.defaults<TriggeredActionData>(card));
+		].map((contract) => Kernel.defaults<TriggeredActionData>(contract));
 
-		for (const card of cards) {
+		for (const contract of contracts) {
 			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.session,
-				card as Contract,
+				contract as Contract,
 			);
 		}
 
@@ -1123,9 +1122,9 @@ describe('.getTypeTriggers()', () => {
 		expect(result).toEqual([]);
 	});
 
-	it('should ignore non-matching cards', async () => {
+	it('should ignore non-matching contracts', async () => {
 		const typeSlug = autumndbTestUtils.generateRandomSlug();
-		const cards = [
+		const contracts = [
 			{
 				type: 'triggered-action@1.0.0',
 				slug: autumndbTestUtils.generateRandomSlug({
@@ -1151,7 +1150,7 @@ describe('.getTypeTriggers()', () => {
 						},
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: {
@@ -1191,7 +1190,7 @@ describe('.getTypeTriggers()', () => {
 						},
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: {
@@ -1206,14 +1205,14 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map((card) => Kernel.defaults<TriggeredActionData>(card));
+		].map((contract) => Kernel.defaults<TriggeredActionData>(contract));
 
-		const insertedCards = await Promise.all(
-			cards.map((card) => {
+		const insertedContracts = await Promise.all(
+			contracts.map((contract) => {
 				return ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
-					card as Contract,
+					contract as Contract,
 				);
 			}),
 		);
@@ -1225,22 +1224,22 @@ describe('.getTypeTriggers()', () => {
 			`${typeSlug}@1.0.0`,
 		);
 
-		const updatedCard = await ctx.kernel.getContractById(
+		const updatedContract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
-			insertedCards[0].id,
+			insertedContracts[0].id,
 		);
 
 		expect(result).toEqual([
-			Object.assign({}, updatedCard, {
+			Object.assign({}, updatedContract, {
 				id: result[0].id,
 			}),
 		]);
 	});
 
-	it('should ignore cards that are not triggered actions', async () => {
+	it('should ignore contracts that are not triggered actions', async () => {
 		const typeSlug = autumndbTestUtils.generateRandomSlug();
-		const cards = [
+		const contracts = [
 			{
 				type: 'triggered-action@1.0.0',
 				slug: autumndbTestUtils.generateRandomSlug({
@@ -1266,7 +1265,7 @@ describe('.getTypeTriggers()', () => {
 						},
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: {
@@ -1306,7 +1305,7 @@ describe('.getTypeTriggers()', () => {
 						},
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: {
@@ -1321,14 +1320,14 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map((card) => Kernel.defaults<TriggeredActionData>(card));
+		].map((contract) => Kernel.defaults<TriggeredActionData>(contract));
 
-		const insertedCards = await Promise.all(
-			cards.map((card) => {
+		const insertedContracts = await Promise.all(
+			contracts.map((contract) => {
 				return ctx.kernel.insertContract(
 					ctx.logContext,
 					ctx.session,
-					card as Contract,
+					contract as Contract,
 				);
 			}),
 		);
@@ -1340,21 +1339,21 @@ describe('.getTypeTriggers()', () => {
 			`${typeSlug}@1.0.0`,
 		);
 
-		const updatedCard = await ctx.kernel.getContractById(
+		const updatedContract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
-			insertedCards[0].id,
+			insertedContracts[0].id,
 		);
 
 		expect(result).toEqual([
-			Object.assign({}, updatedCard, {
+			Object.assign({}, updatedContract, {
 				id: result[0].id,
 			}),
 		]);
 	});
 
 	it('should not return triggered actions not associated with a type', async () => {
-		const cards = [
+		const contracts = [
 			{
 				type: 'triggered-action@1.0.0',
 				slug: autumndbTestUtils.generateRandomSlug({
@@ -1379,7 +1378,7 @@ describe('.getTypeTriggers()', () => {
 						},
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: {
@@ -1394,13 +1393,13 @@ describe('.getTypeTriggers()', () => {
 					},
 				},
 			},
-		].map((card) => Kernel.defaults<TriggeredActionData>(card));
+		].map((contract) => Kernel.defaults<TriggeredActionData>(contract));
 
-		for (const card of cards) {
+		for (const contract of contracts) {
 			await ctx.kernel.insertContract(
 				ctx.logContext,
 				ctx.session,
-				card as Contract,
+				contract as Contract,
 			);
 		}
 
@@ -1433,7 +1432,7 @@ describe('.getStartDate()', () => {
 						type: 'object',
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1465,7 +1464,7 @@ describe('.getStartDate()', () => {
 					},
 					startDate: 'foo',
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1498,7 +1497,7 @@ describe('.getStartDate()', () => {
 					},
 					startDate: date.toISOString(),
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1533,7 +1532,7 @@ describe('.getNextExecutionDate()', () => {
 						type: 'object',
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1563,7 +1562,7 @@ describe('.getNextExecutionDate()', () => {
 				data: {
 					interval: 'PT1H',
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1592,7 +1591,7 @@ describe('.getNextExecutionDate()', () => {
 				data: {
 					interval: 'PT1H',
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1622,7 +1621,7 @@ describe('.getNextExecutionDate()', () => {
 				data: {
 					interval: 'PT1H',
 					action: 'action-create-card@1.0.0',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1655,7 +1654,7 @@ describe('.getNextExecutionDate()', () => {
 					data: {
 						interval: 'FOOBARBAZ',
 						action: 'action-create-card@1.0.0',
-						target: typeCard.id,
+						target: typeContract.id,
 						arguments: {
 							properties: {
 								slug: 'foo',
@@ -1685,7 +1684,7 @@ describe('.getNextExecutionDate()', () => {
 					interval: 'PT1H',
 					action: 'action-create-card@1.0.0',
 					startDate: '2018-01-01T00:00:00.000Z',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1716,7 +1715,7 @@ describe('.getNextExecutionDate()', () => {
 					interval: 'PT1H',
 					action: 'action-create-card@1.0.0',
 					startDate: '2018-01-01T05:00:00.000Z',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1747,7 +1746,7 @@ describe('.getNextExecutionDate()', () => {
 					interval: 'PT1H',
 					action: 'action-create-card@1.0.0',
 					startDate: '2018-01-01T05:00:00.000Z',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',
@@ -1778,7 +1777,7 @@ describe('.getNextExecutionDate()', () => {
 					interval: 'PT1H',
 					action: 'action-create-card@1.0.0',
 					startDate: '2018-01-01T05:00:00.000Z',
-					target: typeCard.id,
+					target: typeContract.id,
 					arguments: {
 						properties: {
 							slug: 'foo',

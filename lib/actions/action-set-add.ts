@@ -1,54 +1,54 @@
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
-import { clone, get, includes, isArray, isString } from 'lodash';
+import _ from 'lodash';
 import type { ActionDefinition } from '../plugin';
 
 const handler: ActionDefinition['handler'] = async (
 	session,
 	context,
-	card,
+	contract,
 	request,
 ) => {
-	const current = get(card, request.arguments.property);
-	const source = clone(current) || [];
+	const current = _.get(contract, request.arguments.property);
+	const source = _.clone(current) || [];
 	const initialLength = source.length;
-	const input = isArray(request.arguments.value)
+	const input = _.isArray(request.arguments.value)
 		? request.arguments.value
 		: [request.arguments.value];
 
 	for (const element of input) {
-		if (!includes(source, element)) {
+		if (!_.includes(source, element)) {
 			source.push(element);
 		}
 	}
 
 	if (initialLength === source.length) {
 		return {
-			id: card.id,
-			type: card.type,
-			version: card.version,
-			slug: card.slug,
+			id: contract.id,
+			type: contract.type,
+			version: contract.version,
+			slug: contract.slug,
 		};
 	}
 
-	const typeCard = (await context.getCardBySlug(
+	const typeContract = (await context.getCardBySlug(
 		session,
-		card.type,
+		contract.type,
 	))! as TypeContract;
 
-	const path = isString(request.arguments.property)
+	const path = _.isString(request.arguments.property)
 		? `/${request.arguments.property.replace(/\./g, '/')}`
 		: `/${request.arguments.property.join('/')}`;
 
 	const result = await context.patchCard(
 		session,
-		typeCard,
+		typeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,
 			originator: request.originator,
 			attachEvents: true,
 		},
-		card,
+		contract,
 		[
 			{
 				op: current ? 'replace' : 'add',

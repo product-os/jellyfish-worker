@@ -1,11 +1,11 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { Kernel } from 'autumndb';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	Contract,
 	LinkContract,
 } from '@balena/jellyfish-types/build/core';
+import type { Kernel } from 'autumndb';
 import jsone = require('json-e');
 import _ from 'lodash';
 import * as skhema from 'skhema';
@@ -33,30 +33,30 @@ interface GetRequestOptions {
 	session: string;
 }
 
-export const matchesCard = async (
-	context: LogContext,
+export const matchesContract = async (
+	logContext: LogContext,
 	kernel: Kernel,
 	session: string,
 	filter: JsonSchema,
-	card: Contract | null,
+	contract: Contract | null,
 ): Promise<Contract | false | void> => {
-	if (!card) {
+	if (!contract) {
 		return false;
 	}
 
 	// TS-TODO: Change the Skhema module to accept interfaces that extend JsonSchema
-	const isValid = skhema.isValid(filter as any, card);
-	const isLink = card.type.split('@')[0] === 'link';
+	const isValid = skhema.isValid(filter as any, contract);
+	const isLink = contract.type.split('@')[0] === 'link';
 
 	/*
-	 * We don't discard triggers that didn't match the card
+	 * We don't discard triggers that didn't match the contract
 	 * right away as if a trigger uses links, then we also need
-	 * to consider how new link cards impact the trigger.
+	 * to consider how new link contracts impact the trigger.
 	 *
-	 * Consider cards A and B and a trigger that detects whether
+	 * Consider contracts A and B and a trigger that detects whether
 	 * A is linked to B. If A is created and then linked to B
 	 * at some time in the future, then we need to execute
-	 * the trigger when the corresponding link card is created.
+	 * the trigger when the corresponding link contract is created.
 	 */
 	if (!isValid && !isLink) {
 		return false;
@@ -65,10 +65,10 @@ export const matchesCard = async (
 	/*
 	 * If the triggered action filter doesn't use any link,
 	 * then its validity depends on whether it matches
-	 * against the card or not.
+	 * against the contract or not.
 	 */
 	if (!filter || !(filter instanceof Object && filter.$$links)) {
-		return isValid ? card : false;
+		return isValid ? contract : false;
 	}
 
 	/*
@@ -77,7 +77,7 @@ export const matchesCard = async (
 	 * a query to figure out if the filter is satisfied or not.
 	 *
 	 * The idea is that we can extend the trigger schema adding
-	 * the id of the card we expect to find and execute it as
+	 * the id of the contract we expect to find and execute it as
 	 * a database query. If there is one result, then it means
 	 * the trigger is satisfied.
 	 */
@@ -85,7 +85,7 @@ export const matchesCard = async (
 	// So that we don't modify the object
 	const schema = _.cloneDeep(filter);
 
-	// We need the full card so we pass it to the trigger
+	// We need the full contract so we pass it to the trigger
 	// templating engine
 	schema.additionalProperties = true;
 
@@ -109,17 +109,17 @@ export const matchesCard = async (
 
 	/*
 	 * This is the tricky part, where we augment the trigger
-	 * schema with the right card id. The challenge is that
-	 * we need to consider link cards, and use the id from
+	 * schema with the right contract id. The challenge is that
+	 * we need to consider link contracts, and use the id from
 	 * the right direction of the link depending on the
 	 * link name in the trigger schema.
 	 */
 	if (isLink) {
-		const linkContract: LinkContract = card as LinkContract;
+		const linkContract: LinkContract = contract as LinkContract;
 		const linkType = Object.keys(schema.$$links!)[0];
-		if (linkType === card.name) {
+		if (linkType === contract.name) {
 			schema.properties.id.const = linkContract.data.from.id;
-		} else if (linkType === card.data.inverseName) {
+		} else if (linkType === contract.data.inverseName) {
 			schema.properties.id.const = linkContract.data.to.id;
 
 			// Abort if the link doesn't match.
@@ -127,12 +127,12 @@ export const matchesCard = async (
 			return false;
 		}
 	} else {
-		schema.properties.id.const = card.id;
+		schema.properties.id.const = contract.id;
 	}
 
 	// Run the query
 	return _.first(
-		await kernel.query(context, session, schema, {
+		await kernel.query(logContext, session, schema, {
 			limit: 1,
 		}),
 	);
@@ -143,12 +143,10 @@ export const matchesCard = async (
  * @function
  * @private
  *
- * @param {Object} trigger - trigger
- * @param {String} trigger.card - card id
- * @param {Object} trigger.arguments - arguments
- * @param {(Object|Null)} card - card
- * @param {Date} currentDate - current date
- * @returns {Object} compiled data
+ * @param trigger - trigger
+ * @param contract - trigger contract
+ * @param currentDate - current date
+ * @returns compiled data
  *
  * @example
  * const data = compileTrigger({ ... }, { ... }, new Date())
@@ -159,7 +157,7 @@ export const matchesCard = async (
  */
 const compileTrigger = (
 	trigger: string | Record<any, any>,
-	card: Contract | null,
+	contract: Contract | null,
 	currentDate: Date,
 ) => {
 	const context: CompileContext = {
@@ -176,8 +174,8 @@ const compileTrigger = (
 		},
 	};
 
-	if (card) {
-		context.source = card;
+	if (contract) {
+		context.source = contract;
 	}
 
 	try {
@@ -197,22 +195,17 @@ const compileTrigger = (
  * @function
  * @public
  *
- * @param {Kernel} kernel - kernel instance
- * @param {Object} trigger - triggered action contract
- * @param {Object} oldContract - contract before the change was applied (null if contract is new)
- * @param {Object} newContract - contract after the change was applied
- * @param {Object} options - options
- * @param {String} options.mode - change type
- * @param {String} options.session - session
- * @param {Date} options.currentDate - current date
- * @param {Object} options.logContext - execution context
- * @returns {(Object|Null)} action request, or null if the trigger doesn't match
- *
+ * @param kernel - kernel instance
+ * @param trigger - triggered action contract
+ * @param oldContract - contract before the change was applied (null if contract is new)
+ * @param newContract - contract after the change was applied
+ * @param options - options
+ * @returns action request, or null if the trigger doesn't match
  */
 export const getRequest = async (
 	kernel: Kernel,
 	trigger: TriggeredActionContract,
-	// If getRequest is called by a time triggered action, then card will be null
+	// If getRequest is called by a time triggered action, then contract will be null
 	oldContract: Contract | null,
 	newContract: Contract,
 	options: GetRequestOptions,
@@ -221,7 +214,7 @@ export const getRequest = async (
 		return null;
 	}
 
-	const newContractMatches = await matchesCard(
+	const newContractMatches = await matchesContract(
 		options.logContext,
 		kernel,
 		options.session,
@@ -281,27 +274,27 @@ export const getRequest = async (
  * @function
  * @public
  *
- * @param {Object} context - execution context
- * @param {Kernel} kernel - kernel instance
- * @param {String} session - session id
- * @param {String} type - type slug
- * @returns {Object[]} triggered actions
+ * @param logContext - execution context
+ * @param kernel - kernel instance
+ * @param session - session id
+ * @param type - type slug
+ * @returns triggered actions
  *
  * @example
- * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- * const cards = await triggers.getTypeTriggers({ ... }, { ... }, session, 'user')
+ * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84';
+ * const contracts = await triggers.getTypeTriggers({ ... }, { ... }, session, 'user');
  *
- * for (const card of cards) {
- *   console.log(card)
+ * for (const contract of contracts) {
+ *   console.log(contract);
  * }
  */
 export const getTypeTriggers = async (
-	context: LogContext,
+	logContext: LogContext,
 	kernel: Kernel,
 	session: string,
 	type: string,
 ): Promise<TriggeredActionContract[]> => {
-	return kernel.query<TriggeredActionContract>(context, session, {
+	return kernel.query<TriggeredActionContract>(logContext, session, {
 		type: 'object',
 		additionalProperties: true,
 		required: ['id', 'version', 'active', 'type', 'data'],
@@ -324,7 +317,7 @@ export const getTypeTriggers = async (
 				type: 'object',
 				additionalProperties: true,
 
-				// We only want to consider cards that act based on a filter
+				// We only want to consider contracts that act based on a filter
 				required: ['type', 'filter'],
 
 				properties: {
@@ -352,8 +345,8 @@ export const getTypeTriggers = async (
  * start taking effect.
  * This function defaults to epoch if there is no start date.
  *
- * @param {Object} trigger - triggered action card
- * @returns {Date} start date
+ * @param trigger - triggered action contract
+ * @returns start date
  *
  * @example
  * const date = triggers.getStartDate({
@@ -382,9 +375,9 @@ export const getStartDate = (trigger: TriggeredActionContract): Date => {
  * @function
  * @public
  *
- * @param {Object} trigger - triggered action card
- * @param {Date} lastExecutionDate - last execution date
- * @returns {(Date|Null)} next execution date, if any
+ * @param trigger - triggered action contract
+ * @param lastExecutionDate - last execution date
+ * @returns next execution date, if any
  *
  * @example
  * const nextExecutionDate = triggers.getNextExecutionDate({ ... }, new Date())

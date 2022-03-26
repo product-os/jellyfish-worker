@@ -1,9 +1,9 @@
 import { Contract } from '@balena/jellyfish-types/build/core';
 import _ from 'lodash';
 import * as semver from 'semver';
-import { Plugin, PluginDefinition } from './plugin';
 import type { IntegrationDefinition } from '../sync/types';
 import type { Action, Map } from '../types';
+import { Plugin, PluginDefinition } from './plugin';
 
 const mergeMaps = <T>(maps: Map<Map<T>>): Map<T> => {
 	const merged = {};

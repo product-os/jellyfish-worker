@@ -58,8 +58,8 @@ const inverseLinks = _.groupBy(
  * If the link is not defined in the SDK, we assume it to be named
  * symmetrically.
  *
- * @param targetTypeSlug the type the link is starting from
- * @param linkVerb the link verb to reverse
+ * @param versionedSourceType - the type the link is starting from
+ * @param linkVerb - the link verb to reverse
  * @returns a reverse link verbs
  */
 export const reverseLink = (versionedSourceType: string, linkVerb: string) => {

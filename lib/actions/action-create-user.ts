@@ -23,13 +23,13 @@ const pre: ActionDefinition['pre'] = async (_session, _context, request) => {
 const handler: ActionDefinition['handler'] = async (
 	_session,
 	context,
-	card,
+	contract,
 	request,
 ) => {
 	try {
 		const result = await context.insertCard(
 			context.privilegedSession,
-			card as TypeContract,
+			contract as TypeContract,
 			{
 				timestamp: request.timestamp,
 				actor: request.actor,
