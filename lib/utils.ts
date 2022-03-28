@@ -17,10 +17,10 @@ const logger = getLogger('worker');
  * @function
  * @public
  *
- * @returns {String} RFC 3339 timestamp
+ * @returns RFC 3339 timestamp
  *
  * @example
- * const timestamp = utils.getCurrentTimestamp()
+ * const timestamp = utils.getCurrentTimestamp();
  */
 export const getCurrentTimestamp = (): string => {
 	const currentDate = new Date();
@@ -32,12 +32,12 @@ export const getCurrentTimestamp = (): string => {
  * @function
  * @public
  *
- * @param {Object} actionContract - action contract
- * @returns {Object} arguments schema
+ * @param actionContract - action contract
+ * @returns arguments schema
  *
  * @example
- * const schema = utils.getActionArgumentsSchema({ ... })
- * console.log(schema.type)
+ * const schema = utils.getActionArgumentsSchema({ ... });
+ * console.log(schema.type);
  */
 export const getActionArgumentsSchema = (
 	actionContract: ActionContract,
@@ -60,24 +60,24 @@ export const getActionArgumentsSchema = (
  * @function
  * @public
  *
- * @param {Object} context - execution context
- * @param {Object} kernel - kernel instance
- * @param {String} session - session id
- * @param {Object} object - contract properties
- * @returns {Boolean} whether the contract exists
+ * @param logContext - log context
+ * @param kernel - kernel instance
+ * @param session - session id
+ * @param object - contract properties
+ * @returns whether the contract exists
  *
  * @example
- * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
+ * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84';
  * const hasContract = await utils.hasContract({ ... }, kernel, session, {
  *   id: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
  *   active: true,
  *   data: {
- *     foo: 'bar'
- *   }
- * })
+ *     foo: 'bar',
+ *   },
+ * });
  *
  * if (hasContract) {
- *   console.log('This contract already exists')
+ *   console.log('This contract already exists');
  * }
  */
 export const hasContract = async (
@@ -125,8 +125,10 @@ export const getEventSlug = async (type: string): Promise<string> => {
 
 /**
  * @summary Convert an ISO 8601 duration to milliseconds
- * @param {String} duration - the ISO 8601 duration (e.g. 'PT1H')
- * @returns {Number} - the duration in milliseconds, or 0 if the duration is invalid
+ * @function
+ *
+ * @param duration - the ISO 8601 duration (e.g. 'PT1H')
+ * @returns the duration in milliseconds, or 0 if the duration is invalid
  */
 export const durationToMs = (duration: string): number => {
 	try {

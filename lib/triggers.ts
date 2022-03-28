@@ -149,10 +149,10 @@ export const matchesContract = async (
  * @returns compiled data
  *
  * @example
- * const data = compileTrigger({ ... }, { ... }, new Date())
+ * const data = compileTrigger({ ... }, { ... }, new Date());
  * if (data) {
- *   console.log(data.card)
- *   console.log(data.arguments)
+ *   console.log(data.card);
+ *   console.log(data.arguments);
  * }
  */
 const compileTrigger = (
@@ -351,10 +351,10 @@ export const getTypeTriggers = async (
  * @example
  * const date = triggers.getStartDate({
  *   type: 'triggered-action',
- *   data: { ... }
- * })
+ *   data: { ... },
+ * });
  *
- * console.log(date.toISOString())
+ * console.log(date.toISOString());
  */
 export const getStartDate = (trigger: TriggeredActionContract): Date => {
 	if (trigger && trigger.data && trigger.data.startDate) {
@@ -380,9 +380,9 @@ export const getStartDate = (trigger: TriggeredActionContract): Date => {
  * @returns next execution date, if any
  *
  * @example
- * const nextExecutionDate = triggers.getNextExecutionDate({ ... }, new Date())
+ * const nextExecutionDate = triggers.getNextExecutionDate({ ... }, new Date());
  * if (nextExecutionDate) {
- *   console.log(nextExecutionDate.toISOString())
+ *   console.log(nextExecutionDate.toISOString());
  * }
  */
 export const getNextExecutionDate = (
