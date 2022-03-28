@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
-import { errors as coreErrors } from 'autumndb';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import { errors as coreErrors } from 'autumndb';
 import { WorkerNoElement } from '../errors';
 import type { ActionDefinition } from '../plugin';
 
@@ -8,10 +8,10 @@ import type { ActionDefinition } from '../plugin';
 const handler: ActionDefinition['handler'] = async (
 	session,
 	context,
-	card,
+	contract,
 	request,
 ) => {
-	const typeCard = (await context.getCardBySlug(
+	const typeContract = (await context.getCardBySlug(
 		session,
 		`${request.arguments.type}@1.0.0`,
 	))! as TypeContract;
@@ -19,24 +19,24 @@ const handler: ActionDefinition['handler'] = async (
 	// In most cases, the `card` argument will contain all the information we
 	// need, but in some instances (for example when the guest user session
 	// creates a new user), `card` will be missing certain fields due to
-	// a permission filter being applied. The full card is loaded using
+	// a permission filter being applied. The full contract is loaded using
 	// a privileged sessions so that we can ensure all required fields are
 	// present.
-	const fullCard = (await context.getCardById(
+	const fullContract = (await context.getCardById(
 		context.privilegedSession,
-		card.id,
+		contract.id,
 	))!;
 
 	assert.USER(
 		request.logContext,
-		typeCard,
+		typeContract,
 		WorkerNoElement,
 		`No such type: ${request.arguments.type}`,
 	);
 
 	const data = {
 		timestamp: request.timestamp,
-		target: fullCard.id,
+		target: fullContract.id,
 		actor: request.actor,
 		payload: request.arguments.payload,
 	};
@@ -44,7 +44,7 @@ const handler: ActionDefinition['handler'] = async (
 	const result = (await context
 		.insertCard(
 			session,
-			typeCard,
+			typeContract,
 			{
 				timestamp: request.timestamp,
 				actor: request.actor,
@@ -53,13 +53,14 @@ const handler: ActionDefinition['handler'] = async (
 			},
 			{
 				slug:
-					request.arguments.slug || (await context.getEventSlug(typeCard.slug)),
+					request.arguments.slug ||
+					(await context.getEventSlug(typeContract.slug)),
 				version: '1.0.0',
 				name: request.arguments.name || null,
 				tags: request.arguments.tags || [],
 
-				// Events always inherit the head cards markers
-				markers: fullCard.markers,
+				// Events always inherit the head contracts markers
+				markers: fullContract.markers,
 				data,
 			},
 		)
@@ -72,7 +73,7 @@ const handler: ActionDefinition['handler'] = async (
 			throw error;
 		}))!;
 
-	const linkTypeCard = (await context.getCardBySlug(
+	const linkTypeContract = (await context.getCardBySlug(
 		session,
 		'link@1.0.0',
 	))! as TypeContract;
@@ -80,7 +81,7 @@ const handler: ActionDefinition['handler'] = async (
 	// Create a link card between the event and its target
 	await context.insertCard(
 		session,
-		linkTypeCard,
+		linkTypeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,
@@ -98,8 +99,8 @@ const handler: ActionDefinition['handler'] = async (
 					type: result.type,
 				},
 				to: {
-					id: fullCard.id,
-					type: fullCard.type,
+					id: fullContract.id,
+					type: fullContract.type,
 				},
 			},
 		},
@@ -123,7 +124,7 @@ export const actionCreateEvent: ActionDefinition = {
 		slug: 'action-create-event',
 		version: '1.0.0',
 		type: 'action@1.0.0',
-		name: 'Attach an event to a card',
+		name: 'Attach an event to a contract',
 		data: {
 			arguments: {
 				tags: {

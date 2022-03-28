@@ -1,5 +1,5 @@
-import * as errors from './errors';
 import { Sync } from '.';
+import * as errors from './errors';
 import type { SyncActionContext } from './sync-context';
 import type { IntegrationDefinition } from './types';
 
@@ -12,11 +12,11 @@ describe('.isValidEvent()', () => {
 		const result = await sync.isValidEvent(
 			{ id: 'test' },
 			'invalid',
+			{},
 			{
 				headers: {},
 				raw: '....',
 			},
-			{},
 		);
 
 		expect(result).toBe(false);
@@ -182,7 +182,7 @@ describe('.associate()', () => {
 		).rejects.toThrow(errors.SyncNoCompatibleIntegration);
 	});
 
-	test('should set the access token in the user card', async () => {
+	test('should set the access token in the user contract', async () => {
 		const data = {
 			'user-johndoe': {
 				active: true,

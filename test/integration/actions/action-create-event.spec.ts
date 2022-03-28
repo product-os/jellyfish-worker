@@ -21,7 +21,7 @@ afterAll(async () => {
 
 describe('action-create-event', () => {
 	test('should throw an error on invalid type', async () => {
-		const card = await ctx.createContract(
+		const contract = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
 			'card@1.0.0',
@@ -37,7 +37,7 @@ describe('action-create-event', () => {
 			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				type: 'foobar',
-				payload: card.data.payload,
+				payload: contract.data.payload,
 			},
 		};
 
@@ -45,14 +45,14 @@ describe('action-create-event', () => {
 			actionCreateEvent.handler(
 				ctx.session,
 				actionContext,
-				card,
+				contract,
 				request as any,
 			),
 		).rejects.toThrow(`No such type: ${request.arguments.type}`);
 	});
 
-	test('should return event card', async () => {
-		const card = await ctx.createContract(
+	test('should return event contract', async () => {
+		const contract = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
 			'card@1.0.0',
@@ -68,21 +68,21 @@ describe('action-create-event', () => {
 			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				type: 'card',
-				payload: card.data.payload,
+				payload: contract.data.payload,
 			},
 		};
 
 		const results = await actionCreateEvent.handler(
 			ctx.session,
 			actionContext,
-			card,
+			contract,
 			request as any,
 		);
 		expect((results as any).slug).toMatch(/^card-/);
 	});
 
-	test('should throw an error on attempt to insert existing card', async () => {
-		const card = await ctx.createContract(
+	test('should throw an error on attempt to insert existing contract', async () => {
+		const contract = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
 			'card@1.0.0',
@@ -98,8 +98,8 @@ describe('action-create-event', () => {
 			originator: autumndbTestUtils.generateRandomId(),
 			arguments: {
 				type: 'card',
-				slug: card.slug,
-				payload: card.data.payload,
+				slug: contract.slug,
+				payload: contract.data.payload,
 			},
 		};
 
@@ -107,13 +107,13 @@ describe('action-create-event', () => {
 			actionCreateEvent.handler(
 				ctx.session,
 				actionContext,
-				card,
+				contract,
 				request as any,
 			),
 		).rejects.toThrow(autumndbErrors.JellyfishElementAlreadyExists);
 	});
 
-	test('should create a link card', async () => {
+	test('should create a link contract', async () => {
 		const root = await ctx.createContract(
 			ctx.adminUserId,
 			ctx.session,
@@ -241,7 +241,7 @@ describe('action-create-event', () => {
 
 	test("events should always inherit their parent's markers", async () => {
 		const marker = 'org-test';
-		const card = await ctx.worker.insertCard(
+		const contract = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
 			ctx.worker.typeContracts['card@1.0.0'],
@@ -261,7 +261,7 @@ describe('action-create-event', () => {
 				},
 			},
 		);
-		assert(card);
+		assert(contract);
 
 		const request = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
@@ -269,8 +269,8 @@ describe('action-create-event', () => {
 			{
 				action: 'action-create-event@1.0.0',
 				logContext: ctx.logContext,
-				card: card.id,
-				type: card.type,
+				card: contract.id,
+				type: contract.type,
 				arguments: {
 					type: 'card',
 					tags: [],
@@ -281,16 +281,16 @@ describe('action-create-event', () => {
 			},
 		);
 		await ctx.flushAll(ctx.session);
-		const cardResult: any = await ctx.worker.producer.waitResults(
+		const contractResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
 			request,
 		);
-		expect(cardResult.error).toBe(false);
+		expect(contractResult.error).toBe(false);
 
 		const result = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
-			cardResult.data.id,
+			contractResult.data.id,
 		);
 		assert(result);
 		expect(result.markers).toEqual([marker]);

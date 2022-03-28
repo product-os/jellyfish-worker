@@ -7,7 +7,7 @@ export const execute: ContractDefinition<TypeData> = {
 	slug: 'execute',
 	type: 'type@1.0.0',
 	version: '1.0.0',
-	name: 'The card execute event',
+	name: 'The contract execute event',
 	markers: [],
 	tags: [],
 	active: true,

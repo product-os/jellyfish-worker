@@ -1,5 +1,8 @@
 import { strict as assert } from 'assert';
-import { errors as coreErrors, testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	errors as autumndbErrors,
+	testUtils as autumndbTestUtils,
+} from 'autumndb';
 import { testUtils, WorkerContext } from '../../../lib';
 import { actionCreateCard } from '../../../lib/actions/action-create-card';
 import { makeRequest } from './helpers';
@@ -64,12 +67,12 @@ describe('action-create-card', () => {
 	});
 
 	test('should fail to create an event with an action-create-card', async () => {
-		const cardType = await ctx.kernel.getContractBySlug(
+		const contractType = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(cardType);
+		assert(contractType);
 
 		const typeType = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
@@ -154,9 +157,9 @@ describe('action-create-card', () => {
 
 		await ctx.worker.producer.enqueue(ctx.worker.getId(), ctx.session, {
 			action: 'action-create-card@1.0.0',
-			card: cardType.id,
+			card: contractType.id,
 			logContext: ctx.logContext,
-			type: cardType.type,
+			type: contractType.type,
 			arguments: {
 				reason: null,
 				properties: {
@@ -175,27 +178,27 @@ describe('action-create-card', () => {
 		});
 
 		await expect(ctx.flush(ctx.session)).rejects.toThrow(
-			'You may not use card actions to create an event',
+			'You may not use contract actions to create an event',
 		);
 	});
 
-	test('should create a new card along with a reason', async () => {
-		const typeCard = await ctx.kernel.getContractBySlug(
+	test('should create a new contract along with a reason', async () => {
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard);
+		assert(typeContract);
 		const createRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			{
 				action: 'action-create-card@1.0.0',
 				logContext: ctx.logContext,
-				card: typeCard.id,
-				type: typeCard.type,
+				card: typeContract.id,
+				type: typeContract.type,
 				arguments: {
-					reason: 'My new card',
+					reason: 'My new contract',
 					properties: {
 						slug: autumndbTestUtils.generateRandomSlug(),
 						version: '1.0.0',
@@ -234,10 +237,10 @@ describe('action-create-card', () => {
 		});
 
 		expect(timeline.length).toBe(1);
-		expect(timeline[0].name).toBe('My new card');
+		expect(timeline[0].name).toBe('My new contract');
 	});
 
-	test('should be able to insert a deeply nested card', async () => {
+	test('should be able to insert a deeply nested contract', async () => {
 		const data = {
 			foo: {
 				bar: {
@@ -274,12 +277,12 @@ describe('action-create-card', () => {
 			},
 		};
 
-		const typeCard = await ctx.kernel.getContractBySlug(
+		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
 			'card@latest',
 		);
-		assert(typeCard);
+		assert(typeContract);
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const createRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
@@ -287,8 +290,8 @@ describe('action-create-card', () => {
 			{
 				action: 'action-create-card@1.0.0',
 				logContext: ctx.logContext,
-				card: typeCard.id,
-				type: typeCard.type,
+				card: typeContract.id,
+				type: typeContract.type,
 				arguments: {
 					reason: null,
 					properties: {
@@ -306,15 +309,15 @@ describe('action-create-card', () => {
 		);
 		expect(createResult.error).toBe(false);
 
-		const card = await ctx.kernel.getContractById(
+		const contract = await ctx.kernel.getContractById(
 			ctx.logContext,
 			ctx.session,
 			(createResult.data as any).id,
 		);
-		assert(card);
-		expect(card.slug).toBe(slug);
-		expect(card.version).toBe('1.0.0');
-		expect(card.data).toEqual(data);
+		assert(contract);
+		expect(contract.slug).toBe(slug);
+		expect(contract.version).toBe('1.0.0');
+		expect(contract.data).toEqual(data);
 	});
 
 	test('a community user cannot create a session that points to another user', async () => {
@@ -350,7 +353,7 @@ describe('action-create-card', () => {
 					},
 				} as any,
 			),
-		).rejects.toThrow(coreErrors.JellyfishPermissionsError);
+		).rejects.toThrow(autumndbErrors.JellyfishPermissionsError);
 	});
 
 	test('creating a role with a community user session should fail', async () => {
@@ -386,7 +389,7 @@ describe('action-create-card', () => {
 					},
 				} as any,
 			),
-		).rejects.toThrow(coreErrors.JellyfishUnknownCardType);
+		).rejects.toThrow(autumndbErrors.JellyfishUnknownCardType);
 	});
 
 	test('creating a role with the guest user session should fail', async () => {
@@ -416,7 +419,7 @@ describe('action-create-card', () => {
 					},
 				} as any,
 			),
-		).rejects.toThrow(coreErrors.JellyfishUnknownCardType);
+		).rejects.toThrow(autumndbErrors.JellyfishUnknownCardType);
 	});
 
 	test('creating a user with the guest user session should fail', async () => {
@@ -444,7 +447,7 @@ describe('action-create-card', () => {
 					},
 				} as any,
 			),
-		).rejects.toThrow(coreErrors.JellyfishUnknownCardType);
+		).rejects.toThrow(autumndbErrors.JellyfishUnknownCardType);
 	});
 
 	test('users with no roles should not be able to create sessions for other users', async () => {
@@ -497,7 +500,7 @@ describe('action-create-card', () => {
 					},
 				} as any,
 			),
-		).rejects.toThrow(coreErrors.JellyfishUnknownCardType);
+		).rejects.toThrow(autumndbErrors.JellyfishUnknownCardType);
 	});
 
 	test('users should not be able to create action requests', async () => {
@@ -542,6 +545,6 @@ describe('action-create-card', () => {
 					},
 				} as any,
 			),
-		).rejects.toThrow(coreErrors.JellyfishPermissionsError);
+		).rejects.toThrow(autumndbErrors.JellyfishPermissionsError);
 	});
 });

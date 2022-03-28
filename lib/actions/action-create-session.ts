@@ -31,7 +31,7 @@ const pre: ActionDefinition['pre'] = async (session, context, request) => {
 		request.arguments.scope = {};
 	}
 
-	const userCard = (
+	const userContract = (
 		isUUID(request.card)
 			? await context.getCardById(session, request.card)
 			: await context.getCardBySlug(session, `${request.card}@latest`)
@@ -39,14 +39,14 @@ const pre: ActionDefinition['pre'] = async (session, context, request) => {
 
 	assert.USER(
 		request.logContext,
-		userCard,
+		userContract,
 		WorkerAuthenticationError,
 		'Incorrect username or password',
 	);
 
 	const fullUser = (await context.getCardById(
 		context.privilegedSession,
-		userCard.id,
+		userContract.id,
 	))!;
 
 	assert.USER(
@@ -77,16 +77,19 @@ const pre: ActionDefinition['pre'] = async (session, context, request) => {
 const handler: ActionDefinition['handler'] = async (
 	session,
 	context,
-	card,
+	contract,
 	request,
 ) => {
-	const user = (await context.getCardById(context.privilegedSession, card.id))!;
+	const user = (await context.getCardById(
+		context.privilegedSession,
+		contract.id,
+	))!;
 
 	assert.USER(
 		request.logContext,
 		user,
 		WorkerAuthenticationError,
-		`No such user: ${card.id}`,
+		`No such user: ${contract.id}`,
 	);
 	assert.USER(
 		request.logContext,
@@ -95,14 +98,14 @@ const handler: ActionDefinition['handler'] = async (
 		'Login disallowed',
 	);
 
-	const sessionTypeCard = (await context.getCardBySlug(
+	const sessionTypeContract = (await context.getCardBySlug(
 		session,
 		'session@1.0.0',
 	))! as TypeContract;
 
 	assert.USER(
 		request.logContext,
-		sessionTypeCard,
+		sessionTypeContract,
 		WorkerNoElement,
 		'No such type: session',
 	);
@@ -122,7 +125,7 @@ const handler: ActionDefinition['handler'] = async (
 
 	const result = await context.insertCard(
 		context.privilegedSession,
-		sessionTypeCard,
+		sessionTypeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,
@@ -133,7 +136,7 @@ const handler: ActionDefinition['handler'] = async (
 			version: '1.0.0',
 			slug: `session-${user.slug}-${request.epoch}-${suffix}`,
 			data: {
-				actor: card.id,
+				actor: contract.id,
 				expiration: expirationDate.toISOString(),
 				scope: request.arguments.scope,
 				token: {

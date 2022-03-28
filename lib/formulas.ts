@@ -1,9 +1,12 @@
-import { Jellyscript } from '@balena/jellyfish-jellyscript';
-import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import type { LinkConstraint } from '@balena/jellyfish-client-sdk';
+import { Jellyscript } from '@balena/jellyfish-jellyscript';
+import type {
+	Contract,
+	TypeContract,
+} from '@balena/jellyfish-types/build/core';
 import type { Dictionary } from 'lodash';
-import type { TriggeredActionContract } from './types';
 import { reverseLink } from './link-traversal';
+import type { TriggeredActionContract } from './types';
 
 enum NEEDS_STATUS {
 	PENDING = 'pending',
@@ -34,9 +37,9 @@ export const NEEDS_ALL = (...statuses: NEEDS_STATUS[]) => {
  * is pending. If yes, then if there is an error for the expected type, it concludes
  * it is never mergeable, otherwise if no error exists it is mergeable.
  *
- * @param contract Contract to look for a backflow
- * @param type The expexted output type of the backflow
- * @param func A filter function to match the backflow contract
+ * @param contract - Contract to look for a backflow
+ * @param type - The expexted output type of the backflow
+ * @param func - A filter function to match the backflow contract
  * @returns NEEDS_STATUS status
  */
 export const NEEDS = (
@@ -44,22 +47,28 @@ export const NEEDS = (
 	type: string,
 	func: (contract: any) => boolean = () => true,
 ) => {
-	const backflowHasError = contract.data.$transformer.backflow.some((c) => {
-		return (
-			c.type.split('@')[0] === 'error' &&
-			c.data.expectedOutputTypes.includes(type) &&
-			func(c)
-		);
-	});
+	// TS-TODO: Use proper contract type
+	const backflowHasError = contract.data.$transformer.backflow.some(
+		(backflowContract: Contract) => {
+			return (
+				backflowContract.type.split('@')[0] === 'error' &&
+				(backflowContract.data as any).expectedOutputTypes.includes(type) &&
+				func(backflowContract)
+			);
+		},
+	);
 	if (backflowHasError) {
 		return NEEDS_STATUS.NEVER;
 	}
 
+	// TS-TODO: Use proper contract type
 	const backflowisMergeable = contract.data.$transformer.backflow.some(
-		(c) =>
-			c.type.split('@')[0] === type &&
-			func(c) &&
-			[NEEDS_STATUS.MERGEABLE, true].includes(c.data.$transformer.mergeable),
+		(backflowContract: Contract) =>
+			backflowContract.type.split('@')[0] === type &&
+			func(backflowContract) &&
+			[NEEDS_STATUS.MERGEABLE, true].includes(
+				(backflowContract.data as any).$transformer.mergeable,
+			),
 	);
 	if (backflowisMergeable) {
 		return NEEDS_STATUS.MERGEABLE;
@@ -68,9 +77,11 @@ export const NEEDS = (
 	return NEEDS_STATUS.PENDING;
 };
 
-export const getReferencedLinkVerbs = (typeCard: TypeContract): string[] => {
+export const getReferencedLinkVerbs = (
+	typeContract: TypeContract,
+): string[] => {
 	const linkVerbs = Jellyscript.getObjectMemberExpressions(
-		typeCard.data.schema,
+		typeContract.data.schema,
 		'contract',
 		'links',
 	);
@@ -90,18 +101,16 @@ type PartialTriggeredActionContract = Omit<
 	'id' | 'created_at' | 'updated_at'
 >;
 
-// TS-TODO: use TypeContract interface instead of Contract
-export const getTypeTriggers = (typeCard: TypeContract) => {
-	// TS-TODO: use TriggeredActionDefinition interface instead of ContractDefinition
+export const getTypeTriggers = (typeContract: TypeContract) => {
 	const triggers: PartialTriggeredActionContract[] = [];
 
-	// We create empty updates to cards that reference other cards in links
-	// whenever those linked cards change.
-	// This forces a reevaluation of formulas in the referencing card.
-	const linkVerbs = getReferencedLinkVerbs(typeCard as TypeContract);
+	// We create empty updates to contracts that reference other contracts in links
+	// whenever those linked contracts change.
+	// This forces a reevaluation of formulas in the referencing contract.
+	const linkVerbs = getReferencedLinkVerbs(typeContract as TypeContract);
 	triggers.push(
 		...linkVerbs.flatMap((lv) =>
-			createLinkTrigger(reverseLink(typeCard.slug, lv), typeCard),
+			createLinkTrigger(reverseLink(typeContract.slug, lv), typeContract),
 		),
 	);
 
@@ -109,16 +118,16 @@ export const getTypeTriggers = (typeCard: TypeContract) => {
 };
 
 /**
- * Creates a triggered action that fires when a card gets changed that is linked
- * with the given link verb to a card of the given type
+ * Creates a triggered action that fires when a contract gets changed that is linked
+ * with the given link verb to a contract of the given type
  *
- * @param linkVerb the verb that should trigger
- * @param typeCard the type containing the formula that needs the trigger
+ * @param linkGroups - link groups
+ * @param typeContract - the type containing the formula that needs the trigger
  * @returns the triggered action
  */
 const createLinkTrigger = (
 	linkGroups: Dictionary<LinkConstraint[]>,
-	typeCard: TypeContract,
+	typeContract: TypeContract,
 ): PartialTriggeredActionContract[] => {
 	if (Object.keys(linkGroups).length === 0) {
 		return [];
@@ -127,7 +136,7 @@ const createLinkTrigger = (
 		.filter(([, links]) => links.length)
 		.map(([linkVerb, links]) => {
 			// We try to optimize query speed by limiting to valid types or,
-			// if all are allowed, by excluding some high frequency internal cards
+			// if all are allowed, by excluding some high frequency internal contracts
 			const typeFilter =
 				links.filter((l) => l.data.from === '*').length === 0
 					? {
@@ -140,10 +149,10 @@ const createLinkTrigger = (
 					  };
 			return {
 				slug: slugify(
-					`triggered-action-formula-update-${typeCard.slug}-${linkVerb}`,
+					`triggered-action-formula-update-${typeContract.slug}-${linkVerb}`,
 				),
 				type: 'triggered-action@1.0.0',
-				version: typeCard.version,
+				version: typeContract.version,
 				active: true,
 				requires: [],
 				capabilities: [],
@@ -151,7 +160,7 @@ const createLinkTrigger = (
 				tags: [],
 				data: {
 					action: 'action-update-card@1.0.0',
-					type: `${typeCard.slug}@${typeCard.version}`,
+					type: `${typeContract.slug}@${typeContract.version}`,
 					target: {
 						$map: {
 							$eval: `source.links['${linkVerb}']`, // there was a [0:] at the end... :-/
@@ -174,7 +183,7 @@ const createLinkTrigger = (
 								properties: {
 									type: {
 										type: 'string',
-										const: `${typeCard.slug}@${typeCard.version}`,
+										const: `${typeContract.slug}@${typeContract.version}`,
 									},
 								},
 							},

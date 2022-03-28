@@ -48,8 +48,8 @@ export interface TestContext extends autumndbTestUtils.TestContext {
 	createLinkThroughWorker: (
 		actor: string,
 		session: string,
-		fromCard: Contract,
-		toCard: Contract,
+		fromContract: Contract,
+		toContract: Contract,
 		verb: string,
 		inverseVerb: string,
 	) => Promise<LinkContract>;
@@ -187,7 +187,7 @@ export const newContext = async (
 	);
 	worker.setTypeContracts(autumndbTestContext.logContext, types);
 
-	// Update type cards through the worker for generated triggers, etc
+	// Update type contracts through the worker for generated triggers, etc
 	for (const contract of types) {
 		await worker.replaceCard(
 			autumndbTestContext.logContext,
@@ -326,8 +326,8 @@ export const newContext = async (
 	const createLinkThroughWorker = async (
 		actor: string,
 		session: string,
-		fromCard: Contract,
-		toCard: Contract,
+		fromContract: Contract,
+		toContract: Contract,
 		verb: string,
 		inverseVerb: string,
 	) => {
@@ -340,8 +340,8 @@ export const newContext = async (
 				actor,
 			},
 			{
-				slug: `link-${fromCard.id}-${verb.replace(/\s/g, '-')}-${
-					toCard.id
+				slug: `link-${fromContract.id}-${verb.replace(/\s/g, '-')}-${
+					toContract.id
 				}-${autumndbTestUtils.generateRandomId()}`,
 				tags: [],
 				version: '1.0.0',
@@ -353,12 +353,12 @@ export const newContext = async (
 				data: {
 					inverseName: inverseVerb,
 					from: {
-						id: fromCard.id,
-						type: fromCard.type,
+						id: fromContract.id,
+						type: fromContract.type,
 					},
 					to: {
-						id: toCard.id,
-						type: toCard.type,
+						id: toContract.id,
+						type: toContract.type,
 					},
 				},
 			},
@@ -445,11 +445,11 @@ interface Variation {
 }
 
 export const tailSort = [
-	(card: Contract) => {
-		return card.data.timestamp;
+	(contract: Contract) => {
+		return contract.data.timestamp;
 	},
-	(card: Contract) => {
-		return card.type;
+	(contract: Contract) => {
+		return contract.type;
 	},
 ];
 
@@ -657,7 +657,7 @@ export async function webhookScenario(
 			return callback(null, [code, content]);
 		});
 
-	const cards: any[] = [];
+	const contracts: any[] = [];
 	for (const step of testCase.steps) {
 		webhookOffset = Math.max(
 			webhookOffset,
@@ -701,19 +701,19 @@ export async function webhookScenario(
 			request,
 		);
 		assert.ok(result.error === false);
-		cards.push(...(result.data as ExecuteContract[]));
+		contracts.push(...(result.data as ExecuteContract[]));
 	}
 
 	if (!testCase.expected.head) {
-		assert.equal(cards.length, 0);
+		assert.equal(contracts.length, 0);
 		return;
 	}
-	assert.ok(cards.length > 0);
+	assert.ok(contracts.length > 0);
 
 	const head = await context.kernel.getContractById(
 		context.logContext,
 		context.session,
-		cards[testCase.headIndex].id,
+		contracts[testCase.headIndex].id,
 	);
 	assert(head);
 
@@ -773,14 +773,17 @@ export async function webhookScenario(
 	}
 	assert.deepEqual(head, expectedHead);
 
-	const tailFilter = (card: any) => {
-		const baseType = card.type.split('@')[0];
+	const tailFilter = (contract: any) => {
+		const baseType = contract.type.split('@')[0];
 		if (testCase.ignoreUpdateEvents && baseType === 'update') {
 			return false;
 		}
 
 		if (baseType === 'message' || baseType === 'whisper') {
-			if (!card.active && card.data.payload.message.trim().length === 0) {
+			if (
+				!contract.active &&
+				contract.data.payload.message.trim().length === 0
+			) {
 				return false;
 			}
 		}
@@ -790,88 +793,100 @@ export async function webhookScenario(
 
 	const actualTail = await Promise.all(
 		_.sortBy(_.filter(timeline, tailFilter), tailSort).map(
-			async (card: any) => {
-				Reflect.deleteProperty(card, 'slug');
-				Reflect.deleteProperty(card, 'links');
-				Reflect.deleteProperty(card, 'markers');
-				Reflect.deleteProperty(card, 'created_at');
-				Reflect.deleteProperty(card, 'updated_at');
-				Reflect.deleteProperty(card, 'linked_at');
-				Reflect.deleteProperty(card.data, 'origin');
-				Reflect.deleteProperty(card.data, 'translateDate');
-				Reflect.deleteProperty(card.data, 'edited_at');
+			async (contract: any) => {
+				Reflect.deleteProperty(contract, 'slug');
+				Reflect.deleteProperty(contract, 'links');
+				Reflect.deleteProperty(contract, 'markers');
+				Reflect.deleteProperty(contract, 'created_at');
+				Reflect.deleteProperty(contract, 'updated_at');
+				Reflect.deleteProperty(contract, 'linked_at');
+				Reflect.deleteProperty(contract.data, 'origin');
+				Reflect.deleteProperty(contract.data, 'translateDate');
+				Reflect.deleteProperty(contract.data, 'edited_at');
 
 				// TODO: Remove once we fully support versioned
 				// slug references in the sync module.
-				if (!card.type.includes('@')) {
-					card.type = `${card.type}@1.0.0`;
+				if (!contract.type.includes('@')) {
+					contract.type = `${contract.type}@1.0.0`;
 				}
 
-				const actorCard = await context.kernel.getContractById(
+				const actorContract = await context.kernel.getContractById(
 					context.logContext,
 					context.session,
-					card.data.actor,
+					contract.data.actor,
 				);
-				card.data.actor = actorCard
+				contract.data.actor = actorContract
 					? {
-							slug: actorCard.slug,
-							active: actorCard.active,
+							slug: actorContract.slug,
+							active: actorContract.active,
 					  }
-					: card.data.actor;
+					: contract.data.actor;
 
-				if (card.type.split('@')[0] === 'update') {
-					card.data.payload = card.data.payload.filter((operation: any) => {
-						return ![
-							'/data/origin',
-							'/linked_at/has attached element',
-						].includes(operation.path);
-					});
+				if (contract.type.split('@')[0] === 'update') {
+					contract.data.payload = contract.data.payload.filter(
+						(operation: any) => {
+							return ![
+								'/data/origin',
+								'/linked_at/has attached element',
+							].includes(operation.path);
+						},
+					);
 
-					if (card.data.payload.length === 0) {
+					if (contract.data.payload.length === 0) {
 						return null;
 					}
-				} else if (card.data.payload) {
-					Reflect.deleteProperty(card.data.payload, 'slug');
-					Reflect.deleteProperty(card.data.payload, 'links');
-					Reflect.deleteProperty(card.data.payload, 'markers');
-					Reflect.deleteProperty(card.data.payload, 'created_at');
-					Reflect.deleteProperty(card.data.payload, 'updated_at');
-					Reflect.deleteProperty(card.data.payload, 'linked_at');
+				} else if (contract.data.payload) {
+					Reflect.deleteProperty(contract.data.payload, 'slug');
+					Reflect.deleteProperty(contract.data.payload, 'links');
+					Reflect.deleteProperty(contract.data.payload, 'markers');
+					Reflect.deleteProperty(contract.data.payload, 'created_at');
+					Reflect.deleteProperty(contract.data.payload, 'updated_at');
+					Reflect.deleteProperty(contract.data.payload, 'linked_at');
 
-					if (card.data.payload.data) {
-						Reflect.deleteProperty(card.data.payload.data, 'origin');
-						Reflect.deleteProperty(card.data.payload.data, 'translateDate');
+					if (contract.data.payload.data) {
+						Reflect.deleteProperty(contract.data.payload.data, 'origin');
+						Reflect.deleteProperty(contract.data.payload.data, 'translateDate');
 					}
 
 					// TODO: Remove once we fully support versioned
 					// slug references in the sync module.
-					if (card.data.payload.type && !card.data.payload.type.includes('@')) {
-						card.data.payload.type = `${card.data.payload.type}@1.0.0`;
+					if (
+						contract.data.payload.type &&
+						!contract.data.payload.type.includes('@')
+					) {
+						contract.data.payload.type = `${contract.data.payload.type}@1.0.0`;
 					}
 				}
 
-				return card;
+				return contract;
 			},
 		),
 	);
 
 	const expectedTail = _.map(
 		_.sortBy(_.filter(testCase.expected.tail, tailFilter), tailSort),
-		(card, index) => {
-			card.id = _.get(actualTail, [index, 'id']);
-			card.name = _.get(actualTail, [index, 'name']);
+		(contract: Contract, index) => {
+			contract.id = _.get(actualTail, [index, 'id']);
+			contract.name = _.get(actualTail, [index, 'name']);
 
-			card.data.target = head.id;
+			contract.data.target = head.id;
 
 			// If we have to ignore the update events, then we can't also
 			// trust the create event to be what it should have been at
 			// the beginning, as services might not preserve that information.
-			if (testCase.ignoreUpdateEvents && card.type.split('@')[0] === 'create') {
-				card.data.payload = _.get(actualTail, [index, 'data', 'payload']);
-				card.data.timestamp = _.get(actualTail, [index, 'data', 'timestamp']);
+			if (
+				testCase.ignoreUpdateEvents &&
+				contract.type.split('@')[0] === 'create'
+			) {
+				contract.data.payload = _.get(actualTail, [index, 'data', 'payload']);
+				contract.data.timestamp = _.get(actualTail, [
+					index,
+					'data',
+					'timestamp',
+				]);
 			}
 
-			return card;
+			return contract;
 		},
 	);
 

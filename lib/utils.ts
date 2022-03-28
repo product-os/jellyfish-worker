@@ -28,11 +28,11 @@ export const getCurrentTimestamp = (): string => {
 };
 
 /**
- * @summary Get the arguments schema from an action card
+ * @summary Get the arguments schema from an action contract
  * @function
  * @public
  *
- * @param {Object} actionCard - action card
+ * @param {Object} actionContract - action contract
  * @returns {Object} arguments schema
  *
  * @example
@@ -40,35 +40,35 @@ export const getCurrentTimestamp = (): string => {
  * console.log(schema.type)
  */
 export const getActionArgumentsSchema = (
-	actionCard: ActionContract,
+	actionContract: ActionContract,
 ): JsonSchema => {
-	const argumentNames = Object.keys(actionCard.data.arguments);
+	const argumentNames = Object.keys(actionContract.data.arguments);
 	return argumentNames.length === 0
 		? {
 				type: 'object',
 		  }
 		: {
 				type: 'object',
-				properties: actionCard.data.arguments,
+				properties: actionContract.data.arguments,
 				additionalProperties: false,
-				required: (actionCard.data.required as string[]) || argumentNames,
+				required: (actionContract.data.required as string[]) || argumentNames,
 		  };
 };
 
 /**
- * @summary Check if a card exists in the system
+ * @summary Check if a contract exists in the system
  * @function
  * @public
  *
  * @param {Object} context - execution context
  * @param {Object} kernel - kernel instance
  * @param {String} session - session id
- * @param {Object} object - card properties
- * @returns {Boolean} whether the card exists
+ * @param {Object} object - contract properties
+ * @returns {Boolean} whether the contract exists
  *
  * @example
  * const session = '4a962ad9-20b5-4dd8-a707-bf819593cc84'
- * const hasCard = await utils.hasCard({ ... }, kernel, session, {
+ * const hasContract = await utils.hasContract({ ... }, kernel, session, {
  *   id: 'a13474e4-7b44-453b-9f3e-aa783b8f37ea',
  *   active: true,
  *   data: {
@@ -76,19 +76,19 @@ export const getActionArgumentsSchema = (
  *   }
  * })
  *
- * if (hasCard) {
- *   console.log('This card already exists')
+ * if (hasContract) {
+ *   console.log('This contract already exists')
  * }
  */
-export const hasCard = async (
-	context: LogContext,
+export const hasContract = async (
+	logContext: LogContext,
 	kernel: Kernel,
 	session: string,
 	object: Pick<Contract, 'slug' | 'version' | 'id'>,
 ): Promise<boolean> => {
 	if (
 		object.id &&
-		(await kernel.getContractById(context, session, object.id))
+		(await kernel.getContractById(logContext, session, object.id))
 	) {
 		return true;
 	}
@@ -96,7 +96,7 @@ export const hasCard = async (
 	if (
 		object.slug &&
 		(await kernel.getContractBySlug(
-			context,
+			logContext,
 			session,
 			`${object.slug}@${object.version}`,
 		))
@@ -193,7 +193,7 @@ export const getQueryWithOptionalLinks = (
 		  };
 	return {
 		type: 'object',
-		description: 'Get card with optional links',
+		description: 'Get contract with optional links',
 
 		// All links will be optional
 		anyOf: [

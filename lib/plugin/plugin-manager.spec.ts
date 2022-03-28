@@ -1,14 +1,14 @@
 import _ from 'lodash';
+import { PluginManager } from '.';
 import {
 	action1,
 	action2,
-	card1,
-	card2,
+	contract1,
+	contract2,
 	integration1,
 	integration2,
 	testPlugin,
 } from './helpers';
-import { PluginManager } from '.';
 
 describe('PluginManager', () => {
 	describe('validates plugins', () => {
@@ -108,46 +108,46 @@ describe('PluginManager', () => {
 	});
 
 	describe('.getCards', () => {
-		test('returns an empty object if no cards are supplied to any of the plugins', () => {
+		test('returns an empty object if no contracts are supplied to any of the plugins', () => {
 			const pluginManager = new PluginManager([
 				testPlugin({ slug: 'plugin-test-1' }),
 				testPlugin({ slug: 'plugin-test-2' }),
 			]);
-			const cards = pluginManager.getCards();
-			expect(cards).toEqual({});
+			const contracts = pluginManager.getCards();
+			expect(contracts).toEqual({});
 		});
 
-		test('will throw an exception if different plugins contain duplicate card slugs', () => {
+		test('will throw an exception if different plugins contain duplicate contract slugs', () => {
 			const pluginManager = new PluginManager([
 				testPlugin({
 					slug: 'plugin-test-1',
 					name: 'Test Plugin 1',
-					contracts: [card1],
+					contracts: [contract1],
 				}),
 				testPlugin({
 					slug: 'plugin-test-2',
 					name: 'Test Plugin 2',
-					contracts: [Object.assign({}, card2, { slug: card1.slug })],
+					contracts: [Object.assign({}, contract2, { slug: contract1.slug })],
 				}),
 			]);
 			const getCards = () => pluginManager.getCards();
 
 			expect(getCards).toThrow(
-				"'card-1' already exists and cannot be loaded from plugin 'plugin-test-2'",
+				"'contract-1' already exists and cannot be loaded from plugin 'plugin-test-2'",
 			);
 		});
 
-		test('returns a dictionary of cards, keyed by slug', () => {
+		test('returns a dictionary of contracts, keyed by slug', () => {
 			const pluginManager = new PluginManager([
 				testPlugin({
-					contracts: [card1, card2],
+					contracts: [contract1, contract2],
 				}),
 			]);
 
-			const cards = pluginManager.getCards();
-			expect(cards).toEqual({
-				'card-1': card1,
-				'card-2': card2,
+			const contracts = pluginManager.getCards();
+			expect(contracts).toEqual({
+				'contract-1': contract1,
+				'contract-2': contract2,
 			});
 		});
 	});

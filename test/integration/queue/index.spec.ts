@@ -21,7 +21,7 @@ afterAll(async () => {
 describe('queue', () => {
 	describe('.enqueue()', () => {
 		test('should include the actor from the passed session', async () => {
-			const typeCard = (await context.kernel.getContractBySlug(
+			const typeContract = (await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
@@ -35,8 +35,8 @@ describe('queue', () => {
 			await context.worker.producer.enqueue(context.actor, context.session, {
 				action: 'action-create-card@1.0.0',
 				logContext: context.logContext,
-				card: typeCard!.id,
-				type: typeCard!.type,
+				card: typeContract!.id,
+				type: typeContract!.type,
 				arguments: {
 					properties: {
 						version: '1.0.0',
@@ -54,21 +54,22 @@ describe('queue', () => {
 		});
 
 		test('should include the whole passed action', async () => {
-			const typeCard = await context.kernel.getContractBySlug(
+			const typeContract = await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
 			);
-			const actionCard = await context.kernel.getContractBySlug<ActionContract>(
-				context.logContext,
-				context.session,
-				'action-create-card@latest',
-			);
+			const actionContract =
+				await context.kernel.getContractBySlug<ActionContract>(
+					context.logContext,
+					context.session,
+					'action-create-card@latest',
+				);
 			await context.worker.producer.enqueue(context.actor, context.session, {
 				action: 'action-create-card@1.0.0',
 				logContext: context.logContext,
-				card: typeCard!.id,
-				type: typeCard!.type,
+				card: typeContract!.id,
+				type: typeContract!.type,
 				arguments: {
 					properties: {
 						version: '1.0.0',
@@ -83,12 +84,12 @@ describe('queue', () => {
 			const request = await context.dequeue();
 			expect(request).not.toBe(null);
 			expect(request!.data.action).toBe(
-				`${actionCard!.slug}@${actionCard!.version}`,
+				`${actionContract!.slug}@${actionContract!.version}`,
 			);
 		});
 
 		test('should set an originator', async () => {
-			const typeCard = await context.kernel.getContractBySlug(
+			const typeContract = await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
@@ -96,8 +97,8 @@ describe('queue', () => {
 			await context.worker.producer.enqueue(context.actor, context.session, {
 				action: 'action-create-card@1.0.0',
 				logContext: context.logContext,
-				card: typeCard!.id,
-				type: typeCard!.type,
+				card: typeContract!.id,
+				type: typeContract!.type,
 				originator: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 				arguments: {
 					properties: {
@@ -115,7 +116,7 @@ describe('queue', () => {
 		});
 
 		test('should take a current date', async () => {
-			const typeCard = await context.kernel.getContractBySlug(
+			const typeContract = await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
@@ -125,8 +126,8 @@ describe('queue', () => {
 			await context.worker.producer.enqueue(context.actor, context.session, {
 				action: 'action-create-card@1.0.0',
 				logContext: context.logContext,
-				card: typeCard!.id,
-				type: typeCard!.type,
+				card: typeContract!.id,
+				type: typeContract!.type,
 				currentDate: date,
 				arguments: {
 					properties: {
@@ -157,7 +158,7 @@ describe('queue', () => {
 
 		test('should set a present timestamp', async () => {
 			const currentDate = new Date();
-			const typeCard = await context.kernel.getContractBySlug(
+			const typeContract = await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
@@ -165,8 +166,8 @@ describe('queue', () => {
 			await context.worker.producer.enqueue(context.actor, context.session, {
 				action: 'action-create-card@1.0.0',
 				logContext: context.logContext,
-				card: typeCard!.id,
-				type: typeCard!.type,
+				card: typeContract!.id,
+				type: typeContract!.type,
 				arguments: {
 					properties: {
 						version: '1.0.0',
@@ -204,7 +205,7 @@ describe('queue', () => {
 		});
 
 		test('should throw if the action was not found', async () => {
-			const typeCard = await context.kernel.getContractBySlug(
+			const typeContract = await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
@@ -213,8 +214,8 @@ describe('queue', () => {
 				return context.worker.producer.enqueue(context.actor, context.session, {
 					action: 'action-foo-bar@1.0.0',
 					logContext: context.logContext,
-					card: typeCard!.id,
-					type: typeCard!.type,
+					card: typeContract!.id,
+					type: typeContract!.type,
 					arguments: {
 						properties: {
 							version: '1.0.0',
@@ -229,7 +230,7 @@ describe('queue', () => {
 		});
 
 		test('should throw if the session was not found', async () => {
-			const typeCard = await context.kernel.getContractBySlug(
+			const typeContract = await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
@@ -239,8 +240,8 @@ describe('queue', () => {
 				return context.worker.producer.enqueue(context.actor, id, {
 					action: 'action-create-card@1.0.0',
 					logContext: context.logContext,
-					card: typeCard!.id,
-					type: typeCard!.type,
+					card: typeContract!.id,
+					type: typeContract!.type,
 					arguments: {
 						properties: {
 							version: '1.0.0',
@@ -262,7 +263,7 @@ describe('queue', () => {
 		});
 
 		test('should not let the same owner take a request twice', async () => {
-			const typeCard = await context.kernel.getContractBySlug(
+			const typeContract = await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
@@ -273,8 +274,8 @@ describe('queue', () => {
 				{
 					action: 'action-create-card@1.0.0',
 					logContext: context.logContext,
-					card: typeCard!.id,
-					type: typeCard!.type,
+					card: typeContract!.id,
+					type: typeContract!.type,
 					arguments: {
 						properties: {
 							version: '1.0.0',
@@ -297,18 +298,18 @@ describe('queue', () => {
 		});
 
 		test('should cope with link materialization failures', async () => {
-			const typeCard = await context.kernel.getContractBySlug(
+			const typeContract = await context.kernel.getContractBySlug(
 				context.logContext,
 				context.session,
 				'card@latest',
 			);
-			expect(typeCard).not.toBe(null);
+			expect(typeContract).not.toBe(null);
 
 			const producerOptions: ProducerOptions = {
 				action: 'action-create-card@1.0.0',
 				logContext: context.logContext,
-				card: typeCard!.id,
-				type: typeCard!.type,
+				card: typeContract!.id,
+				type: typeContract!.type,
 				arguments: {
 					properties: {
 						slug: 'foo',

@@ -32,7 +32,7 @@ export interface SequenceItem {
 	time: Date;
 	actor: string;
 	/**
-	 * If this is set, we don't set an originator when inserting this card.
+	 * If this is set, we don't set an originator when inserting this contract.
 	 * This treats this as a new request.
 	 * This is being used to allow inserting contracts as part of a translate which
 	 * should be mirrored again.

@@ -11,10 +11,10 @@ import * as oauth from './oauth';
 import * as pipeline from './pipeline';
 import * as syncContext from './sync-context';
 import type {
+	HttpRequestOptions,
 	Integration,
 	IntegrationDefinition,
 	IntegrationInitializationOptions,
-	HttpRequestOptions,
 	SequenceItem,
 } from './types';
 
@@ -260,15 +260,15 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} name - integration name
-	 * @param {Object} userCard - user to associate external token to
-	 * @param {Object} credentials - external provider's api token
-	 * @param {Object} context - execution context
-	 * @returns {Object} Upserted user card
+	 * @param name - integration name
+	 * @param userContract - user to associate external token to
+	 * @param credentials - external provider's api token
+	 * @param context - sync action context
+	 * @returns upserted user contract
 	 */
 	async associate(
 		name: string,
-		userCard: Contract,
+		userContract: Contract,
 		credentials: any,
 		context: syncContext.SyncActionContext,
 	) {
@@ -282,12 +282,16 @@ export class Sync {
 		);
 
 		/*
-		 * Set the access token in the user card.
+		 * Set the access token in the user contract.
 		 */
-		_.set(userCard, ['data', 'oauth', name], credentials);
-		return context.upsertElement(userCard.type, _.omit(userCard, ['type']), {
-			timestamp: new Date(),
-		});
+		_.set(userContract, ['data', 'oauth', name], credentials);
+		return context.upsertElement(
+			userContract.type,
+			_.omit(userContract, ['type']),
+			{
+				timestamp: new Date(),
+			},
+		);
 	}
 
 	/**
@@ -295,19 +299,22 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} name - integration name
-	 * @param {Object} token - token details
-	 * @param {Object} event - event
-	 * @param {String} event.raw - raw event payload
-	 * @param {Object} event.headers - request headers
-	 * @param {Object} context - logger context
-	 * @returns {Boolean} whether the external event should be accepted or not
+	 * @param logContext - log context
+	 * @param name - integration name
+	 * @param token - token details
+	 * @param event - event
+	 * @param event.raw - raw event payload
+	 * @param event.headers - request headers
+	 * @returns whether the external event should be accepted or not
 	 */
 	async isValidEvent(
 		logContext: LogContext,
 		name: string,
 		token: any,
-		event: any,
+		event: {
+			raw: any;
+			headers: any;
+		},
 	) {
 		const integration = this.integrations[name];
 		if (!integration || !token) {
@@ -323,23 +330,24 @@ export class Sync {
 	}
 
 	/**
-	 * @summary Mirror back a card insert coming from Jellyfish
+	 * @summary Mirror back a contract insert coming from Jellyfish
 	 * @function
 	 * @public
 	 *
-	 * @param {String} name - integration name
-	 * @param {Object} token - token details
-	 * @param {Object} card - action target card
-	 * @param {Object} context - execution context
-	 * @param {Object} options - options
-	 * @param {String} options.actor - actor id
-	 * @param {String} [options.origin] - OAuth origin URL
-	 * @returns {Object[]} inserted cards
+	 * @param name - integration name
+	 * @param token - token details
+	 * @param contract - action target contract
+	 * @param context - sync action context
+	 * @param options - options object
+	 * @param options.actor - actor id
+	 * @param options.origin - oauth origin url
+	 * @param options.defaultUser - default user id
+	 * @returns inserted contracts
 	 */
 	async mirror(
 		name: string,
 		token: any,
-		card: Contract,
+		contract: Contract,
 		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;
@@ -367,7 +375,7 @@ export class Sync {
 			return [];
 		}
 
-		return pipeline.mirrorCard(integration, card, {
+		return pipeline.mirrorCard(integration, contract, {
 			actor: options.actor,
 			origin: options.origin,
 			defaultUser: options.defaultUser,
@@ -382,20 +390,20 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} name - integration name
-	 * @param {Object} token - token details
-	 * @param {Object} card - action target card
-	 * @param {Object} context - execution context
-	 * @param {Object} options - options
-	 * @param {String} options.actor - actor id
-	 * @param {String} options.timestamp - timestamp
-	 * @param {String} [options.origin] - OAuth origin URL
-	 * @returns {Object[]} inserted cards
+	 * @param name - integration name
+	 * @param token - token details
+	 * @param contract - action target contract
+	 * @param context - execution context
+	 * @param options - options
+	 * @param options.actor - actor id
+	 * @param options.defaultUser - default user id
+	 * @param options.origin - oauth origin url
+	 * @returns inserted contracts
 	 */
 	async translate(
 		name: string,
 		token: string,
-		card: Contract,
+		contract: Contract,
 		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;
@@ -424,13 +432,13 @@ export class Sync {
 		}
 
 		context.log.info('Translating external event', {
-			id: card.id,
-			slug: card.slug,
+			id: contract.id,
+			slug: contract.slug,
 			integration: name,
 		});
 
-		const cards = await metrics.measureTranslate(name, async () => {
-			return pipeline.translateExternalEvent(integration, card, {
+		const contracts = await metrics.measureTranslate(name, async () => {
+			return pipeline.translateExternalEvent(integration, contract, {
 				actor: options.actor,
 				origin: options.origin,
 				defaultUser: options.defaultUser,
@@ -441,12 +449,12 @@ export class Sync {
 		});
 
 		context.log.info('Translated external event', {
-			slugs: cards.map((translatedCard) => {
-				return translatedCard.slug;
+			slugs: contracts.map((translatedContract) => {
+				return translatedContract.slug;
 			}),
 		});
 
-		return cards;
+		return contracts;
 	}
 
 	/**
@@ -454,13 +462,13 @@ export class Sync {
 	 * @function
 	 * @public
 	 *
-	 * @param {String} name - integration name
-	 * @param {Object} token - token details
-	 * @param {String} file - file id
-	 * @param {Object} context - execution context
-	 * @param {Object} options - options
-	 * @param {String} options.actor - actor id
-	 * @returns {Buffer} file
+	 * @param name - integration name
+	 * @param token - token details
+	 * @param file - file id
+	 * @param context - sync action context
+	 * @param options - options object
+	 * @param options.actor - actor id
+	 * @returns file
 	 */
 	async getFile(
 		name: string,

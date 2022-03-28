@@ -2,8 +2,8 @@ import _ from 'lodash';
 import {
 	action1,
 	action2,
-	card1,
-	card2,
+	contract1,
+	contract2,
 	integration1,
 	integration2,
 	testPlugin,
@@ -33,36 +33,39 @@ describe('Plugin', () => {
 	});
 
 	describe('.getCards', () => {
-		test('returns an empty object if no cards are supplied to the plugin', () => {
+		test('returns an empty object if no contracts are supplied to the plugin', () => {
 			const plugin = new Plugin(testPlugin());
-			const cards = plugin.getCards();
-			expect(cards).toEqual({});
+			const contracts = plugin.getCards();
+			expect(contracts).toEqual({});
 		});
 
-		test('throws an exception if duplicate card slugs are found', () => {
+		test('throws an exception if duplicate contract slugs are found', () => {
 			const plugin = new Plugin(
 				testPlugin({
-					contracts: [card1, Object.assign({}, card2, { slug: card1.slug })],
+					contracts: [
+						contract1,
+						Object.assign({}, contract2, { slug: contract1.slug }),
+					],
 				}),
 			);
 
 			const getCards = () => plugin.getCards();
 
-			expect(getCards).toThrow('Duplicate contract: card-1');
+			expect(getCards).toThrow('Duplicate contract: contract-1');
 		});
 
-		test('returns a dictionary of cards, keyed by slug', () => {
+		test('returns a dictionary of contracts, keyed by slug', () => {
 			const plugin = new Plugin(
 				testPlugin({
-					contracts: [card1, card2],
+					contracts: [contract1, contract2],
 				}),
 			);
 
-			const cards = plugin.getCards();
+			const contracts = plugin.getCards();
 
-			expect(cards).toEqual({
-				'card-1': card1,
-				'card-2': card2,
+			expect(contracts).toEqual({
+				'contract-1': contract1,
+				'contract-2': contract2,
 			});
 		});
 	});
