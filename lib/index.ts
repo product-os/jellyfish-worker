@@ -300,7 +300,7 @@ export class Worker {
 	 * @function
 	 * @public
 	 *
-	 * @returns {String} unique worker id
+	 * @returns unique worker id
 	 *
 	 * @example
 	 * const worker = new Worker({ ... })

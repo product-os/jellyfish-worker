@@ -4,7 +4,6 @@ import { errors as coreErrors } from 'autumndb';
 import { WorkerNoElement } from '../errors';
 import type { ActionDefinition } from '../plugin';
 
-// TODO: Bring in relavent tests from action-library
 const handler: ActionDefinition['handler'] = async (
 	session,
 	context,

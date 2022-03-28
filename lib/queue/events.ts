@@ -8,14 +8,12 @@ const logger = getLogger(__filename);
 
 /**
  * @summary The execution event contract type slug
- * @type {String}
  * @private
  */
 const EXECUTION_EVENT_TYPE: string = 'execute';
 
 /**
  * @summary The execution event contract version
- * @type {String}
  * @private
  * @description
  * Events in the system are meant to be immutable, so
@@ -41,7 +39,7 @@ export const getExecuteEventSlug = (options: { id: string }): string => {
  * @public
  *
  * @param logContext - log context
- * @param kernel - jellyfish instance
+ * @param kernel - kernel instance
  * @param session - session id
  * @param options - options object
  * @param results - action results
@@ -191,7 +189,7 @@ export interface WaitOptions {
  *   id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
  *   card: '033d9184-70b2-4ec9-bc39-9a249b186422',
  * });
- * console.log(contract.id)
+ * console.log(contract.id);
  */
 export const wait = async (
 	logContext: LogContext,

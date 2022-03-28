@@ -373,8 +373,8 @@ export class Producer implements QueueProducer {
 	 * @function
 	 * @public
 	 *
-	 * @param {LogContext} logContext - log context
-	 * @param {String} originator - originator contract id
+	 * @param logContext - log context
+	 * @param originator - originator contract id
 	 * @returns last execution event contract
 	 */
 	async getLastExecutionEvent(
