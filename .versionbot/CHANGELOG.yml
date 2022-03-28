@@ -1,4 +1,18 @@
 - commits:
+    - subject: A bit more cleanup
+      hash: f24692aeeb3449d6e550ccba5251f0a93dce4dcc
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 21.0.8
+  title: "'A bit more cleanup'"
+  date: 2022-03-28T02:57:11.538Z
+- commits:
     - subject: Rename card to contract
       hash: a536b42cf392fc90522827e6fa52aacbf5e2c09f
       body: ""
