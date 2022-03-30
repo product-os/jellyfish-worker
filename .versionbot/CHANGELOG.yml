@@ -1,4 +1,25 @@
 - commits:
+    - subject: "Sync: Add `getContactByEmail` method"
+      hash: 7bc274649e1c9674e94b2d6cbf9875ce72c3b479
+      body: >
+        This change alls brings in the `contact` contract type. The sync context
+
+        now has the ability to link to contacts as part of it's interface so
+
+        logically the contact is part of the core offering.
+
+        The original `contact` definition came from here: https://github.com/product-os/jellyfish-plugin-default/blob/v24.0.44/lib/contracts/contact.ts
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: edufschmidt
+      nested: []
+  version: 21.1.0
+  title: "'Sync: Add getContactByEmail method'"
+  date: 2022-03-30T12:31:12.835Z
+- commits:
     - subject: A bit more cleanup
       hash: f24692aeeb3449d6e550ccba5251f0a93dce4dcc
       body: ""
