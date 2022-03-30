@@ -231,6 +231,7 @@ export const run = async (
 		defaultUser: options.defaultUser,
 		context: {
 			log: options.context.log,
+			getContactByEmail: options.context.getContactByEmail,
 			getRemoteUsername: options.context.getRemoteUsername,
 			getLocalUsername: options.context.getLocalUsername,
 			getElementBySlug: options.context.getElementBySlug,

@@ -87,6 +87,7 @@ export interface IntegrationInitializationOptions {
 		getLocalUsername: SyncActionContext['getLocalUsername'];
 		getElementBySlug: SyncActionContext['getElementBySlug'];
 		getElementById: SyncActionContext['getElementById'];
+		getContactByEmail: SyncActionContext['getContactByEmail'];
 		getElementByMirrorId: SyncActionContext['getElementByMirrorId'];
 		request: (
 			actor: string,

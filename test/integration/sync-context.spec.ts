@@ -20,10 +20,6 @@ afterAll(() => {
 	return testUtils.destroyContext(ctx);
 });
 
-test('empty test', async () => {
-	expect(1).toEqual(1);
-});
-
 describe('context.getElementByMirrorId()', () => {
 	test('should match mirrors exactly', async () => {
 		const mirrorId = `test://${uuidv4()}`;
@@ -296,5 +292,39 @@ describe('context.upsertElement()', () => {
 		expect(result.slug).toBe(foo.slug);
 		expect(result.id).toBe(foo.id);
 		expect(result.data.test).toBe(update.patch[0].value);
+	});
+});
+
+describe('context.getContactByEmail()', () => {
+	test('should match emails exactly', async () => {
+		const email = 'test@example.com';
+
+		// Insert a decoy
+		await ctx.createContract(
+			ctx.adminUserId,
+			ctx.worker.session,
+			'contact@1.0.0',
+			`contract-${uuidv4()}`,
+			{
+				profile: {
+					email: 'decoy@example.com',
+				},
+			},
+		);
+
+		const contact = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.worker.session,
+			'contact@1.0.0',
+			`contract-${uuidv4()}`,
+			{
+				profile: {
+					email,
+				},
+			},
+		);
+
+		const result: any = await actionContext.getContactByEmail(email);
+		expect(result).toEqual(contact);
 	});
 });
