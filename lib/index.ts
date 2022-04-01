@@ -485,11 +485,13 @@ export class Worker {
 
 		object.type = `${typeContract.slug}@${typeContract.version}`;
 
+		// Check if the contract already exists, using a privileged session (in case the contract isn't accessible due to permissions)
+		// If the contract already exists, somethings gone wrong, and we should throw
 		let contract: Contract | null = null;
 		if (object.slug) {
 			contract = await kernel.getContractBySlug(
 				logContext,
-				insertSession,
+				instance.session,
 				`${object.slug}@${object.version || 'latest'}`,
 			);
 		}
@@ -497,9 +499,13 @@ export class Worker {
 		if (!contract && object.id) {
 			contract = await kernel.getContractById(
 				logContext,
-				insertSession,
+				instance.session,
 				object.id,
 			);
+		}
+
+		if (contract) {
+			throw new Error(`Contract ${object.slug || object.id} already exists`);
 		}
 
 		if (typeof object.name !== 'string') {
@@ -510,7 +516,7 @@ export class Worker {
 			logContext,
 			insertSession,
 			typeContract,
-			contract,
+			null,
 			{
 				eventPayload: _.omit(object, ['id']),
 				eventType: 'create',
