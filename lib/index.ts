@@ -813,11 +813,43 @@ export class Worker {
 				);
 
 				// TS-TODO: Fix these "any" castings
-				const result = formulaParser.evaluateObject(
+				const evaluatedContract = formulaParser.evaluateObject(
 					typeContract.data.schema,
 					objectWithLinks as any,
 				);
-				return kernel.insertContract(logContext, insertSession, result as any);
+				const result = await kernel.insertContract<T>(
+					logContext,
+					insertSession,
+					evaluatedContract as any,
+				);
+
+				// Create a link between the contract and the creator
+				if (options.actor && typeContract.slug !== 'link') {
+					const actor = await kernel.getContractById(
+						logContext,
+						instance.session,
+						options.actor,
+					);
+					if (actor) {
+						await kernel.insertContract(logContext, insertSession, {
+							type: 'link@1.0.0',
+							name: 'is creator of',
+							data: {
+								inverseName: 'was created by',
+								from: {
+									id: actor.id,
+									type: actor.type,
+								},
+								to: {
+									id: result.id,
+									type: result.type,
+								},
+							},
+						});
+					}
+				}
+
+				return result;
 			},
 		);
 	}
