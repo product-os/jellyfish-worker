@@ -2758,6 +2758,8 @@ describe('.patchCard()', () => {
 			],
 		);
 
+		await ctx.worker.triggerQueue.drained();
+
 		const triggers = await ctx.kernel.query(ctx.logContext, ctx.session, {
 			type: 'object',
 			additionalProperties: true,

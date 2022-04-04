@@ -795,11 +795,14 @@ describe('.execute()', () => {
 
 		await ctx.flushAll(ctx.session);
 
-		const contract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			`${command}@latest`,
-		);
+		const contract = await ctx.waitForMatch({
+			type: 'object',
+			properties: {
+				slug: {
+					const: command,
+				},
+			},
+		});
 
 		expect(contract).toBeTruthy();
 
