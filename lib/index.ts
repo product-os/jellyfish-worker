@@ -1294,6 +1294,12 @@ export class Worker {
 		const workerContext = this.getActionContext(logContext);
 
 		const insertedContract = await fn();
+
+		logger.info(
+			logContext,
+			'Worker function complete, now running commit logic',
+		);
+
 		if (!insertedContract) {
 			return null;
 		}
