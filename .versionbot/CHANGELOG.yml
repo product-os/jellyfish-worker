@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add additional logging to commit method
+      hash: f867e99a5031bf88bf55e5b992b5424ca683c389
+      body: |
+        This is to help debug the cause of slow worker execution in production.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 21.1.4
+  title: "'Add additional logging to commit method'"
+  date: 2022-04-04T12:58:44.794Z
+- commits:
     - subject: Update internal-patch
       hash: d43807ac623620b7399fca8078ed4015c7a9b487
       body: ""
