@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch
+      hash: e37ef23a45af0c58f17d3292f3ccfb1bd59ffe07
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 21.1.5
+  title: "'Update internal-patch'"
+  date: 2022-04-05T10:04:35.768Z
+- commits:
     - subject: Add additional logging to commit method
       hash: f867e99a5031bf88bf55e5b992b5424ca683c389
       body: |
