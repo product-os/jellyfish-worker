@@ -1362,13 +1362,11 @@ describe('Worker', () => {
 			},
 		});
 
-		console.log('before enqueue');
 		const createUserRequest = await ctx.worker.producer.enqueue(
 			ctx.worker.getId(),
 			ctx.session,
 			request1,
 		);
-		console.log('after enqueue');
 
 		await ctx.flush(ctx.session);
 		const signupResult: any = await ctx.worker.producer.waitResults(
