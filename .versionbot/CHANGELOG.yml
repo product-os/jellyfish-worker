@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove unnecessary test logs
+      hash: 189223e909706a920c0440d05c331d246d4fe811
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 21.1.6
+  title: "'Remove unnecessary test logs'"
+  date: 2022-04-06T07:53:38.998Z
+- commits:
     - subject: Update internal-patch
       hash: e37ef23a45af0c58f17d3292f3ccfb1bd59ffe07
       body: ""
