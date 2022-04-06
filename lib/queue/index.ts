@@ -13,4 +13,7 @@ export type {
 	ExecuteContract,
 	ExecuteContractDefinition,
 	ExecuteData,
+	ScheduledActionData,
+	ScheduledActionContract,
+	ScheduledActionContractDefinition,
 } from './types';

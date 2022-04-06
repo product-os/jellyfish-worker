@@ -1,27 +1,23 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type {
-	ContractData,
-	SessionContract,
-} from '@balena/jellyfish-types/build/core';
+import type { ContractData } from '@balena/jellyfish-types/build/core';
 import { strict as nativeAssert } from 'assert';
 import { Kernel } from 'autumndb';
+import { parseExpression } from 'cron-parser';
 import * as graphileWorker from 'graphile-worker';
-import { v4 as isUUID } from 'is-uuid';
 import type { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 import { contracts } from './contracts';
 import {
 	QueueInvalidAction,
 	QueueInvalidRequest,
-	QueueInvalidSession,
 	QueueNoRequest,
 } from './errors';
-import { getLastExecutionEvent, wait } from './events';
+import { wait } from './events';
 import type {
-	ActionContract,
 	ActionRequestContract,
 	ExecuteContract,
+	ScheduledActionData,
 } from './types';
 
 const logger = getLogger(__filename);
@@ -53,37 +49,111 @@ export interface ProducerResults {
 
 export interface QueueProducer {
 	initialize: (logContext: LogContext) => Promise<void>;
-	storeRequest: (
-		actor: string,
-		session: string,
-		options: ProducerOptions,
-	) => Promise<ActionRequestContract>;
-	enqueue: (
-		actor: string,
-		session: string,
-		options: ProducerOptions,
-	) => Promise<ActionRequestContract>;
 	waitResults: (
 		logContext: LogContext,
 		actionRequest: ActionRequestContract,
 	) => Promise<ProducerResults>;
-	getLastExecutionEvent: (
-		logContext: LogContext,
-		originator: string,
-	) => Promise<ExecuteContract | null>;
 	deleteJob: (context: LogContext, key: string) => Promise<void>;
 }
 
-async function props(obj: any) {
-	const keys = Object.keys(obj);
-	const values = Object.values(obj);
-	return Promise.all(values).then((resolved) => {
-		const result = {};
-		for (let i = 0; i < keys.length; i += 1) {
-			result[keys[i]] = resolved[i];
+/**
+ * @summary Get the next execute date-time for a scheduled action
+ *
+ * @param schedule - schedule configuration
+ * @returns next execution date, or null if no future date was found
+ */
+export function getNextExecutionDate(
+	schedule: ScheduledActionData['schedule'],
+): Date | null {
+	const now = new Date();
+	if (schedule.once) {
+		const next = new Date(schedule.once.date);
+		if (next > now) {
+			return schedule.once.date;
 		}
-		return result;
+	} else if (schedule.recurring) {
+		const endDate = new Date(schedule.recurring.end);
+		const startDate = new Date(schedule.recurring.start);
+
+		// Ignore anything that will have already ended
+		if (endDate > now) {
+			try {
+				// Handle future start dates
+				const options =
+					startDate > now
+						? {
+								currentDate: startDate,
+						  }
+						: {
+								startDate,
+						  };
+
+				// Create iterator based on provided configuration
+				const iterator = parseExpression(schedule.recurring.interval, {
+					endDate,
+					...options,
+				});
+
+				// Return next execution date if available
+				if (iterator.hasNext()) {
+					return iterator.next().toDate();
+				}
+			} catch (error) {
+				throw new QueueInvalidAction(
+					`Invalid recurring schedule configuration: ${error}`,
+				);
+			}
+		}
+	}
+
+	return null;
+}
+
+/**
+ * @summary Enqueue an action request
+ * @function
+ *
+ * @param logContext - log context
+ * @param pool - database connection pool
+ * @param actor - actor id
+ * @param actionRequest - action request contract
+ * @param schedule - scheduling options
+ * @returns enqueued action request contract
+ */
+export async function enqueue(
+	logContext: LogContext,
+	pool: Pool,
+	actor: string,
+	actionRequest: ActionRequestContract,
+	schedule?: ProducerOptionsSchedule,
+): Promise<ActionRequestContract> {
+	let jobName = 'enqueue-action-request';
+	const jobParameters: string[] = [`'actionRequest'`, '$1'];
+	const values: any[] = [actionRequest];
+
+	// Handle scheduled actions
+	if (schedule) {
+		jobName = `enqueue-action-request-${uuidv4()}`;
+		jobParameters.push('run_at := $2', 'job_key := $3');
+		values.push(schedule.runAt, schedule.contract);
+	}
+
+	logger.info(logContext, 'Enqueueing action request', {
+		actor,
+		request: {
+			slug: actionRequest.slug,
+			action: actionRequest.data.action,
+			card: actionRequest.data.card,
+		},
 	});
+
+	await pool.query({
+		name: jobName,
+		text: `SELECT graphile_worker.add_job(${jobParameters.join(',')});`,
+		values,
+	});
+
+	return actionRequest;
 }
 
 /**
@@ -117,7 +187,7 @@ export class Producer implements QueueProducer {
 		// Set up the graphile worker to ensure that the graphile_worker schema
 		// exists in the DB before we attempt to enqueue a job.
 		const workerUtils = await this.makeWorkerUtils(logContext);
-		workerUtils.release();
+		await workerUtils.release();
 	}
 
 	/**
@@ -155,151 +225,6 @@ export class Producer implements QueueProducer {
 			}
 			throw error;
 		}
-	}
-
-	// FIXME this function exists solely for the purpose of allowing upstream code
-	// to put stuff "in the queue" ( = the request table on db) and call worker.execute
-	// right after. Fix upstream code by calling queue.enqueue and let the worker deal
-	// with the request asynchronously. Once done, turn this function private or merge
-	// it with `enqueue`
-	async storeRequest(
-		actor: string,
-		session: string,
-		options: ProducerOptions,
-	): Promise<ActionRequestContract> {
-		const id = uuidv4();
-		const slug = `action-request-${id}`;
-
-		logger.debug(options.logContext, 'Storing request', {
-			actor,
-			request: {
-				slug,
-				action: options.action,
-				card: options.card,
-			},
-		});
-
-		// Use the request session to retrieve the various contracts, this ensures that
-		// the action cannot be run if the session doesn't have access to the contracts.
-		const propContracts: any = await props({
-			target: isUUID(options.card)
-				? {
-						id: options.card,
-
-						// TODO: Require users to be explicit on the contract version
-				  }
-				: this.kernel.getContractBySlug(
-						options.logContext,
-						session,
-						`${options.card}@latest`,
-				  ),
-
-			action: this.kernel.getContractBySlug<ActionContract>(
-				options.logContext,
-				session,
-				options.action,
-			),
-			session: this.kernel.getContractById<SessionContract>(
-				options.logContext,
-				session,
-				session,
-			),
-		});
-
-		assert.INTERNAL(
-			options.logContext,
-			propContracts.session,
-			QueueInvalidSession,
-			`No such session: ${session}`,
-		);
-		assert.USER(
-			options.logContext,
-			propContracts.action,
-			QueueInvalidAction,
-			`No such action: ${options.action}`,
-		);
-		assert.USER(
-			options.logContext,
-			propContracts.target,
-			QueueInvalidRequest,
-			`No such input contract: ${options.card}`,
-		);
-
-		const date = options.currentDate || new Date();
-
-		// Use the Queue's session instead of the session passed as a parameter as the
-		// passed session shouldn't have permissions to create action requests
-		return this.kernel.insertContract<ActionRequestContract>(
-			options.logContext,
-			this.session,
-			{
-				type: 'action-request@1.0.0',
-				slug,
-				data: {
-					epoch: date.valueOf(),
-					timestamp: date.toISOString(),
-					context: options.logContext,
-					originator: options.originator,
-					actor: propContracts.session!.data.actor,
-					action: `${propContracts.action!.slug}@${
-						propContracts.action!.version
-					}`,
-					input: {
-						id: propContracts.target!.id,
-					},
-					arguments: options.arguments,
-					schedule: options.schedule?.contract,
-					card: options.card,
-					type: options.type,
-				},
-			},
-		);
-	}
-
-	/**
-	 * @summary Enqueue a request
-	 * @function
-	 * @public
-	 *
-	 * @param actor - actor id
-	 * @param session - session id
-	 * @param options - producer options
-	 * @returns action request contract
-	 */
-	async enqueue(
-		actor: string,
-		session: string,
-		options: ProducerOptions,
-	): Promise<ActionRequestContract> {
-		const request = await this.storeRequest(actor, session, options);
-
-		let jobName = 'enqueue-action-request';
-		const jobParameters: string[] = [`'actionRequest'`, '$1'];
-		const values: any[] = [request];
-
-		// Handle scheduled actions
-		if (options.schedule) {
-			jobName = `enqueue-action-request-${uuidv4()}`;
-			jobParameters.push('run_at := $2', 'job_key := $3');
-			values.push(options.schedule.runAt, options.schedule.contract);
-		}
-
-		logger.info(options.logContext, 'Enqueueing request', {
-			actor,
-			request: {
-				slug: request.slug,
-				action: options.action,
-				card: options.card,
-			},
-		});
-
-		await this.pool.query({
-			name: jobName,
-			text: `SELECT graphile_worker.add_job(${jobParameters.join(',')});`,
-			values,
-		});
-
-		return request;
 	}
 
 	/**
@@ -366,27 +291,6 @@ export class Producer implements QueueProducer {
 			timestamp: request.data.payload.timestamp,
 			data: request.data.payload.data,
 		};
-	}
-
-	/**
-	 * @summary Get the last execution event given an originator
-	 * @function
-	 * @public
-	 *
-	 * @param logContext - log context
-	 * @param originator - originator contract id
-	 * @returns last execution event contract
-	 */
-	async getLastExecutionEvent(
-		logContext: LogContext,
-		originator: string,
-	): Promise<ExecuteContract | null> {
-		return getLastExecutionEvent(
-			logContext,
-			this.kernel,
-			this.session,
-			originator,
-		);
 	}
 
 	/**

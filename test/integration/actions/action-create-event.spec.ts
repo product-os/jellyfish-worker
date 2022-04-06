@@ -4,7 +4,7 @@ import {
 	Kernel,
 	testUtils as autumndbTestUtils,
 } from 'autumndb';
-import { testUtils, WorkerContext } from '../../../lib';
+import { ActionRequestContract, testUtils, WorkerContext } from '../../../lib';
 import { actionCreateEvent } from '../../../lib/actions/action-create-event';
 
 let ctx: testUtils.TestContext;
@@ -122,23 +122,34 @@ describe('action-create-event', () => {
 			{ payload: 'test' },
 		);
 
-		const eventRequest = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const eventRequest = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: 'action-create-event@1.0.0',
-				logContext: ctx.logContext,
-				card: root.id,
-				type: root.type,
-				arguments: {
-					type: 'card',
-					tags: [],
-					payload: {
-						message: 'johndoe',
+				data: {
+					action: 'action-create-event@1.0.0',
+					context: ctx.logContext,
+					card: root.id,
+					type: root.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: root.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						type: 'card',
+						tags: [],
+						payload: {
+							message: 'johndoe',
+						},
 					},
 				},
 			},
 		);
+		assert(eventRequest);
 		await ctx.flushAll(ctx.session);
 		const eventResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
@@ -205,24 +216,35 @@ describe('action-create-event', () => {
 			{ payload: 'test' },
 		);
 
-		const eventRequest = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const eventRequest = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: 'action-create-event@1.0.0',
-				logContext: ctx.logContext,
-				card: root.id,
-				type: root.type,
-				arguments: {
-					type: 'card',
-					name: 'Hello world',
-					tags: [],
-					payload: {
-						message: 'johndoe',
+				data: {
+					action: 'action-create-event@1.0.0',
+					context: ctx.logContext,
+					card: root.id,
+					type: root.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: root.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						type: 'card',
+						name: 'Hello world',
+						tags: [],
+						payload: {
+							message: 'johndoe',
+						},
 					},
 				},
 			},
 		);
+		assert(eventRequest);
 		await ctx.flushAll(ctx.session);
 		const eventResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
@@ -263,23 +285,34 @@ describe('action-create-event', () => {
 		);
 		assert(contract);
 
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: 'action-create-event@1.0.0',
-				logContext: ctx.logContext,
-				card: contract.id,
-				type: contract.type,
-				arguments: {
-					type: 'card',
-					tags: [],
-					payload: {
-						message: 'johndoe',
+				data: {
+					action: 'action-create-event@1.0.0',
+					context: ctx.logContext,
+					card: contract.id,
+					type: contract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: contract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						type: 'card',
+						tags: [],
+						payload: {
+							message: 'johndoe',
+						},
 					},
 				},
 			},
 		);
+		assert(request);
 		await ctx.flushAll(ctx.session);
 		const contractResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,

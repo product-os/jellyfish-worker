@@ -12,7 +12,6 @@ import type {
 import { strict } from 'assert';
 import { CONTRACTS, Kernel, StreamChange } from 'autumndb';
 import Bluebird from 'bluebird';
-import { parseExpression } from 'cron-parser';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
 import _ from 'lodash';
@@ -29,20 +28,21 @@ import { PluginDefinition, PluginManager } from './plugin';
 import {
 	ActionContract,
 	ActionRequestContract,
+	ActionRequestData,
 	Consumer,
 	Producer,
-	ProducerOptions,
+	ScheduledActionContract,
 } from './queue';
 import type { OnMessageEventHandler } from './queue/consumer';
+import { enqueue, getNextExecutionDate } from './queue/producer';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
 import { evaluate as evaluateTransformers } from './transformers';
 import * as triggersLib from './triggers';
 import type {
 	Action,
+	ActionPreRequest,
 	Map,
-	ScheduledActionContract,
-	ScheduledActionData,
 	TransformerContract,
 	TriggeredActionContract,
 	WorkerContext,
@@ -88,6 +88,7 @@ export {
 	Producer,
 	ProducerOptions,
 	ProducerResults,
+	ScheduledActionData,
 } from './queue';
 export * as testUtils from './test-utils';
 export * from './types';
@@ -289,59 +290,6 @@ export async function getObjectWithLinks<
 }
 
 /**
- * @summary Get the next execute date-time for a scheduled action
- *
- * @param schedule - schedule configuration
- * @returns next execution date, or null if no future date was found
- */
-export function getNextExecutionDate(
-	schedule: ScheduledActionData['schedule'],
-): Date | null {
-	const now = new Date();
-	if (schedule.once) {
-		const next = new Date(schedule.once.date);
-		if (next > now) {
-			return schedule.once.date;
-		}
-	} else if (schedule.recurring) {
-		const endDate = new Date(schedule.recurring.end);
-		const startDate = new Date(schedule.recurring.start);
-
-		// Ignore anything that will have already ended
-		if (endDate > now) {
-			try {
-				// Handle future start dates
-				const options =
-					startDate > now
-						? {
-								currentDate: startDate,
-						  }
-						: {
-								startDate,
-						  };
-
-				// Create iterator based on provided configuration
-				const iterator = parseExpression(schedule.recurring.interval, {
-					endDate,
-					...options,
-				});
-
-				// Return next execution date if available
-				if (iterator.hasNext()) {
-					return iterator.next().toDate();
-				}
-			} catch (error) {
-				throw new errors.WorkerInvalidActionRequest(
-					`Invalid recurring schedule configuration: ${error}`,
-				);
-			}
-		}
-	}
-
-	return null;
-}
-
-/**
  * Jellyfish worker library module.
  *
  * @module worker
@@ -349,6 +297,7 @@ export function getNextExecutionDate(
 export class Worker {
 	kernel: Kernel;
 	pluginManager: PluginManager;
+	pool: Pool;
 	consumer: Consumer;
 	producer: Producer;
 	contractsStream: any;
@@ -388,6 +337,7 @@ export class Worker {
 	) {
 		this.kernel = kernel;
 		this.pluginManager = new PluginManager(plugins);
+		this.pool = pool;
 		this.triggers = [];
 		this.transformers = [];
 		this.latestTransformers = [];
@@ -772,31 +722,11 @@ export class Worker {
 					patch,
 				);
 			},
-			enqueueAction: (...args) => {
-				return this.enqueueAction(...args);
-			},
 			cards: {
 				...CONTRACTS,
 				...self.getTypeContracts(),
 			},
 		};
-	}
-
-	/**
-	 * @summary Enqueus an action request
-	 * @function
-	 * @public
-	 *
-	 * @param session - The session with which to enqueue the action
-	 * @param actionRequest - request values to be enqueued
-	 *
-	 * @returns the stored action request contract
-	 */
-	async enqueueAction(
-		session: string,
-		actionRequest: ProducerOptions,
-	): Promise<ActionRequestContract> {
-		return this.producer.enqueue(this.getId(), session, actionRequest);
 	}
 
 	/**
@@ -812,7 +742,7 @@ export class Worker {
 	 *
 	 * @returns inserted contract
 	 */
-	async insertCard(
+	async insertCard<T extends Contract = Contract>(
 		logContext: LogContext,
 		insertSession: string,
 		typeContract: TypeContract,
@@ -825,7 +755,7 @@ export class Worker {
 			attachEvents?: any;
 		},
 		object: Partial<Contract>,
-	) {
+	): Promise<T | null> {
 		const instance = this;
 		const kernel = instance.kernel;
 
@@ -858,7 +788,7 @@ export class Worker {
 			Reflect.deleteProperty(object, 'name');
 		}
 
-		return this.commit(
+		return this.commit<T>(
 			logContext,
 			insertSession,
 			typeContract,
@@ -1345,16 +1275,7 @@ export class Worker {
 	 * @param request - action request options
 	 * @returns request arguments
 	 */
-	async pre(
-		session: string,
-		request: {
-			action: string;
-			logContext: LogContext;
-			arguments: any;
-			card: string;
-			type: string;
-		},
-	) {
+	async pre(session: string, request: ActionPreRequest) {
 		const actionDefinition = this.library[request.action.split('@')[0]];
 		assert.USER(
 			request.logContext,
@@ -1547,9 +1468,23 @@ export class Worker {
 				data.type &&
 				data.type.split('@')[0] === 'scheduled-action'
 			) {
-				await this.scheduleAction(logContext, session, data.id);
+				await this.scheduleAction(
+					logContext,
+					session,
+					request.data.actor,
+					request.data.epoch,
+					data.id,
+					request.data.originator,
+				);
 			} else if (request.data.schedule) {
-				await this.scheduleAction(logContext, session, request.data.schedule);
+				await this.scheduleAction(
+					logContext,
+					session,
+					request.data.actor,
+					request.data.epoch,
+					request.data.schedule,
+					request.data.originator,
+				);
 			}
 
 			result = {
@@ -1621,7 +1556,7 @@ export class Worker {
 	 * @param fn - an asynchronous function that will perform the operation
 	 */
 	// TS-TODO: Improve the typings for the `options` parameter
-	private async commit(
+	private async commit<T extends Contract | TypeContract>(
 		logContext: LogContext,
 		session: string,
 		typeContract: TypeContract,
@@ -1635,8 +1570,8 @@ export class Worker {
 			eventType: any;
 			eventPayload: any;
 		},
-		fn: () => Promise<Contract>,
-	) {
+		fn: () => Promise<T>,
+	): Promise<T | null> {
 		assert.INTERNAL(
 			logContext,
 			typeContract && typeContract.data && typeContract.data.schema,
@@ -1696,13 +1631,20 @@ export class Worker {
 				);
 			},
 			executeAndAwaitAction: async (actionRequest) => {
-				const req = await this.enqueueAction(workerContext.privilegedSession, {
-					...actionRequest,
+				const req = await this.insertCard(
 					logContext,
-					type: actionRequest.type!,
-				});
-
-				const result = await this.producer.waitResults(logContext, req);
+					workerContext.privilegedSession,
+					this.typeContracts['action-request@1.0.0'],
+					{
+						actor: options.actor,
+						timestamp: new Date().toISOString(),
+					},
+					actionRequest,
+				);
+				const result = await this.producer.waitResults(
+					logContext,
+					req as ActionRequestContract,
+				);
 
 				return result;
 			},
@@ -1808,21 +1750,6 @@ export class Worker {
 									`No such input contract for trigger ${trigger.slug}: ${identifier}`,
 								);
 							}
-							const actionRequest = {
-								// Re-enqueuing an action request expects the "contract" option to be an
-								// id, not a full contract.
-								card: triggerContract.id,
-								action: request.action!,
-								actor: options.actor,
-								logContext: request.logContext,
-								timestamp: request.currentDate.toISOString(),
-								epoch: request.currentDate.valueOf(),
-								arguments: request.arguments,
-
-								// Carry the old originator if present so we
-								// don't break the chain
-								originator: options.originator || request.originator,
-							};
 
 							logger.info(
 								logContext,
@@ -1834,8 +1761,31 @@ export class Worker {
 								},
 							);
 
-							// TS-TODO: remove any casting
-							return this.enqueueAction(session, actionRequest as any);
+							return this.insertCard(
+								request.logContext,
+								this.session,
+								this.typeContracts['action-request@1.0.0'],
+								{
+									timestamp: request.currentDate.toISOString(),
+									actor: options.actor,
+									originator: options.originator || request.originator,
+								},
+								{
+									data: {
+										card: triggerContract.id,
+										action: request.action!,
+										actor: options.actor,
+										context: request.logContext,
+										input: {
+											id: triggerContract.id,
+										},
+										epoch: request.currentDate.valueOf(),
+										timestamp: request.currentDate.toISOString(),
+										originator: options.originator || request.originator,
+										arguments: request.arguments,
+									},
+								},
+							);
 						}),
 					);
 				} catch (error: any) {
@@ -2003,6 +1953,16 @@ export class Worker {
 			);
 		}
 
+		// Add inserted action-request contracts to queue
+		if (insertedContract.type.split('@')[0] === 'action-request') {
+			await enqueue(
+				logContext,
+				this.pool,
+				options.actor,
+				insertedContract as ActionRequestContract,
+			);
+		}
+
 		return insertedContract;
 	}
 
@@ -2012,12 +1972,17 @@ export class Worker {
 	 *
 	 * @param logContext - log context
 	 * @param session - session id
+	 * @param actor - actor id
+	 * @param epoch - epoch
 	 * @param id - scheduled action contract ID
 	 */
 	async scheduleAction(
 		logContext: LogContext,
 		session: string,
+		actor: string,
+		epoch: number,
 		id: string,
+		originator: string | undefined,
 	): Promise<void> {
 		// Remove any already enqueued jobs
 		await this.producer.deleteJob(logContext, id);
@@ -2032,16 +1997,44 @@ export class Worker {
 		if (scheduledAction && scheduledAction.active) {
 			const runAt = getNextExecutionDate(scheduledAction.data.schedule);
 			if (runAt) {
-				await this.enqueueAction(session, {
-					logContext,
-					action: scheduledAction.data.options.action,
-					card: scheduledAction.data.options.card,
-					type: scheduledAction.data.options.type,
-					arguments: scheduledAction.data.options.arguments,
-					schedule: {
-						contract: id,
-						runAt,
+				// Create new action-request contract
+				const data: ActionRequestData = {
+					actor,
+					input: {
+						id: scheduledAction.data.options.card,
 					},
+					card: scheduledAction.data.options.card,
+					action: scheduledAction.data.options.action,
+					context: logContext,
+					epoch,
+					timestamp: new Date().toISOString(),
+					arguments: scheduledAction.data.options.arguments,
+					schedule: scheduledAction.id,
+				};
+				if (originator) {
+					data.originator = originator;
+				}
+				const actionRequest =
+					await this.kernel.insertContract<ActionRequestContract>(
+						logContext,
+						session,
+						{
+							slug: utils.getEventSlug('action-request'),
+							type: 'action-request@1.0.0',
+							data,
+						},
+					);
+				strict(
+					actionRequest,
+					new errors.WorkerNoElement(
+						`Failed to insert action-request for scheduled action`,
+					),
+				);
+
+				// Enqueue new action-request
+				await enqueue(logContext, this.pool, actor, actionRequest, {
+					runAt,
+					contract: scheduledAction.id,
 				});
 			}
 		}

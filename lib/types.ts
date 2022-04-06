@@ -8,11 +8,7 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import type { Kernel } from 'autumndb';
 import type { Operation } from 'fast-json-patch';
-import type {
-	ActionContract,
-	ActionRequestContract,
-	ProducerOptions,
-} from './queue';
+import type { ActionContract } from './queue';
 
 export interface Action {
 	handler: <TData = ContractData>(
@@ -53,7 +49,7 @@ export interface ActionPreRequest {
 
 export interface WorkerContext {
 	sync: any;
-	getEventSlug: (type: string) => Promise<string>;
+	getEventSlug: (type: string) => string;
 	getCardById: (lsession: string, id: string) => Promise<Contract | null>;
 	getCardBySlug: (lsession: string, slug: string) => Promise<Contract | null>;
 	query: <T extends Contract = Contract>(
@@ -99,10 +95,6 @@ export interface WorkerContext {
 		card: Partial<Contract>,
 		patch: Operation[],
 	) => Promise<Contract | null>;
-	enqueueAction: (
-		session: string,
-		actionRequest: ProducerOptions,
-	) => Promise<ActionRequestContract>;
 	cards: {
 		[slug: string]: ContractDefinition<ContractData>;
 	};
@@ -163,27 +155,6 @@ export interface TriggeredActionContractDefinition
 
 export interface TriggeredActionContract
 	extends Contract<TriggeredActionData> {}
-
-export interface ScheduledActionData {
-	options: ProducerOptions;
-	schedule: {
-		once?: {
-			date: Date;
-		};
-		recurring?: {
-			start: Date;
-			end: Date;
-			interval: string;
-		};
-	};
-	[k: string]: unknown;
-}
-
-export interface ScheduledActionContractDefinition
-	extends ContractDefinition<ScheduledActionData> {}
-
-export interface ScheduledActionContract
-	extends Contract<ScheduledActionData> {}
 
 export interface TransformerData {
 	data: {

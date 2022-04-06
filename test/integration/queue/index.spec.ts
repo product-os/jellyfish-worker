@@ -1,339 +1,461 @@
-import { Contract, SessionContract } from '@balena/jellyfish-types/build/core';
-import { errors as coreErrors, Kernel } from 'autumndb';
+import type { SessionContract } from '@balena/jellyfish-types/build/core';
+import { strict as assert } from 'assert';
+import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
 import {
 	ActionContract,
 	ActionRequestData,
-	ProducerOptions,
-	queueErrors,
+	errors,
 	testUtils,
 } from '../../../lib';
 
-let context: testUtils.TestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	context = await testUtils.newContext();
+	ctx = await testUtils.newContext();
 });
 
-afterAll(async () => {
-	await testUtils.destroyContext(context);
+afterAll(() => {
+	return testUtils.destroyContext(ctx);
 });
 
 describe('queue', () => {
 	describe('.enqueue()', () => {
 		test('should include the actor from the passed session', async () => {
-			const typeContract = (await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
-			)) as Contract;
-			const session = await context.kernel.getContractById<SessionContract>(
-				context.logContext,
-				context.session,
-				context.session,
+			const session = await ctx.kernel.getContractById<SessionContract>(
+				ctx.logContext,
+				ctx.session,
+				ctx.session,
 			);
-			expect(session).not.toBe(null);
-			await context.worker.producer.enqueue(context.actor, context.session, {
-				action: 'action-create-card@1.0.0',
-				logContext: context.logContext,
-				card: typeContract!.id,
-				type: typeContract!.type,
-				arguments: {
-					properties: {
-						version: '1.0.0',
-						slug: 'foo',
-						data: {
-							foo: 'bar',
+			assert(session);
+
+			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+			const actionRequest = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
+				{
+					timestamp: new Date().toISOString(),
+					attachEvents: false,
+				},
+				{
+					type: 'action-request@1.0.0',
+					data: {
+						action: 'action-create-card@1.0.0',
+						context: ctx.logContext,
+						card: typeContract.id,
+						type: typeContract.type,
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: typeContract.id,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							reason: null,
+							properties: {
+								version: '1.0.0',
+								slug: 'foo',
+								data: {
+									foo: 'bar',
+								},
+							},
 						},
 					},
 				},
-			});
+			);
+			assert(actionRequest);
 
-			const request = await context.dequeue();
-			expect(request).not.toBe(null);
-			expect(session!.data.actor).toBe(request!.data.actor);
+			const dequeued = await ctx.dequeue();
+			assert(dequeued);
+			expect(dequeued.id).toEqual(actionRequest.id);
+			expect(dequeued.data.actor).toEqual(session.data.actor);
 		});
 
 		test('should include the whole passed action', async () => {
-			const typeContract = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
+			const actionContract = await ctx.kernel.getContractBySlug<ActionContract>(
+				ctx.logContext,
+				ctx.session,
+				'action-create-card@latest',
 			);
-			const actionContract =
-				await context.kernel.getContractBySlug<ActionContract>(
-					context.logContext,
-					context.session,
-					'action-create-card@latest',
-				);
-			await context.worker.producer.enqueue(context.actor, context.session, {
-				action: 'action-create-card@1.0.0',
-				logContext: context.logContext,
-				card: typeContract!.id,
-				type: typeContract!.type,
-				arguments: {
-					properties: {
-						version: '1.0.0',
-						slug: 'foo',
-						data: {
-							foo: 'bar',
+			assert(actionContract);
+
+			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+			const actionRequest = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
+				{
+					attachEvents: false,
+					timestamp: new Date().toISOString(),
+				},
+				{
+					type: 'action-request@1.0.0',
+					data: {
+						action: 'action-create-card@1.0.0',
+						context: ctx.logContext,
+						card: typeContract.id,
+						type: typeContract.type,
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: typeContract.id,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							properties: {
+								version: '1.0.0',
+								slug: 'foo',
+								data: {
+									foo: 'bar',
+								},
+							},
 						},
 					},
 				},
-			});
+			);
+			assert(actionRequest);
 
-			const request = await context.dequeue();
-			expect(request).not.toBe(null);
-			expect(request!.data.action).toBe(
-				`${actionContract!.slug}@${actionContract!.version}`,
+			const dequeued = await ctx.dequeue();
+			assert(dequeued);
+			expect(dequeued.id).toEqual(actionRequest.id);
+			expect(dequeued.data.action).toBe(
+				`${actionContract.slug}@${actionContract.version}`,
 			);
 		});
 
 		test('should set an originator', async () => {
-			const typeContract = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
-			);
-			await context.worker.producer.enqueue(context.actor, context.session, {
-				action: 'action-create-card@1.0.0',
-				logContext: context.logContext,
-				card: typeContract!.id,
-				type: typeContract!.type,
-				originator: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-				arguments: {
-					properties: {
-						slug: 'foo',
-						version: '1.0.0',
+			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+			const actionRequest = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
+				{
+					attachEvents: false,
+					timestamp: new Date().toISOString(),
+				},
+				{
+					type: 'action-request@1.0.0',
+					data: {
+						action: 'action-create-card@1.0.0',
+						context: ctx.logContext,
+						card: typeContract.id,
+						type: typeContract.type,
+						originator: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: typeContract.id,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							properties: {
+								slug: 'foo',
+								version: '1.0.0',
+							},
+						},
 					},
 				},
-			});
+			);
+			assert(actionRequest);
 
-			const request = await context.dequeue();
-			expect(request).not.toBe(null);
-			expect(request!.data.originator).toBe(
+			const dequeued = await ctx.dequeue();
+			assert(dequeued);
+			expect(dequeued.id).toBe(actionRequest.id);
+			expect(dequeued.data.originator).toBe(
 				'4a962ad9-20b5-4dd8-a707-bf819593cc84',
 			);
 		});
 
 		test('should take a current date', async () => {
-			const typeContract = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
-			);
 			const date = new Date();
-
-			await context.worker.producer.enqueue(context.actor, context.session, {
-				action: 'action-create-card@1.0.0',
-				logContext: context.logContext,
-				card: typeContract!.id,
-				type: typeContract!.type,
-				currentDate: date,
-				arguments: {
-					properties: {
-						slug: 'foo',
-						version: '1.0.0',
+			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+			const actionRequest = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
+				{
+					attachEvents: false,
+					timestamp: new Date().toISOString(),
+				},
+				{
+					type: 'action-request@1.0.0',
+					data: {
+						action: 'action-create-card@1.0.0',
+						context: ctx.logContext,
+						card: typeContract.id,
+						type: typeContract.type,
+						currentDate: date,
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: typeContract.id,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							properties: {
+								slug: 'foo',
+								version: '1.0.0',
+							},
+						},
 					},
 				},
-			});
+			);
+			assert(actionRequest);
 
-			// Removing this as context.dequeue already retries!
-			// const dequeue = async (times = 10) => {
-			// 	const dequeued = await context.dequeue();
-			// 	if (dequeued) {
-			// 		return dequeued;
-			// 	}
-
-			// 	if (times <= 0) {
-			// 		throw new Error("Didn't dequeue in time");
-			// 	}
-
-			// 	return dequeue(times - 1);
-			// };
-
-			const request = await context.dequeue();
-			expect(request).not.toBe(null);
-			expect(request!.data.timestamp).toBe(date.toISOString());
+			const dequeued = await ctx.dequeue();
+			assert(dequeued);
+			expect(dequeued.id).toEqual(actionRequest.id);
+			expect(dequeued.data.timestamp).toBe(date.toISOString());
 		});
 
 		test('should set a present timestamp', async () => {
 			const currentDate = new Date();
-			const typeContract = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
-			);
-			await context.worker.producer.enqueue(context.actor, context.session, {
-				action: 'action-create-card@1.0.0',
-				logContext: context.logContext,
-				card: typeContract!.id,
-				type: typeContract!.type,
-				arguments: {
-					properties: {
-						version: '1.0.0',
-						slug: 'foo',
-						data: {
-							foo: 'bar',
+			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+			const actionRequest = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
+				{
+					attachEvents: false,
+					timestamp: new Date().toISOString(),
+				},
+				{
+					type: 'action-request@1.0.0',
+					data: {
+						action: 'action-create-card@1.0.0',
+						context: ctx.logContext,
+						card: typeContract.id,
+						type: typeContract.type,
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: typeContract.id,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							properties: {
+								version: '1.0.0',
+								slug: 'foo',
+								data: {
+									foo: 'bar',
+								},
+							},
 						},
 					},
 				},
-			});
+			);
+			assert(actionRequest);
 
-			const request = await context.dequeue();
-			expect(request).not.toBe(null);
-			expect(new Date(request!.data.timestamp) >= currentDate).toBe(true);
+			const dequeued = await ctx.dequeue();
+			assert(dequeued);
+			expect(dequeued.id).toEqual(actionRequest.id);
+			expect(new Date(dequeued.data.timestamp) >= currentDate).toBe(true);
 		});
 
 		test('should throw if the type is a slug and was not found', async () => {
-			expect(() => {
-				return context.worker.producer.enqueue(context.actor, context.session, {
-					action: 'action-create-card@1.0.0',
-					logContext: context.logContext,
-					card: 'foo-bar-baz-qux',
-					type: 'type',
-					arguments: {
-						properties: {
-							version: '1.0.0',
-							slug: 'foo',
-							data: {
-								foo: 'bar',
+			const fakeId = autumndbTestUtils.generateRandomId();
+			const actionRequest = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
+				{
+					attachEvents: false,
+					timestamp: new Date().toISOString(),
+				},
+				{
+					id: autumndbTestUtils.generateRandomId(),
+					slug: autumndbTestUtils.generateRandomSlug({
+						prefix: 'action-request',
+					}),
+					version: '1.0.0',
+					type: 'action-request@1.0.0',
+					tags: [],
+					markers: [],
+					active: true,
+					created_at: new Date().toISOString(),
+					capabilities: [],
+					requires: [],
+					data: {
+						action: 'action-create-card@1.0.0',
+						context: ctx.logContext,
+						card: fakeId,
+						type: 'type',
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: fakeId,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							reason: null,
+							properties: {
+								version: '1.0.0',
+								slug: 'foo',
+								data: {
+									foo: 'bar',
+								},
 							},
 						},
 					},
-				});
-			}).rejects.toThrowError(queueErrors.QueueInvalidRequest);
+				},
+			);
+			assert(actionRequest);
+
+			await expect(() => {
+				return ctx.flush(ctx.session);
+			}).rejects.toThrow();
 		});
 
 		test('should throw if the action was not found', async () => {
-			const typeContract = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
-			);
-			expect(() => {
-				return context.worker.producer.enqueue(context.actor, context.session, {
-					action: 'action-foo-bar@1.0.0',
-					logContext: context.logContext,
-					card: typeContract!.id,
-					type: typeContract!.type,
-					arguments: {
-						properties: {
-							version: '1.0.0',
-							slug: 'foo',
-							data: {
-								foo: 'bar',
+			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+			const actionRequest = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
+				{
+					attachEvents: false,
+					timestamp: new Date().toISOString(),
+				},
+				{
+					id: autumndbTestUtils.generateRandomId(),
+					slug: autumndbTestUtils.generateRandomSlug({
+						prefix: 'action-request',
+					}),
+					version: '1.0.0',
+					type: 'action-request@1.0.0',
+					tags: [],
+					markers: [],
+					active: true,
+					created_at: new Date().toISOString(),
+					capabilities: [],
+					requires: [],
+					data: {
+						action: 'action-foo-bar@1.0.0',
+						context: ctx.logContext,
+						card: typeContract.id,
+						type: typeContract.type,
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: typeContract.id,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							properties: {
+								version: '1.0.0',
+								slug: 'foo',
+								data: {
+									foo: 'bar',
+								},
 							},
 						},
 					},
-				});
-			}).rejects.toThrowError(queueErrors.QueueInvalidAction);
-		});
+				},
+			);
+			assert(actionRequest);
 
-		test('should throw if the session was not found', async () => {
-			const typeContract = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
-			);
-			const id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-			expect(() => {
-				return context.worker.producer.enqueue(context.actor, id, {
-					action: 'action-create-card@1.0.0',
-					logContext: context.logContext,
-					card: typeContract!.id,
-					type: typeContract!.type,
-					arguments: {
-						properties: {
-							version: '1.0.0',
-							slug: 'foo',
-							data: {
-								foo: 'bar',
-							},
-						},
-					},
-				});
-			}).rejects.toThrowError(coreErrors.JellyfishInvalidSession);
+			await expect(() => {
+				return ctx.flush(ctx.session);
+			}).rejects.toThrowError(errors.WorkerInvalidAction);
 		});
 	});
 
 	describe('.dequeue()', () => {
 		test('should return nothing if no requests', async () => {
-			const request = await context.dequeue();
+			const request = await ctx.dequeue();
 			expect(request).toBe(null);
 		});
 
 		test('should not let the same owner take a request twice', async () => {
-			const typeContract = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
-			);
-			const actionRequest = await context.worker.producer.enqueue(
-				context.actor,
-				context.session,
+			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+			const actionRequest = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
 				{
-					action: 'action-create-card@1.0.0',
-					logContext: context.logContext,
-					card: typeContract!.id,
-					type: typeContract!.type,
-					arguments: {
-						properties: {
-							version: '1.0.0',
-							slug: 'foo',
-							data: {
-								foo: 'bar',
+					attachEvents: false,
+					timestamp: new Date().toISOString(),
+				},
+				{
+					type: 'action-request@1.0.0',
+					data: {
+						action: 'action-create-card@1.0.0',
+						context: ctx.logContext,
+						card: typeContract!.id,
+						type: typeContract!.type,
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: typeContract!.id,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							properties: {
+								version: '1.0.0',
+								slug: 'foo',
+								data: {
+									foo: 'bar',
+								},
 							},
 						},
 					},
 				},
 			);
+			assert(actionRequest);
 
-			const request1 = await context.dequeue();
-			expect(request1).not.toBe(null);
-			expect(request1!.slug).toBe(actionRequest.slug);
+			const dequeued1 = await ctx.dequeue();
+			assert(dequeued1);
+			expect(dequeued1.id).toEqual(actionRequest.id);
+			expect(dequeued1.slug).toEqual(actionRequest.slug);
 
-			const request2 = await context.dequeue();
-
-			expect(request2).toBe(null);
+			const dequeued2 = await ctx.dequeue();
+			expect(dequeued2).toBe(null);
 		});
 
 		test('should cope with link materialization failures', async () => {
-			const typeContract = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
-				'card@latest',
-			);
-			expect(typeContract).not.toBe(null);
-
-			const producerOptions: ProducerOptions = {
-				action: 'action-create-card@1.0.0',
-				logContext: context.logContext,
-				card: typeContract!.id,
-				type: typeContract!.type,
-				arguments: {
-					properties: {
-						slug: 'foo',
-						version: '1.0.0',
+			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+			const enqueued = await ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['action-request@1.0.0'],
+				{
+					attachEvents: false,
+					timestamp: new Date().toISOString(),
+				},
+				{
+					type: 'action-request@1.0.0',
+					data: {
+						action: 'action-create-card@1.0.0',
+						context: ctx.logContext,
+						card: typeContract!.id,
+						type: typeContract!.type,
+						actor: ctx.adminUserId,
+						epoch: new Date().valueOf(),
+						input: {
+							id: typeContract!.id,
+						},
+						timestamp: new Date().toISOString(),
+						arguments: {
+							properties: {
+								slug: 'foo',
+								version: '1.0.0',
+							},
+						},
 					},
 				},
-			};
-
-			const enqueued = await context.worker.producer.enqueue(
-				context.actor,
-				context.session,
-				producerOptions,
 			);
+			assert(enqueued);
 
 			const actionRequest = Kernel.defaults<ActionRequestData>({
 				id: enqueued.id,
 				slug: enqueued.slug,
 				type: enqueued.type,
-				data: enqueued.data,
+				data: enqueued.data as ActionRequestData,
 			});
 
-			await context.worker.consumer.postResults(
-				context.actor,
-				context.logContext,
+			await ctx.worker.consumer.postResults(
+				ctx.actor,
+				ctx.logContext,
 				actionRequest as any,
 				{
 					error: false,
@@ -344,21 +466,20 @@ describe('queue', () => {
 			);
 
 			// Simulate non-materialized links
-			await context.kernel.replaceContract(
-				context.logContext,
-				context.session,
+			await ctx.kernel.replaceContract(
+				ctx.logContext,
+				ctx.session,
 				Object.assign({}, enqueued, {
 					links: {},
 				}),
 			);
 
-			const currentRequest = await context.kernel.getContractBySlug(
-				context.logContext,
-				context.session,
+			const currentRequest = await ctx.kernel.getContractBySlug(
+				ctx.logContext,
+				ctx.session,
 				`${enqueued.slug}@${enqueued.version}`,
 			);
 			expect(currentRequest).not.toBe(null);
-
 			expect(currentRequest!.links).toEqual({});
 		});
 	});
