@@ -47,7 +47,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.26",
-    "@balena/jellyfish-client-sdk": "^10.3.6",
+    "@balena/jellyfish-client-sdk": "10.4.0-joshbwlng-user-preference-links-a9549d729b16522f8083faf526228c22731608f4",
     "@balena/jellyfish-environment": "^11.0.0",
     "@balena/jellyfish-jellyscript": "^7.0.8",
     "@balena/jellyfish-logger": "^5.0.25",
