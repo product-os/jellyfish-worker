@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch
+      hash: 99afa9cf7709f373fd3baefaf53933e93f63aaaf
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 21.1.7
+  title: "'Update internal-patch'"
+  date: 2022-04-06T23:54:56.406Z
+- commits:
     - subject: Remove unnecessary test logs
       hash: 189223e909706a920c0440d05c331d246d4fe811
       body: ""
