@@ -1,4 +1,18 @@
 - commits:
+    - subject: Revert "Add type and triggered action stream"
+      hash: ee39a42e0a32ac1a958fa4bf481113095fa56a64
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 21.2.1
+  title: "'Revert \"Add type and triggered action stream\"'"
+  date: 2022-04-10T10:54:26.416Z
+- commits:
     - subject: Add type and triggered action stream
       hash: 5b85c7eb9a59ca0395e43a8825a9f2eed14a9e9a
       body: |
