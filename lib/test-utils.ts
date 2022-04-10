@@ -3,7 +3,6 @@ import type {
 	ContractDefinition,
 	LinkContract,
 	SessionContract,
-	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import { ExecuteContract } from '@balena/jellyfish-types/build/queue';
 import { strict as assert } from 'assert';
@@ -172,47 +171,6 @@ export const newContext = async (
 			contract,
 		);
 	}
-
-	const types = await autumndbTestContext.kernel.query<TypeContract>(
-		autumndbTestContext.logContext,
-		worker.session,
-		{
-			type: 'object',
-			properties: {
-				type: {
-					const: 'type@1.0.0',
-				},
-			},
-		},
-	);
-	worker.setTypeContracts(autumndbTestContext.logContext, types);
-
-	// Update type contracts through the worker for generated triggers, etc
-	for (const contract of types) {
-		await worker.replaceCard(
-			autumndbTestContext.logContext,
-			worker.session,
-			worker.typeContracts['type@1.0.0'],
-			{
-				attachEvents: false,
-			},
-			contract,
-		);
-	}
-
-	const triggers = await autumndbTestContext.kernel.query<TypeContract>(
-		autumndbTestContext.logContext,
-		worker.session,
-		{
-			type: 'object',
-			properties: {
-				type: {
-					const: 'triggered-action@1.0.0',
-				},
-			},
-		},
-	);
-	worker.setTriggers(autumndbTestContext.logContext, triggers);
 
 	const flush = async (session: string) => {
 		const request = await dequeue();
@@ -436,6 +394,8 @@ export const newContext = async (
  */
 export const destroyContext = async (context: TestContext) => {
 	await context.worker.consumer.cancel();
+	await context.worker.contractsStream.removeAllListeners();
+	await context.worker.contractsStream.close();
 	await autumndbTestUtils.destroyContext(context);
 };
 

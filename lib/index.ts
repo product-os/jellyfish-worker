@@ -7,7 +7,7 @@ import type {
 	ContractData,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import { CONTRACTS, Kernel } from 'autumndb';
+import { CONTRACTS, Kernel, StreamChange } from 'autumndb';
 import { parseExpression } from 'cron-parser';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -100,6 +100,52 @@ const CONTRACT_TYPE_TYPE = 'type@1.0.0';
  * @private
  */
 const INSERT_CONCURRENCY = 3;
+
+/**
+ * @summary Query for stream to watch for new triggered action contracts
+ * @private
+ */
+const SCHEMA_ACTIVE_TRIGGERS: JsonSchema = {
+	type: 'object',
+	properties: {
+		id: {
+			type: 'string',
+		},
+		slug: {
+			type: 'string',
+		},
+		active: {
+			type: 'boolean',
+			const: true,
+		},
+		type: {
+			type: 'string',
+			const: 'triggered-action@1.0.0',
+		},
+		data: {
+			type: 'object',
+			additionalProperties: true,
+		},
+	},
+	required: ['id', 'slug', 'active', 'type', 'data'],
+};
+
+/**
+ * @summary Query for stream to watch for new type contracts
+ * @private
+ */
+const SCHEMA_ACTIVE_TYPE_CONTRACTS: JsonSchema = {
+	type: 'object',
+	required: ['active', 'type'],
+	properties: {
+		active: {
+			const: true,
+		},
+		type: {
+			const: 'type@1.0.0',
+		},
+	},
+};
 
 /**
  * @summary Get the request input contract
@@ -244,6 +290,7 @@ export class Worker {
 	kernel: Kernel;
 	consumer: Consumer;
 	producer: Producer;
+	contractsStream: any;
 	triggers: TriggeredActionContract[];
 	transformers: Transformer[];
 	latestTransformers: Transformer[];
@@ -288,6 +335,7 @@ export class Worker {
 		this.library = actionLibrary;
 		this.consumer = new Consumer(kernel, pool, session);
 		this.producer = new Producer(kernel, pool, session);
+		this.contractsStream = {};
 
 		// Add actions defined in this repo
 		Object.keys(actions).forEach((name) => {
@@ -356,6 +404,80 @@ export class Worker {
 				);
 			}),
 		);
+
+		// For better performance, commonly accessed contracts are stored in cache in the worker.
+		// These contracts are streamed from the DB, so the worker always has the most up to date version of them.
+		this.contractsStream = await this.kernel.stream(
+			logContext,
+			this.kernel.adminSession()!,
+			{
+				anyOf: [SCHEMA_ACTIVE_TRIGGERS, SCHEMA_ACTIVE_TYPE_CONTRACTS],
+			},
+		);
+
+		this.contractsStream.on('data', (change: StreamChange) => {
+			const contract = change.after;
+			const contractType = change.contractType.split('@')[0];
+			if (
+				change.type === 'update' ||
+				change.type === 'insert' ||
+				change.type === 'unmatch'
+			) {
+				// If `after` is null, the contract is no longer available: most likely it has
+				// been soft-deleted, having its `active` state set to false
+				if (!contract) {
+					switch (contractType) {
+						case 'triggered-action':
+							this.removeTrigger(logContext, change.id);
+							break;
+						case 'type':
+							const filteredContracts = _.filter(this.typeContracts, (type) => {
+								return type.id !== change.id;
+							});
+							this.setTypeContracts(logContext, filteredContracts);
+					}
+				} else {
+					switch (contractType) {
+						case 'triggered-action':
+							this.upsertTrigger(logContext, contract);
+							break;
+						case 'type':
+							const filteredContracts = _.filter(this.typeContracts, (type) => {
+								return type.id !== change.id;
+							});
+							filteredContracts.push(contract as TypeContract);
+							this.setTypeContracts(logContext, filteredContracts);
+					}
+				}
+			} else if (change.type === 'delete') {
+				switch (contractType) {
+					case 'triggered-action':
+						this.removeTrigger(logContext, change.id);
+						break;
+					case 'type':
+						const filteredContracts = _.filter(this.typeContracts, (type) => {
+							return type.id !== change.id;
+						});
+						this.setTypeContracts(logContext, filteredContracts);
+				}
+			}
+		});
+
+		const [triggers, typeContracts] = await Promise.all(
+			[SCHEMA_ACTIVE_TRIGGERS, SCHEMA_ACTIVE_TYPE_CONTRACTS].map((schema) =>
+				this.kernel.query(logContext, this.kernel.adminSession()!, schema),
+			),
+		);
+
+		logger.info(logContext, 'Loading triggers', {
+			triggers: triggers.length,
+		});
+		this.setTriggers(logContext, triggers as TriggeredActionContract[]);
+
+		logger.info(logContext, 'Loading types', {
+			types: typeContracts.length,
+		});
+		this.setTypeContracts(logContext, typeContracts as TypeContract[]);
 	}
 
 	/**
