@@ -1,9 +1,7 @@
 import type {
 	Contract,
-	ContractDefinition,
 	LinkContract,
 	SessionContract,
-	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import { ExecuteContract } from '@balena/jellyfish-types/build/queue';
 import { strict as assert } from 'assert';
@@ -16,7 +14,6 @@ import { v4 as uuid } from 'uuid';
 import { Worker } from '.';
 import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
 import type { ActionRequestContract } from './queue/types';
-import { Sync } from './sync';
 import { Action, Map } from './types';
 
 /**
@@ -111,108 +108,21 @@ export const newContext = async (
 	const pluginManager = new PluginManager(options.plugins || []);
 
 	// Prepare and insert all contracts, including those from plugins.
-	const pluginContracts = pluginManager.getCards();
 	const actionLibrary = pluginManager.getActions();
-
-	// Initialize sync.
-	const sync = new Sync({
-		integrations: pluginManager.getSyncIntegrations(),
-	});
 
 	// Initialize worker instance.
 	const worker = new Worker(
 		autumndbTestContext.kernel,
 		autumndbTestContext.session,
-		actionLibrary,
 		autumndbTestContext.pool,
+		options.plugins || [],
 	);
 	await worker.initialize(
 		autumndbTestContext.logContext,
-		sync,
 		async (payload: ActionRequestContract) => {
 			consumedActionRequests.push(payload);
 		},
 	);
-
-	// Make sure any loop contracts are initialized, as they can be a prerequisite
-	const bootstrapContracts: ContractDefinition[] = [];
-	Object.keys(pluginContracts).forEach((slug: string) => {
-		if (slug.match(/^(loop-|action-)/)) {
-			bootstrapContracts.push(pluginContracts[slug]);
-		}
-	});
-
-	// Add passed in actions
-	if (options.actions) {
-		for (const action of options.actions) {
-			Object.assign(actionLibrary, {
-				[action.contract.slug]: {
-					handler: action.handler,
-				},
-			});
-			await autumndbTestContext.kernel.insertContract(
-				autumndbTestContext.logContext,
-				autumndbTestContext.session,
-				action.contract,
-			);
-		}
-	}
-
-	// Any remaining contracts from plugins can now be added to the sequence
-	const remainder = _.filter(pluginContracts, (contract: Contract) => {
-		return !_.find(bootstrapContracts, { slug: contract.slug });
-	});
-	for (const contract of remainder) {
-		bootstrapContracts.push(contract);
-	}
-	for (const contract of bootstrapContracts) {
-		await autumndbTestContext.kernel.replaceContract(
-			autumndbTestContext.logContext,
-			autumndbTestContext.session,
-			contract,
-		);
-	}
-
-	const types = await autumndbTestContext.kernel.query<TypeContract>(
-		autumndbTestContext.logContext,
-		worker.session,
-		{
-			type: 'object',
-			properties: {
-				type: {
-					const: 'type@1.0.0',
-				},
-			},
-		},
-	);
-	worker.setTypeContracts(autumndbTestContext.logContext, types);
-
-	// Update type contracts through the worker for generated triggers, etc
-	for (const contract of types) {
-		await worker.replaceCard(
-			autumndbTestContext.logContext,
-			worker.session,
-			worker.typeContracts['type@1.0.0'],
-			{
-				attachEvents: false,
-			},
-			contract,
-		);
-	}
-
-	const triggers = await autumndbTestContext.kernel.query<TypeContract>(
-		autumndbTestContext.logContext,
-		worker.session,
-		{
-			type: 'object',
-			properties: {
-				type: {
-					const: 'triggered-action@1.0.0',
-				},
-			},
-		},
-	);
-	worker.setTriggers(autumndbTestContext.logContext, triggers);
 
 	const flush = async (session: string) => {
 		const request = await dequeue();
@@ -436,6 +346,8 @@ export const newContext = async (
  */
 export const destroyContext = async (context: TestContext) => {
 	await context.worker.consumer.cancel();
+	context.worker.contractsStream.removeAllListeners();
+	context.worker.contractsStream.close();
 	await autumndbTestUtils.destroyContext(context);
 };
 

@@ -6,8 +6,8 @@ import { strict as assert } from 'assert';
 import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
 import {
-	ActionDefinition,
 	testUtils,
+	PluginDefinition,
 	TriggeredActionContract,
 	TriggeredActionData,
 } from '../../lib';
@@ -16,29 +16,43 @@ import { actionCreateCard } from '../../lib/actions/action-create-card';
 let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	const actionTestOriginator: ActionDefinition = {
-		handler: async (
-			session: string,
-			handlerCtx: any,
-			contract: any,
-			request: any,
-		) => {
-			request.arguments.properties.data =
-				request.arguments.properties.data || {};
-			request.arguments.properties.data.originator = request.originator;
-			return actionCreateCard.handler(session, handlerCtx, contract, request);
-		},
-		contract: {
-			slug: 'action-test-originator',
+	const foobarPlugin = (): PluginDefinition => {
+		return {
+			slug: 'plugin-foobar',
+			name: 'Foobar Plugin',
 			version: '1.0.0',
-			type: actionCreateCard.contract.type,
-			name: actionCreateCard.contract.name,
-			data: actionCreateCard.contract.data,
-		},
+			actions: [
+				{
+					handler: async (
+						session: string,
+						handlerCtx: any,
+						contract: any,
+						request: any,
+					) => {
+						request.arguments.properties.data =
+							request.arguments.properties.data || {};
+						request.arguments.properties.data.originator = request.originator;
+						return actionCreateCard.handler(
+							session,
+							handlerCtx,
+							contract,
+							request,
+						);
+					},
+					contract: {
+						slug: 'action-test-originator',
+						version: '1.0.0',
+						type: actionCreateCard.contract.type,
+						name: actionCreateCard.contract.name,
+						data: actionCreateCard.contract.data,
+					},
+				},
+			],
+		};
 	};
 
 	ctx = await testUtils.newContext({
-		actions: [actionTestOriginator],
+		plugins: [foobarPlugin()],
 	});
 });
 

@@ -2,49 +2,49 @@ import type { Kernel } from 'autumndb';
 import type { Pool } from 'pg';
 import * as errors from './errors';
 import { getNextExecutionDate, Worker } from './index';
-import type { Transformer } from './transformers';
+import { TransformerContract } from './types';
+
+function makeTransformer(
+	id: string,
+	slug: string,
+	version: string,
+): TransformerContract {
+	return {
+		id,
+		slug,
+		type: 'transformer@1.0.0',
+		version,
+		active: true,
+		data: {
+			inputFilter: {},
+			workerFilter: {},
+			requirements: {},
+		},
+		created_at: new Date().toISOString(),
+		tags: [],
+		capabilities: [],
+		requires: [],
+		markers: [],
+	};
+}
 
 describe('Worker.updateCurrentTransformers()', () => {
 	test('should generate properly filtered list of transformers', async () => {
-		const transformers = [
-			{
-				id: 'a1.0.0',
-				slug: 'a-transformer',
-				version: '1.0.0',
-			},
-			{
-				id: 'a1.1.0',
-				slug: 'a-transformer',
-				version: '1.1.0',
-			},
-			{
-				id: 'a1.1.0',
-				slug: 'a-transformer',
-				version: '1.1.1-someprerelease',
-			},
-			{
-				id: 'a2.0.0',
-				slug: 'a-transformer',
-				version: '2.0.0',
-			},
-			{
-				id: 'b1.0.0',
-				slug: 'b-transformer',
-				version: '1.0.0',
-			},
-			{
-				id: 'b0.0.1',
-				slug: 'b-transformer',
-				version: '0.0.1',
-			},
-		] as Transformer[];
+		const transformers: TransformerContract[] = [
+			makeTransformer('a1.0.0', 'a-transformer', '1.0.0'),
+			makeTransformer('a1.1.0', 'a-transformer', '1.1.0'),
+			makeTransformer('a1.1.0', 'a-transformer', '1.1.1-someprerelease'),
+			makeTransformer('a2.0.0', 'a-transformer', '2.0.0'),
+			makeTransformer('b1.0.0', 'b-transformer', '1.0.0'),
+			makeTransformer('b0.0.1', 'b-transformer', '0.0.1'),
+		];
 
 		// TS-TODO: is there a better way to instantiate a simple Worker?
 		const worker = new Worker(
 			{} as any as Kernel,
 			'session-foo',
-			{},
 			{} as any as Pool,
+			[],
 		);
 		worker.transformers = transformers;
 		worker.updateLatestTransformers();

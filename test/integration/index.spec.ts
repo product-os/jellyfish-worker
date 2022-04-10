@@ -12,7 +12,6 @@ import {
 	TriggeredActionData,
 	Worker,
 } from '../../lib';
-import { Sync } from '../../lib/sync';
 
 let ctx: testUtils.TestContext;
 
@@ -85,32 +84,17 @@ describe('.getId()', () => {
 	});
 
 	test('different workers should get different ids', async () => {
-		const worker1 = new Worker(
-			ctx.kernel as any,
-			ctx.session,
-			ctx.actionLibrary,
-			ctx.pool,
-		);
-		const worker2 = new Worker(
-			ctx.kernel,
-			ctx.session,
-			ctx.actionLibrary,
-			ctx.pool,
-		);
-		const worker3 = new Worker(
-			ctx.kernel,
-			ctx.session,
-			ctx.actionLibrary,
-			ctx.pool,
-		);
+		const worker1 = new Worker(ctx.kernel, ctx.session, ctx.pool, []);
+		const worker2 = new Worker(ctx.kernel, ctx.session, ctx.pool, []);
+		const worker3 = new Worker(ctx.kernel, ctx.session, ctx.pool, []);
 
-		await worker1.initialize(ctx.logContext, new Sync(), async () => {
+		await worker1.initialize(ctx.logContext, async () => {
 			return;
 		});
-		await worker2.initialize(ctx.logContext, new Sync(), async () => {
+		await worker2.initialize(ctx.logContext, async () => {
 			return;
 		});
-		await worker3.initialize(ctx.logContext, new Sync(), async () => {
+		await worker3.initialize(ctx.logContext, async () => {
 			return;
 		});
 
@@ -130,6 +114,152 @@ describe('.getId()', () => {
 });
 
 describe('Worker', () => {
+	it('instance should update on new type contract', async () => {
+		// Insert a new type contract
+		const contract = await ctx.kernel.insertContract<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: autumndbTestUtils.generateRandomId(),
+				type: 'type@1.0.0',
+				markers: [],
+				data: {
+					schema: {
+						type: 'object',
+						required: ['name'],
+						properties: {
+							name: {
+								type: 'string',
+							},
+						},
+					},
+				},
+			},
+		);
+		assert(contract);
+
+		// Wait for the stream to update the worker
+		await ctx.retry(
+			() => {
+				return ctx.worker.typeContracts[`${contract.slug}@${contract.version}`];
+			},
+			(typeContract: any) => {
+				return typeContract !== undefined;
+			},
+		);
+	});
+
+	it('instance should update on new triggered-action contract', async () => {
+		// Insert a new triggered action contract
+		const contract = await ctx.kernel.insertContract<TriggeredActionContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'triggered-action',
+				}),
+				type: 'triggered-action@1.0.0',
+				markers: [],
+				data: {
+					filter: {
+						type: 'object',
+						required: ['type'],
+						properties: {
+							type: {
+								type: 'string',
+								const: 'foobar@1.0.0',
+							},
+						},
+					},
+					action: 'action-create-card@1.0.0',
+					target: 'card@1.0.0',
+					arguments: {
+						reason: null,
+						properties: {},
+					},
+				},
+			},
+		);
+		assert(contract);
+
+		// Wait for the stream to update the worker
+		await ctx.retry(
+			() => {
+				return _.find(ctx.worker.triggers, { id: contract.id });
+			},
+			(typeContract: any) => {
+				return typeContract !== undefined;
+			},
+		);
+
+		// Remove the test trigger
+		ctx.worker.removeTrigger(ctx.logContext, contract.id);
+	});
+
+	it('instance should update on new formula generated triggered-action', async () => {
+		// Insert a new type with a formula
+		const contract = await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			ctx.worker.typeContracts['type@1.0.0'],
+			{},
+			{
+				slug: autumndbTestUtils.generateRandomId(),
+				type: 'type@1.0.0',
+				markers: [],
+				data: {
+					schema: {
+						type: 'object',
+						properties: {
+							latest: {
+								type: 'object',
+								$$formula: `
+								PROPERTY(contract, [ "links", "has attached element", "length" ])
+								? LAST(
+										ORDER_BY(
+											FILTER(
+												contract.links["has attached element"],
+												function (c) { return c && (c.type === "card@1.0.0"); }
+											),
+											"data.timestamp"
+										)
+									)
+								: null
+							`,
+							},
+						},
+					},
+				},
+			},
+		);
+		assert(contract);
+
+		// Wait for the stream to update the worker
+		await ctx.retry(
+			() => {
+				return _.find(ctx.worker.triggers, (item: TriggeredActionContract) => {
+					return item.slug.startsWith(
+						`triggered-action-formula-update-${contract.slug}`,
+					);
+				});
+			},
+			(typeContract: any) => {
+				return typeContract !== undefined;
+			},
+		);
+
+		// Remove the test trigger
+		const trigger = _.find(
+			ctx.worker.triggers,
+			(item: TriggeredActionContract) => {
+				return item.slug.startsWith(
+					`triggered-action-formula-update-${contract.slug}`,
+				);
+			},
+		);
+		ctx.worker.removeTrigger(ctx.logContext, trigger!.id);
+	});
+
 	it('should not re-enqueue requests after duplicated execute events', async () => {
 		const typeContract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,

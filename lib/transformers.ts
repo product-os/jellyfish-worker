@@ -6,12 +6,12 @@ import _ from 'lodash';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';
 import type { ProducerResults } from './queue';
-import type { EnqueueOptions } from './types';
+import type { EnqueueOptions, TransformerContract } from './types';
 
 const logger = getLogger('worker');
 
 export interface EvaluateOptions {
-	transformers: Transformer[];
+	transformers: TransformerContract[];
 	oldContract: Contract<any> | null;
 	newContract: Contract<any>;
 	logContext: LogContext;
@@ -24,13 +24,6 @@ export interface EvaluateOptions {
 		actionRequest: EnqueueOptions,
 	) => Promise<ProducerResults>;
 }
-
-export interface TransformerData {
-	inputFilter: any;
-	workerFilter: any;
-	[key: string]: unknown;
-}
-export type Transformer = Contract<TransformerData>;
 
 // TS-TODO: Transformers should be a default model and included in this module
 export const evaluate = async ({
@@ -55,7 +48,7 @@ export const evaluate = async ({
 		oldContract?.data?.$transformer?.artifactReady !== readyNow;
 
 	await Promise.all(
-		transformers.map(async (transformer: Transformer) => {
+		transformers.map(async (transformer: TransformerContract) => {
 			if (!transformer.data.inputFilter) {
 				return;
 			}
@@ -154,7 +147,7 @@ async function getTransformerActor(
 			limit?: number;
 		},
 	) => Promise<Contract[]>,
-	transformer: Transformer,
+	transformer: TransformerContract,
 ) {
 	// The transformer should be run on behalf of the actor that owns the
 	// transformer
