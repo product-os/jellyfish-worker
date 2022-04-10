@@ -1,4 +1,21 @@
 - commits:
+    - subject: Add type and triggered action stream
+      hash: 5b85c7eb9a59ca0395e43a8825a9f2eed14a9e9a
+      body: |
+        Add stream to keep the worker instance
+        up to date with type and triggered action
+        contracts as they are added to the system.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 21.2.0
+  title: "'Add type and triggered action stream'"
+  date: 2022-04-10T01:25:20.691Z
+- commits:
     - subject: Update internal-patch
       hash: ff0ae07c1f0fa6594368d44722538e196eb2b746
       body: ""
