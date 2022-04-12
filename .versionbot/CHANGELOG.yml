@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typedoc from 0.22.14 to 0.22.15
+      hash: 07998ac5e5e83b39fcb47e00919f23e2fe5cdaf8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 21.2.2
+  title: "'Update typedoc from 0.22.14 to 0.22.15'"
+  date: 2022-04-12T00:10:05.128Z
+- commits:
     - subject: Revert "Add type and triggered action stream"
       hash: ee39a42e0a32ac1a958fa4bf481113095fa56a64
       body: ""
