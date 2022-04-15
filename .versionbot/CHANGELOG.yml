@@ -1,4 +1,16 @@
 - commits:
+    - subject: 🔄 Synced file(s) with product-os/jellyfish-config
+      hash: 9f6972729d8755ca5b4bf8a3d743cd2be9d5e566
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: joshbwlng
+      nested: []
+  version: 21.2.8
+  title: "'🔄 Synced file(s) with product-os/jellyfish-config'"
+  date: 2022-04-15T02:18:56.515Z
+- commits:
     - subject: Update internal-patch
       hash: 243b5854e7c6d13fb12e09b5292e1b4bd3ee80ad
       body: ""
