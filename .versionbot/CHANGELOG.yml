@@ -1,4 +1,24 @@
 - commits:
+    - subject: Init worker with plugins
+      hash: 726c1e0f8990fc1909a9163bd28a61b5cbd816d4
+      body: |
+        Update worker to be created with a list of plugins.
+        This means that all contracts provided by plugins
+        are inserted into the system when the worker starts.
+        Also allows us to add in the worker instance contract
+        update stream. A part of bringing the API codebase
+        into the worker.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 22.0.0
+  title: "'Init worker with plugins'"
+  date: 2022-04-18T02:14:32.800Z
+- commits:
     - subject: Update external-non-major
       hash: e0ab69a16fdb3c5b8e914ceecc7f2e01ec38b32b
       body: ""
