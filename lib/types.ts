@@ -184,3 +184,29 @@ export interface ScheduledActionContractDefinition
 
 export interface ScheduledActionContract
 	extends Contract<ScheduledActionData> {}
+
+export interface TransformerData {
+	data: {
+		requirements: {
+			os?: string;
+			architecture?: string;
+			[k: string]: unknown;
+		};
+		inputFilter: {
+			[k: string]: unknown;
+		};
+		workerFilter: {
+			[k: string]: unknown;
+		};
+		[k: string]: unknown;
+	};
+	[k: string]: unknown;
+}
+
+export interface TransformerContractDefinition
+	extends Omit<ContractDefinition, 'data'>,
+		TransformerData {}
+
+export interface TransformerContract
+	extends Omit<Contract, 'data'>,
+		TransformerData {}

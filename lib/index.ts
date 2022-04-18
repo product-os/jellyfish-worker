@@ -1,13 +1,17 @@
 import * as assert from '@balena/jellyfish-assert';
+import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	Contract,
 	ContractData,
+	ContractDefinition,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
-import { CONTRACTS, Kernel } from 'autumndb';
+import { strict } from 'assert';
+import { CONTRACTS, Kernel, StreamChange } from 'autumndb';
+import Bluebird from 'bluebird';
 import { parseExpression } from 'cron-parser';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -21,6 +25,7 @@ import { actions } from './actions';
 import { contracts } from './contracts';
 import * as errors from './errors';
 import * as formulas from './formulas';
+import { PluginDefinition, PluginManager } from './plugin';
 import {
 	ActionContract,
 	ActionRequestContract,
@@ -31,19 +36,29 @@ import {
 import type { OnMessageEventHandler } from './queue/consumer';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
-import { evaluate as evaluateTransformers, Transformer } from './transformers';
+import { evaluate as evaluateTransformers } from './transformers';
 import * as triggersLib from './triggers';
 import type {
 	Action,
 	Map,
 	ScheduledActionContract,
 	ScheduledActionData,
+	TransformerContract,
 	TriggeredActionContract,
 	WorkerContext,
 } from './types';
 import * as utils from './utils';
 
-export { actions, triggersLib, errors, contracts, utils, Transformer, Sync };
+export {
+	actions,
+	triggersLib,
+	errors,
+	contracts,
+	PluginDefinition,
+	PluginManager,
+	utils,
+	Sync,
+};
 export * as contractMixins from './contracts/mixins';
 export {
 	errors as syncErrors,
@@ -57,9 +72,7 @@ export {
 export {
 	ActionContractDefinition,
 	ActionDefinition,
-	PluginDefinition,
 	PluginIdentity,
-	PluginManager,
 } from './plugin';
 export {
 	ActionContract,
@@ -100,6 +113,99 @@ const CONTRACT_TYPE_TYPE = 'type@1.0.0';
  * @private
  */
 const INSERT_CONCURRENCY = 3;
+
+/**
+ * @summary Query for stream to watch for new triggered action contracts
+ * @private
+ */
+const SCHEMA_ACTIVE_TRIGGERS: JsonSchema = {
+	type: 'object',
+	required: ['active', 'type', 'data'],
+	properties: {
+		active: {
+			const: true,
+		},
+		type: {
+			const: 'triggered-action@1.0.0',
+		},
+		data: {
+			type: 'object',
+			additionalProperties: true,
+		},
+	},
+};
+
+/**
+ * @summary Query for stream to watch for new transformer contracts
+ * @private
+ */
+const SCHEMA_ACTIVE_TRANSFORMERS: JsonSchema = {
+	type: 'object',
+	required: ['active', 'type', 'data', 'version'],
+	properties: {
+		active: {
+			const: true,
+		},
+		type: {
+			const: 'transformer@1.0.0',
+		},
+		// ignoring draft versions
+		version: { not: { pattern: '-' } },
+		data: {
+			type: 'object',
+			required: ['$transformer'],
+			properties: {
+				$transformer: {
+					type: 'object',
+					required: ['artifactReady'],
+					properties: {
+						artifactReady: {
+							not: {
+								const: false,
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+};
+
+/**
+ * @summary Query for stream to watch for new type contracts
+ * @private
+ */
+const SCHEMA_ACTIVE_TYPE_CONTRACTS: JsonSchema = {
+	type: 'object',
+	required: ['active', 'type'],
+	properties: {
+		active: {
+			const: true,
+		},
+		type: {
+			const: 'type@1.0.0',
+		},
+	},
+};
+
+/**
+ * As it's valid to specify a version without type, this guarantees that we
+ * have a fully qualified versioned type.
+ *
+ * @param {string} type - name of type that may or may not contain a version suffix
+ * @returns a type string that contains a version suffix
+ */
+export const ensureTypeHasVersion = (type: string): string => {
+	if (!_.includes(type, '@')) {
+		// Types should not default to latest to ensure old "insert" code doesn't break
+		return `${type}@1.0.0`;
+	}
+	const versionPattern = /@(?<major>\d+)(\.(?<minor>\d+))?(\.(?<patch>\d+))?$/;
+	if (!versionPattern.test(type)) {
+		throw Error(`Contract loader encountered invalid type spec: ${type}`);
+	}
+	return type;
+};
 
 /**
  * @summary Get the request input contract
@@ -242,28 +348,28 @@ export function getNextExecutionDate(
  */
 export class Worker {
 	kernel: Kernel;
+	pluginManager: PluginManager;
 	consumer: Consumer;
 	producer: Producer;
+	contractsStream: any;
 	triggers: TriggeredActionContract[];
-	transformers: Transformer[];
-	latestTransformers: Transformer[];
+	transformers: TransformerContract[];
+	latestTransformers: TransformerContract[];
 	typeContracts: { [key: string]: TypeContract };
 	session: string;
 	library: Map<Action>;
 	id: string = '0';
-	// TS-TODO: use correct sync typings.
-	// Starts off undefined, set to Sync with initialize().
-	sync: undefined | Sync;
+	sync: Sync;
 
 	/**
 	 * @summary The Jellyfish Actions Worker
 	 * @class
 	 * @public
 	 *
-	 * @param {Object} kernel - kernel instance
-	 * @param {String} session - worker privileged session id
-	 * @param {Object} actionLibrary - action library
-	 * @param {Object} pool - postgres pool
+	 * @param kernel - kernel instance
+	 * @param session - worker privileged session id
+	 * @param pool - postgres pool
+	 * @param plugins - list of plugins
 	 *
 	 * @example
 	 * const worker = new Worker({ ... }, '4a962ad9-20b5-4dd8-a707-bf819593cc84', {
@@ -271,27 +377,33 @@ export class Worker {
 	 *     'action-update-card': { ... },
 	 *   },
 	 *   pool,
+	 *   [foobarPlugin()],
 	 * );
 	 */
 	constructor(
 		kernel: Kernel,
 		session: string,
-		actionLibrary: Map<Action>,
 		pool: Pool,
+		plugins: PluginDefinition[],
 	) {
 		this.kernel = kernel;
+		this.pluginManager = new PluginManager(plugins);
 		this.triggers = [];
 		this.transformers = [];
 		this.latestTransformers = [];
 		this.typeContracts = {};
 		this.session = session;
-		this.library = actionLibrary;
+		this.library = this.pluginManager.getActions();
 		this.consumer = new Consumer(kernel, pool, session);
 		this.producer = new Producer(kernel, pool, session);
+		this.contractsStream = {};
+		this.sync = new Sync({
+			integrations: this.pluginManager.getSyncIntegrations(),
+		});
 
 		// Add actions defined in this repo
 		Object.keys(actions).forEach((name) => {
-			actionLibrary[name] = actions[name];
+			this.library[name] = actions[name];
 		});
 	}
 
@@ -317,7 +429,6 @@ export class Worker {
 	 * @public
 	 *
 	 * @param logContext - log context
-	 * @param sync - sync instance
 	 * @param onMessageEventHandler - consumer event handler
 	 *
 	 * @example
@@ -327,12 +438,10 @@ export class Worker {
 	// TS-TODO: this signature
 	async initialize(
 		logContext: LogContext,
-		sync: Sync,
 		onMessageEventHandler: OnMessageEventHandler,
 	) {
 		// TS-TODO: type this correctly
 		this.id = uuidv4();
-		this.sync = sync;
 
 		// Initialize producer and consumer
 		await this.producer.initialize(logContext);
@@ -341,7 +450,7 @@ export class Worker {
 			onMessageEventHandler,
 		);
 
-		// Insert worker specific contracts
+		// Insert worker contracts
 		await Promise.all(
 			Object.values(contracts).map(async (contract) => {
 				return this.kernel.replaceContract(logContext, this.session, contract);
@@ -356,6 +465,221 @@ export class Worker {
 				);
 			}),
 		);
+
+		// Get all contracts provided by plugins
+		const pluginContracts = this.pluginManager.getCards();
+
+		// Make sure certain contracts are initialized, as they can be prerequisites
+		const [loopType, actionType] = await Promise.all([
+			this.kernel.getContractBySlug<TypeContract>(
+				logContext,
+				this.session,
+				'loop@latest',
+			),
+			this.kernel.getContractBySlug<TypeContract>(
+				logContext,
+				this.session,
+				'action@latest',
+			),
+		]);
+		strict(loopType && actionType);
+		await Promise.all(
+			Object.values(pluginContracts).map(
+				async (contract: ContractDefinition) => {
+					if (contract.slug.match(/^(loop-|action-)/)) {
+						const typeContract = contract.slug.match(/^loop-/)
+							? loopType
+							: actionType;
+						return this.replaceCard(
+							logContext,
+							this.session,
+							typeContract,
+							{
+								attachEvents: false,
+							},
+							pluginContracts[contract.slug],
+						);
+					}
+				},
+			),
+		);
+
+		// Only need test user role during development and CI.
+		const contractsToSkip: string[] = [];
+		if (environment.isProduction() && !environment.isCI()) {
+			contractsToSkip.push('user-guest');
+			contractsToSkip.push('role-user-test');
+		}
+
+		// Insert all other contracts provided by plugins
+		const contractLoaders = _.values(this.pluginManager.getCards()).filter(
+			(contract: ContractDefinition) => {
+				return !contractsToSkip.includes(contract.slug);
+			},
+		);
+
+		await Bluebird.each(
+			contractLoaders,
+			async (contract: ContractDefinition) => {
+				if (!contract) {
+					return;
+				}
+
+				// Skip contracts that already exist and do not need updating
+				// Need to update omitted list if any similar fields are added to the schema
+				contract.name = contract.name ? contract.name : null;
+				const currentContract = await this.kernel.getContractBySlug(
+					logContext,
+					this.session,
+					`${contract.slug}@${contract.version}`,
+				);
+				if (
+					currentContract &&
+					_.isEqual(
+						contract,
+						_.omit(currentContract, [
+							'id',
+							'created_at',
+							'updated_at',
+							'linked_at',
+						]),
+					)
+				) {
+					return;
+				}
+
+				const versionedType = ensureTypeHasVersion(contract.type);
+				const typeContract = await this.kernel.getContractBySlug<TypeContract>(
+					logContext,
+					this.session,
+					versionedType,
+				);
+
+				if (typeContract) {
+					logger.info(logContext, 'Inserting default contract', {
+						slug: contract.slug,
+						type: contract.type,
+					});
+
+					await this.replaceCard(
+						logContext,
+						this.session,
+						typeContract,
+						{
+							attachEvents: false,
+						},
+						contract,
+					);
+
+					logger.info(logContext, 'Inserted default contract using worker', {
+						slug: contract.slug,
+						type: contract.type,
+					});
+				} else {
+					logger.warn(
+						logContext,
+						'Failed to insert default contract as type not found',
+						{
+							slug: contract.slug,
+							type: versionedType,
+						},
+					);
+				}
+			},
+		);
+
+		// For better performance, commonly accessed contracts are stored in cache in the worker.
+		// These contracts are streamed from the DB, so the worker always has the most up to date version of them.
+		this.contractsStream = await this.kernel.stream(
+			logContext,
+			this.kernel.adminSession()!,
+			{
+				anyOf: [
+					SCHEMA_ACTIVE_TRIGGERS,
+					SCHEMA_ACTIVE_TRANSFORMERS,
+					SCHEMA_ACTIVE_TYPE_CONTRACTS,
+				],
+			},
+		);
+
+		this.contractsStream.on('data', (change: StreamChange) => {
+			const contract = change.after;
+			const contractType = change.contractType.split('@')[0];
+			if (
+				change.type === 'update' ||
+				change.type === 'insert' ||
+				change.type === 'unmatch'
+			) {
+				// If `after` is null, the contract is no longer available: most likely it has
+				// been soft-deleted, having its `active` state set to false
+				if (!contract) {
+					switch (contractType) {
+						case 'triggered-action':
+							this.removeTrigger(logContext, change.id);
+							break;
+						case 'transformer':
+							this.removeTransformer(logContext, change.id);
+							break;
+						case 'type':
+							const filteredContracts = _.filter(this.typeContracts, (type) => {
+								return type.id !== change.id;
+							});
+							this.setTypeContracts(logContext, filteredContracts);
+					}
+				} else {
+					switch (contractType) {
+						case 'triggered-action':
+							this.upsertTrigger(logContext, contract);
+							break;
+						case 'transformer':
+							this.upsertTransformer(
+								logContext,
+								contract as TransformerContract,
+							);
+						case 'type':
+							const filteredContracts = _.filter(this.typeContracts, (type) => {
+								return type.id !== change.id;
+							});
+							filteredContracts.push(contract as TypeContract);
+							this.setTypeContracts(logContext, filteredContracts);
+					}
+				}
+			} else if (change.type === 'delete') {
+				switch (contractType) {
+					case 'triggered-action':
+						this.removeTrigger(logContext, change.id);
+						break;
+					case 'type':
+						const filteredContracts = _.filter(this.typeContracts, (type) => {
+							return type.id !== change.id;
+						});
+						this.setTypeContracts(logContext, filteredContracts);
+				}
+			}
+		});
+
+		const [triggers, transformers, types] = await Promise.all(
+			[
+				SCHEMA_ACTIVE_TRIGGERS,
+				SCHEMA_ACTIVE_TRANSFORMERS,
+				SCHEMA_ACTIVE_TYPE_CONTRACTS,
+			].map((schema) => this.kernel.query(logContext, this.session, schema)),
+		);
+
+		logger.info(logContext, 'Loading triggers', {
+			triggers: triggers.length,
+		});
+		this.setTriggers(logContext, triggers as TriggeredActionContract[]);
+
+		logger.info(logContext, 'Loading transformers', {
+			transformers: transformers.length,
+		});
+		this.setTransformers(logContext, transformers as TransformerContract[]);
+
+		logger.info(logContext, 'Loading types', {
+			types: types.length,
+		});
+		this.setTypeContracts(logContext, types as TypeContract[]);
 	}
 
 	/**
@@ -828,7 +1152,7 @@ export class Worker {
 	 * this.updateLatestTransformers();
 	 */
 	updateLatestTransformers() {
-		const transformersMap: { [slug: string]: Transformer } = {};
+		const transformersMap: { [slug: string]: TransformerContract } = {};
 		this.transformers.forEach((tf) => {
 			const majorV = semver.major(tf.version) || 1; // we treat 0.x.y versions as "drafts" of 1.x.y versions
 			const slugMajV = `${tf.slug}@${majorV}`;
@@ -858,7 +1182,10 @@ export class Worker {
 	 * worker.settransformers([ ... ]);
 	 */
 	// TS-TODO: Make transformers a core cotnract and type them correctly here
-	setTransformers(logContext: LogContext, transformerContracts: Transformer[]) {
+	setTransformers(
+		logContext: LogContext,
+		transformerContracts: TransformerContract[],
+	) {
 		logger.info(logContext, 'Setting transformers', {
 			count: transformerContracts.length,
 		});
@@ -918,7 +1245,7 @@ export class Worker {
 	 * const worker = new Worker({ ... });
 	 * worker.upserttransformer({ ... });
 	 */
-	upsertTransformer(logContext: LogContext, transformer: Transformer) {
+	upsertTransformer(logContext: LogContext, transformer: TransformerContract) {
 		logger.info(logContext, 'Upserting transformer', {
 			slug: transformer.slug,
 		});

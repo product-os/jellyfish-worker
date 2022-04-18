@@ -3,9 +3,10 @@ import _ from 'lodash';
 import * as sinon from 'sinon';
 import { v4 as uuid } from 'uuid';
 import * as transformers from './transformers';
+import type { TransformerContract } from './types';
 
 const getEvaluateParamsStub = (
-	transformerContracts: Array<Contract<transformers.TransformerData>>,
+	transformerContracts: TransformerContract[],
 	oldContract: Contract | null,
 	newContract: Contract,
 	returnActor: boolean = true,
@@ -57,15 +58,24 @@ const getEvaluateParamsStub = (
 
 describe('.evaluate()', () => {
 	test('should create a task if a transformer matches a contract that changed artifactReady:false->true', async () => {
-		const transformer = {
+		const transformer: TransformerContract = {
 			id: uuid(),
+			active: true,
+			version: '1.0.0',
 			slug: 'test-transformer',
 			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
 				},
+				workerFilter: {},
+				requirements: {},
 			},
+			created_at: new Date().toISOString(),
+			tags: [],
+			markers: [],
+			capabilities: [],
+			requires: [],
 		};
 
 		const oldContract = {
@@ -86,7 +96,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as Contract<transformers.TransformerData>],
+			[transformer],
 			oldContract as any as Contract,
 			newContract as any as Contract,
 		);
@@ -112,15 +122,24 @@ describe('.evaluate()', () => {
 	});
 
 	test('should create a task if a transformer matches a contract that changed artifactReady:truthy->other-truthy', async () => {
-		const transformer = {
+		const transformer: TransformerContract = {
 			id: uuid(),
+			active: true,
+			version: '1.0.0',
 			slug: 'test-transformer',
 			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
 				},
+				workerFilter: {},
+				requirements: {},
 			},
+			created_at: new Date().toISOString(),
+			tags: [],
+			markers: [],
+			capabilities: [],
+			requires: [],
 		};
 
 		const oldContract = {
@@ -141,7 +160,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as Contract<transformers.TransformerData>],
+			[transformer],
 			oldContract as any as Contract,
 			newContract as any as Contract,
 		);
@@ -167,8 +186,10 @@ describe('.evaluate()', () => {
 	});
 
 	test('should create a task if a transformer matches a contract that was ready before, but only matches now', async () => {
-		const transformer = {
+		const transformer: TransformerContract = {
 			id: uuid(),
+			active: true,
+			version: '1.0.0',
 			slug: 'test-late-match-transformer',
 			type: 'transformer@1.0.0',
 			data: {
@@ -186,7 +207,14 @@ describe('.evaluate()', () => {
 						},
 					},
 				},
+				workerFilter: {},
+				requirements: {},
 			},
+			created_at: new Date().toISOString(),
+			tags: [],
+			markers: [],
+			capabilities: [],
+			requires: [],
 		};
 
 		const oldContract = {
@@ -208,7 +236,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as Contract<transformers.TransformerData>],
+			[transformer],
 			oldContract as any as Contract,
 			newContract as any as Contract,
 		);
@@ -234,8 +262,10 @@ describe('.evaluate()', () => {
 	});
 
 	test('should only create a task when a transformer matches the input for an updated contract', async () => {
-		const transformer = {
+		const transformer: TransformerContract = {
 			id: uuid(),
+			active: true,
+			version: '1.0.0',
 			slug: 'test-transformer',
 			type: 'transformer@1.0.0',
 			data: {
@@ -248,7 +278,14 @@ describe('.evaluate()', () => {
 						},
 					},
 				},
+				workerFilter: {},
+				requirements: {},
 			},
+			created_at: new Date().toISOString(),
+			tags: [],
+			markers: [],
+			capabilities: [],
+			requires: [],
 		};
 		const oldContract = {
 			type: 'card@1.0.0',
@@ -270,7 +307,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as Contract<transformers.TransformerData>],
+			[transformer],
 			oldContract as any as Contract,
 			newContract as any as Contract,
 		);
@@ -282,15 +319,24 @@ describe('.evaluate()', () => {
 	});
 
 	test('should create a task even when a there is no previous contract', async () => {
-		const transformer = {
+		const transformer: TransformerContract = {
 			id: uuid(),
+			active: true,
+			version: '1.0.0',
 			slug: 'test-transformer',
 			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
 				},
+				workerFilter: {},
+				requirements: {},
 			},
+			created_at: new Date().toISOString(),
+			tags: [],
+			markers: [],
+			capabilities: [],
+			requires: [],
 		};
 
 		const newContract = {
@@ -303,7 +349,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as Contract<transformers.TransformerData>],
+			[transformer],
 			null,
 			newContract as any as Contract,
 		);
@@ -329,15 +375,24 @@ describe('.evaluate()', () => {
 	});
 
 	test('should not create a task when contract change is not relevant', async () => {
-		const transformer = {
+		const transformer: TransformerContract = {
 			id: uuid(),
+			active: true,
+			version: '1.0.0',
 			slug: 'test-transformer',
 			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
 				},
+				workerFilter: {},
+				requirements: {},
 			},
+			created_at: new Date().toISOString(),
+			tags: [],
+			markers: [],
+			capabilities: [],
+			requires: [],
 		};
 
 		const oldContract = {
@@ -362,7 +417,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as Contract<transformers.TransformerData>],
+			[transformer],
 			oldContract as any as Contract,
 			newContract as any as Contract,
 		);
@@ -374,15 +429,24 @@ describe('.evaluate()', () => {
 	});
 
 	test("should not create a task if a transformer doesn't have an owner", async () => {
-		const transformer = {
+		const transformer: TransformerContract = {
 			id: uuid(),
+			active: true,
+			version: '1.0.0',
 			slug: 'test-transformer',
 			type: 'transformer@1.0.0',
 			data: {
 				inputFilter: {
 					type: 'object',
 				},
+				workerFilter: {},
+				requirements: {},
 			},
+			created_at: new Date().toISOString(),
+			tags: [],
+			markers: [],
+			capabilities: [],
+			requires: [],
 		};
 
 		const oldContract = {
@@ -403,7 +467,7 @@ describe('.evaluate()', () => {
 		};
 
 		const { executeSpy, params } = getEvaluateParamsStub(
-			[transformer as any as Contract<transformers.TransformerData>],
+			[transformer],
 			oldContract as any as Contract,
 			newContract as any as Contract,
 			false,
