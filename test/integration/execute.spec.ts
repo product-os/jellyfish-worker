@@ -1025,9 +1025,7 @@ describe('.execute()', () => {
 	});
 
 	test('should return an error if the action has no corresponding implementation', async () => {
-		const localCtx = await testUtils.newContext({
-			// plugins: [DefaultPlugin, ActionLibrary, ProductOsPlugin],
-		});
+		const localCtx = await testUtils.newContext();
 
 		const action = 'action-create-card@1.0.0';
 
