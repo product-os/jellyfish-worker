@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add transformer contracts
+      hash: 1b140a9080937fe79db271bb360d7ecce85a767d
+      body: |
+        Move transformer contracts from plugin-product-os.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 22.1.0
+  title: "'Add transformer contracts'"
+  date: 2022-04-19T01:57:39.365Z
+- commits:
     - subject: Init worker with plugins
       hash: 726c1e0f8990fc1909a9163bd28a61b5cbd816d4
       body: |
