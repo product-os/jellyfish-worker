@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch
+      hash: b23f8ba61515591c36ebfdb92686cb1e05fdc716
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 22.1.1
+  title: "'Update internal-patch'"
+  date: 2022-04-21T05:45:02.436Z
+- commits:
     - subject: Add transformer contracts
       hash: 1b140a9080937fe79db271bb360d7ecce85a767d
       body: |
