@@ -52,6 +52,10 @@ export const evaluate = async ({
 			if (!transformer.data.inputFilter) {
 				return;
 			}
+			console.log(
+				'=== evaluateTransformers - transformer.slug:',
+				transformer.slug,
+			);
 			// TODO: Allow transformer input filter to match $$links, by re-using the trigger filter
 			const matchesNow = skhema.isValid(
 				transformer.data.inputFilter,

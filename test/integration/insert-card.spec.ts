@@ -10,12 +10,26 @@ import {
 	PluginDefinition,
 	TriggeredActionContract,
 	TriggeredActionData,
+	TransformerContractDefinition,
 } from '../../lib';
 import { actionCreateCard } from '../../lib/actions/action-create-card';
 
 let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
+	const foobarTransformer: TransformerContractDefinition = {
+		slug: 'transformer-foobar',
+		type: 'transformer@1.0.0',
+		active: true,
+		data: {
+			requirements: {},
+			inputFilter: {},
+			workerFilter: {},
+			$transformer: {
+				artifactReady: true,
+			},
+		},
+	};
 	const foobarPlugin = (): PluginDefinition => {
 		return {
 			slug: 'plugin-foobar',
@@ -48,12 +62,40 @@ beforeAll(async () => {
 					},
 				},
 			],
+			contracts: [foobarTransformer],
 		};
 	};
 
 	ctx = await testUtils.newContext({
 		plugins: [foobarPlugin()],
 	});
+
+	await ctx.kernel.replaceContract(ctx.logContext, ctx.session, {
+		slug: 'transformer-buzbaz',
+		type: 'transformer@1.0.0',
+		active: true,
+		data: {
+			requirements: {},
+			inputFilter: {},
+			workerFilter: {},
+			$transformer: {
+				artifactReady: true,
+			},
+		},
+	});
+
+	await new Promise((resolve) => {
+		setTimeout(resolve, 3000);
+	});
+
+	console.log(
+		'transformers:',
+		JSON.stringify(ctx.worker.transformers, null, 4),
+	);
+	console.log(
+		'latestTransformers:',
+		JSON.stringify(ctx.worker.latestTransformers, null, 4),
+	);
 });
 
 afterAll(() => {
@@ -61,7 +103,7 @@ afterAll(() => {
 });
 
 describe('.insertCard()', () => {
-	test('should pass a triggered action originator', async () => {
+	test.only('should pass a triggered action originator', async () => {
 		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
 			ctx.logContext,
 			ctx.session,
