@@ -5,18 +5,48 @@ import _ from 'lodash';
 import {
 	errors,
 	getNextExecutionDate,
+	PluginDefinition,
 	ProducerOptions,
 	ScheduledActionData,
 	testUtils,
+	TransformerContract,
 	TriggeredActionContract,
 	TriggeredActionData,
 	Worker,
 } from '../../lib';
 
 let ctx: testUtils.TestContext;
+const transformerSlugs = _.map(['foo', 'bar'], (name) => {
+	return `transformer-${name}`;
+});
 
 beforeAll(async () => {
-	ctx = await testUtils.newContext();
+	const foobarPlugin = (): PluginDefinition => {
+		return {
+			slug: 'plugin-foobar',
+			name: 'Foobar Plugin',
+			version: '1.0.0',
+			contracts: [
+				{
+					slug: transformerSlugs[0],
+					type: 'transformer@1.0.0',
+					active: true,
+					data: {
+						requirements: {},
+						inputFilter: {},
+						workerFilter: {},
+						$transformer: {
+							artifactReady: true,
+						},
+					},
+				},
+			],
+		};
+	};
+
+	ctx = await testUtils.newContext({
+		plugins: [foobarPlugin()],
+	});
 });
 
 afterAll(() => {
@@ -194,6 +224,43 @@ describe('Worker', () => {
 
 		// Remove the test trigger
 		ctx.worker.removeTrigger(ctx.logContext, contract.id);
+	});
+
+	it('instance should update on new transformer contract', async () => {
+		// Insert a new transformer contract
+		await ctx.kernel.insertContract<TransformerContract>(
+			ctx.logContext,
+			ctx.session,
+			{
+				slug: transformerSlugs[1],
+				type: 'transformer@1.0.0',
+				active: true,
+				data: {
+					requirements: {},
+					inputFilter: {},
+					workerFilter: {},
+					$transformer: {
+						artifactReady: true,
+					},
+				},
+			},
+		);
+
+		// Will fail until the stream updates the worker
+		const match = (transformer: TransformerContract) => {
+			return _.includes(transformerSlugs, transformer.slug);
+		};
+		await ctx.retry(
+			() => {
+				return _.concat(
+					_.filter(ctx.worker.transformers, match),
+					_.filter(ctx.worker.latestTransformers, match),
+				);
+			},
+			(matches: TransformerContract[]) => {
+				return matches.length === 4;
+			},
+		);
 	});
 
 	it('instance should update on new formula generated triggered-action', async () => {
