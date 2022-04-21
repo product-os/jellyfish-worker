@@ -1,4 +1,21 @@
 - commits:
+    - subject: Add transformer stream update test
+      hash: c25ee86ee09d2b20b91fc8a51b79bd28b9ee4206
+      body: |
+        Add test to assert that the worker instance
+        is kept up-to-date when new transformer
+        contracts are added to the system.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 22.1.2
+  title: "'Add transformer stream update test'"
+  date: 2022-04-21T15:06:15.369Z
+- commits:
     - subject: Update internal-patch
       hash: b23f8ba61515591c36ebfdb92686cb1e05fdc716
       body: ""
