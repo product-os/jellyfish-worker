@@ -1,63 +1,67 @@
 import * as assert from '@balena/jellyfish-assert';
-import { getLogger } from '@balena/jellyfish-logger';
+import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import type { JsonSchema } from '@balena/jellyfish-types';
-import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import type {
+	ContractDefinition,
+	TypeContract,
+} from '@balena/jellyfish-types/build/core';
+import { strict } from 'assert';
 import _ from 'lodash';
 import * as skhema from 'skhema';
 import * as errors from '../errors';
 import type { ActionDefinition } from '../plugin';
+import type { WorkerContext } from '../types';
 
 const logger = getLogger(__filename);
 
-const defaultWorkerFilter = {
-	type: 'object',
-	required: ['type'],
-	properties: {
-		type: {
-			const: 'transformer-worker@1.0.0',
-		},
-		data: {
-			type: 'object',
-			properties: {
-				canary: {
-					not: {
-						const: true,
+// TODO: Store this in worker context in something like workerContext.matchMakeHandlers[]?
+// Defined as the fallback default channel matchmake handler
+async function defaultMakeMatchHandler(
+	_workerContext: WorkerContext,
+	_logContext: LogContext,
+	_contract: ContractDefinition,
+): Promise<ContractDefinition | null> {
+	// Simple things to check that would make sense for all cases, a common demoninator handler.
+	// Could check things like:
+	// The number of contracts (tasks) owned by each agent
+	// How recently each agent was assigned a contract
+
+	return null;
+}
+
+// TODO: Store this in worker context in something like workerContext.matchMakeHandlers[]?
+// Defined as part of the channel contract, like actions and their handlers.
+async function transformerMatchMakeHandler(
+	workerContext: WorkerContext,
+	logContext: LogContext,
+	contract: ContractDefinition,
+): Promise<ContractDefinition | null> {
+	const defaultWorkerFilter = {
+		type: 'object',
+		required: ['type'],
+		properties: {
+			type: {
+				const: 'transformer-worker@1.0.0',
+			},
+			data: {
+				type: 'object',
+				properties: {
+					canary: {
+						not: {
+							const: true,
+						},
 					},
 				},
 			},
 		},
-	},
-};
-
-const handler: ActionDefinition['handler'] = async (
-	session,
-	context,
-	card,
-	request,
-) => {
-	const typeCard = context.cards[card.type];
-
-	assert.USER(
-		request.logContext,
-		typeCard,
-		errors.WorkerNoElement,
-		`No such type: ${card.type}`,
-	);
-
-	const result = {
-		id: card.id,
-		type: card.type,
-		version: card.version,
-		slug: card.slug,
 	};
 
-	let matcher = _.get(card, ['data', 'workerFilter', 'schema']);
-
+	let matcher = _.get(contract, ['data', 'workerFilter', 'schema']);
 	if (!matcher) {
-		logger.warn(request.logContext, 'Task has no worker filter', {
-			id: card.id,
-			slug: card.slug,
-			type: card.type,
+		logger.warn(logContext, 'Task has no worker filter', {
+			id: contract.id,
+			slug: contract.slug,
+			type: contract.type,
 		});
 		matcher = defaultWorkerFilter;
 	}
@@ -85,8 +89,8 @@ const handler: ActionDefinition['handler'] = async (
 		},
 	]);
 	// Find all the agents that match the task
-	const workers = await context.query(
-		context.privilegedSession,
+	const workers = await workerContext.query(
+		workerContext.privilegedSession,
 		safeWorkerQuery as JsonSchema,
 	);
 
@@ -97,18 +101,118 @@ const handler: ActionDefinition['handler'] = async (
 		}),
 	);
 
-	if (!bestMatchedWorker) {
-		logger.warn(
+	return bestMatchedWorker;
+}
+
+const handler: ActionDefinition['handler'] = async (
+	session,
+	context,
+	contract,
+	request,
+) => {
+	// 1. Assert valid contract type
+	const typeCard = context.cards[contract.type];
+	assert.USER(
+		request.logContext,
+		typeCard,
+		errors.WorkerNoElement,
+		`No such type: ${contract.type}`,
+	);
+
+	const result = {
+		id: contract.id,
+		type: contract.type,
+		version: contract.version,
+		slug: contract.slug,
+	};
+
+	// 2. Assert contract is not already owned
+	const owner = await context.query(context.privilegedSession, {
+		type: 'object',
+		$$links: {
+			'is owner of': {
+				type: 'object',
+				required: ['id'],
+				properties: {
+					id: {
+						type: 'string',
+						const: contract.id,
+					},
+				},
+			},
+		},
+	});
+	if (owner && owner.length > 0) {
+		logger.debug(
 			request.logContext,
-			'Could not find a matching worker for task',
+			'Contract already owned, skipping matchmake',
 			{
-				id: card.id,
-				slug: card.slug,
-				type: card.type,
+				contract: {
+					id: contract.id,
+					type: contract.type,
+				},
+				owner: {
+					id: owner[0].id,
+					type: owner[0].type,
+				},
 			},
 		);
 		return result;
 	}
+
+	// 3. Get channel along with all agents and their preferences
+	const channel = await context.query(context.privilegedSession, {
+		type: 'object',
+		required: ['id', 'type'],
+		properties: {
+			id: {
+				type: 'string',
+				const: request.arguments.channel,
+			},
+			type: {
+				type: 'string',
+				const: 'channel@1.0.0',
+			},
+		},
+		anyOf: [
+			{
+				$$links: {
+					'has agent': {
+						type: 'object',
+					},
+				},
+			},
+			{
+				$$links: {
+					'has preference': {
+						type: 'object',
+					},
+				},
+			},
+		],
+	});
+	strict(channel.length > 0);
+
+	// TODO: Use function stored under context.matchMakeHandlers? (similar to action handlers)
+	// Example: const candidate = await context.matchMakeHandlers[channel.data.matchmake.handler](...);
+	const candidate = await transformerMatchMakeHandler(
+		context,
+		request.logContext,
+		contract,
+	);
+	if (!candidate) {
+		logger.warn(
+			request.logContext,
+			'Could not find a matching agent for task',
+			{
+				id: contract.id,
+				slug: contract.slug,
+				type: contract.type,
+			},
+		);
+		return result;
+	}
+
 	// Assign the task to the agent
 	const linkTypeCard = context.cards['link@1.0.0'];
 	assert.INTERNAL(
@@ -134,12 +238,12 @@ const handler: ActionDefinition['handler'] = async (
 			data: {
 				inverseName: 'is owned by',
 				from: {
-					id: bestMatchedWorker.id,
-					type: bestMatchedWorker.type,
+					id: candidate.id,
+					type: candidate.type,
 				},
 				to: {
-					id: card.id,
-					type: card.type,
+					id: contract.id,
+					type: contract.type,
 				},
 			},
 		},
