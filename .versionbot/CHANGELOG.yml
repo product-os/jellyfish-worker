@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update transformer logs
+      hash: c17cbf3d5fa61446d5d998bbc8f5da1f390d6041
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 22.1.4
+  title: "'Update transformer logs'"
+  date: 2022-04-22T05:22:25.327Z
+- commits:
     - subject: Add transformer execution logs
       hash: f7ff7e0f15ff28e29a0c52847f07ee65365276c6
       body: ""
