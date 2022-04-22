@@ -37,10 +37,6 @@ export const evaluate = async ({
 	if (!transformers || !Array.isArray(transformers)) {
 		logger.info(logContext, 'No transformers');
 		return null;
-	} else {
-		logger.info(logContext, 'Transformers found', {
-			count: transformers.length,
-		});
 	}
 
 	// Only run transformers with contracts with a valid artifact or which do not have artifacts at all
@@ -59,7 +55,8 @@ export const evaluate = async ({
 		transformers.map(async (transformer: TransformerContract) => {
 			if (!transformer.data.inputFilter) {
 				logger.info(logContext, 'Transformer has no inputFilter defined', {
-					transformer: transformer.id,
+					transformerId: transformer.id,
+					transformerSlug: transformer.slug,
 				});
 				return;
 			}
@@ -78,10 +75,10 @@ export const evaluate = async ({
 
 			if (!shouldRun) {
 				logger.info(logContext, 'Transformer shouldRun is false', {
-					transformer: transformer.id,
-					matchesNow,
-					matchedPreviously,
-					artifactReadyChanged,
+					transformerId: transformer.id,
+					transformerSlug: transformer.slug,
+					newContract: newContract.id,
+					oldContract: oldContract?.id,
 				});
 				return;
 			}
