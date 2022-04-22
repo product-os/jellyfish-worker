@@ -1682,12 +1682,6 @@ export class Worker {
 			return null;
 		}
 
-		logger.info(logContext, 'this.transformers count', {
-			count: this.transformers.length,
-		});
-		logger.info(logContext, 'this.latestTransformers count', {
-			count: this.latestTransformers.length,
-		});
 		evaluateTransformers({
 			transformers: this.latestTransformers,
 			oldContract: currentContract,
