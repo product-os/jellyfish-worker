@@ -1209,7 +1209,6 @@ export class Worker {
 	 * const worker = new Worker({ ... });
 	 * worker.settransformers([ ... ]);
 	 */
-	// TS-TODO: Make transformers a core cotnract and type them correctly here
 	setTransformers(
 		logContext: LogContext,
 		transformerContracts: TransformerContract[],
@@ -1683,6 +1682,12 @@ export class Worker {
 			return null;
 		}
 
+		logger.info(logContext, 'this.transformers count', {
+			count: this.transformers.length,
+		});
+		logger.info(logContext, 'this.latestTransformers count', {
+			count: this.latestTransformers.length,
+		});
 		evaluateTransformers({
 			transformers: this.latestTransformers,
 			oldContract: currentContract,

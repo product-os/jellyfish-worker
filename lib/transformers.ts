@@ -35,13 +35,21 @@ export const evaluate = async ({
 	executeAndAwaitAction,
 }: EvaluateOptions): Promise<null> => {
 	if (!transformers || !Array.isArray(transformers)) {
+		logger.info(logContext, 'No transformers');
 		return null;
+	} else {
+		logger.info(logContext, 'Transformers found', {
+			count: transformers.length,
+		});
 	}
 
 	// Only run transformers with contracts with a valid artifact or which do not have artifacts at all
 	// and their input filter matches now, but didn't match before (or artifact wasn't ready)
 	const readyNow = newContract.data?.$transformer?.artifactReady;
 	if (readyNow === false) {
+		logger.info(logContext, 'readyNow is false', {
+			newContract: newContract.id,
+		});
 		return null;
 	}
 	const artifactReadyChanged =
@@ -50,6 +58,9 @@ export const evaluate = async ({
 	await Promise.all(
 		transformers.map(async (transformer: TransformerContract) => {
 			if (!transformer.data.inputFilter) {
+				logger.info(logContext, 'Transformer has no inputFilter defined', {
+					transformer: transformer.id,
+				});
 				return;
 			}
 			// TODO: Allow transformer input filter to match $$links, by re-using the trigger filter
@@ -66,6 +77,12 @@ export const evaluate = async ({
 				matchesNow && (!matchedPreviously || artifactReadyChanged);
 
 			if (!shouldRun) {
+				logger.info(logContext, 'Transformer shouldRun is false', {
+					transformer: transformer.id,
+					matchesNow,
+					matchedPreviously,
+					artifactReadyChanged,
+				});
 				return;
 			}
 
@@ -84,6 +101,11 @@ export const evaluate = async ({
 
 			// Re enqueue an action request to call the matchmaking function
 			// TODO: link task to origin transformer
+			logger.info(logContext, 'Creating transformer task', {
+				transformer: transformer.id,
+				actor: transformerActor.id,
+				newContract: newContract.id,
+			});
 			const result: any = await executeAndAwaitAction({
 				card: 'task@1.0.0',
 				type: 'type',
