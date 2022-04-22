@@ -43,22 +43,25 @@ export const evaluate = async ({
 	// and their input filter matches now, but didn't match before (or artifact wasn't ready)
 	const readyNow = newContract.data?.$transformer?.artifactReady;
 	if (readyNow === false) {
-		logger.info(logContext, 'readyNow is false', {
-			newContract: newContract.id,
+		logger.info(logContext, 'Transformer artifact not ready', {
+			oldContract: {
+				id: oldContract?.id,
+				type: oldContract?.type,
+			},
+			newContract: {
+				id: newContract.id,
+				type: newContract.type,
+			},
 		});
 		return null;
 	}
 	const artifactReadyChanged =
 		oldContract?.data?.$transformer?.artifactReady !== readyNow;
 
-	await Promise.all(
+	const results = await Promise.all(
 		transformers.map(async (transformer: TransformerContract) => {
 			if (!transformer.data.inputFilter) {
-				logger.info(logContext, 'Transformer has no inputFilter defined', {
-					transformerId: transformer.id,
-					transformerSlug: transformer.slug,
-				});
-				return;
+				return false;
 			}
 			// TODO: Allow transformer input filter to match $$links, by re-using the trigger filter
 			const matchesNow = skhema.isValid(
@@ -74,13 +77,7 @@ export const evaluate = async ({
 				matchesNow && (!matchedPreviously || artifactReadyChanged);
 
 			if (!shouldRun) {
-				logger.info(logContext, 'Transformer shouldRun is false', {
-					transformerId: transformer.id,
-					transformerSlug: transformer.slug,
-					newContract: newContract.id,
-					oldContract: oldContract?.id,
-				});
-				return;
+				return false;
 			}
 
 			const transformerActor = await getTransformerActor(query, transformer);
@@ -89,19 +86,31 @@ export const evaluate = async ({
 					logContext,
 					'Cannot run transformer that does not have an owner',
 					{
-						transformerId: transformer.id,
-						transformerSlug: transformer.slug,
+						id: transformer.id,
+						slug: transformer.slug,
+						version: transformer.version,
 					},
 				);
-				return;
+				return false;
 			}
 
 			// Re enqueue an action request to call the matchmaking function
 			// TODO: link task to origin transformer
 			logger.info(logContext, 'Creating transformer task', {
-				transformer: transformer.id,
-				actor: transformerActor.id,
-				newContract: newContract.id,
+				transformer: {
+					id: transformer.id,
+					slug: transformer.slug,
+					version: transformer.version,
+					actor: transformerActor.id,
+				},
+				newContract: {
+					id: newContract.id,
+					type: newContract.type,
+				},
+				oldContract: {
+					id: oldContract?.id,
+					type: oldContract?.type,
+				},
 			});
 			const result: any = await executeAndAwaitAction({
 				card: 'task@1.0.0',
@@ -152,8 +161,23 @@ export const evaluate = async ({
 					},
 				},
 			});
+
+			return readyNow;
 		}),
 	);
+
+	if (!results.includes(true)) {
+		logger.info(logContext, 'Did not execute any transformers', {
+			newContract: {
+				id: newContract.id,
+				type: newContract.type,
+			},
+			oldContract: {
+				id: oldContract?.id,
+				type: oldContract?.type,
+			},
+		});
+	}
 	return null;
 };
 
