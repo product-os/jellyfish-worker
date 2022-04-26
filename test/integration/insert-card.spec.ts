@@ -3,7 +3,11 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
-import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	errors as autumndbErrors,
+	Kernel,
+	testUtils as autumndbTestUtils,
+} from 'autumndb';
 import _ from 'lodash';
 import {
 	testUtils,
@@ -1279,5 +1283,107 @@ describe('.insertCard()', () => {
 		expect(testContractAfterUpdate.data.dependentProperty).toEqual(
 			'greater than 10!',
 		);
+	});
+
+	test('should throw when contract with same slug already exists', async () => {
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeContract);
+
+		// Insert initial contract
+		const slug = autumndbTestUtils.generateRandomSlug();
+		await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			typeContract,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				slug,
+				version: '1.0.0',
+				data: {},
+			},
+		);
+
+		// Insert another contract with same slug, should throw
+		await expect(() => {
+			return ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				typeContract,
+				{
+					timestamp: new Date().toISOString(),
+					actor: ctx.adminUserId,
+					attachEvents: false,
+					reason: null,
+				},
+				{
+					slug,
+					version: '1.0.0',
+					data: {},
+				},
+			);
+		}).rejects.toThrowError(autumndbErrors.JellyfishElementAlreadyExists);
+	});
+
+	test('should throw when contract with same id already exists', async () => {
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeContract);
+
+		// Insert initial contract
+		const id = autumndbTestUtils.generateRandomId();
+		await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			typeContract,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				id,
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'card',
+				}),
+				version: '1.0.0',
+				data: {},
+			},
+		);
+
+		// Insert another contract with same id, should throw
+		await expect(() => {
+			return ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				typeContract,
+				{
+					timestamp: new Date().toISOString(),
+					actor: ctx.adminUserId,
+					attachEvents: false,
+					reason: null,
+				},
+				{
+					id,
+					slug: autumndbTestUtils.generateRandomSlug({
+						prefix: 'card',
+					}),
+					version: '1.0.0',
+					data: {},
+				},
+			);
+		}).rejects.toThrowError(autumndbErrors.JellyfishElementAlreadyExists);
 	});
 });
