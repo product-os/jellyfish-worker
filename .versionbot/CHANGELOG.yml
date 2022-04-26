@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add insertCard collision tests
+      hash: bae4f07fe5eb2c237d0591cd2505c04dfede3a49
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: YingwenChen <yingwenchen@balena.io>
+        signed-off-by: YingwenChen <yingwenchen@balena.io>
+      author: yingwen chen
+      nested: []
+  version: 22.1.9
+  title: "'Create new PR to check if inserting an existing contract, insertCard
+    will throw an error'"
+  date: 2022-04-26T01:15:15.824Z
+- commits:
     - subject: Update internal-patch
       hash: 62e7d78a03df2522a517981d425ca6735bf5f876
       body: ""
