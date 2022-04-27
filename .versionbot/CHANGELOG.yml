@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 10.0.2 to 11.0.0
+      hash: 430f20d25e511c356b88698dbf92724f4e548cb0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 22.1.10
+  title: "'Update @balena/jellyfish-environment from 10.0.2 to 11.0.0'"
+  date: 2022-04-27T10:06:42.908Z
+- commits:
     - subject: Add insertCard collision tests
       hash: bae4f07fe5eb2c237d0591cd2505c04dfede3a49
       body: ""
