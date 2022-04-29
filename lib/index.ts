@@ -448,40 +448,50 @@ export class Worker {
 			onMessageEventHandler,
 		);
 
-		// Insert type contracts as prerequisite
-		await Promise.all(
-			Object.values(contracts).map(async (contract) => {
-				if (contract.type.split('@')[0] === 'type') {
-					return this.kernel.replaceContract(
+		// Insert worker contracts by priority
+		const priority = ['type', 'triggered-action'];
+
+		const groups = Object.entries(
+			_.groupBy(Object.values(contracts), 'type'),
+		).sort(([typeA], [typeB]) => {
+			return (
+				priority.indexOf(typeB.split('@')[0]) -
+				priority.indexOf(typeA.split('@')[0])
+			);
+		});
+
+		for (const [, groupContracts] of groups) {
+			await Promise.all(
+				groupContracts.map(async (contract) => {
+					if (contract.type.split('@')[0] === 'type') {
+						return this.kernel.replaceContract(
+							logContext,
+							this.session,
+							contract,
+						);
+					}
+
+					const versionedType = ensureTypeHasVersion(contract.type);
+					const typeContract =
+						await this.kernel.getContractBySlug<TypeContract>(
+							logContext,
+							this.session,
+							versionedType,
+						);
+					strict(typeContract);
+					return this.replaceCard(
 						logContext,
 						this.session,
+						typeContract,
+						{
+							attachEvents: false,
+						},
 						contract,
 					);
-				}
-			}),
-		);
+				}),
+			);
+		}
 
-		// Insert other worker contracts
-		await Promise.all(
-			Object.values(contracts).map(async (contract) => {
-				const versionedType = ensureTypeHasVersion(contract.type);
-				const typeContract = await this.kernel.getContractBySlug<TypeContract>(
-					logContext,
-					this.session,
-					versionedType,
-				);
-				strict(typeContract);
-				return this.replaceCard(
-					logContext,
-					this.session,
-					typeContract,
-					{
-						attachEvents: false,
-					},
-					contract,
-				);
-			}),
-		);
 		const actionType = await this.kernel.getContractBySlug<TypeContract>(
 			logContext,
 			this.session,
