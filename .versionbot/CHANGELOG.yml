@@ -1,4 +1,21 @@
 - commits:
+    - subject: Enqueue inserted action requests
+      hash: 6006006dafadc9cac40fe5176d808f360fac8742
+      body: |
+        Automatically enqueue any inserted action-request
+        type contracts. Drop support for manually enqueueing
+        action requests.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 23.0.0
+  title: "'Enqueue inserted action requests'"
+  date: 2022-04-30T03:39:25.371Z
+- commits:
     - subject: Update internal-patch
       hash: 7397d9eafdda7baa636786b0cdb3e529a346f0d6
       body: ""
