@@ -168,16 +168,25 @@ export const newContext = async (
 		}
 	};
 
-	const processAction = async (session: string, action: any) => {
-		const createRequest = await worker.producer.enqueue(
-			worker.getId(),
-			session,
+	const processAction = async (
+		session: string,
+		action: ActionRequestContract,
+	) => {
+		const createRequest = await worker.insertCard(
+			autumndbTestContext.logContext,
+			worker.session,
+			worker.typeContracts['action-request@1.0.0'],
+			{
+				actor: action.data.actor,
+				timestamp: new Date().toISOString(),
+			},
 			action,
 		);
+		assert(createRequest);
 		await flush(session);
 		return worker.producer.waitResults(
 			autumndbTestContext.logContext,
-			createRequest,
+			createRequest as ActionRequestContract,
 		);
 	};
 
@@ -202,23 +211,43 @@ export const newContext = async (
 		body: string,
 		type: string,
 	) => {
-		const req = await worker.producer.enqueue(actor, session, {
-			action: 'action-create-event@1.0.0',
-			logContext: autumndbTestContext.logContext,
-			card: target.id,
-			type: target.type,
-			arguments: {
-				type,
-				payload: {
-					message: body,
+		const date = new Date();
+		const req = await worker.insertCard(
+			autumndbTestContext.logContext,
+			autumndbTestContext.kernel.adminSession()!,
+			worker.typeContracts['action-request@1.0.0'],
+			{
+				actor,
+				timestamp: new Date().toISOString(),
+				attachEvents: true,
+			},
+			{
+				data: {
+					actor,
+					context: autumndbTestContext.logContext,
+					action: 'action-create-event@1.0.0',
+					card: target.id,
+					type: target.type,
+					epoch: date.valueOf(),
+					timestamp: date.toISOString(),
+					input: {
+						id: target.id,
+					},
+					arguments: {
+						type,
+						payload: {
+							message: body,
+						},
+					},
 				},
 			},
-		});
+		);
+		assert(req);
 
 		await flushAll(session);
 		const result: any = await worker.producer.waitResults(
 			autumndbTestContext.logContext,
-			req,
+			req as ActionRequestContract,
 		);
 		expect(result.error).toBe(false);
 		assert(result.data);
@@ -595,22 +624,35 @@ export async function webhookScenario(
 			},
 		);
 
-		const request = await context.worker.producer.enqueue(
-			context.worker.getId(),
+		const request = await context.worker.insertCard(
+			context.logContext,
 			context.session,
+			context.worker.typeContracts['action-request@1.0.0'],
 			{
-				logContext: context.logContext,
-				action: 'action-integration-import-event@1.0.0',
-				card: event.id,
-				type: event.type,
-				arguments: {},
+				actor: context.adminUserId,
+				timestamp: new Date().toISOString(),
+			},
+			{
+				data: {
+					context: context.logContext,
+					action: 'action-integration-import-event@1.0.0',
+					card: event.id,
+					type: event.type,
+					actor: context.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: event.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {},
+				},
 			},
 		);
 
 		await context.flush(context.session);
 		const result = await context.worker.producer.waitResults(
 			context.logContext,
-			request,
+			request as ActionRequestContract,
 		);
 		assert.ok(result.error === false);
 		contracts.push(...(result.data as ExecuteContract[]));

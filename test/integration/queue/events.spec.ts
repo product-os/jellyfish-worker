@@ -7,14 +7,14 @@ import {
 import _ from 'lodash';
 import { events, testUtils } from '../../../lib';
 
-let context: testUtils.TestContext;
+let ctx: testUtils.TestContext;
 
 beforeAll(async () => {
-	context = await testUtils.newContext();
+	ctx = await testUtils.newContext();
 });
 
-afterAll(async () => {
-	await testUtils.destroyContext(context);
+afterAll(() => {
+	return testUtils.destroyContext(ctx);
 });
 
 describe('events', () => {
@@ -22,9 +22,9 @@ describe('events', () => {
 		test('should insert an active execute contract', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			const event = await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -40,9 +40,9 @@ describe('events', () => {
 				},
 			);
 
-			const contract = await context.kernel.getContractById(
-				context.logContext,
-				context.session,
+			const contract = await ctx.kernel.getContractById(
+				ctx.logContext,
+				ctx.session,
 				event.id,
 			);
 			expect(contract!.active).toBe(true);
@@ -54,9 +54,9 @@ describe('events', () => {
 			const id = autumndbTestUtils.generateRandomId();
 
 			const contract = await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -78,9 +78,9 @@ describe('events', () => {
 		test('should not use a passed id', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			const contract = await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -103,9 +103,9 @@ describe('events', () => {
 			const id = autumndbTestUtils.generateRandomId();
 			await expect(() => {
 				return events.post(
-					context.logContext,
-					context.kernel,
-					context.session,
+					ctx.logContext,
+					ctx.kernel,
+					ctx.session,
 					{
 						id,
 						action: 'action-create-card@1.0.0',
@@ -125,9 +125,9 @@ describe('events', () => {
 		test('should use the passed timestamp in the payload', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			const contract = await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -149,9 +149,9 @@ describe('events', () => {
 
 		test('should allow an object result', async () => {
 			const contract = await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id: autumndbTestUtils.generateRandomId(),
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -177,7 +177,7 @@ describe('events', () => {
 		test('should return when a certain execute event is inserted', (done) => {
 			const id = autumndbTestUtils.generateRandomId();
 			events
-				.wait(context.logContext, context.kernel, context.session, {
+				.wait(ctx.logContext, ctx.kernel, ctx.session, {
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
 					card: '033d9184-70b2-4ec9-bc39-9a249b186422',
@@ -198,9 +198,9 @@ describe('events', () => {
 			setTimeout(() => {
 				try {
 					return events.post(
-						context.logContext,
-						context.kernel,
-						context.session,
+						ctx.logContext,
+						ctx.kernel,
+						ctx.session,
 						{
 							id,
 							action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -224,9 +224,9 @@ describe('events', () => {
 		test('should return if the contract already exists', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -243,9 +243,9 @@ describe('events', () => {
 			);
 
 			const contract = await events.wait(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -268,7 +268,7 @@ describe('events', () => {
 			const BIG_EXECUTE_CARD = require('./big-execute.json');
 
 			events
-				.wait(context.logContext, context.kernel, context.session, {
+				.wait(ctx.logContext, ctx.kernel, ctx.session, {
 					id: BIG_EXECUTE_CARD.slug.replace(/^execute-/g, ''),
 					action: BIG_EXECUTE_CARD.data.action,
 					card: BIG_EXECUTE_CARD.data.target,
@@ -283,12 +283,8 @@ describe('events', () => {
 
 			setTimeout(() => {
 				try {
-					context.kernel
-						.insertContract(
-							context.logContext,
-							context.session,
-							BIG_EXECUTE_CARD,
-						)
+					ctx.kernel
+						.insertContract(ctx.logContext, ctx.session, BIG_EXECUTE_CARD)
 						.then((execute) => {
 							expect(_.omit(execute, ['id', 'loop'])).toEqual(
 								Object.assign({}, BIG_EXECUTE_CARD, {
@@ -307,9 +303,9 @@ describe('events', () => {
 		test('should be able to access the event payload', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -324,9 +320,9 @@ describe('events', () => {
 			);
 
 			const contract = await events.wait(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -350,7 +346,7 @@ describe('events', () => {
 
 			const id1 = autumndbTestUtils.generateRandomId();
 			events
-				.wait(context.logContext, context.kernel, context.session, {
+				.wait(ctx.logContext, ctx.kernel, ctx.session, {
 					id: id1,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
 					card: '033d9184-70b2-4ec9-bc39-9a249b186422',
@@ -369,9 +365,9 @@ describe('events', () => {
 			setTimeout(async () => {
 				try {
 					await events.post(
-						context.logContext,
-						context.kernel,
-						context.session,
+						ctx.logContext,
+						ctx.kernel,
+						ctx.session,
 						{
 							id: id2,
 							action: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
@@ -388,9 +384,9 @@ describe('events', () => {
 					);
 
 					await events.post(
-						context.logContext,
-						context.kernel,
-						context.session,
+						ctx.logContext,
+						ctx.kernel,
+						ctx.session,
 						{
 							id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
 							action: '033d9184-70b2-4ec9-bc39-9a249b186422',
@@ -407,9 +403,9 @@ describe('events', () => {
 					);
 
 					await events.post(
-						context.logContext,
-						context.kernel,
-						context.session,
+						ctx.logContext,
+						ctx.kernel,
+						ctx.session,
 						{
 							id: id1,
 							action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -435,9 +431,9 @@ describe('events', () => {
 		test('should return the last execution event given one event', async () => {
 			const id = autumndbTestUtils.generateRandomId();
 			const contract = await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id,
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -453,9 +449,9 @@ describe('events', () => {
 			);
 
 			const event = await events.getLastExecutionEvent(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
 			);
 
@@ -488,9 +484,9 @@ describe('events', () => {
 			const originator = autumndbTestUtils.generateRandomId();
 
 			const contract1 = await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id: autumndbTestUtils.generateRandomId(),
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -508,9 +504,9 @@ describe('events', () => {
 			);
 
 			await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id: autumndbTestUtils.generateRandomId(),
 					action: 'e4fe3f19-13ae-4421-b28f-6507af78d1f6',
@@ -528,9 +524,9 @@ describe('events', () => {
 			);
 
 			const event = await events.getLastExecutionEvent(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				originator,
 			);
 
@@ -563,9 +559,9 @@ describe('events', () => {
 			const originator = autumndbTestUtils.generateRandomId();
 
 			const contract1 = await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id: autumndbTestUtils.generateRandomId(),
 					action: '57692206-8da2-46e1-91c9-159b2c6928ef',
@@ -583,9 +579,9 @@ describe('events', () => {
 			);
 
 			await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id: autumndbTestUtils.generateRandomId(),
 					action: 'e4fe3f19-13ae-4421-b28f-6507af78d1f6',
@@ -603,9 +599,9 @@ describe('events', () => {
 			);
 
 			const event = await events.getLastExecutionEvent(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				originator,
 			);
 
@@ -637,9 +633,9 @@ describe('events', () => {
 
 		test('should return null given no matching event', async () => {
 			await events.post(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				{
 					id: autumndbTestUtils.generateRandomId(),
 					action: 'e4fe3f19-13ae-4421-b28f-6507af78d1f6',
@@ -657,9 +653,9 @@ describe('events', () => {
 			);
 
 			const event = await events.getLastExecutionEvent(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				autumndbTestUtils.generateRandomId(),
 			);
 			expect(event).toBeNull();
@@ -667,7 +663,7 @@ describe('events', () => {
 
 		test('should only consider execute contracts', async () => {
 			const id = autumndbTestUtils.generateRandomId();
-			await context.kernel.insertContract(context.logContext, context.session, {
+			await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 				type: 'card@1.0.0',
 				slug: autumndbTestUtils.generateRandomId(),
 				version: '1.0.0',
@@ -686,9 +682,9 @@ describe('events', () => {
 			});
 
 			const event = await events.getLastExecutionEvent(
-				context.logContext,
-				context.kernel,
-				context.session,
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
 				id,
 			);
 			expect(event).toBeNull();

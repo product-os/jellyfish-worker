@@ -118,9 +118,8 @@ export const hasContract = async (
  * @example
  * const slug = await utils.getEventSlug('execute')
  */
-export const getEventSlug = async (type: string): Promise<string> => {
-	const id = uuidv4();
-	return `${type}-${id}`;
+export const getEventSlug = (type: string): string => {
+	return `${type}-${uuidv4()}`;
 };
 
 /**

@@ -2,6 +2,7 @@ import type {
 	Contract,
 	ContractDefinition,
 } from '@balena/jellyfish-types/build/core';
+import type { ProducerOptions } from './producer';
 
 export interface ActionData {
 	filter?: {
@@ -79,3 +80,24 @@ export interface ExecuteContractDefinition
 	extends ContractDefinition<ExecuteData> {}
 
 export interface ExecuteContract extends Contract<ExecuteData> {}
+
+export interface ScheduledActionData {
+	options: ProducerOptions;
+	schedule: {
+		once?: {
+			date: Date;
+		};
+		recurring?: {
+			start: Date;
+			end: Date;
+			interval: string;
+		};
+	};
+	[k: string]: unknown;
+}
+
+export interface ScheduledActionContractDefinition
+	extends ContractDefinition<ScheduledActionData> {}
+
+export interface ScheduledActionContract
+	extends Contract<ScheduledActionData> {}

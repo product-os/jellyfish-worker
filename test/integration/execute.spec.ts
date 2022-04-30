@@ -25,31 +25,41 @@ describe('.execute()', () => {
 			ctx.session,
 			'card@latest',
 		);
+		assert(typeContract);
 
-		assert(typeContract !== null);
-
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: 'action-create-card@1.0.0',
-				logContext: ctx.logContext,
-				card: typeContract.id,
-				type: typeContract.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: autumndbTestUtils.generateRandomSlug({
-							prefix: 'execute-test',
-						}),
-						version: '1.0.0',
-						data: {
-							foo: 'bar',
+				data: {
+					action: 'action-create-card@1.0.0',
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug: autumndbTestUtils.generateRandomSlug({
+								prefix: 'execute-test',
+							}),
+							version: '1.0.0',
+							data: {
+								foo: 'bar',
+							},
 						},
 					},
 				},
 			},
 		);
+		assert(request);
 
 		await ctx.flush(ctx.session);
 		const result: any = await ctx.worker.producer.waitResults(
@@ -106,28 +116,39 @@ describe('.execute()', () => {
 			},
 		};
 
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: `${slug}@1.0.0`,
-				logContext: ctx.logContext,
-				card: typeContract.id,
-				type: typeContract.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: autumndbTestUtils.generateRandomSlug({
-							prefix: 'execute-test',
-						}),
-						version: '1.0.0',
-						data: {
-							foo: 'bar',
+				data: {
+					action: `${slug}@1.0.0`,
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug: autumndbTestUtils.generateRandomSlug({
+								prefix: 'execute-test',
+							}),
+							version: '1.0.0',
+							data: {
+								foo: 'bar',
+							},
 						},
 					},
 				},
 			},
 		);
+		assert(request);
 
 		try {
 			await ctx.flush(ctx.session);
@@ -196,26 +217,37 @@ describe('.execute()', () => {
 		);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: `${actionContract.slug}@${actionContract.version}`,
-				logContext: ctx.logContext,
-				card: typeContract.id,
-				type: typeContract.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug,
-						version: '1.0.0',
-						data: {
-							command,
+				data: {
+					action: `${actionContract.slug}@${actionContract.version}`,
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug,
+							version: '1.0.0',
+							data: {
+								command,
+							},
 						},
 					},
 				},
 			},
 		);
+		assert(request);
 
 		await ctx.flush(ctx.session);
 		const result = await ctx.worker.producer.waitResults(
@@ -311,26 +343,37 @@ describe('.execute()', () => {
 		);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: `${actionContract.slug}@${actionContract.version}`,
-				logContext: ctx.logContext,
-				card: typeContract.id,
-				type: typeContract.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug,
-						version: '1.0.0',
-						data: {
-							command,
+				data: {
+					action: `${actionContract.slug}@${actionContract.version}`,
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug,
+							version: '1.0.0',
+							data: {
+								command,
+							},
 						},
 					},
 				},
 			},
 		);
+		assert(request);
 
 		await ctx.flush(ctx.session);
 		const result = await ctx.worker.producer.waitResults(
@@ -428,27 +471,37 @@ describe('.execute()', () => {
 			setTimeout(resolve, 5000);
 		});
 
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: `${actionContract.slug}@${actionContract.version}`,
-				logContext: ctx.logContext,
-				card: typeContract.id,
-				type: typeContract.type,
-				arguments: {
-					reason: null,
-					properties: {
-						version: '1.0.0',
-						slug,
-						data: {
-							command,
+				data: {
+					action: `${actionContract.slug}@${actionContract.version}`,
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							version: '1.0.0',
+							slug,
+							data: {
+								command,
+							},
 						},
 					},
 				},
 			},
 		);
-
+		assert(request);
 		await ctx.flush(ctx.session);
 
 		const result = await ctx.worker.producer.waitResults(
@@ -484,27 +537,37 @@ describe('.execute()', () => {
 		assert(actionContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: `${actionContract.slug}@${actionContract.version}`,
-				logContext: ctx.logContext,
-				card: typeContract.id,
-				type: typeContract.type,
-				arguments: {
-					reason: null,
-					properties: {
-						version: '1.0.0',
-						slug,
-						data: {
-							foo: 'bar',
+				data: {
+					action: `${actionContract.slug}@${actionContract.version}`,
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							version: '1.0.0',
+							slug,
+							data: {
+								foo: 'bar',
+							},
 						},
 					},
 				},
 			},
 		);
-
+		assert(request);
 		await ctx.flush(ctx.session);
 		const result: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
@@ -546,37 +609,47 @@ describe('.execute()', () => {
 		assert(typeType !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: 'action-create-card@1.0.0',
-				logContext: ctx.logContext,
-				card: typeType.id,
-				type: typeType.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug,
-						version: '1.0.0',
-						data: {
-							schema: {
-								type: 'object',
-								properties: {
-									type: {
-										type: 'string',
-										const: `${slug}@1.0.0`,
+				data: {
+					action: 'action-create-card@1.0.0',
+					context: ctx.logContext,
+					card: typeType.id,
+					type: typeType.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeType.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug,
+							version: '1.0.0',
+							data: {
+								schema: {
+									type: 'object',
+									properties: {
+										type: {
+											type: 'string',
+											const: `${slug}@1.0.0`,
+										},
 									},
+									additionalProperties: true,
+									required: ['type'],
 								},
-								additionalProperties: true,
-								required: ['type'],
 							},
 						},
 					},
 				},
 			},
 		);
-
+		assert(request);
 		await ctx.flush(ctx.session);
 		const typeResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
@@ -584,24 +657,34 @@ describe('.execute()', () => {
 		);
 		expect(typeResult.error).toBe(false);
 
-		const threadRequest = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const threadRequest = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: 'action-create-card@1.0.0',
-				logContext: ctx.logContext,
-				card: typeResult.data.id,
-				type: typeResult.data.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: autumndbTestUtils.generateRandomSlug(),
-						version: '1.0.0',
+				data: {
+					action: 'action-create-card@1.0.0',
+					context: ctx.logContext,
+					card: typeResult.data.id,
+					type: typeResult.data.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeResult.data.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug: autumndbTestUtils.generateRandomSlug(),
+							version: '1.0.0',
+						},
 					},
 				},
 			},
 		);
-
+		assert(threadRequest);
 		await ctx.flush(ctx.session);
 		const threadResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
@@ -609,25 +692,35 @@ describe('.execute()', () => {
 		);
 		expect(threadResult.error).toBe(false);
 
-		const messageRequest = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const messageRequest = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: 'action-create-event@1.0.0',
-				logContext: ctx.logContext,
-				card: threadResult.data.id,
-				type: threadResult.data.type,
-				arguments: {
-					type: 'card',
-					tags: ['testtag'],
-					payload: {
-						$$mentions: ['johndoe'],
-						message: 'Hello',
+				data: {
+					action: 'action-create-event@1.0.0',
+					context: ctx.logContext,
+					card: threadResult.data.id,
+					type: threadResult.data.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: threadResult.data.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						type: 'card',
+						tags: ['testtag'],
+						payload: {
+							$$mentions: ['johndoe'],
+							message: 'Hello',
+						},
 					},
 				},
 			},
 		);
-
+		assert(messageRequest);
 		await ctx.flush(ctx.session);
 		const messageResult: any = await ctx.worker.producer.waitResults(
 			ctx.logContext,
@@ -661,27 +754,37 @@ describe('.execute()', () => {
 		assert(typeContract !== null);
 		assert(actionContract !== null);
 
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: `${actionContract.slug}@${actionContract.version}`,
-				logContext: ctx.logContext,
-				card: typeContract.id,
-				type: typeContract.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug: autumndbTestUtils.generateRandomSlug(),
-						version: '1.0.0',
-						data: {
-							foo: 'bar',
+				data: {
+					action: `${actionContract.slug}@${actionContract.version}`,
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug: autumndbTestUtils.generateRandomSlug(),
+							version: '1.0.0',
+							data: {
+								foo: 'bar',
+							},
 						},
 					},
 				},
 			},
 		);
-
+		assert(request);
 		await ctx.flush(ctx.session);
 		const result = await ctx.worker.producer.waitResults(
 			ctx.logContext,
@@ -764,27 +867,37 @@ describe('.execute()', () => {
 		);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
-		const request = await ctx.worker.producer.enqueue(
-			ctx.worker.getId(),
+		const request = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
 			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
 			{
-				action: `${actionContract.slug}@${actionContract.version}`,
-				logContext: ctx.logContext,
-				card: typeContract.id,
-				type: typeContract.type,
-				arguments: {
-					reason: null,
-					properties: {
-						slug,
-						version: '1.0.0',
-						data: {
-							command,
+				data: {
+					action: `${actionContract.slug}@${actionContract.version}`,
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug,
+							version: '1.0.0',
+							data: {
+								command,
+							},
 						},
 					},
 				},
 			},
 		);
-
+		assert(request);
 		await ctx.flush(ctx.session);
 		const result = await ctx.worker.producer.waitResults(
 			ctx.logContext,
