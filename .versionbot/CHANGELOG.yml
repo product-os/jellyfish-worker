@@ -1,4 +1,18 @@
 - commits:
+    - subject: Use session actor for triggered actions
+      hash: f448caf56035fdd628d5d855bbf23972cb834acf
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 23.0.6
+  title: "'Use session actor for triggered actions'"
+  date: 2022-05-01T15:07:23.235Z
+- commits:
     - subject: Update triggered action enqueue log
       hash: a8c1e32441acc1d5e337e6e6a7b2df98fd54a929
       body: ""
