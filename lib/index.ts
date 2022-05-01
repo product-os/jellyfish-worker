@@ -1770,6 +1770,8 @@ export class Worker {
 									trigger: trigger.slug,
 									contract: triggerContract.id,
 									arguments: request.arguments,
+									session,
+									actor: options.actor,
 								},
 							);
 
