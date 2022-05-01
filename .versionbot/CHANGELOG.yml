@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add another execute log
+      hash: 33527c08048129ecac791bfac0b03511de6bacad
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 23.0.4
+  title: "'Add another execute log'"
+  date: 2022-05-01T05:49:57.614Z
+- commits:
     - subject: Log execute session
       hash: aea7ad4bb54d102294dc71d8be058a4729d97f3e
       body: ""
