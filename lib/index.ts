@@ -7,6 +7,7 @@ import type {
 	Contract,
 	ContractData,
 	ContractDefinition,
+	SessionContract,
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import { strict } from 'assert';
@@ -1720,6 +1721,11 @@ export class Worker {
 				}
 			});
 
+		const sessionContract = await this.kernel.getContractById<SessionContract>(
+			logContext,
+			session,
+			session,
+		);
 		await Promise.all(
 			this.triggers.map(async (trigger: TriggeredActionContract) => {
 				try {
@@ -1771,7 +1777,7 @@ export class Worker {
 									contract: triggerContract.id,
 									arguments: request.arguments,
 									session,
-									actor: options.actor,
+									actor: sessionContract!.data.actor,
 								},
 							);
 
@@ -1781,14 +1787,14 @@ export class Worker {
 								this.typeContracts['action-request@1.0.0'],
 								{
 									timestamp: request.currentDate.toISOString(),
-									actor: options.actor,
+									actor: sessionContract!.data.actor,
 									originator: options.originator || request.originator,
 								},
 								{
 									data: {
 										card: triggerContract.id,
 										action: request.action!,
-										actor: options.actor,
+										actor: sessionContract!.data.actor,
 										context: request.logContext,
 										input: {
 											id: triggerContract.id,
