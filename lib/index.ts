@@ -1338,6 +1338,17 @@ export class Worker {
 			session,
 			request.data.action,
 		);
+		if (!actionContract) {
+			logger.warn(logContext, 'Action not found', {
+				id: request.id,
+				card: request.data.input.id,
+				type: request.data.input.type,
+				actor: request.data.actor,
+				action: request.data.action,
+				session,
+				actionContract,
+			});
+		}
 
 		assert.USER(
 			logContext,
