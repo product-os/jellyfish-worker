@@ -1,4 +1,18 @@
 - commits:
+    - subject: Log execute session
+      hash: aea7ad4bb54d102294dc71d8be058a4729d97f3e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 23.0.3
+  title: "'Log execute session'"
+  date: 2022-05-01T04:02:38.169Z
+- commits:
     - subject: Update external-non-major
       hash: 4a9df68a4a73bf752c817c62964e4b4c36750eb8
       body: ""
