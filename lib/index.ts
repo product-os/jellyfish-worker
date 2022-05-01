@@ -1329,6 +1329,7 @@ export class Worker {
 				type: request.data.input.type,
 				actor: request.data.actor,
 				action: request.data.action,
+				session,
 			},
 		});
 
