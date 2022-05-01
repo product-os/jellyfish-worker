@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update triggered action enqueue log
+      hash: a8c1e32441acc1d5e337e6e6a7b2df98fd54a929
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 23.0.5
+  title: "'Update triggered action enqueue log'"
+  date: 2022-05-01T14:36:40.282Z
+- commits:
     - subject: Add another execute log
       hash: 33527c08048129ecac791bfac0b03511de6bacad
       body: ""
