@@ -1,4 +1,22 @@
 - commits:
+    - subject: Add triggered-action actor test
+      hash: ca5ea3a57ae780f111197e00d917f5be4c6b8252
+      body: |
+        Add test that asserts that the actor used to
+        execute triggered action requests is the
+        actor of the session used to insert the
+        contract that caused the trigger.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 23.0.7
+  title: "'Add triggered-action actor test'"
+  date: 2022-05-02T04:23:09.041Z
+- commits:
     - subject: Use session actor for triggered actions
       hash: f448caf56035fdd628d5d855bbf23972cb834acf
       body: ""
