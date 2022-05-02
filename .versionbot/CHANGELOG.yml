@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update triggered action actor test
+      hash: cdf2dc1843723970016e1c23ede7c39ceff5b415
+      body: |
+        Assert using a non-admin user
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 23.0.8
+  title: "'Update triggered action actor test'"
+  date: 2022-05-02T04:47:25.165Z
+- commits:
     - subject: Add triggered-action actor test
       hash: ca5ea3a57ae780f111197e00d917f5be4c6b8252
       body: |
