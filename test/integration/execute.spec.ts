@@ -1191,19 +1191,8 @@ describe('.execute()', () => {
 	});
 
 	test('should execute a triggered action using the initial sessions actor', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
-
-		const actionContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'action-create-card@latest',
-		);
-		assert(actionContract !== null);
+		const user = await ctx.createUser(autumndbTestUtils.generateRandomId());
+		const session = await ctx.createSession(user);
 
 		const foo = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
@@ -1226,7 +1215,7 @@ describe('.execute()', () => {
 						},
 					},
 					action: 'action-create-card@1.0.0',
-					target: typeContract.id,
+					target: ctx.worker.typeContracts['card@1.0.0'].id,
 					arguments: {
 						reason: null,
 						properties: {
@@ -1240,44 +1229,20 @@ describe('.execute()', () => {
 			}) as TriggeredActionContract,
 		);
 
-		const request = await ctx.worker.insertCard<ActionRequestContract>(
+		const request = await ctx.worker.insertCard(
 			ctx.logContext,
-			ctx.session,
-			ctx.worker.typeContracts['action-request@1.0.0'],
+			session.id,
+			ctx.worker.typeContracts['card@1.0.0'],
 			{},
 			{
+				version: '1.0.0',
+				name: foo,
 				data: {
-					action: `${actionContract.slug}@${actionContract.version}`,
-					context: ctx.logContext,
-					card: typeContract.id,
-					type: typeContract.type,
-					actor: ctx.adminUserId,
-					epoch: new Date().valueOf(),
-					input: {
-						id: typeContract.id,
-					},
-					timestamp: new Date().toISOString(),
-					arguments: {
-						reason: null,
-						properties: {
-							slug: autumndbTestUtils.generateRandomSlug(),
-							version: '1.0.0',
-							name: foo,
-							data: {
-								actor: autumndbTestUtils.generateRandomId(),
-							},
-						},
-					},
+					actor: autumndbTestUtils.generateRandomId(),
 				},
 			},
 		);
 		assert(request);
-		await ctx.flush(ctx.session);
-		const result = await ctx.worker.producer.waitResults(
-			ctx.logContext,
-			request,
-		);
-		expect(result.error).toBe(false);
 		await ctx.flushAll(ctx.session);
 
 		await ctx.waitForMatch({
@@ -1293,7 +1258,7 @@ describe('.execute()', () => {
 							const: 'action-create-card@1.0.0',
 						},
 						actor: {
-							const: ctx.adminUserId,
+							const: user.id,
 						},
 						arguments: {
 							type: 'object',
