@@ -1,6 +1,6 @@
 {
   "name": "@balena/jellyfish-worker",
-  "version": "23.0.13",
+  "version": "23.0.14",
   "repository": {
     "type": "git",
     "url": "https://github.com/product-os/jellyfish-worker.git"
@@ -101,6 +101,6 @@
     "pre-commit": "npx lint-staged"
   },
   "versionist": {
-    "publishedAt": "2022-05-04T06:20:08.127Z"
+    "publishedAt": "2022-05-07T02:36:10.379Z"
   }
 }
