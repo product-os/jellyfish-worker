@@ -1,5 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import _ from 'lodash';
 import skhema from 'skhema';
 import type { ActionDefinition } from '../plugin';
 
@@ -19,6 +20,9 @@ const handler: ActionDefinition['handler'] = async (
 		'You may not use contract actions to create an event',
 	);
 
+	// TODO: Validate requested links against relationships in worker instance cache
+
+	// Create new contract
 	const result = await context.insertCard(
 		session,
 		typeContract as TypeContract,
@@ -35,6 +39,8 @@ const handler: ActionDefinition['handler'] = async (
 	if (!result) {
 		return null;
 	}
+
+	// TODO: Link contract(s) if necessary
 
 	return {
 		id: result.id,

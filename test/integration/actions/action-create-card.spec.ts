@@ -643,4 +643,81 @@ describe('action-create-card', () => {
 			),
 		).rejects.toThrow(autumndbErrors.JellyfishPermissionsError);
 	});
+
+	test('should create specified links', async () => {
+		// Create an org
+		const org = await ctx.createOrg(autumndbTestUtils.generateRandomId());
+
+		// Create a user with link to org
+		const request = makeRequest(ctx, {
+			properties: {
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'user@1.0.0',
+				data: {
+					hash: autumndbTestUtils.generateRandomId(),
+					roles: [],
+				},
+				links: {
+					'is member of': [
+						{
+							id: org.id,
+							slug: org.slug,
+							type: 'org',
+						},
+					],
+				},
+			},
+		});
+
+		const result: any = await actionCreateCard.handler(
+			ctx.session,
+			actionContext,
+			ctx.worker.typeContracts['user@1.0.0'],
+			request,
+		);
+		assert(result);
+
+		await ctx.waitForMatch({
+			type: 'object',
+			required: ['type', 'name', 'data'],
+			properties: {
+				type: {
+					type: 'string',
+					const: 'link@1.0.0',
+				},
+				name: {
+					type: 'string',
+					const: 'is member of',
+				},
+				data: {
+					type: 'object',
+					required: ['from', 'to'],
+					properties: {
+						from: {
+							type: 'object',
+							required: ['id'],
+							properties: {
+								id: {
+									type: 'string',
+									const: result.id,
+								},
+							},
+						},
+						to: {
+							type: 'object',
+							required: ['id'],
+							properties: {
+								id: {
+									type: 'string',
+									const: org.id,
+								},
+							},
+						},
+					},
+				},
+			},
+		});
+	});
 });
