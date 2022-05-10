@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add action-create-card duplicate slug test
+      hash: 4b15f1063589a9df7ccc59f05197665caec7698a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 23.0.17
+  title: "'Add action-create-card duplicate slug test'"
+  date: 2022-05-10T03:36:09.197Z
+- commits:
     - subject: Update internal-patch
       hash: 5b64a107d9d89fdce4ca3bcc8bb1e59f2f0c4b5d
       body: ""
