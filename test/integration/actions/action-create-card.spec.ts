@@ -49,6 +49,38 @@ describe('action-create-card', () => {
 		expect(result.slug).toEqual(request.arguments.properties.slug);
 	});
 
+	test('should throw when creating multiple contracts with same slug', async () => {
+		// Create first contract
+		const slug = autumndbTestUtils.generateRandomSlug();
+		const result: any = await actionCreateCard.handler(
+			ctx.session,
+			actionContext,
+			ctx.worker.typeContracts['card@1.0.0'],
+			makeRequest(ctx, {
+				properties: {
+					slug,
+					type: 'card@1.0.0',
+				},
+			}),
+		);
+		assert(result);
+		expect(result.slug).toEqual(slug);
+
+		await expect(() => {
+			return actionCreateCard.handler(
+				ctx.session,
+				actionContext,
+				ctx.worker.typeContracts['card@1.0.0'],
+				makeRequest(ctx, {
+					properties: {
+						slug,
+						type: 'card@1.0.0',
+					},
+				}),
+			);
+		}).rejects.toThrowError(autumndbErrors.JellyfishElementAlreadyExists);
+	});
+
 	test('should generate a slug when one is not provided', async () => {
 		const request = makeRequest(ctx, {
 			properties: {
