@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add slug to integration definition
+      hash: fe4091b8a110d80d2747a288e6f333d21c897d75
+      body: >
+        Remove extra parameter `provider` for running integration. Oauth
+        credentials in user contract is stored in
+        [`user.data.oauth[integration]`](https://github.com/product-os/jellyfish-worker/blob/6c93126aa385f5e0d5c242de14988383fdfca856/lib/sync/index.ts#L258-L295)
+      footer:
+        Change-type: major
+        change-type: major
+      author: karaxuna
+      nested: []
+  version: 24.0.0
+  title: "'Add slug to integration definition'"
+  date: 2022-05-10T10:51:16.395Z
+- commits:
     - subject: Add action-create-card duplicate slug test
       hash: 4b15f1063589a9df7ccc59f05197665caec7698a
       body: ""
