@@ -261,12 +261,12 @@ export const run = async (
 
 				options.context.log.info('Sync: Getting OAuth user', {
 					actor,
-					provider: options.provider,
+					provider: integration.slug,
 					defaultUser: options.defaultUser,
 				});
 				const userContract = await getOAuthUser(
 					options.context,
-					options.provider,
+					integration.slug,
 					actor,
 					{
 						defaultUser: options.defaultUser,
@@ -276,7 +276,7 @@ export const run = async (
 					id: userContract.id,
 				});
 
-				const tokenPath = ['data', 'oauth', options.provider];
+				const tokenPath = ['data', 'oauth', integration.slug];
 				const tokenData = _.get(userContract, tokenPath);
 				if (tokenData) {
 					_.set(
@@ -291,7 +291,7 @@ export const run = async (
 				// Lets try refreshing the token and retry if so
 				if (result.code === 401 && tokenData) {
 					options.context.log.info('Refreshing OAuth token', {
-						provider: options.provider,
+						provider: integration.slug,
 						user: userContract.slug,
 						origin: options.origin,
 						appId: token.appId,

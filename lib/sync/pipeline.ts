@@ -39,7 +39,6 @@ const runIntegration = async (
 			actor: options.actor,
 			origin: options.origin,
 			defaultUser: options.defaultUser,
-			provider: options.provider,
 			context: options.context,
 		},
 	);

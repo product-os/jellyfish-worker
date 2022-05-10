@@ -97,6 +97,8 @@ afterAll(() => {
 });
 
 const oAuthTokenRefreshTestIntegration = {
+	slug: 'balena-cloud',
+
 	OAUTH_BASE_URL: 'https://api.balena-cloud.com',
 	OAUTH_SCOPES: ['users'],
 
@@ -198,7 +200,6 @@ describe('instance', () => {
 				actor: 'foo',
 				defaultUser: 'bar',
 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
-				provider: 'balena-cloud',
 				context: {
 					log: {
 						info: _.noop,
@@ -291,7 +292,6 @@ describe('instance', () => {
 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
 				actor: 'foo',
 				defaultUser: 'jellysync',
-				provider: 'balena-cloud',
 				context: {
 					log: {
 						info: _.noop,
@@ -406,7 +406,6 @@ describe('instance', () => {
 				actor: 'foo',
 				defaultUser: 'bar',
 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
-				provider: 'balena-cloud',
 				context: {
 					log: {
 						info: _.noop,
@@ -499,7 +498,6 @@ describe('instance', () => {
 				actor: 'foobar',
 				origin: 'https://jel.ly.fish/oauth/balena-cloud',
 				defaultUser: 'jellysync',
-				provider: 'balena-cloud',
 				context: {
 					log: {
 						info: _.noop,
@@ -634,7 +632,6 @@ describe('instance', () => {
 				{
 					actor: 'foo',
 					origin: 'https://jel.ly.fish/oauth/balena-cloud',
-					provider: 'balena-cloud',
 					defaultUser: 'foobar',
 					context: {
 						log: {

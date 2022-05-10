@@ -23,7 +23,6 @@ export interface PipelineOpts {
 	actor: string;
 	origin: string;
 	defaultUser: string;
-	provider: string;
 	token: any;
 	context: SyncActionContext;
 }
@@ -98,6 +97,8 @@ export interface IntegrationInitializationOptions {
 }
 
 export interface IntegrationDefinition {
+	slug: string;
+
 	OAUTH_BASE_URL?: string;
 	OAUTH_SCOPES?: string[];
 

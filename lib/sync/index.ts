@@ -379,7 +379,6 @@ export class Sync {
 			actor: options.actor,
 			origin: options.origin,
 			defaultUser: options.defaultUser,
-			provider: name,
 			token,
 			context,
 		});
@@ -442,7 +441,6 @@ export class Sync {
 				actor: options.actor,
 				origin: options.origin,
 				defaultUser: options.defaultUser,
-				provider: name,
 				token,
 				context,
 			});
@@ -524,7 +522,6 @@ export class Sync {
 			},
 			{
 				actor: options.actor,
-				provider: name,
 				origin: '',
 				defaultUser: '',
 				context,

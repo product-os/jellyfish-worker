@@ -63,6 +63,8 @@ class TestIntegration implements Integration {
 
 const integrationDefinitionFor = (slug: string): IntegrationDefinition => {
 	return {
+		slug,
+
 		initialize: async () => new TestIntegration(slug),
 
 		isEventValid: (
