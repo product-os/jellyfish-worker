@@ -57,6 +57,7 @@
     "axios": "^0.26.1",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
+    "countries-and-timezones": "^3.3.0",
     "cron-parser": "^4.4.0",
     "fast-equals": "^3.0.2",
     "fast-json-patch": "^3.1.1",
