@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add agent-settings contract, timezone mixin
+      hash: bfb3c8abb955511608473524406fa0193d128464
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 24.1.0
+  title: "'Add agent-settings contract, timezone mixin'"
+  date: 2022-05-11T02:00:41.085Z
+- commits:
     - subject: Add slug to integration definition
       hash: fe4091b8a110d80d2747a288e6f333d21c897d75
       body: >
