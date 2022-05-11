@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-client-sdk from 10.3.10 to 10.4.0
+      hash: c1db2ed5392cf56271b0be5a91b721a8f73d07b1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 24.1.1
+  title: "'Update @balena/jellyfish-client-sdk from 10.3.10 to 10.4.0'"
+  date: 2022-05-11T02:14:37.939Z
+- commits:
     - subject: Add agent-settings contract, timezone mixin
       hash: bfb3c8abb955511608473524406fa0193d128464
       body: ""
