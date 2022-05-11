@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add relationship contracts
+      hash: b5acf4a328b67217505935cef6b7a107f4fb0f40
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 24.2.0
+  title: "'Add relationship contracts'"
+  date: 2022-05-11T04:58:34.276Z
+- commits:
     - subject: Update autumndb from 19.1.40 to 19.3.0
       hash: ced2b8e1de660133eb3f8040c0dc76bad20f96c2
       body: ""
