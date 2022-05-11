@@ -29,12 +29,6 @@ export interface TestContext extends autumndbTestUtils.TestContext {
 	flushAll: (session: string) => Promise<void>;
 	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
 	processAction: (session: string, action: any) => Promise<any>;
-	retry: (
-		fn: any,
-		checkResult: any,
-		times?: number,
-		delay?: number,
-	) => Promise<any>;
 	createEvent: (
 		actor: string,
 		session: string,
@@ -188,20 +182,6 @@ export const newContext = async (
 			autumndbTestContext.logContext,
 			createRequest as ActionRequestContract,
 		);
-	};
-
-	const retry = async (fn: any, checkResult: any, times = 10, delay = 500) => {
-		const result = await fn();
-		if (!checkResult(result)) {
-			if (times > 0) {
-				await new Promise((resolve) => {
-					setTimeout(resolve, delay);
-				});
-				return retry(fn, checkResult, times - 1);
-			}
-			throw new Error('Ran out of retry attempts');
-		}
-		return result;
 	};
 
 	const createEvent = async (
@@ -361,7 +341,6 @@ export const newContext = async (
 		waitForMatch,
 		flushAll,
 		processAction,
-		retry,
 		createEvent,
 		createLinkThroughWorker,
 		createContract,
