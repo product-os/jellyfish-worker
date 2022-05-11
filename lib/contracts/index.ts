@@ -1,4 +1,5 @@
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import { agentSettings } from './agent-settings';
 import { contact } from './contact';
 import { create } from './create';
 import { genericSource } from './generic-source';
@@ -21,6 +22,7 @@ import { viewAllViews } from './view-all-views';
 import { viewScheduledActions } from './view-scheduled-actions';
 
 export const contracts: ContractDefinition[] = [
+	agentSettings,
 	contact,
 	create,
 	genericSource,
