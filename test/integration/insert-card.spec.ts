@@ -1386,4 +1386,77 @@ describe('.insertCard()', () => {
 			);
 		}).rejects.toThrowError(autumndbErrors.JellyfishElementAlreadyExists);
 	});
+	test('should create actor links', async () => {
+		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeContract);
+
+		// Insert initial contract
+		const inserted = await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			typeContract,
+			{
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				attachEvents: false,
+				reason: null,
+			},
+			{
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'card',
+				}),
+				version: '1.0.0',
+				data: {},
+			},
+		);
+		assert(inserted);
+
+		await ctx.waitForMatch({
+			type: 'object',
+			additionalProperties: true,
+			required: ['type', 'name', 'data'],
+			properties: {
+				type: {
+					const: 'link@1.0.0',
+				},
+				name: {
+					const: 'is creator of',
+				},
+				data: {
+					type: 'object',
+					required: ['from', 'to'],
+					properties: {
+						from: {
+							type: 'object',
+							required: ['type', 'id'],
+							properties: {
+								type: {
+									const: 'user@1.0.0',
+								},
+								id: {
+									const: ctx.adminUserId,
+								},
+							},
+						},
+						to: {
+							type: 'object',
+							required: ['type', 'id'],
+							properties: {
+								type: {
+									const: 'card@1.0.0',
+								},
+								id: {
+									const: inserted.id,
+								},
+							},
+						},
+					},
+				},
+			},
+		});
+	});
 });
