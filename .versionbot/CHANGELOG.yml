@@ -1,4 +1,19 @@
 - commits:
+    - subject: Oauth flow with contracts
+      hash: 41b6011da4884681dbd81f860a2c7170be126256
+      body: >
+        All necessary data for interacting with outh providers should be read
+        from `oauth-provider` contracts instead of hardcoding it in
+        integrations.
+      footer:
+        Change-type: major
+        change-type: major
+      author: karaxuna
+      nested: []
+  version: 25.0.0
+  title: "'Oauth flow with contracts'"
+  date: 2022-05-13T10:17:15.077Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 11.0.3 to 12.0.0
       hash: 644da177c4e81d5bde16bc52fb9f762517edcee7
       body: ""
