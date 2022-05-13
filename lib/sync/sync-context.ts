@@ -8,6 +8,7 @@ import { strict } from 'assert';
 import { Kernel } from 'autumndb';
 import jsonpatch, { Operation } from 'fast-json-patch';
 import _ from 'lodash';
+import { OauthProviderContract } from '../contracts/oauth-provider';
 import * as workerErrors from '../errors';
 import type { WorkerContext } from '../types';
 
@@ -279,6 +280,37 @@ export const getActionContext = (
 		},
 		getElementById: async (id: string) => {
 			return workerContext.getCardById(session, id);
+		},
+		getOauthProviderByIntegration: async (integration: string) => {
+			const [contact] = await workerContext.query<OauthProviderContract>(
+				workerContext.privilegedSession,
+				{
+					type: 'object',
+					required: ['active', 'type', 'data'],
+					properties: {
+						type: {
+							const: 'oauth-provider@1.0.0',
+						},
+						active: {
+							const: true,
+						},
+						data: {
+							type: 'object',
+							required: ['integration'],
+							properties: {
+								integration: {
+									const: integration,
+								},
+							},
+						},
+					},
+				},
+				{
+					limit: 1,
+				},
+			);
+
+			return contact || null;
 		},
 		getElementByMirrorId: async (
 			type: string,

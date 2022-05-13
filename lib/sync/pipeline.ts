@@ -20,7 +20,6 @@ const runIntegration = async (
 ): Promise<Contract[]> => {
 	return instance.run(
 		integration,
-		options.token,
 		async (integrationInstance: Integration) => {
 			const sequence = await integrationInstance[fn](contract, {
 				actor: options.actor,
@@ -37,7 +36,6 @@ const runIntegration = async (
 		},
 		{
 			actor: options.actor,
-			origin: options.origin,
 			defaultUser: options.defaultUser,
 			context: options.context,
 		},

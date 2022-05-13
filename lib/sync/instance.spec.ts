@@ -21,7 +21,6 @@ const firstNock = () => {
 					grant_type: 'refresh_token',
 					client_id: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
 					client_secret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-					redirect_uri: 'https://jel.ly.fish/oauth/balena-cloud',
 					refresh_token: 'POolsdYTlmM2YxOTQ5MGE3YmNmMDFkNTVk',
 				})
 			) {
@@ -96,11 +95,28 @@ afterAll(() => {
 	nock.cleanAll();
 });
 
+const provider = {
+	id: 'b5fc8487-cd6b-46aa-84ec-2407d5989e93',
+	slug: 'oauth-provider-balena-cloud',
+	type: 'oauth-provider@1.0.0',
+	version: '1.0.0',
+	tags: [],
+	markers: [],
+	active: true,
+	created_at: Date.now().toString(),
+	requires: [],
+	capabilities: [],
+	data: {
+		authorizeUrl: 'https://api.balena-cloud.com/auth',
+		tokenUrl: 'https://api.balena-cloud.com/oauth/token',
+		clientId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
+		clientSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
+		integration: 'balena-cloud',
+	},
+};
+
 const oAuthTokenRefreshTestIntegration = {
 	slug: 'balena-cloud',
-
-	OAUTH_BASE_URL: 'https://api.balena-cloud.com',
-	OAUTH_SCOPES: ['users'],
 
 	initialize: async (options: IntegrationInitializationOptions) =>
 		new OAuthTokenRefreshTestIntegration(options),
@@ -187,10 +203,6 @@ describe('instance', () => {
 
 		const result = await instance.run(
 			oAuthTokenRefreshTestIntegration,
-			{
-				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-			},
 			(object) => {
 				return object.translate({} as Contract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -199,7 +211,6 @@ describe('instance', () => {
 			{
 				actor: 'foo',
 				defaultUser: 'bar',
-				origin: 'https://jel.ly.fish/oauth/balena-cloud',
 				context: {
 					log: {
 						info: _.noop,
@@ -212,6 +223,9 @@ describe('instance', () => {
 						data[object.id] = object;
 						data[object.id].type = type;
 						return data[object.id];
+					},
+					getOauthProviderByIntegration: async () => {
+						return provider;
 					},
 				} as any as SyncActionContext,
 			},
@@ -279,17 +293,12 @@ describe('instance', () => {
 
 		const result = await instance.run(
 			oAuthTokenRefreshTestIntegration,
-			{
-				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-			},
 			(object) => {
 				return object.translate({} as Contract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 				});
 			},
 			{
-				origin: 'https://jel.ly.fish/oauth/balena-cloud',
 				actor: 'foo',
 				defaultUser: 'jellysync',
 				context: {
@@ -307,6 +316,9 @@ describe('instance', () => {
 						data[object.id] = object;
 						data[object.id].type = type;
 						return data[object.id];
+					},
+					getOauthProviderByIntegration: async () => {
+						return provider;
 					},
 				} as any as SyncActionContext,
 			},
@@ -393,10 +405,6 @@ describe('instance', () => {
 
 		const result = await instance.run(
 			oAuthTokenRefreshTestIntegration,
-			{
-				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-			},
 			(object) => {
 				return object.translate({} as Contract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -405,7 +413,6 @@ describe('instance', () => {
 			{
 				actor: 'foo',
 				defaultUser: 'bar',
-				origin: 'https://jel.ly.fish/oauth/balena-cloud',
 				context: {
 					log: {
 						info: _.noop,
@@ -418,6 +425,9 @@ describe('instance', () => {
 						data[object.id] = object;
 						data[object.id].type = type;
 						return data[object.id];
+					},
+					getOauthProviderByIntegration: async () => {
+						return provider;
 					},
 				} as any as SyncActionContext,
 			},
@@ -485,10 +495,6 @@ describe('instance', () => {
 
 		const result = await instance.run(
 			oAuthTokenRefreshTestIntegration,
-			{
-				appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-				appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-			},
 			(object) => {
 				return object.translate({} as Contract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -496,7 +502,6 @@ describe('instance', () => {
 			},
 			{
 				actor: 'foobar',
-				origin: 'https://jel.ly.fish/oauth/balena-cloud',
 				defaultUser: 'jellysync',
 				context: {
 					log: {
@@ -513,6 +518,9 @@ describe('instance', () => {
 						data[object.id] = object;
 						data[object.id].type = type;
 						return data[object.id];
+					},
+					getOauthProviderByIntegration: async () => {
+						return provider;
 					},
 				} as any as SyncActionContext,
 			},
@@ -571,17 +579,12 @@ describe('instance', () => {
 		await expect(
 			instance.run(
 				oAuthTokenRefreshTestIntegration,
-				{
-					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-				},
 				(object) => {
 					return object.translate({} as Contract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 					});
 				},
 				{
-					origin: 'https://jel.ly.fish/oauth/balena-cloud',
 					provider: 'balena-cloud',
 					context: {
 						log: {
@@ -598,6 +601,9 @@ describe('instance', () => {
 							data[object.id] = object;
 							data[object.id].type = type;
 							return data[object.id];
+						},
+						getOauthProviderByIntegration: async () => {
+							return provider;
 						},
 					} as any as SyncActionContext,
 				} as any,
@@ -620,10 +626,6 @@ describe('instance', () => {
 		await expect(
 			instance.run(
 				oAuthTokenRefreshTestIntegration,
-				{
-					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-				},
 				(object) => {
 					return object.translate({} as Contract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -631,7 +633,6 @@ describe('instance', () => {
 				},
 				{
 					actor: 'foo',
-					origin: 'https://jel.ly.fish/oauth/balena-cloud',
 					defaultUser: 'foobar',
 					context: {
 						log: {
@@ -648,6 +649,9 @@ describe('instance', () => {
 							data[object.id] = object;
 							data[object.id].type = type;
 							return data[object.id];
+						},
+						getOauthProviderByIntegration: async () => {
+							return provider;
 						},
 					} as any as SyncActionContext,
 				},
@@ -677,17 +681,12 @@ describe('instance', () => {
 		await expect(
 			instance.run(
 				oAuthTokenRefreshTestIntegration,
-				{
-					appId: '1T+8uJdHUEzAHz5Z84+tg3HtipfEbzdsXbMmWAnI',
-					appSecret: '7Fj+Rf1p/fgXTLR505noNwoq7btJaY8KLyIJWE/r',
-				},
 				(object) => {
 					return object.translate({} as Contract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
 					});
 				},
 				{
-					origin: 'https://jel.ly.fish/oauth/balena-cloud',
 					provider: 'balena-cloud',
 					defaultUser: 'jellysync',
 					context: {
@@ -705,6 +704,9 @@ describe('instance', () => {
 							data[object.id] = object;
 							data[object.id].type = type;
 							return data[object.id];
+						},
+						getOauthProviderByIntegration: async () => {
+							return provider;
 						},
 					} as any as SyncActionContext,
 				} as any,
