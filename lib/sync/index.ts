@@ -50,91 +50,6 @@ export class Sync {
 	}
 
 	/**
-	 * @summary Get an external authorize URL
-	 * @function
-	 * @public
-	 *
-	 * @param {String} name - integration name
-	 * @param {Object} token - token details
-	 * @param {String} slug - user slug
-	 * @param {Object} options - options
-	 * @param {String} options.origin - The callback URL
-	 * @returns {String} Authorize URL
-	 */
-	getAssociateUrl(
-		name: string,
-		token: any,
-		slug: string,
-		options: { origin: string },
-	) {
-		const integration = this.integrations[name];
-		if (
-			!integration ||
-			!token ||
-			!token.appId ||
-			!integration.OAUTH_BASE_URL ||
-			!integration.OAUTH_SCOPES
-		) {
-			return null;
-		}
-
-		return oauth.getAuthorizeUrl(
-			integration.OAUTH_BASE_URL,
-			integration.OAUTH_SCOPES,
-			slug,
-			{
-				appId: token.appId,
-				redirectUri: options.origin,
-			},
-		);
-	}
-
-	/**
-	 * @summary Authorize a user with an external OAuth service
-	 * @function
-	 * @public
-	 *
-	 * @param {String} name - integration name
-	 * @param {Object} token - token details
-	 * @param {Object} context - execution context
-	 * @param {Object} options - options
-	 * @param {String} options.code - short lived OAuth code
-	 * @param {String} options.origin - The callback URL
-	 * @returns {Object} external provider's access token
-	 */
-	async authorize(
-		name: string,
-		token: any,
-		context: syncContext.SyncActionContext,
-		options: {
-			code: string;
-			origin: string;
-		},
-	) {
-		const integration = this.integrations[name];
-
-		assert.INTERNAL(
-			context,
-			!!integration,
-			errors.SyncNoCompatibleIntegration,
-			`There is no compatible integration for provider: ${name}`,
-		);
-
-		assert.INTERNAL(
-			context,
-			token && token.appId && token.appSecret,
-			errors.SyncNoIntegrationAppCredentials,
-			`No application credentials found for integration: ${name}`,
-		);
-
-		return oauth.getAccessToken(integration.OAUTH_BASE_URL, options.code, {
-			appId: token.appId,
-			appSecret: token.appSecret,
-			redirectUri: options.origin,
-		});
-	}
-
-	/**
 	 * @summary Gets external user
 	 * @function
 	 * @public
@@ -377,9 +292,7 @@ export class Sync {
 
 		return pipeline.mirrorCard(integration, contract, {
 			actor: options.actor,
-			origin: options.origin,
 			defaultUser: options.defaultUser,
-			token,
 			context,
 		});
 	}
@@ -439,9 +352,7 @@ export class Sync {
 		const contracts = await metrics.measureTranslate(name, async () => {
 			return pipeline.translateExternalEvent(integration, contract, {
 				actor: options.actor,
-				origin: options.origin,
 				defaultUser: options.defaultUser,
-				token,
 				context,
 			});
 		});
@@ -470,21 +381,12 @@ export class Sync {
 	 */
 	async getFile(
 		name: string,
-		token: any,
 		file: string,
 		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;
 		},
 	): Promise<Buffer | null> {
-		if (!token) {
-			context.log.warn('Not fetching file as there is no token', {
-				integration: name,
-			});
-
-			return null;
-		}
-
 		const integration = this.integrations[name];
 		if (!integration) {
 			context.log.warn(
@@ -505,7 +407,6 @@ export class Sync {
 		// TS-TODO: Its unclear if the origin and defaultUser options are required
 		return instance.run(
 			integration,
-			token,
 			async (integrationInstance) => {
 				if (!integrationInstance.getFile) {
 					context.log.warn(
@@ -522,7 +423,6 @@ export class Sync {
 			},
 			{
 				actor: options.actor,
-				origin: '',
 				defaultUser: '',
 				context,
 			},

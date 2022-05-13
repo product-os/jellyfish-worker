@@ -219,7 +219,6 @@ const getOAuthUser = async (
 
 export const run = async (
 	integration: IntegrationDefinition,
-	token: any,
 	fn: (integrationInstance: Integration) => any,
 	options: Omit<PipelineOpts, 'token'>,
 ) => {
@@ -227,7 +226,6 @@ export const run = async (
 
 	// eslint-disable-next-line new-cap
 	const instance = await integration.initialize({
-		token,
 		defaultUser: options.defaultUser,
 		context: {
 			log: options.context.log,
@@ -245,19 +243,13 @@ export const run = async (
 					'Missing request actor',
 				);
 
-				if (!integration.OAUTH_BASE_URL || !token.appId || !token.appSecret) {
+				const provider = await options.context.getOauthProviderByIntegration(
+					integration.slug,
+				);
+
+				if (!provider) {
 					return httpRequest(requestOptions);
 				}
-
-				options.context.log.info('Sync: OAuth origin URL', {
-					origin: options.origin,
-				});
-				assert.INTERNAL(
-					null,
-					!!options.origin,
-					errors.SyncOAuthError,
-					'Missing OAuth origin URL',
-				);
 
 				options.context.log.info('Sync: Getting OAuth user', {
 					actor,
@@ -289,12 +281,10 @@ export const run = async (
 				const result = await httpRequest(requestOptions);
 
 				// Lets try refreshing the token and retry if so
-				if (result.code === 401 && tokenData) {
+				if (result.code === 401 && tokenData && tokenData.refresh_token) {
 					options.context.log.info('Refreshing OAuth token', {
 						provider: integration.slug,
 						user: userContract.slug,
-						origin: options.origin,
-						appId: token.appId,
 						oldToken: tokenData.access_token,
 					});
 
@@ -306,14 +296,10 @@ export const run = async (
 					 * his account.
 					 */
 					const newToken = await oauth.refreshAccessToken(
-						integration.OAUTH_BASE_URL,
-						tokenData,
-						{
-							appId: token.appId,
-							appSecret: token.appSecret,
-							redirectUri: options.origin,
-						},
+						provider,
+						tokenData.refresh_token,
 					);
+
 					_.set(userContract, tokenPath, newToken);
 					await options.context.upsertElement(
 						userContract.type,

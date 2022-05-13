@@ -4,7 +4,7 @@ import Bluebird from 'bluebird';
 import _ from 'lodash';
 import qs from 'qs';
 import { TypedError } from 'typed-error';
-import url from 'url';
+import { OauthProviderContract } from '../contracts/oauth-provider';
 
 export class OAuthInvalidOption extends TypedError {}
 export class OAuthRequestError extends TypedError {}
@@ -28,8 +28,7 @@ export class OAuthUnsuccessfulResponse extends TypedError {}
 export const request = async (
 	accessToken: { access_token: any } | null,
 	options: {
-		baseUrl: string;
-		uri: string;
+		url;
 		form: string;
 		headers?: {
 			[key: string]: string;
@@ -44,13 +43,9 @@ export const request = async (
 	}
 
 	try {
-		const result = await axios.post(
-			`${options.baseUrl}${options.uri}`,
-			options.form,
-			{
-				headers,
-			},
-		);
+		const result = await axios.post(options.url, options.form, {
+			headers,
+		});
 		return {
 			code: result.status,
 			body: result.data,
@@ -73,79 +68,23 @@ export const request = async (
 	}
 };
 
-/**
- * @summary Get external authorize URL
- * @function
- * @public
- *
- * @description
- * This is the external OAuth URL that we must redirect
- * people to in order to confirm the authorization. When
- * that happens, the external service will direct the user
- * back to us along with a short lived code that we can
- * exchange for a proper access token.
- *
- * @param {String} baseUrl - OAuth service base URL
- * @param {String[]} scopes - List of desired scopes
- * @param {Any} state - Optional metadata to return after the redirect
- * @param {Object} options - options
- * @param {String} options.appId - The client id
- * @param {String} options.redirectUri - The redirect URL
- * @returns {String} Authorize URL
- */
-export const getAuthorizeUrl = (
-	baseUrl: string,
-	scopes: any[] = [],
-	state: any,
-	options: { appId: string; redirectUri: string },
-) => {
-	assert.INTERNAL(
-		null,
-		Boolean(options.appId),
-		OAuthInvalidOption,
-		'Missing appId',
-	);
-	assert.INTERNAL(
-		null,
-		Boolean(options.redirectUri),
-		OAuthInvalidOption,
-		'Missing redirectUri',
-	);
-
-	const authorizeUrl = new url.URL('/oauth/authorize', baseUrl);
-	authorizeUrl.searchParams.append('response_type', 'code');
-	authorizeUrl.searchParams.append('client_id', options.appId);
-	authorizeUrl.searchParams.append('redirect_uri', options.redirectUri);
-	authorizeUrl.searchParams.append('scope', scopes.join(' '));
-
-	if (state) {
-		const str = _.isString(state) ? state : JSON.stringify(state);
-		authorizeUrl.searchParams.append('state', str);
-	}
-
-	return authorizeUrl.href;
-};
-
 const oauthPost = async (
-	baseUrl: any,
-	path: string,
+	url: string,
 	data: {
 		grant_type: string;
 		client_id: any;
 		client_secret: any;
-		redirect_uri: any;
 		code?: any;
 		refresh_token?: any;
 	},
 ) => {
 	const { code, body } = await request(null, {
-		baseUrl,
-		uri: path,
+		url,
 		form: qs.stringify(data),
 	});
 
 	assert.INTERNAL(null, code < 500, OAuthRequestError, () => {
-		return `POST ${baseUrl}${path} responded with ${code}: ${JSON.stringify(
+		return `POST ${url} responded with ${code}: ${JSON.stringify(
 			body,
 			null,
 			2,
@@ -154,14 +93,14 @@ const oauthPost = async (
 
 	assert.INTERNAL(null, code < 400, OAuthUnsuccessfulResponse, () => {
 		return [
-			`POST ${baseUrl}${path} responded with ${code}:`,
+			`POST ${url} responded with ${code}:`,
 			JSON.stringify(body, null, 2),
 			`to payload: ${JSON.stringify(data, null, 2)}`,
 		].join(' ');
 	});
 
 	assert.INTERNAL(null, code === 200, OAuthRequestError, () => {
-		return `POST ${baseUrl}${path} responded with ${code}: ${JSON.stringify(
+		return `POST ${url} responded with ${code}: ${JSON.stringify(
 			body,
 			null,
 			2,
@@ -188,44 +127,21 @@ const oauthPost = async (
  *   "scope": "create"
  * }
  *
- * @param {String} baseUrl - OAuth service base URL
+ * @param {OauthProviderContract} provider - Oauth provider contract to get info from
  * @param {String} code - Short-lived token
- * @param {Object} options - options
- * @param {String} options.appId - The client id
- * @param {String} options.appSecret - The client secret
- * @param {String} options.redirectUri - The redirect URL
+ * @returns {Object} New access token
  * @returns {Object} Access token
  */
 export const getAccessToken = async (
-	baseUrl: any,
-	code: any,
-	options: { appId: any; appSecret: any; redirectUri: any },
+	provider: OauthProviderContract,
+	code: string,
 ) => {
-	assert.INTERNAL(
-		null,
-		Boolean(options.appId),
-		OAuthInvalidOption,
-		'Missing appId',
-	);
-	assert.INTERNAL(
-		null,
-		Boolean(options.appSecret),
-		OAuthInvalidOption,
-		'Missing appSecret',
-	);
-	assert.INTERNAL(
-		null,
-		Boolean(options.redirectUri),
-		OAuthInvalidOption,
-		'Missing redirectUri',
-	);
 	assert.INTERNAL(null, Boolean(code), OAuthInvalidOption, 'Missing code');
 
-	return oauthPost(baseUrl, '/oauth/token', {
+	return oauthPost(provider.data.tokenUrl, {
 		grant_type: 'authorization_code',
-		client_id: options.appId,
-		client_secret: options.appSecret,
-		redirect_uri: options.redirectUri,
+		client_id: provider.data.clientId,
+		client_secret: provider.data.clientSecret,
 		code,
 	});
 };
@@ -239,55 +155,18 @@ export const getAccessToken = async (
  * adquired through `.getAccessToken()`. The result of this
  * function is the same as `.getAccessToken()`.
  *
- * @param {String} baseUrl - OAuth service base URL
- * @param {Object} accessToken - Access token
- * @param {Object} options - options
- * @param {String} options.appId - The client id
- * @param {String} options.appSecret - The client secret
- * @param {String} options.redirectUri - The redirect URL
+ * @param {OauthProviderContract} provider - Oauth provider contract to get info from
+ * @param {String} refreshToken - The refresh token
  * @returns {Object} New access token
  */
 export const refreshAccessToken = async (
-	baseUrl: string,
-	accessToken: {
-		refresh_token: any;
-	},
-	options: {
-		appId: any;
-		appSecret: any;
-		redirectUri: any;
-	},
+	provider: OauthProviderContract,
+	refreshToken: string,
 ) => {
-	assert.INTERNAL(
-		null,
-		Boolean(options.appId),
-		OAuthInvalidOption,
-		'Missing appId',
-	);
-	assert.INTERNAL(
-		null,
-		Boolean(options.appSecret),
-		OAuthInvalidOption,
-		'Missing appSecret',
-	);
-	assert.INTERNAL(
-		null,
-		Boolean(options.redirectUri),
-		OAuthInvalidOption,
-		'Missing redirectUri',
-	);
-	assert.INTERNAL(
-		null,
-		accessToken && accessToken.refresh_token,
-		OAuthInvalidOption,
-		'Missing refresh token',
-	);
-
-	return oauthPost(baseUrl, '/oauth/token', {
+	return oauthPost(provider.data.tokenUrl, {
 		grant_type: 'refresh_token',
-		client_id: options.appId,
-		client_secret: options.appSecret,
-		redirect_uri: options.redirectUri,
-		refresh_token: accessToken.refresh_token,
+		client_id: provider.data.clientId,
+		client_secret: provider.data.clientSecret,
+		refresh_token: refreshToken,
 	});
 };
