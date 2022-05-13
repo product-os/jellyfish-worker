@@ -203,6 +203,7 @@ describe('instance', () => {
 
 		const result = await instance.run(
 			oAuthTokenRefreshTestIntegration,
+			{},
 			(object) => {
 				return object.translate({} as Contract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -293,6 +294,7 @@ describe('instance', () => {
 
 		const result = await instance.run(
 			oAuthTokenRefreshTestIntegration,
+			{},
 			(object) => {
 				return object.translate({} as Contract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -405,6 +407,7 @@ describe('instance', () => {
 
 		const result = await instance.run(
 			oAuthTokenRefreshTestIntegration,
+			{},
 			(object) => {
 				return object.translate({} as Contract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -495,6 +498,7 @@ describe('instance', () => {
 
 		const result = await instance.run(
 			oAuthTokenRefreshTestIntegration,
+			{},
 			(object) => {
 				return object.translate({} as Contract, {
 					actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -579,6 +583,7 @@ describe('instance', () => {
 		await expect(
 			instance.run(
 				oAuthTokenRefreshTestIntegration,
+				{},
 				(object) => {
 					return object.translate({} as Contract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -626,6 +631,7 @@ describe('instance', () => {
 		await expect(
 			instance.run(
 				oAuthTokenRefreshTestIntegration,
+				{},
 				(object) => {
 					return object.translate({} as Contract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
@@ -681,6 +687,7 @@ describe('instance', () => {
 		await expect(
 			instance.run(
 				oAuthTokenRefreshTestIntegration,
+				{},
 				(object) => {
 					return object.translate({} as Contract, {
 						actor: 'b5fc8487-cd6b-46aa-84ec-2407d5989e92',
