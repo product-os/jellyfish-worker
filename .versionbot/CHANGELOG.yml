@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add back token
+      hash: 6bcb733806beae44882a2fbb579cd3c1cebe38cb
+      body: >
+        Token contains not only oauth app id and app secret, but also private
+        key for encryption.
+      footer:
+        Change-type: major
+        change-type: major
+      author: karaxuna
+      nested: []
+  version: 26.0.0
+  title: "'Add back token'"
+  date: 2022-05-13T14:38:14.190Z
+- commits:
     - subject: Update internal-patch
       hash: 6c752b52b4d8fbc0eac14c54b64181140cc0f5ef
       body: ""
