@@ -219,6 +219,7 @@ const getOAuthUser = async (
 
 export const run = async (
 	integration: IntegrationDefinition,
+	token: any,
 	fn: (integrationInstance: Integration) => any,
 	options: Omit<PipelineOpts, 'token'>,
 ) => {
@@ -226,6 +227,7 @@ export const run = async (
 
 	// eslint-disable-next-line new-cap
 	const instance = await integration.initialize({
+		token,
 		defaultUser: options.defaultUser,
 		context: {
 			log: options.context.log,

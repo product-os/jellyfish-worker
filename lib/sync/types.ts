@@ -22,6 +22,7 @@ export interface ActorInformation {
 export interface PipelineOpts {
 	actor: string;
 	defaultUser: string;
+	token: any;
 	context: SyncActionContext;
 }
 
@@ -76,6 +77,7 @@ export interface HttpRequestOptions {
 }
 
 export interface IntegrationInitializationOptions {
+	token: any;
 	defaultUser: string;
 	context: {
 		log: SyncActionContext['log'];

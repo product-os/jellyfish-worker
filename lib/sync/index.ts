@@ -293,6 +293,7 @@ export class Sync {
 		return pipeline.mirrorCard(integration, contract, {
 			actor: options.actor,
 			defaultUser: options.defaultUser,
+			token,
 			context,
 		});
 	}
@@ -353,6 +354,7 @@ export class Sync {
 			return pipeline.translateExternalEvent(integration, contract, {
 				actor: options.actor,
 				defaultUser: options.defaultUser,
+				token,
 				context,
 			});
 		});
@@ -381,12 +383,21 @@ export class Sync {
 	 */
 	async getFile(
 		name: string,
+		token: any,
 		file: string,
 		context: syncContext.SyncActionContext,
 		options: {
 			actor: string;
 		},
 	): Promise<Buffer | null> {
+		if (!token) {
+			context.log.warn('Not fetching file as there is no token', {
+				integration: name,
+			});
+
+			return null;
+		}
+
 		const integration = this.integrations[name];
 		if (!integration) {
 			context.log.warn(
@@ -407,6 +418,7 @@ export class Sync {
 		// TS-TODO: Its unclear if the origin and defaultUser options are required
 		return instance.run(
 			integration,
+			token,
 			async (integrationInstance) => {
 				if (!integrationInstance.getFile) {
 					context.log.warn(
