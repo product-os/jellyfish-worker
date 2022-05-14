@@ -82,7 +82,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/bluebird": "^3.5.36",
     "@types/is-uuid": "^1.0.0",
-    "@types/jest": "^27.5.0",
+    "@types/jest": "^27.5.1",
     "@types/lodash": "^4.14.182",
     "@types/pg": "^8.6.5",
     "@types/semver": "^7.3.9",
@@ -94,7 +94,7 @@
     "rimraf": "^3.0.2",
     "simple-git-hooks": "^2.7.0",
     "sinon": "^13.0.2",
-    "ts-jest": "^28.0.1",
+    "ts-jest": "^28.0.2",
     "typedoc": "^0.22.15",
     "typescript": "^4.6.4"
   },
