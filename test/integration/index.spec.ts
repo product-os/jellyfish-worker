@@ -3616,7 +3616,7 @@ describe('scheduled actions', () => {
 
 		// Wait 3 seconds for scheduled job to execute
 		await new Promise((resolve) => {
-			setTimeout(resolve, 3000);
+			setTimeout(resolve, 5000);
 		});
 		await ctx.flush(ctx.session);
 

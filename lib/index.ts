@@ -1635,6 +1635,9 @@ export class Worker {
 			oldContract: currentContract,
 			newContract: insertedContract,
 			logContext,
+			getTypeContract: (type) => {
+				return this.typeContracts[type];
+			},
 			query: (querySchema, queryOpts) => {
 				return this.kernel.query(
 					logContext,
