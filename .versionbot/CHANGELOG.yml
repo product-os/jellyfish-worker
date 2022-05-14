@@ -1,4 +1,20 @@
 - commits:
+    - subject: Fix transformer execute action-request
+      hash: 066b68705bfd0ee62ff490d7568228749d4f2b6c
+      body: |
+        Fix malformed action-request contract that is
+        executed on transformer match
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 26.0.1
+  title: "'Fix transformer execute action-request'"
+  date: 2022-05-14T00:21:06.521Z
+- commits:
     - subject: Add back token
       hash: 6bcb733806beae44882a2fbb579cd3c1cebe38cb
       body: >
