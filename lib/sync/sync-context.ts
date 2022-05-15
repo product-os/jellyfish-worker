@@ -72,6 +72,7 @@ export const getActionContext = (
 	};
 
 	const contextObject = {
+		logContext,
 		log: {
 			warn: (message: string, data: any) => {
 				logger.warn(logContext, message, data);
