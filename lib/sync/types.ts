@@ -109,7 +109,10 @@ export interface IntegrationDefinition {
 		headers: Map<string>,
 	) => Promise<boolean> | boolean;
 
-	whoami?: (logContext: LogContext, credentials: any) => Promise<any>;
+	whoami?: (
+		syncActionContext: SyncActionContext,
+		credentials: any,
+	) => Promise<any>;
 
 	match?: (
 		context: SyncActionContext,
