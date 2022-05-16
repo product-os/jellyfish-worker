@@ -1,4 +1,21 @@
 - commits:
+    - subject: Pass SyncActionContext to whoami()
+      hash: 53923e755f4c46aad91da2ec4c31691fd4c23ef9
+      body: |
+        Pass an instance of SyncActionContext instead of
+        LogContext into the whoami() function to give
+        this function the ability to query the backend.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 27.0.0
+  title: "'Pass SyncActionContext to whoami()'"
+  date: 2022-05-16T08:55:24.968Z
+- commits:
     - subject: Update internal-patch
       hash: cca39bd448c7ef0f2193e2ebfb9f54eed4d25f52
       body: ""
