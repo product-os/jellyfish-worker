@@ -58,7 +58,6 @@ export const agentSettings: ContractDefinition = {
 				},
 				data: {
 					type: 'object',
-					required: ['default'],
 					properties: {
 						default: {
 							type: 'object',
