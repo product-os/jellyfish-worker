@@ -1,4 +1,18 @@
 - commits:
+    - subject: Allow for empty agent-settings contracts
+      hash: e09919015dbde3747fdfde9aaafcbe2c4db82c72
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 27.0.1
+  title: "'Allow for empty agent-settings contracts'"
+  date: 2022-05-17T05:51:00.659Z
+- commits:
     - subject: Pass SyncActionContext to whoami()
       hash: 53923e755f4c46aad91da2ec4c31691fd4c23ef9
       body: |
