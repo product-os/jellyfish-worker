@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch
+      hash: 2f8ded213bb2a6a552ed47ae93e355c062823bce
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 27.0.2
+  title: "'Update internal-patch'"
+  date: 2022-05-18T13:55:25.499Z
+- commits:
     - subject: Allow for empty agent-settings contracts
       hash: e09919015dbde3747fdfde9aaafcbe2c4db82c72
       body: ""
