@@ -18,31 +18,41 @@ export function asTimeSlot() {
 	return slot;
 }
 
-const timeSlots = {
-	type: 'array',
-	items: {
+function timeSlots() {
+	const foobar = {
 		type: 'object',
-		required: ['timeSlot', 'preference'],
-		properties: {
-			from: {
-				type: 'string',
-				title: 'Start time',
-				enum: asTimeSlot(),
+		properties: {},
+	};
+	const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+	for (const day of days) {
+		foobar.properties[day] = {
+			type: 'array',
+			items: {
+				type: 'object',
+				required: ['timeSlot', 'preference'],
+				properties: {
+					from: {
+						type: 'string',
+						title: 'Start time',
+						enum: asTimeSlot(),
+					},
+					to: {
+						type: 'string',
+						title: 'End time',
+						enum: asTimeSlot(),
+					},
+					preference: {
+						type: 'string',
+						title: 'Preference',
+						default: 'Most preferred',
+						enum: ['Most preferred', 'Less preferred', 'Least preferred'],
+					},
+				},
 			},
-			to: {
-				type: 'string',
-				title: 'End time',
-				enum: asTimeSlot(),
-			},
-			preference: {
-				type: 'string',
-				title: 'Preference',
-				default: 'Most preferred',
-				enum: ['Most preferred', 'Less preferred', 'Least preferred'],
-			},
-		},
-	},
-};
+		};
+	}
+	return foobar;
+}
 
 export const agentSettings: ContractDefinition = {
 	slug: 'agent-settings',
@@ -69,7 +79,7 @@ export const agentSettings: ContractDefinition = {
 								},
 								timeSlots: {
 									title: 'Default preferred working hours',
-									...timeSlots,
+									...timeSlots(),
 								},
 							},
 						},
@@ -96,7 +106,7 @@ export const agentSettings: ContractDefinition = {
 									},
 									timeSlots: {
 										title: 'Preferred working hours',
-										...timeSlots,
+										...timeSlots(),
 									},
 								},
 							},
