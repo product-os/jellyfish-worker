@@ -1,4 +1,18 @@
 - commits:
+    - subject: Create actor link on contract creation
+      hash: d6e78afe1a152bc9b059844357015f98fdff3d66
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: YingwenChen <yingwenchen@balena.io>
+        signed-off-by: YingwenChen <yingwenchen@balena.io>
+      author: yingwen chen
+      nested: []
+  version: 27.1.0
+  title: "'Create actor link on contract creation'"
+  date: 2022-05-27T01:03:55.968Z
+- commits:
     - subject: Update internal-patch
       hash: 1b841b010fb4b3da3864bf08e26fc406c79515b5
       body: ""
