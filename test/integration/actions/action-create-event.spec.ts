@@ -203,6 +203,7 @@ describe('action-create-event', () => {
 						type: root.type,
 					},
 				},
+				linked_at: link!.linked_at,
 			}),
 		);
 	});

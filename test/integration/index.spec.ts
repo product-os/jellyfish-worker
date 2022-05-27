@@ -2590,6 +2590,7 @@ describe('.insertCard()', () => {
 				data: {
 					foo: 1,
 				},
+				linked_at: contract!.linked_at,
 			}),
 		);
 	});
