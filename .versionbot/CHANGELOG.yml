@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update internal-patch (internal patch bumps)
+      hash: 4625b8f972432167da3578c924fefa4cfb83fa44
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 27.1.1
+  title: "'Update internal-patch (internal patch bumps)'"
+  date: 2022-05-28T01:24:17.671Z
+- commits:
     - subject: Create actor link on contract creation
       hash: d6e78afe1a152bc9b059844357015f98fdff3d66
       body: ""
