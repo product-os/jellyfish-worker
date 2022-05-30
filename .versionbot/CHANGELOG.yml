@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove contract exist check from insertCard
+      hash: f44eb6f5de23f8ed589f03bb7b15715ccec41a61
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 27.1.4
+  title: "'Remove contract exist check from insertCard'"
+  date: 2022-05-30T00:51:02.447Z
+- commits:
     - subject: Update graphile-worker from 0.12.2 to 0.13.0
       hash: 79d9d14fad4b4f89f2127f8225927d53f2cd79c6
       body: ""
