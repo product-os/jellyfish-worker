@@ -768,23 +768,6 @@ export class Worker {
 
 		object.type = `${typeContract.slug}@${typeContract.version}`;
 
-		let contract: Contract | null = null;
-		if (object.slug) {
-			contract = await kernel.getContractBySlug(
-				logContext,
-				insertSession,
-				`${object.slug}@${object.version || 'latest'}`,
-			);
-		}
-
-		if (!contract && object.id) {
-			contract = await kernel.getContractById(
-				logContext,
-				insertSession,
-				object.id,
-			);
-		}
-
 		if (typeof object.name !== 'string') {
 			Reflect.deleteProperty(object, 'name');
 		}
@@ -793,7 +776,7 @@ export class Worker {
 			logContext,
 			insertSession,
 			typeContract,
-			contract,
+			null,
 			{
 				eventPayload: _.omit(object, ['id']),
 				eventType: 'create',
