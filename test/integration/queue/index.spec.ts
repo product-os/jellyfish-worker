@@ -190,7 +190,7 @@ describe('queue', () => {
 						input: {
 							id: typeContract.id,
 						},
-						timestamp: new Date().toISOString(),
+						timestamp: date.toISOString(),
 						arguments: {
 							properties: {
 								slug: 'foo',

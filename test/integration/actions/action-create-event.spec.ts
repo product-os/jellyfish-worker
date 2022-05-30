@@ -1,10 +1,17 @@
+import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
 import {
 	errors as autumndbErrors,
 	Kernel,
+	RelationshipContractDefinition,
 	testUtils as autumndbTestUtils,
 } from 'autumndb';
-import { ActionRequestContract, testUtils, WorkerContext } from '../../../lib';
+import {
+	ActionRequestContract,
+	errors,
+	testUtils,
+	WorkerContext,
+} from '../../../lib';
 import { actionCreateEvent } from '../../../lib/actions/action-create-event';
 
 let ctx: testUtils.TestContext;
@@ -13,6 +20,8 @@ let actionContext: WorkerContext;
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 	actionContext = ctx.worker.getActionContext(ctx.logContext);
+	// Create relationship relationship-card-is-attached-to-card used in tests
+	await createCardIsAttachedToCardRelationship();
 });
 
 afterAll(async () => {
@@ -330,3 +339,40 @@ describe('action-create-event', () => {
 		expect(result.markers).toEqual([marker]);
 	});
 });
+
+async function createCardIsAttachedToCardRelationship() {
+	const relationship: RelationshipContractDefinition = {
+		slug: `relationship-card-is-attached-to-card`,
+		type: 'relationship@1.0.0',
+		name: 'is attached to',
+		data: {
+			inverseName: 'has attached element',
+			title: 'Card',
+			inverseTitle: 'Card',
+			from: {
+				type: 'card',
+			},
+			to: {
+				type: `card`,
+			},
+		},
+	};
+	const relationshipTypeContract =
+		await ctx.kernel.getContractBySlug<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			'relationship@1.0.0',
+		);
+	if (!relationshipTypeContract) {
+		throw new errors.WorkerNoElement(`No relationship type contract found`);
+	}
+	await ctx.worker.replaceCard(
+		ctx.logContext,
+		ctx.session,
+		relationshipTypeContract,
+		{
+			attachEvents: false,
+		},
+		relationship,
+	);
+}
