@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add creator relationship
+      hash: 4ffebd6b684e9d32d477c29ab6a5a54b1704f607
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 27.2.0
+  title: "'Add creator relationship'"
+  date: 2022-05-31T01:53:16.405Z
+- commits:
     - subject: Update typedoc from 0.22.15 to 0.22.16
       hash: 270f28cbcc9aa6d954123a0ed17cb7f5f9db9694
       body: ""
