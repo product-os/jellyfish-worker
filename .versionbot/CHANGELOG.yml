@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typedoc from 0.22.15 to 0.22.16
+      hash: 270f28cbcc9aa6d954123a0ed17cb7f5f9db9694
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 27.1.5
+  title: "'Update typedoc from 0.22.15 to 0.22.16'"
+  date: 2022-05-30T19:18:11.755Z
+- commits:
     - subject: Remove contract exist check from insertCard
       hash: f44eb6f5de23f8ed589f03bb7b15715ccec41a61
       body: ""
