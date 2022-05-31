@@ -50,7 +50,7 @@
     "@balena/jellyfish-client-sdk": "^10.4.2",
     "@balena/jellyfish-environment": "^12.0.3",
     "@balena/jellyfish-jellyscript": "^7.0.12",
-    "@balena/jellyfish-logger": "^5.0.34",
+    "@balena/jellyfish-logger": "^5.1.0",
     "@balena/jellyfish-metrics": "^2.0.80",
     "@graphile/logger": "^0.2.0",
     "autumndb": "^20.1.0",
