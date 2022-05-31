@@ -1,12 +1,20 @@
 import { strict as assert } from 'assert';
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	testUtils as autumndbTestUtils,
+	RelationshipContractDefinition,
+} from 'autumndb';
 import _ from 'lodash';
 import { testUtils, TransformerContract } from '../../lib';
 
 let ctx: testUtils.TestContext;
+let loop: any;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
+	await createTaskRelationships();
+	loop = await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
+		type: 'loop@1.0.0',
+	});
 });
 
 afterAll(() => {
@@ -44,14 +52,8 @@ describe('transformers', () => {
 		);
 		assert(transformer);
 
-		// Link the admin user as the owner of the transformer
-		const adminUser = await ctx.kernel.getContractById(
-			ctx.logContext,
-			ctx.session,
-			ctx.adminUserId,
-		);
-		assert(adminUser);
-		await ctx.createLink(adminUser, transformer, 'owns', 'is owned by');
+		// Link the loop as the owner of the transformer
+		await ctx.createLink(loop, transformer, 'owns', 'is owned by');
 
 		// Wait for the stream to update the worker
 		await ctx.retry(
@@ -210,14 +212,8 @@ describe('transformers', () => {
 		);
 		assert(transformer);
 
-		// Link the admin user as the owner of the transformer
-		const adminUser = await ctx.kernel.getContractById(
-			ctx.logContext,
-			ctx.session,
-			ctx.adminUserId,
-		);
-		assert(adminUser);
-		await ctx.createLink(adminUser, transformer, 'owns', 'is owned by');
+		// Link the loop as the owner of the transformer
+		await ctx.createLink(loop, transformer, 'owns', 'is owned by');
 
 		// Wait for the stream to update the worker
 		await ctx.retry(
@@ -386,14 +382,8 @@ describe('transformers', () => {
 		);
 		assert(transformer);
 
-		// Link the admin user as the owner of the transformer
-		const adminUser = await ctx.kernel.getContractById(
-			ctx.logContext,
-			ctx.session,
-			ctx.adminUserId,
-		);
-		assert(adminUser);
-		await ctx.createLink(adminUser, transformer, 'owns', 'is owned by');
+		// Link the loop as the owner of the transformer
+		await ctx.createLink(loop, transformer, 'owns', 'is owned by');
 
 		// Wait for the stream to update the worker
 		await ctx.retry(
@@ -563,14 +553,8 @@ describe('transformers', () => {
 		);
 		assert(transformer);
 
-		// Link the admin user as the owner of the transformer
-		const adminUser = await ctx.kernel.getContractById(
-			ctx.logContext,
-			ctx.session,
-			ctx.adminUserId,
-		);
-		assert(adminUser);
-		await ctx.createLink(adminUser, transformer, 'owns', 'is owned by');
+		// Link the loop as the owner of the transformer
+		await ctx.createLink(loop, transformer, 'owns', 'is owned by');
 
 		// Wait for the stream to update the worker
 		await ctx.retry(
@@ -689,14 +673,8 @@ describe('transformers', () => {
 		);
 		assert(transformer);
 
-		// Link the admin user as the owner of the transformer
-		const adminUser = await ctx.kernel.getContractById(
-			ctx.logContext,
-			ctx.session,
-			ctx.adminUserId,
-		);
-		assert(adminUser);
-		await ctx.createLink(adminUser, transformer, 'owns', 'is owned by');
+		// Link the loop as the owner of the transformer
+		await ctx.createLink(loop, transformer, 'owns', 'is owned by');
 
 		// Wait for the stream to update the worker
 		await ctx.retry(
@@ -836,14 +814,8 @@ describe('transformers', () => {
 		);
 		assert(transformer);
 
-		// Link the admin user as the owner of the transformer
-		const adminUser = await ctx.kernel.getContractById(
-			ctx.logContext,
-			ctx.session,
-			ctx.adminUserId,
-		);
-		assert(adminUser);
-		await ctx.createLink(adminUser, transformer, 'owns', 'is owned by');
+		// Link the loop as the owner of the transformer
+		await ctx.createLink(loop, transformer, 'owns', 'is owned by');
 
 		// Wait for the stream to update the worker
 		await ctx.retry(
@@ -1102,3 +1074,61 @@ describe('transformers', () => {
 		expect(task.length).toEqual(0);
 	});
 });
+
+async function createTaskRelationships() {
+	const relationshipTypeContract =
+		ctx.worker.typeContracts['relationship@1.0.0'];
+	const cardOwnsTask: RelationshipContractDefinition = {
+		slug: `relationship-card-owns-task`,
+		type: 'relationship@1.0.0',
+		name: 'owns',
+		data: {
+			inverseName: 'is owned by',
+			title: 'Card',
+			inverseTitle: 'Task',
+			from: {
+				type: 'card',
+			},
+			to: {
+				type: `task`,
+			},
+		},
+	};
+
+	await ctx.worker.replaceCard(
+		ctx.logContext,
+		ctx.session,
+		relationshipTypeContract,
+		{
+			attachEvents: false,
+		},
+		cardOwnsTask,
+	);
+
+	const typeOwnsTask: RelationshipContractDefinition = {
+		slug: `relationship-type-owns-task`,
+		type: 'relationship@1.0.0',
+		name: 'owns',
+		data: {
+			inverseName: 'is owned by',
+			title: 'Type',
+			inverseTitle: 'Task',
+			from: {
+				type: 'type',
+			},
+			to: {
+				type: `task`,
+			},
+		},
+	};
+
+	await ctx.worker.replaceCard(
+		ctx.logContext,
+		ctx.session,
+		relationshipTypeContract,
+		{
+			attachEvents: false,
+		},
+		typeOwnsTask,
+	);
+}

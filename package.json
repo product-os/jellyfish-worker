@@ -53,7 +53,7 @@
     "@balena/jellyfish-logger": "^5.0.34",
     "@balena/jellyfish-metrics": "^2.0.80",
     "@graphile/logger": "^0.2.0",
-    "autumndb": "^20.0.6",
+    "autumndb": "^20.1.0",
     "axios": "^0.26.1",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",

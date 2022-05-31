@@ -6,12 +6,14 @@ import { strict as assert } from 'assert';
 import {
 	errors as autumndbErrors,
 	Kernel,
+	RelationshipContractDefinition,
 	testUtils as autumndbTestUtils,
 } from 'autumndb';
 import _ from 'lodash';
 import {
-	testUtils,
+	errors,
 	PluginDefinition,
+	testUtils,
 	TriggeredActionContract,
 	TriggeredActionData,
 } from '../../lib';
@@ -836,6 +838,7 @@ describe('.insertCard()', () => {
 		// This test
 		// * creates a new type with a link formula
 		// * creates two contracts of this type
+		// * creates a relationship that backs a link between the two contracts
 		// * links the two contracts
 		// * updates the contract that was linked from
 		// * checks if formula in linked to contract was updated
@@ -961,6 +964,10 @@ describe('.insertCard()', () => {
 			},
 		))!;
 
+		// Before creating the link we need to create a relationship for the type.
+		await createWasBuiltIntoRelationship(linkedContract);
+		// Ready to insert the link
+
 		await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -1080,6 +1087,7 @@ describe('.insertCard()', () => {
 		// This test
 		// * creates a new type with a link formula and a formula that references this field
 		// * creates two contracts
+		// * creates a backing relationship for the link
 		// * links the two contracts
 		// * updates the contract that was linked from
 		// * checks if formula in linked to contract was updated
@@ -1212,6 +1220,10 @@ describe('.insertCard()', () => {
 				},
 			},
 		))!;
+
+		// Before creating the link we need to create a relationship for the type.
+		await createWasBuiltIntoRelationship(linkedContract);
+		// Ready to insert the link
 
 		await ctx.worker.insertCard(
 			ctx.logContext,
@@ -1641,3 +1653,42 @@ describe('.insertCard()', () => {
 		expect(links).toEqual([]);
 	});
 });
+async function createWasBuiltIntoRelationship(linkedContract) {
+	const relationship: RelationshipContractDefinition = {
+		slug: `relationship-card-was-built-into-card`,
+		type: 'relationship@1.0.0',
+		name: 'was built into',
+		data: {
+			inverseName: 'was built from',
+			title: 'Card',
+			inverseTitle: 'Card',
+			from: {
+				type: linkedContract.type,
+			},
+			to: {
+				type: linkedContract.type,
+			},
+		},
+	};
+
+	const relationshipTypeContract =
+		await ctx.kernel.getContractBySlug<TypeContract>(
+			ctx.logContext,
+			ctx.session,
+			'relationship@1.0.0',
+		);
+	if (!relationshipTypeContract) {
+		throw new errors.WorkerNoElement(`No relationship type contract found`);
+	}
+
+	const createdRelationship = await ctx.worker.replaceCard(
+		ctx.logContext,
+		ctx.session,
+		relationshipTypeContract,
+		{
+			attachEvents: false,
+		},
+		relationship,
+	);
+	expect(createdRelationship).not.toBeNull();
+}

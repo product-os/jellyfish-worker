@@ -1,5 +1,9 @@
 import { strict as assert } from 'assert';
-import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	Kernel,
+	RelationshipContractDefinition,
+	testUtils as autumndbTestUtils,
+} from 'autumndb';
 import _ from 'lodash';
 import {
 	ActionRequestContract,
@@ -691,6 +695,36 @@ describe('.execute()', () => {
 			threadRequest,
 		);
 		expect(threadResult.error).toBe(false);
+
+		// Before enqueing up a create event we need to create a relationship to the random-slug type created above
+		const relationship: RelationshipContractDefinition = {
+			slug: `relationship-card-is-attached-to-${slug}`,
+			type: 'relationship@1.0.0',
+			name: 'is attached to',
+			data: {
+				inverseName: 'has attached element',
+				title: _.capitalize(slug),
+				inverseTitle: 'Card',
+				from: {
+					type: 'card@1.0.0',
+				},
+				to: {
+					type: `${slug}@1.0.0`,
+				},
+			},
+		};
+		const relationshipTypeContract =
+			ctx.worker.typeContracts['relationship@1.0.0'];
+
+		await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			relationshipTypeContract,
+			{
+				attachEvents: false,
+			},
+			relationship,
+		);
 
 		const messageRequest = await ctx.worker.insertCard<ActionRequestContract>(
 			ctx.logContext,

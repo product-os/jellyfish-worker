@@ -1,7 +1,16 @@
+import { TypeContract } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	RelationshipContractDefinition,
+	testUtils as autumndbTestUtils,
+} from 'autumndb';
 import _ from 'lodash';
-import { contractMixins, PluginDefinition, testUtils } from '../../../../lib';
+import {
+	contractMixins,
+	errors,
+	PluginDefinition,
+	testUtils,
+} from '../../../../lib';
 
 let ctx: testUtils.TestContext;
 
@@ -116,6 +125,42 @@ describe('with-events mixin', () => {
 			},
 		);
 		assert(foo);
+
+		// Before enqueing up a create event we need to create a relationship for the types defined in the plugin.
+		const relationship: RelationshipContractDefinition = {
+			slug: `relationship-bar-is-attached-to-foo`,
+			type: 'relationship@1.0.0',
+			name: 'is attached to',
+			data: {
+				inverseName: 'has attached element',
+				title: 'Bar',
+				inverseTitle: 'Foo',
+				from: {
+					type: 'bar@1.0.0',
+				},
+				to: {
+					type: `foo@1.0.0`,
+				},
+			},
+		};
+		const relationshipTypeContract =
+			await ctx.kernel.getContractBySlug<TypeContract>(
+				ctx.logContext,
+				ctx.session,
+				'relationship@1.0.0',
+			);
+		if (!relationshipTypeContract) {
+			throw new errors.WorkerNoElement(`No relationship type contract found`);
+		}
+		await ctx.worker.replaceCard(
+			ctx.logContext,
+			ctx.session,
+			relationshipTypeContract,
+			{
+				attachEvents: false,
+			},
+			relationship,
+		);
 
 		// Add an event
 		const bar = await ctx.createEvent(
