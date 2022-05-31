@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update tests for relationships
+      hash: d6869f85e6d2d7db2b1ef857c6f3f8c703d0a5e6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+        signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+      author: Ramiro González Maciel
+      nested: []
+  version: 27.2.1
+  title: "'Update tests for relationships'"
+  date: 2022-05-31T03:58:48.443Z
+- commits:
     - subject: Add creator relationship
       hash: 4ffebd6b684e9d32d477c29ab6a5a54b1704f607
       body: ""
