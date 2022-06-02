@@ -33,6 +33,7 @@ import { viewAllTransformerWorkers } from './view-all-transformer-workers';
 import { viewAllTransformers } from './view-all-transformers';
 import { viewAllViews } from './view-all-views';
 import { viewScheduledActions } from './view-scheduled-actions';
+import { workingHours } from './working-hours';
 
 export const contracts: ContractDefinition[] = [
 	agentSettings,
@@ -69,4 +70,5 @@ export const contracts: ContractDefinition[] = [
 	viewAllTransformers,
 	viewAllViews,
 	viewScheduledActions,
+	workingHours,
 ];
