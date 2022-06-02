@@ -3,6 +3,7 @@ import { account } from './account';
 import { action } from './action';
 import { actionRequest } from './action-request';
 import { agentChannelSettings } from './agent-channel-settings';
+import { agentSettings } from './agent-settings';
 import { blogPost } from './blog-post';
 import { brainstormCall } from './brainstorm-call';
 import { brainstormTopic } from './brainstorm-topic';
@@ -116,6 +117,7 @@ import { relationshipTransformerWorkerOwnsTask } from './relationship-transforme
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
 import { relationshipUserHasSettingsAgentChannelSettings } from './relationship-user-has-settings-agent-channel-settings';
+import { relationshipUserHasSettingsAgentSettings } from './relationship-user-has-settings-agent-settings';
 import { relationshipUserHasSettingsWorkingHours } from './relationship-user-has-settings-working-hours';
 import { relationshipUserOwnsRating } from './relationship-user-owns-rating';
 import { relationshipViewIsAttachedToChannel } from './relationship-view-is-attached-to-channel';
@@ -142,6 +144,7 @@ import { triggeredAction } from './triggered-action';
 import { triggeredActionBootstrapChannel } from './triggered-action-bootstrap-channel';
 import { triggeredActionHangoutsLink } from './triggered-action-hangouts-link';
 import { triggeredActionIncrementTag } from './triggered-action-increment-tag';
+import { triggeredActionInitializeAgent } from './triggered-action-initialize-agent';
 import { triggeredActionIntegrationImportEvent } from './triggered-action-integration-import-event';
 import { triggeredActionMatchmakeTask } from './triggered-action-matchmake-task';
 import { triggeredActionMergeDraftVersion } from './triggered-action-merge-draft-version';
@@ -194,6 +197,7 @@ export const contracts: ContractDefinition[] = [
 	action,
 	actionRequest,
 	agentChannelSettings,
+    agentSettings,
 	blogPost,
 	brainstormCall,
 	brainstormTopic,
@@ -307,6 +311,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
 	relationshipUserHasSettingsAgentChannelSettings,
+	relationshipUserHasSettingsAgentSettings,
 	relationshipUserHasSettingsWorkingHours,
 	relationshipUserOwnsRating,
 	relationshipViewIsAttachedToChannel,
@@ -333,6 +338,7 @@ export const contracts: ContractDefinition[] = [
 	triggeredActionBootstrapChannel,
 	triggeredActionHangoutsLink,
 	triggeredActionIncrementTag,
+	triggeredActionInitializeAgent,
 	triggeredActionIntegrationImportEvent,
 	triggeredActionMatchmakeTask,
 	triggeredActionMergeDraftVersion,

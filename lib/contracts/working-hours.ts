@@ -75,7 +75,6 @@ export const workingHours: ContractDefinition = {
 				},
 				data: {
 					type: 'object',
-					required: ['timeZone'],
 					properties: {
 						timeZone: {
 							title: 'Time zone',

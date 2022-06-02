@@ -11,8 +11,10 @@ import { actionDeleteCard } from './action-delete-card';
 import { actionGoogleMeet } from './action-google-meet';
 import { actionIncrement } from './action-increment';
 import { actionIncrementTag } from './action-increment-tag';
+import { actionInitializeAgent } from './action-initialize-agent';
 import { actionIntegrationImportEvent } from './action-integration-import-event';
 import { actionMaintainContact } from './action-maintain-contact';
+import { actionMatchMake } from './action-matchmake';
 import { actionMatchMakeTask } from './action-matchmake-task';
 import { actionMergeDraftVersion } from './action-merge-draft-version';
 import { actionOAuthAssociate } from './action-oauth-associate';
@@ -40,8 +42,10 @@ export const actions: ActionDefinition[] = [
 	actionGoogleMeet,
 	actionIncrement,
 	actionIncrementTag,
+	actionInitializeAgent,
 	actionIntegrationImportEvent,
 	actionMaintainContact,
+	actionMatchMake,
 	actionMatchMakeTask,
 	actionMergeDraftVersion,
 	actionOAuthAssociate,
