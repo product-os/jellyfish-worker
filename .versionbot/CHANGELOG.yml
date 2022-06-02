@@ -1,4 +1,21 @@
 - commits:
+    - subject: Remove agent-settings contract
+      hash: 7cec2bcbd61015cda6e87e21402db99a2af7c9d4
+      body: |
+        May bring this back, but for now time zone
+        and user working hour settings have been
+        moved to the working-hours contract.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 28.0.0
+  title: "'Remove agent-settings contract'"
+  date: 2022-06-02T04:16:12.261Z
+- commits:
     - subject: Add working hour contract
       hash: 11f5e6899e952a41dbf13d9c5d0f88415df89b0b
       body: ""
