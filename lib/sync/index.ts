@@ -122,15 +122,15 @@ export class Sync {
 
 		strict.ok(integration.match);
 		const user = await integration.match(context, externalUser, {
-			slug: `${options.slug}@latest`,
+			slug: options.slug,
 		});
 
 		if (user) {
 			assert.INTERNAL(
 				context,
-				user.slug === options.slug,
+				`${user.slug}@${user.version}` === options.slug,
 				errors.SyncNoMatchingUser,
-				`Could not find matching user for provider: ${name}, slugs do not match ${user.slug} !== ${options.slug}`,
+				`Could not find matching user for provider: ${name}, slugs do not match ${user.slug}@${user.version} !== ${options.slug}`,
 			);
 		}
 
