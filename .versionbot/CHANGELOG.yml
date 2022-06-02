@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add working hour contract
+      hash: 11f5e6899e952a41dbf13d9c5d0f88415df89b0b
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 27.3.0
+  title: "'Add working hour contract'"
+  date: 2022-06-02T02:47:44.632Z
+- commits:
     - subject: Update typescript from 4.6.4 to 4.7.2
       hash: 463be68426ac90a711fcbb7ff435b7481991cd66
       body: ""
