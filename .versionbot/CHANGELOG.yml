@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove duplicate version from slug
+      hash: cf325ec2124fa6250aebf51b4578b34edac329e9
+      body: >
+        Slug passed in sync.match contains version, so no need to add additional
+        version.
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: karaxuna
+      nested: []
+  version: 28.0.1
+  title: "'Remove duplicate version from slug'"
+  date: 2022-06-02T12:55:41.655Z
+- commits:
     - subject: Remove agent-settings contract
       hash: 7cec2bcbd61015cda6e87e21402db99a2af7c9d4
       body: |
