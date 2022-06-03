@@ -1,5 +1,8 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import type {
+	Contract,
+	TypeContract,
+} from '@balena/jellyfish-types/build/core';
 import * as bcrypt from 'bcrypt';
 import { v4 as isUUID } from 'is-uuid';
 import * as skhema from 'skhema';
@@ -10,7 +13,10 @@ import {
 	WorkerSchemaMismatch,
 } from '../errors';
 import type { ActionDefinition } from '../plugin';
+import { WorkerContext } from '../types';
 import { BCRYPT_SALT_ROUNDS } from './constants';
+
+const AUTH_LINK_VERB = 'is authenticated with';
 
 const pre: ActionDefinition['pre'] = async (session, context, request) => {
 	// Validate scope schema if set.
@@ -44,21 +50,20 @@ const pre: ActionDefinition['pre'] = async (session, context, request) => {
 		'Incorrect username or password',
 	);
 
-	const fullUser = (await context.getCardById(
-		context.privilegedSession,
-		userContract.id,
-	))!;
+	const [fullUser] = await getUser(context, userContract);
+
+	const userHash = fullUser?.links?.[AUTH_LINK_VERB][0].data.hash;
 
 	assert.USER(
 		request.logContext,
-		fullUser.data.hash,
+		userHash,
 		WorkerAuthenticationError,
 		'Login disallowed',
 	);
 
 	const matches = await bcrypt.compare(
 		request.arguments.password,
-		fullUser.data.hash as string,
+		userHash as string,
 	);
 	assert.USER(
 		request.logContext,
@@ -80,10 +85,7 @@ const handler: ActionDefinition['handler'] = async (
 	contract,
 	request,
 ) => {
-	const user = (await context.getCardById(
-		context.privilegedSession,
-		contract.id,
-	))!;
+	const [user] = await getUser(context, contract);
 
 	assert.USER(
 		request.logContext,
@@ -93,7 +95,7 @@ const handler: ActionDefinition['handler'] = async (
 	);
 	assert.USER(
 		request.logContext,
-		user.data.hash,
+		user?.links?.[AUTH_LINK_VERB][0].data.hash,
 		WorkerAuthenticationError,
 		'Login disallowed',
 	);
@@ -194,3 +196,34 @@ export const actionCreateSession: ActionDefinition = {
 		},
 	},
 };
+
+function getUser(
+	context: WorkerContext,
+	userContract: any,
+): Promise<Contract[]> {
+	return context.query(context.privilegedSession, {
+		type: 'object',
+		properties: {
+			type: {
+				type: 'string',
+				const: 'user@1.0.0',
+			},
+			id: {
+				type: 'string',
+				const: userContract.id,
+			},
+		},
+		$$links: {
+			[AUTH_LINK_VERB]: {
+				type: 'object',
+				required: ['type'],
+				properties: {
+					type: {
+						const: 'authentication-password@1.0.0',
+					},
+				},
+			},
+		},
+		required: ['type'],
+	});
+}
