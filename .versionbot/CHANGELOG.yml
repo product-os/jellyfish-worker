@@ -1,4 +1,18 @@
 - commits:
+    - subject: Fix type import
+      hash: 6d8b40c25b6c94f8e8c05cf204658d7be3e88292
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 28.0.3
+  title: "'Fix type import'"
+  date: 2022-06-03T09:29:30.935Z
+- commits:
     - subject: "action-create-session: Use new password contract when comparing hash"
       hash: 1d80619b7ff6cea8c35dae183f509ae814c91d84
       body: |
