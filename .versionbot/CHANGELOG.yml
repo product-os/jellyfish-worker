@@ -1,4 +1,19 @@
 - commits:
+    - subject: "action-create-session: Use new password contract when comparing hash"
+      hash: 1d80619b7ff6cea8c35dae183f509ae814c91d84
+      body: |
+        Resolves https://github.com/product-os/jellyfish/issues/8659
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Ramiro González Maciel
+      nested: []
+  version: 28.0.2
+  title: "'action-create-session: Use new password contract when comparing hash'"
+  date: 2022-06-03T08:34:02.637Z
+- commits:
     - subject: Remove duplicate version from slug
       hash: cf325ec2124fa6250aebf51b4578b34edac329e9
       body: >
