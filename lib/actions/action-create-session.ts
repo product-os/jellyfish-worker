@@ -13,7 +13,7 @@ import {
 	WorkerSchemaMismatch,
 } from '../errors';
 import type { ActionDefinition } from '../plugin';
-import { WorkerContext } from '../types';
+import type { WorkerContext } from '../types';
 import { BCRYPT_SALT_ROUNDS } from './constants';
 
 const AUTH_LINK_VERB = 'is authenticated with';
