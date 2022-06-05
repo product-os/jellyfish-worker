@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update external-major (external major bumps)
+      hash: cddecc4e0d35b853afeb9300be2a77378d7891e3
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 28.0.6
+  title: "'Update external-major (external major bumps) (major)'"
+  date: 2022-06-05T07:42:10.927Z
+- commits:
     - subject: Update internal packages
       hash: ab1e75810a870244762282466d81f593f059d98b
       body: ""
