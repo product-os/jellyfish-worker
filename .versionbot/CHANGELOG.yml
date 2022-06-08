@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-client-sdk from 10.4.7 to 11.0.0
+      hash: e15ea37c35c7b929af78acbefc256316f87fca26
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 28.0.7
+  title: "'Update @balena/jellyfish-client-sdk from 10.4.7 to 11.0.0'"
+  date: 2022-06-08T00:32:05.658Z
+- commits:
     - subject: Update external-major (external major bumps)
       hash: cddecc4e0d35b853afeb9300be2a77378d7891e3
       body: ""
