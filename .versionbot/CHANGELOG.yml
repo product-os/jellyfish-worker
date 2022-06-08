@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add user to working hours relationship
+      hash: ea2b404a1d344fdd81d68a3cfceba8376020e81f
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 29.1.0
+  title: "'Add user to working hours relationship'"
+  date: 2022-06-08T07:02:06.429Z
+- commits:
     - subject: Fix action export format
       hash: 32684900505d0bf516ad5516f784ffde9fc39381
       body: |
