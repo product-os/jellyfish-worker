@@ -17,6 +17,7 @@ import { relationshipTransformerGeneratedTask } from './relationship-transformer
 import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
+import { relationshipUserHasSettingsWorkingHours } from './relationship-user-has-settings-working-hours';
 import { roleTransformerWorker } from './role-transformer-worker';
 import { scheduledAction } from './scheduled-action';
 import { serviceSource } from './service-source';
@@ -52,6 +53,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipTransformerWorkerOwnsTask,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
+	relationshipUserHasSettingsWorkingHours,
 	oauthProvider,
 	roleTransformerWorker,
 	scheduledAction,
