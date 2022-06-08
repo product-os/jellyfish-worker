@@ -353,9 +353,9 @@ export class Worker {
 		});
 
 		// Add actions defined in this repo
-		Object.keys(actions).forEach((name) => {
-			this.library[name] = actions[name];
-		});
+		for (const action of actions) {
+			this.library[action.contract.slug] = action;
+		}
 	}
 
 	/**
@@ -440,7 +440,7 @@ export class Worker {
 		);
 		strict(actionType);
 		await Promise.all(
-			Object.values(actions).map(async (action) => {
+			actions.map((action) => {
 				return this.replaceCard(
 					logContext,
 					this.session,
