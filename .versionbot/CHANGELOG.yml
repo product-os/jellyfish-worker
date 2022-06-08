@@ -1,4 +1,20 @@
 - commits:
+    - subject: Fix action export format
+      hash: 32684900505d0bf516ad5516f784ffde9fc39381
+      body: |
+        Update action export format to
+        match that of other libraries
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 29.0.0
+  title: "'Fix action export format'"
+  date: 2022-06-08T01:32:44.027Z
+- commits:
     - subject: Update @balena/jellyfish-client-sdk from 10.4.7 to 11.0.0
       hash: e15ea37c35c7b929af78acbefc256316f87fca26
       body: ""
