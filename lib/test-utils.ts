@@ -353,9 +353,7 @@ export const newContext = async (
  * Deinitialize the worker.
  */
 export const destroyContext = async (context: TestContext) => {
-	await context.worker.consumer.cancel();
-	context.worker.contractsStream.removeAllListeners();
-	context.worker.contractsStream.close();
+	await context.worker.stop();
 	await autumndbTestUtils.destroyContext(context);
 };
 

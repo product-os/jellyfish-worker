@@ -2,6 +2,7 @@ import { TypeContract, UserContract } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
 import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
+import { setTimeout as delay } from 'timers/promises';
 import {
 	ActionRequestContract,
 	ActionRequestData,
@@ -141,11 +142,7 @@ describe('.getId()', () => {
 		expect(worker1.getId()).not.toBe(worker3.getId());
 		expect(worker2.getId()).not.toBe(worker3.getId());
 
-		await Promise.all([
-			worker1.consumer.cancel(),
-			worker2.consumer.cancel(),
-			worker3.consumer.cancel(),
-		]);
+		await Promise.all([worker1.stop(), worker2.stop(), worker3.stop()]);
 	});
 });
 
@@ -174,7 +171,8 @@ describe('Worker', () => {
 		);
 		assert(contract);
 
-		// Wait for the stream to update the worker
+		// Wait for the polling mechanism to update the worker
+		await delay(15 * 1000);
 		await ctx.retry(
 			() => {
 				return ctx.worker.typeContracts[`${contract.slug}@${contract.version}`];
@@ -218,7 +216,8 @@ describe('Worker', () => {
 		);
 		assert(contract);
 
-		// Wait for the stream to update the worker
+		// Wait for the polling mechanism to update the worker
+		await delay(15 * 1000);
 		await ctx.retry(
 			() => {
 				return _.find(ctx.worker.triggers, { id: contract.id });
@@ -252,7 +251,8 @@ describe('Worker', () => {
 			},
 		);
 
-		// Will fail until the stream updates the worker
+		// Wait for the polling mechanism to update the worker
+		await delay(15 * 1000);
 		const match = (transformer: TransformerContract) => {
 			return _.includes(transformerSlugs, transformer.slug);
 		};
@@ -307,7 +307,8 @@ describe('Worker', () => {
 		);
 		assert(contract);
 
-		// Wait for the stream to update the worker
+		// Wait for the polling mechanism to update the worker
+		await delay(15 * 1000);
 		await ctx.retry(
 			() => {
 				return _.find(ctx.worker.triggers, (item: TriggeredActionContract) => {
