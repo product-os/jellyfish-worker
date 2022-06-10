@@ -1,4 +1,30 @@
 - commits:
+    - subject: Check type enum when running heuristic for links in triggers
+      hash: 5a92e0f19ee53803128b958a1f3712d370a9af66
+      body: |
+        This change improves the number of triggers we can safely reject without
+        making a query to the DB
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Add a heuristic for validating triggers without making a db query
+      hash: df5036f911dd4b200acfbe16ebbe722e20a9985e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 30.0.5
+  title: "'Improve heuristics in trigger validation'"
+  date: 2022-06-10T21:16:18.915Z
+- commits:
     - subject: Don't insert the same contract multiple times during bootstrap
       hash: 43fe9521c78dd84145acc4df73b8030b8ea37c5a
       body: ""
