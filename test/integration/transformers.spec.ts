@@ -66,6 +66,7 @@ describe('transformers', () => {
 			(matches: TransformerContract[]) => {
 				return matches.length === 2;
 			},
+			30,
 		);
 
 		// Insert a new contract
@@ -226,6 +227,7 @@ describe('transformers', () => {
 			(matches: TransformerContract[]) => {
 				return matches.length === 2;
 			},
+			30,
 		);
 
 		// Insert a new contract
@@ -396,6 +398,7 @@ describe('transformers', () => {
 			(matches: TransformerContract[]) => {
 				return matches.length === 2;
 			},
+			30,
 		);
 
 		// Insert a new contract
@@ -567,6 +570,7 @@ describe('transformers', () => {
 			(matches: TransformerContract[]) => {
 				return matches.length === 2;
 			},
+			30,
 		);
 
 		// Insert a new contract
@@ -687,6 +691,7 @@ describe('transformers', () => {
 			(matches: TransformerContract[]) => {
 				return matches.length === 2;
 			},
+			30,
 		);
 
 		// Insert a new contract
@@ -828,6 +833,7 @@ describe('transformers', () => {
 			(matches: TransformerContract[]) => {
 				return matches.length === 2;
 			},
+			30,
 		);
 
 		// Insert a new contract
@@ -998,6 +1004,7 @@ describe('transformers', () => {
 			(matches: TransformerContract[]) => {
 				return matches.length === 2;
 			},
+			30,
 		);
 
 		// Insert a new contract

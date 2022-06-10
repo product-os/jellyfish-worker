@@ -11,7 +11,7 @@ import type {
 	TypeContract,
 } from '@balena/jellyfish-types/build/core';
 import { strict } from 'assert';
-import { CONTRACTS, Kernel, StreamChange } from 'autumndb';
+import { CONTRACTS, Kernel } from 'autumndb';
 import Bluebird from 'bluebird';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -301,7 +301,6 @@ export class Worker {
 	pool: Pool;
 	consumer: Consumer;
 	producer: Producer;
-	contractsStream: any;
 	triggers: TriggeredActionContract[];
 	transformers: TransformerContract[];
 	latestTransformers: TransformerContract[];
@@ -310,6 +309,7 @@ export class Worker {
 	library: Map<Action>;
 	id: string = '0';
 	sync: Sync;
+	private cacheRefreshInterval: null | NodeJS.Timeout = null;
 
 	/**
 	 * @summary The Jellyfish Actions Worker
@@ -347,7 +347,6 @@ export class Worker {
 		this.library = this.pluginManager.getActions();
 		this.consumer = new Consumer(kernel, pool, session);
 		this.producer = new Producer(kernel, pool, session);
-		this.contractsStream = {};
 		this.sync = new Sync({
 			integrations: this.pluginManager.getSyncIntegrations(),
 		});
@@ -568,75 +567,16 @@ export class Worker {
 		);
 
 		// For better performance, commonly accessed contracts are stored in cache in the worker.
-		// These contracts are streamed from the DB, so the worker always has the most up to date version of them.
-		this.contractsStream = await this.kernel.stream(
-			logContext,
-			this.kernel.adminSession()!,
-			{
-				anyOf: [
-					SCHEMA_ACTIVE_TRIGGERS,
-					SCHEMA_ACTIVE_TRANSFORMERS,
-					SCHEMA_ACTIVE_TYPE_CONTRACTS,
-				],
-			},
-		);
+		// Periodically poll for these contracts, so the worker always has the most up to date version of them.
+		await this.loadContracts(logContext);
 
-		this.contractsStream.on('data', (change: StreamChange) => {
-			const contract = change.after;
-			const contractType = change.contractType.split('@')[0];
-			if (
-				change.type === 'update' ||
-				change.type === 'insert' ||
-				change.type === 'unmatch'
-			) {
-				// If `after` is null, the contract is no longer available: most likely it has
-				// been soft-deleted, having its `active` state set to false
-				if (!contract) {
-					switch (contractType) {
-						case 'triggered-action':
-							this.removeTrigger(logContext, change.id);
-							break;
-						case 'transformer':
-							this.removeTransformer(logContext, change.id);
-							break;
-						case 'type':
-							const filteredContracts = _.filter(this.typeContracts, (type) => {
-								return type.id !== change.id;
-							});
-							this.setTypeContracts(logContext, filteredContracts);
-					}
-				} else {
-					switch (contractType) {
-						case 'triggered-action':
-							this.upsertTrigger(logContext, contract);
-							break;
-						case 'transformer':
-							this.upsertTransformer(
-								logContext,
-								contract as TransformerContract,
-							);
-						case 'type':
-							const filteredContracts = _.filter(this.typeContracts, (type) => {
-								return type.id !== change.id;
-							});
-							filteredContracts.push(contract as TypeContract);
-							this.setTypeContracts(logContext, filteredContracts);
-					}
-				}
-			} else if (change.type === 'delete') {
-				switch (contractType) {
-					case 'triggered-action':
-						this.removeTrigger(logContext, change.id);
-						break;
-					case 'type':
-						const filteredContracts = _.filter(this.typeContracts, (type) => {
-							return type.id !== change.id;
-						});
-						this.setTypeContracts(logContext, filteredContracts);
-				}
-			}
-		});
+		// Refresh the cache every 10 seconds
+		this.cacheRefreshInterval = setInterval(async () => {
+			await this.loadContracts(logContext);
+		}, 10 * 1000);
+	}
 
+	async loadContracts(logContext: LogContext) {
 		const [triggers, transformers, types] = await Promise.all(
 			[
 				SCHEMA_ACTIVE_TRIGGERS,
@@ -645,20 +585,26 @@ export class Worker {
 			].map((schema) => this.kernel.query(logContext, this.session, schema)),
 		);
 
-		logger.info(logContext, 'Loading triggers', {
-			triggers: triggers.length,
-		});
-		this.setTriggers(logContext, triggers as TriggeredActionContract[]);
+		if (!_.isEqual(triggers, this.getTriggers())) {
+			logger.info(logContext, 'Loading triggers', {
+				triggers: triggers.length,
+			});
+			this.setTriggers(logContext, triggers as TriggeredActionContract[]);
+		}
 
-		logger.info(logContext, 'Loading transformers', {
-			transformers: transformers.length,
-		});
-		this.setTransformers(logContext, transformers as TransformerContract[]);
+		if (!_.isEqual(transformers, this.transformers)) {
+			logger.info(logContext, 'Loading transformers', {
+				transformers: transformers.length,
+			});
+			this.setTransformers(logContext, transformers as TransformerContract[]);
+		}
 
-		logger.info(logContext, 'Loading types', {
-			types: types.length,
-		});
-		this.setTypeContracts(logContext, types as TypeContract[]);
+		if (!_.isEqual(types, this.getTypeContracts())) {
+			logger.info(logContext, 'Loading types', {
+				types: types.length,
+			});
+			this.setTypeContracts(logContext, types as TypeContract[]);
+		}
 	}
 
 	/**
@@ -2075,6 +2021,14 @@ export class Worker {
 					contract: scheduledAction.id,
 				});
 			}
+		}
+	}
+
+	// Safely stop the worker, waiting for any ongoing jobs to complete.
+	async stop() {
+		await this.consumer.cancel();
+		if (this.cacheRefreshInterval) {
+			clearInterval(this.cacheRefreshInterval);
 		}
 	}
 }
