@@ -7,7 +7,6 @@ export const triggeredActionMatchmakeTask: ContractDefinition = {
 	name: 'Triggered action for matchmaking tasks to agents',
 	markers: [],
 	data: {
-		schedule: 'enqueue',
 		filter: {
 			type: 'object',
 			required: ['active', 'type', 'data'],
@@ -45,6 +44,10 @@ export const triggeredActionMatchmakeTask: ContractDefinition = {
 					properties: {
 						id: {
 							type: 'string',
+						},
+						type: {
+							type: 'string',
+							const: 'task@1.0.0',
 						},
 					},
 				},
