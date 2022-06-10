@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update internal packages
+      hash: 8147494bf72d4914b22471757aa64275dda73b17
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.0.1
+  title: "'Update internal packages'"
+  date: 2022-06-10T03:59:52.694Z
+- commits:
     - subject: Switch to polling strategy for cached contracts
       hash: 139dda586d3600abd570730ce12cff3b8b568c73
       body: |
