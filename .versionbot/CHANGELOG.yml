@@ -1,4 +1,20 @@
 - commits:
+    - subject: Improve performance of task matchmaking trigger
+      hash: 9efca7d8fc00332b723b084f66fd3050dcce2367
+      body: |
+        By specifying the contract type that the trigger expands, we can use
+        heuristics to reduce unnecessary queries to the DB.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 30.0.6
+  title: "'Improve performance of task matchmaking trigger'"
+  date: 2022-06-10T21:41:06.500Z
+- commits:
     - subject: Check type enum when running heuristic for links in triggers
       hash: 5a92e0f19ee53803128b958a1f3712d370a9af66
       body: |
