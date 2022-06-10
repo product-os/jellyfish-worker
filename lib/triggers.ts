@@ -121,11 +121,31 @@ export const matchesContract = async (
 			// If the link being inserted joins different types together
 			// than what is defined in the filter schema, we can use
 			// this as a heuristic to validate the trigger
-			const linkToType = (schema.$$links[verb] as any)?.properties?.type?.const;
-			const linkFromType = (schema.properties?.type as any)?.const;
+
+			// Get a list of types the filter link expansion queries against
+			const linkToTypeKeySchema = (schema.$$links[verb] as any)?.properties
+				?.type;
+			let linkToTypes: null | string[] = null;
+			if (linkToTypeKeySchema?.const) {
+				linkToTypes = [linkToTypeKeySchema.const];
+			} else if (linkToTypeKeySchema?.enum) {
+				linkToTypes = linkToTypeKeySchema.enum;
+			}
+
+			// Get a list of types the filter queries against
+			const linkFromTypeKeySchema = schema.properties?.type as any;
+			let linkFromTypes: null | string[] = null;
+			if (linkFromTypeKeySchema?.const) {
+				linkFromTypes = [linkFromTypeKeySchema.const];
+			} else if (linkFromTypeKeySchema?.enum) {
+				linkFromTypes = linkFromTypeKeySchema.enum;
+			}
+
+			// Check if the link contract references the same types as the filter
 			if (
-				(linkFromType && linkFromType !== linkContract.data.from.type) ||
-				(linkToType && linkToType !== linkContract.data.to.type)
+				(linkFromTypes &&
+					!linkFromTypes.includes(linkContract.data.from.type)) ||
+				(linkToTypes && !linkToTypes.includes(linkContract.data.to.type))
 			) {
 				return false;
 			}
@@ -141,6 +161,13 @@ export const matchesContract = async (
 			}
 		}
 	} else {
+		// If the filter matches against a relationship the contract doesn't have, return false
+		if (schema.$$links && contract.linked_at) {
+			const verb = Object.keys(schema.$$links)[0];
+			if (!contract.linked_at[verb]) {
+				return false;
+			}
+		}
 		schema.properties.id.const = contract.id;
 	}
 
