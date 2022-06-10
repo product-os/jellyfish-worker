@@ -141,6 +141,13 @@ export const matchesContract = async (
 			}
 		}
 	} else {
+		// If the filter matches against a relationship the contract doesn't have, return false
+		if (schema.$$links && contract.linked_at) {
+			const verb = Object.keys(schema.$$links)[0];
+			if (!contract.linked_at[verb]) {
+				return false;
+			}
+		}
 		schema.properties.id.const = contract.id;
 	}
 
