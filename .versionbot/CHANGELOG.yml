@@ -1,4 +1,18 @@
 - commits:
+    - subject: Don't insert the same contract multiple times during bootstrap
+      hash: 43fe9521c78dd84145acc4df73b8030b8ea37c5a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 30.0.4
+  title: "'Don't insert the same contract multiple times during bootstrap'"
+  date: 2022-06-10T13:41:38.753Z
+- commits:
     - subject: Use link from/to type as a heuristic when evaluating triggers
       hash: d9c3c416c100502a4a03f45a300915baa565662b
       body: |
