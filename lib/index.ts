@@ -481,7 +481,7 @@ export class Worker {
 		const [pluginContractPreReqs, pluginContractsRest] = _.partition(
 			pluginContracts,
 			(contract) => {
-				return contract.type.split('@')[0].match(/^(loop|action)$/);
+				return contract.type.split('@')[0].match(/^(loop|action|type)$/);
 			},
 		);
 		await Promise.all(pluginContractPreReqs.map(checkThenReplaceContract));
