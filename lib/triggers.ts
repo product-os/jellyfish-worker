@@ -123,16 +123,22 @@ export const matchesContract = async (
 			// this as a heuristic to validate the trigger
 			const linkToType = (schema.$$links[verb] as any)?.properties?.type?.const;
 			const linkFromType = (schema.properties?.type as any)?.const;
-			if (
-				(linkFromType && linkFromType !== linkContract.data.from.type) ||
-				(linkToType && linkToType !== linkContract.data.to.type)
-			) {
-				return false;
-			}
 
 			if (verb === contract.name) {
+				if (
+					(linkFromType && linkFromType !== linkContract.data.from.type) ||
+					(linkToType && linkToType !== linkContract.data.to.type)
+				) {
+					return false;
+				}
 				schema.properties.id.const = linkContract.data.from.id;
 			} else if (verb === contract.data.inverseName) {
+				if (
+					(linkFromType && linkFromType !== linkContract.data.to.type) ||
+					(linkToType && linkToType !== linkContract.data.from.type)
+				) {
+					return false;
+				}
 				schema.properties.id.const = linkContract.data.to.id;
 
 				// Abort if the link doesn't match.
