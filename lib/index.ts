@@ -391,141 +391,24 @@ export class Worker {
 	) {
 		this.id = uuidv4();
 
-		// Initialize producer and consumer
-		await this.producer.initialize(logContext);
-		await this.consumer.initializeWithEventHandler(
-			logContext,
-			onMessageEventHandler,
-		);
+		// Checks if all the values on object a are equal to the matching values on object b
+		const existingKeysMatch = (a: any, b: any) => {
+			return _.isEqual(_.pick(b, _.keys(a)), a);
+		};
 
-		// Insert type contracts as prerequisite
-		await Promise.all(
-			Object.values(contracts).map(async (contract) => {
-				if (contract.type.split('@')[0] === 'type') {
-					return this.kernel.replaceContract(
-						logContext,
-						this.session,
-						contract,
-					);
-				}
-			}),
-		);
-
-		// Insert other worker contracts
-		await Promise.all(
-			Object.values(contracts).map(async (contract) => {
-				const versionedType = ensureTypeHasVersion(contract.type);
-				const typeContract = await this.kernel.getContractBySlug<TypeContract>(
-					logContext,
-					this.session,
-					versionedType,
-				);
-				strict(typeContract);
-				return this.replaceCard(
-					logContext,
-					this.session,
-					typeContract,
-					{
-						attachEvents: false,
-					},
-					contract,
-				);
-			}),
-		);
-		const actionType = await this.kernel.getContractBySlug<TypeContract>(
-			logContext,
-			this.session,
-			'action@latest',
-		);
-		strict(actionType);
-		await Promise.all(
-			actions.map((action) => {
-				return this.replaceCard(
-					logContext,
-					this.session,
-					actionType,
-					{
-						attachEvents: false,
-					},
-					action.contract,
-				);
-			}),
-		);
-
-		// Get all contracts provided by plugins
-		const pluginContracts = this.pluginManager.getCards();
-
-		// Make sure certain contracts are initialized, as they can be prerequisites
-		const loopType = await this.kernel.getContractBySlug<TypeContract>(
-			logContext,
-			this.session,
-			'loop@latest',
-		);
-		strict(loopType);
-		await Promise.all(
-			Object.values(pluginContracts).map(
-				async (contract: ContractDefinition) => {
-					if (contract.type.split('@')[0].match(/^(loop|action)$/)) {
-						const typeContract =
-							contract.type.split('@')[0] === 'loop' ? loopType : actionType;
-						return this.replaceCard(
-							logContext,
-							this.session,
-							typeContract,
-							{
-								attachEvents: false,
-							},
-							pluginContracts[contract.slug],
-						);
-					}
-				},
-			),
-		);
-
-		// Only need test user role during development and CI.
-		const contractsToSkip: string[] = [];
-		if (environment.isProduction() && !environment.isCI()) {
-			contractsToSkip.push('user-guest');
-			contractsToSkip.push('role-user-test');
-		}
-
-		// Insert all other contracts provided by plugins
-		const contractLoaders = _.values(this.pluginManager.getCards()).filter(
-			(contract: ContractDefinition) => {
-				return !contractsToSkip.includes(contract.slug);
-			},
-		);
-
-		await Bluebird.each(
-			contractLoaders,
-			async (contract: ContractDefinition) => {
-				if (!contract) {
-					return;
-				}
-
-				// Skip contracts that already exist and do not need updating
-				// Need to update omitted list if any similar fields are added to the schema
-				contract.name = contract.name ? contract.name : null;
-				const currentContract = await this.kernel.getContractBySlug(
-					logContext,
-					this.session,
-					`${contract.slug}@${contract.version}`,
-				);
-				if (
-					currentContract &&
-					_.isEqual(
-						contract,
-						_.omit(currentContract, [
-							'id',
-							'created_at',
-							'updated_at',
-							'linked_at',
-						]),
-					)
-				) {
-					return;
-				}
-
+		// Get the existing contract and if it is not found or is different, replace it
+		const checkThenReplaceContract = async (
+			contract: Partial<Contract> & { type: string },
+		) => {
+			if (!contract) {
+				return;
+			}
+			const current = await this.kernel.getContractBySlug(
+				logContext,
+				this.session,
+				`${contract.slug}@${contract.version}`,
+			);
+			if (!current || !existingKeysMatch(contract, current)) {
 				const versionedType = ensureTypeHasVersion(contract.type);
 				const typeContract = await this.kernel.getContractBySlug<TypeContract>(
 					logContext,
@@ -563,6 +446,82 @@ export class Worker {
 						},
 					);
 				}
+			}
+		};
+
+		// Initialize producer and consumer
+		await this.producer.initialize(logContext);
+		await this.consumer.initializeWithEventHandler(
+			logContext,
+			onMessageEventHandler,
+		);
+
+		// Insert type contracts as prerequisite
+		await Promise.all(
+			Object.values(contracts).map(async (contract) => {
+				if (contract.type.split('@')[0] === 'type') {
+					// Get the existing contracts and if it is not found or is different, replace it
+					const current = await this.kernel.getContractBySlug(
+						logContext,
+						this.session,
+						`${contract.slug}@${contract.type}`,
+					);
+					if (!current || !existingKeysMatch(contract, current)) {
+						return this.kernel.replaceContract(
+							logContext,
+							this.session,
+							contract,
+						);
+					}
+				}
+			}),
+		);
+
+		// Insert other worker contracts
+		await Promise.all(
+			Object.values(contracts).map(async (contract) => {
+				return checkThenReplaceContract(contract);
+			}),
+		);
+
+		await Promise.all(
+			actions.map(async (action) => {
+				return checkThenReplaceContract(action.contract);
+			}),
+		);
+
+		// Get all contracts provided by plugins
+		const pluginContracts = this.pluginManager.getCards();
+
+		// Make sure certain contracts are initialized, as they can be prerequisites
+		await Promise.all(
+			Object.values(pluginContracts).map(
+				async (contract: ContractDefinition) => {
+					if (contract.type.split('@')[0].match(/^(loop|action)$/)) {
+						return checkThenReplaceContract(contract);
+					}
+				},
+			),
+		);
+
+		// Only need test user role during development and CI.
+		const contractsToSkip: string[] = [];
+		if (environment.isProduction() && !environment.isCI()) {
+			contractsToSkip.push('user-guest');
+			contractsToSkip.push('role-user-test');
+		}
+
+		// Insert all other contracts provided by plugins
+		const contractLoaders = _.values(this.pluginManager.getCards()).filter(
+			(contract: ContractDefinition) => {
+				return !contractsToSkip.includes(contract.slug);
+			},
+		);
+
+		await Bluebird.each(
+			contractLoaders,
+			async (contract: ContractDefinition) => {
+				return checkThenReplaceContract(contract);
 			},
 		);
 
