@@ -12,7 +12,6 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import { strict } from 'assert';
 import { CONTRACTS, Kernel } from 'autumndb';
-import Bluebird from 'bluebird';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
 import _ from 'lodash';
@@ -456,36 +455,21 @@ export class Worker {
 			onMessageEventHandler,
 		);
 
-		// Insert type contracts as prerequisite
-		await Promise.all(
-			Object.values(contracts).map(async (contract) => {
-				if (contract.type.split('@')[0] === 'type') {
-					// Get the existing contracts and if it is not found or is different, replace it
-					const current = await this.kernel.getContractBySlug(
-						logContext,
-						this.session,
-						`${contract.slug}@${contract.type}`,
-					);
-					if (!current || !existingKeysMatch(contract, current)) {
-						return this.kernel.replaceContract(
-							logContext,
-							this.session,
-							contract,
-						);
-					}
-				}
-			}),
+		const [defaultTypeContracts, defaultContracts] = _.partition(
+			Object.values(contracts),
+			(contract) => {
+				return contract.type.split('@')[0] === 'type';
+			},
 		);
+
+		// Insert type contracts as prerequisite
+		await Promise.all(defaultTypeContracts.map(checkThenReplaceContract));
 
 		// Insert other worker contracts
-		await Promise.all(
-			Object.values(contracts).map(async (contract) => {
-				return checkThenReplaceContract(contract);
-			}),
-		);
+		await Promise.all(defaultContracts.map(checkThenReplaceContract));
 
 		await Promise.all(
-			actions.map(async (action) => {
+			actions.map((action) => {
 				return checkThenReplaceContract(action.contract);
 			}),
 		);
@@ -494,15 +478,13 @@ export class Worker {
 		const pluginContracts = this.pluginManager.getCards();
 
 		// Make sure certain contracts are initialized, as they can be prerequisites
-		await Promise.all(
-			Object.values(pluginContracts).map(
-				async (contract: ContractDefinition) => {
-					if (contract.type.split('@')[0].match(/^(loop|action)$/)) {
-						return checkThenReplaceContract(contract);
-					}
-				},
-			),
+		const [pluginContractPreReqs, pluginContractsRest] = _.partition(
+			pluginContracts,
+			(contract) => {
+				return contract.type.split('@')[0].match(/^(loop|action)$/);
+			},
 		);
+		await Promise.all(pluginContractPreReqs.map(checkThenReplaceContract));
 
 		// Only need test user role during development and CI.
 		const contractsToSkip: string[] = [];
@@ -512,30 +494,25 @@ export class Worker {
 		}
 
 		// Insert all other contracts provided by plugins
-		const contractLoaders = _.values(this.pluginManager.getCards()).filter(
+		const contractsToLoad = _.values(pluginContractsRest).filter(
 			(contract: ContractDefinition) => {
 				return !contractsToSkip.includes(contract.slug);
 			},
 		);
 
-		await Bluebird.each(
-			contractLoaders,
-			async (contract: ContractDefinition) => {
-				return checkThenReplaceContract(contract);
-			},
-		);
+		await Promise.all(contractsToLoad.map(checkThenReplaceContract));
 
 		// For better performance, commonly accessed contracts are stored in cache in the worker.
 		// Periodically poll for these contracts, so the worker always has the most up to date version of them.
-		await this.loadContracts(logContext);
+		await this.fetchCacheData(logContext);
 
 		// Refresh the cache every 10 seconds
 		this.cacheRefreshInterval = setInterval(async () => {
-			await this.loadContracts(logContext);
+			await this.fetchCacheData(logContext);
 		}, 10 * 1000);
 	}
 
-	async loadContracts(logContext: LogContext) {
+	async fetchCacheData(logContext: LogContext) {
 		const [triggers, transformers, types] = await Promise.all(
 			[
 				SCHEMA_ACTIVE_TRIGGERS,
