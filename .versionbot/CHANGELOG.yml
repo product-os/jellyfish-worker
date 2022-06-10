@@ -1,4 +1,20 @@
 - commits:
+    - subject: Don't blindly replace contracts on bootstrap
+      hash: ca635ac7d0a8f98a076979dff5a88279230f92bb
+      body: |
+        This change first checks to see if a contract needs to be updated before
+        replacing it on startup.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 30.0.2
+  title: "'Don't blindly replace contracts on bootstrap'"
+  date: 2022-06-10T09:07:33.028Z
+- commits:
     - subject: Update internal packages
       hash: 8147494bf72d4914b22471757aa64275dda73b17
       body: ""
