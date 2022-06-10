@@ -1,4 +1,23 @@
 - commits:
+    - subject: Use link from/to type as a heuristic when evaluating triggers
+      hash: d9c3c416c100502a4a03f45a300915baa565662b
+      body: |
+        This change allows us to more quickly discard triggers that won't match
+        when evaluating link contract insertions.
+        The types on the trigger filter are compared to the types declared on
+        the link contract, and if they don't match we can safely exit the
+        trigger evaluation logic instead of having to query the kernel.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 30.0.3
+  title: "'Use link from/to type as a heuristic when evaluating triggers'"
+  date: 2022-06-10T10:39:00.939Z
+- commits:
     - subject: Don't blindly replace contracts on bootstrap
       hash: ca635ac7d0a8f98a076979dff5a88279230f92bb
       body: |
