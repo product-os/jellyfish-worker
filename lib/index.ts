@@ -697,6 +697,10 @@ export class Worker {
 					);
 					if (actor) {
 						await kernel.insertContract(logContext, insertSession, {
+							// A lot of these links are created, so relying on the default slug
+							// can be unreliable and potenitally cause slug collisions.
+							// Specifying the slug here allows us to use a full uuid instead.
+							slug: `link-creator-${uuidv4()}`,
 							type: 'link@1.0.0',
 							name: 'is creator of',
 							data: {
