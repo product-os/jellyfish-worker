@@ -1,4 +1,18 @@
 - commits:
+    - subject: "Translate tests: Flush all for translate tests"
+      hash: cd69da0b3e58943be37ae469e3b77ec1ccb2b12a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.0.10
+  title: "'Translate tests: Flush all for translate tests'"
+  date: 2022-06-13T08:41:45.823Z
+- commits:
     - subject: "Triggers: Correctly handle filters that match on inverse link name"
       hash: 7c56065ebffa7f0e3c9da6946d6b0db3e1e08c94
       body: ""
