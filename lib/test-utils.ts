@@ -496,6 +496,7 @@ export async function translateBeforeAll(context: TestContext) {
 export async function translateAfterEach(context: TestContext) {
 	nock.cleanAll();
 	await restore(context);
+	await context.worker.fetchCacheData(context.logContext);
 }
 
 /**
