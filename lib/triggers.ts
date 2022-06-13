@@ -39,6 +39,8 @@ export const matchesContract = async (
 	session: string,
 	filter: JsonSchema,
 	contract: Contract | null,
+	typeContractSlugs: string[],
+	triggerSlug: string,
 ): Promise<Contract | false | void> => {
 	if (!contract) {
 		return false;
@@ -139,6 +141,16 @@ export const matchesContract = async (
 				linkFromTypes = [linkFromTypeKeySchema.const];
 			} else if (linkFromTypeKeySchema?.enum) {
 				linkFromTypes = linkFromTypeKeySchema.enum;
+			} else if (linkFromTypeKeySchema?.not?.const) {
+				linkFromTypes = _.without(
+					typeContractSlugs,
+					linkFromTypeKeySchema.not.const,
+				);
+			} else if (linkFromTypeKeySchema?.not?.enum) {
+				linkFromTypes = _.without(
+					typeContractSlugs,
+					...linkFromTypeKeySchema.not.enum,
+				);
 			}
 
 			// Check if the link contract references the same types as the filter
@@ -250,6 +262,7 @@ export const getRequest = async (
 	oldContract: Contract | null,
 	newContract: Contract,
 	options: GetRequestOptions,
+	typeContractSlugs: string[],
 ) => {
 	if (trigger.data.mode && trigger.data.mode !== options.mode) {
 		return null;
@@ -261,6 +274,8 @@ export const getRequest = async (
 		options.session,
 		trigger.data.filter!,
 		newContract,
+		typeContractSlugs,
+		trigger.slug,
 	);
 
 	if (!newContractMatches) {

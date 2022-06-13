@@ -1645,6 +1645,7 @@ export class Worker {
 							logContext,
 							session,
 						},
+						Object.keys(this.typeContracts),
 					);
 
 					if (!request) {
