@@ -142,17 +142,26 @@ export const matchesContract = async (
 			}
 
 			// Check if the link contract references the same types as the filter
-			if (
-				(linkFromTypes &&
-					!linkFromTypes.includes(linkContract.data.from.type)) ||
-				(linkToTypes && !linkToTypes.includes(linkContract.data.to.type))
-			) {
-				return false;
-			}
-
+			// The type testing heuristic needs to run the other way around if the verb
+			// in the filter is the inverse name
 			if (verb === contract.name) {
+				if (
+					(linkFromTypes &&
+						!linkFromTypes.includes(linkContract.data.from.type)) ||
+					(linkToTypes && !linkToTypes.includes(linkContract.data.to.type))
+				) {
+					return false;
+				}
+
 				schema.properties.id.const = linkContract.data.from.id;
 			} else if (verb === contract.data.inverseName) {
+				if (
+					(linkToTypes && !linkToTypes.includes(linkContract.data.from.type)) ||
+					(linkFromTypes && !linkFromTypes.includes(linkContract.data.to.type))
+				) {
+					return false;
+				}
+
 				schema.properties.id.const = linkContract.data.to.id;
 
 				// Abort if the link doesn't match.
