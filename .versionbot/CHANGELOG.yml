@@ -1,4 +1,18 @@
 - commits:
+    - subject: "Translate tests: Update worker cache after table restore"
+      hash: 7e8da189635ec4636d3a9b5d3a9655f47c4c2b06
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.0.8
+  title: "'Translate tests: Update worker cache after table restore'"
+  date: 2022-06-13T06:18:12.337Z
+- commits:
     - subject: Ensure types are loaded from plugins before their instances
       hash: 788ef6f1d0f480c0c355eac252d20dc0081747c7
       body: ""
