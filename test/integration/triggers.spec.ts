@@ -32,12 +32,7 @@ beforeAll(async () => {
 	await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 		slug: 'foo',
 		type: 'type@1.0.0',
-		version: '1.0.0',
 		name: 'The test foo contract',
-		markers: [],
-		tags: [],
-		links: {},
-		active: true,
 		data: {
 			schema: {
 				type: 'object',
@@ -64,8 +59,18 @@ beforeAll(async () => {
 				},
 			},
 		},
-		requires: [],
-		capabilities: [],
+	});
+
+	await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
+		slug: 'bar',
+		type: 'type@1.0.0',
+		name: 'The test bar contract',
+		data: {
+			schema: {
+				type: 'object',
+				properties: {},
+			},
+		},
 	});
 });
 
@@ -193,6 +198,184 @@ describe('.getRequest()', () => {
 			card: typeContract.id,
 			logContext: ctx.logContext,
 			originator: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
+			arguments: {
+				properties: {
+					slug: 'foo-bar-baz',
+				},
+			},
+		});
+	});
+
+	it('should return a request if the filter use type.not and there is a match', async () => {
+		const trigger = Kernel.defaults<TriggeredActionData>({
+			type: 'triggered-action@1.0.0',
+			data: {
+				mode: 'insert',
+				filter: {
+					type: 'object',
+					required: ['type'],
+					properties: {
+						type: {
+							not: {
+								type: 'string',
+								const: 'foo@1.0.0',
+							},
+						},
+					},
+				},
+				action: 'action-create-card@1.0.0',
+				target: typeContract.id,
+				arguments: {
+					properties: {
+						slug: 'foo-bar-baz',
+					},
+				},
+			},
+		}) as TriggeredActionContract;
+
+		const date = new Date();
+
+		const insertedContract = await ctx.kernel.insertContract(
+			ctx.logContext,
+			ctx.session,
+			{
+				type: 'bar@1.0.0',
+				version: '1.0.0',
+				slug: autumndbTestUtils.generateRandomId(),
+				active: true,
+				links: {},
+				tags: [],
+				markers: [],
+				data: {},
+			},
+		);
+
+		const request = await triggers.getRequest(
+			ctx.kernel,
+			trigger,
+			null,
+			insertedContract,
+			{
+				currentDate: date,
+				mode: 'insert',
+				logContext: ctx.logContext,
+				session: ctx.session,
+			},
+		);
+
+		expect(request).toEqual({
+			action: 'action-create-card@1.0.0',
+			currentDate: date,
+			card: typeContract.id,
+			logContext: ctx.logContext,
+			originator: trigger.id,
+			arguments: {
+				properties: {
+					slug: 'foo-bar-baz',
+				},
+			},
+		});
+	});
+
+	it('should return a request if the filter use type.not and there is a match via link', async () => {
+		const trigger = Kernel.defaults<TriggeredActionData>({
+			type: 'triggered-action@1.0.0',
+			data: {
+				mode: 'insert',
+				filter: {
+					type: 'object',
+					required: ['type'],
+					properties: {
+						type: {
+							not: {
+								type: 'string',
+								const: 'foo@1.0.0',
+							},
+						},
+					},
+					$$links: {
+						'is attached to': {
+							type: 'object',
+							properties: {
+								type: {
+									const: 'contact@1.0.0',
+								},
+							},
+						},
+					},
+				},
+				action: 'action-create-card@1.0.0',
+				target: typeContract.id,
+				arguments: {
+					properties: {
+						slug: 'foo-bar-baz',
+					},
+				},
+			},
+		}) as TriggeredActionContract;
+
+		const date = new Date();
+
+		const insertedContract1 = await ctx.kernel.insertContract(
+			ctx.logContext,
+			ctx.session,
+			{
+				type: 'contact@1.0.0',
+				version: '1.0.0',
+			},
+		);
+		const insertedContract2 = await ctx.kernel.insertContract(
+			ctx.logContext,
+			ctx.session,
+			{
+				type: 'create@1.0.0',
+				data: {
+					actor: ctx.adminUserId,
+					target: insertedContract1.id,
+					timestamp: new Date().toISOString(),
+				},
+			},
+		);
+
+		const linkContract = await ctx.kernel.insertContract(
+			ctx.logContext,
+			ctx.session,
+			{
+				type: 'link@1.0.0',
+				name: 'has attached element',
+				data: {
+					inverseName: 'is attached to',
+					from: {
+						type: insertedContract1.type,
+						id: insertedContract1.id,
+					},
+					to: {
+						type: insertedContract2.type,
+						id: insertedContract2.id,
+					},
+				},
+			},
+		);
+
+		const request = await triggers.getRequest(
+			ctx.kernel,
+			trigger,
+			null,
+			linkContract,
+			{
+				currentDate: date,
+				mode: 'insert',
+				logContext: ctx.logContext,
+				session: ctx.session,
+			},
+		);
+
+		expect(request).toEqual({
+			action: 'action-create-card@1.0.0',
+			currentDate: date,
+			card: typeContract.id,
+			logContext: ctx.logContext,
+			originator: trigger.id,
 			arguments: {
 				properties: {
 					slug: 'foo-bar-baz',
