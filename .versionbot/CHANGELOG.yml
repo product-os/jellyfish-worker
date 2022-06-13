@@ -1,4 +1,18 @@
 - commits:
+    - subject: "Triggers: Correctly handle filters that match on inverse link name"
+      hash: 7c56065ebffa7f0e3c9da6946d6b0db3e1e08c94
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Lucian Buzzo
+      nested: []
+  version: 30.0.9
+  title: "'Mob/trigger validation checks'"
+  date: 2022-06-13T07:14:36.907Z
+- commits:
     - subject: "Translate tests: Update worker cache after table restore"
       hash: 7e8da189635ec4636d3a9b5d3a9655f47c4c2b06
       body: ""
