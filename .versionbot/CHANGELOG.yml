@@ -1,4 +1,19 @@
 - commits:
+    - subject: Specify a long slug for creator links
+      hash: e0e293c3ecf6d2ed4a6dc8c93e78c47f6e03e37f
+      body: |
+        Resolves https://github.com/product-os/jellyfish/issues/8733
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 30.0.11
+  title: "'Specify a long slug for creator links'"
+  date: 2022-06-13T15:38:25.668Z
+- commits:
     - subject: "Translate tests: Flush all for translate tests"
       hash: cd69da0b3e58943be37ae469e3b77ec1ccb2b12a
       body: ""
