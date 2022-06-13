@@ -627,7 +627,7 @@ export async function webhookScenario(
 			},
 		);
 
-		await context.flush(context.session);
+		await context.flushAll(context.session);
 		const result = await context.worker.producer.waitResults(
 			context.logContext,
 			request as ActionRequestContract,
