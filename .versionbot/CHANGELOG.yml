@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update autumndb to 20.1.12
+      hash: db701f3c5a4f324089f814b2ea9967e44abdaff7
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.0.13
+  title: "'Update autumndb to 20.1.12'"
+  date: 2022-06-14T07:23:08.493Z
+- commits:
     - subject: Use official Postgres 14 image
       hash: 7102a2599c8c51f46c9800c97d22b9a4ba47f16f
       body: ""
