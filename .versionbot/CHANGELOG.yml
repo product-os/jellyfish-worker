@@ -1,4 +1,18 @@
 - commits:
+    - subject: Use official Postgres 14 image
+      hash: 7102a2599c8c51f46c9800c97d22b9a4ba47f16f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.0.12
+  title: "'Use official Postgres 14 image'"
+  date: 2022-06-14T04:36:33.371Z
+- commits:
     - subject: Specify a long slug for creator links
       hash: e0e293c3ecf6d2ed4a6dc8c93e78c47f6e03e37f
       body: |
