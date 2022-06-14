@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update dependencies (external v0 minor bumps)
+      hash: b1ebd94af48102b83ab12c8cb7e52be73e0b1ba8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Renovate Bot
+      nested: []
+  version: 30.0.14
+  title: "'Update dependencies (external v0 minor bumps)'"
+  date: 2022-06-14T07:59:56.998Z
+- commits:
     - subject: Update autumndb to 20.1.12
       hash: db701f3c5a4f324089f814b2ea9967e44abdaff7
       body: ""
