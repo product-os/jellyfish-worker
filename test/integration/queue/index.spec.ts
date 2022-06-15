@@ -1,9 +1,5 @@
 import { strict as assert } from 'assert';
-import {
-	Kernel,
-	testUtils as autumndbTestUtils,
-	SessionContract,
-} from 'autumndb';
+import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
 import {
 	ActionContract,
 	ActionRequestData,
@@ -24,13 +20,6 @@ afterAll(() => {
 describe('queue', () => {
 	describe('.enqueue()', () => {
 		test('should include the actor from the passed session', async () => {
-			const session = await ctx.kernel.getContractById<SessionContract>(
-				ctx.logContext,
-				ctx.session,
-				ctx.session,
-			);
-			assert(session);
-
 			const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 			const actionRequest = await ctx.worker.insertCard(
 				ctx.logContext,
@@ -71,7 +60,7 @@ describe('queue', () => {
 			const dequeued = await ctx.dequeue();
 			assert(dequeued);
 			expect(dequeued.id).toEqual(actionRequest.id);
-			expect(dequeued.data.actor).toEqual(session.data.actor);
+			expect(dequeued.data.actor).toEqual(ctx.session.actor.id);
 		});
 
 		test('should include the whole passed action', async () => {

@@ -257,7 +257,7 @@ describe('action-request-password-reset', () => {
 		nockRequest();
 		const username = autumndbTestUtils.generateRandomSlug();
 		const user = await ctx.createUser(username);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
 			ctx.session,
@@ -286,7 +286,7 @@ describe('action-request-password-reset', () => {
 		expect(requestDelete.error).toBe(false);
 
 		await expect(
-			ctx.processAction(session.id, {
+			ctx.processAction(session, {
 				type: 'action-request@1.0.0',
 				data: {
 					action: 'action-request-password-reset@1.0.0',

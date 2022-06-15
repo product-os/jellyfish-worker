@@ -67,7 +67,7 @@ describe('action-complete-first-time-login', () => {
 			autumndbTestUtils.generateRandomSlug(),
 			PASSWORDLESS_USER_HASH,
 		);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
 			ctx.session,
@@ -127,7 +127,7 @@ describe('action-complete-first-time-login', () => {
 		};
 		Reflect.deleteProperty(completeFirstTimeLoginAction, 'logContext');
 
-		await ctx.processAction(session.id, {
+		await ctx.processAction(session, {
 			type: 'action-request@1.0.0',
 			data: completeFirstTimeLoginAction,
 		});
@@ -365,7 +365,7 @@ describe('action-complete-first-time-login', () => {
 			autumndbTestUtils.generateRandomSlug(),
 			PASSWORDLESS_USER_HASH,
 		);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
 			ctx.session,
@@ -443,7 +443,7 @@ describe('action-complete-first-time-login', () => {
 		Reflect.deleteProperty(completeFirstTimeLoginAction, 'logContext');
 
 		await expect(
-			ctx.processAction(session.id, completeFirstTimeLoginAction),
+			ctx.processAction(session, completeFirstTimeLoginAction),
 		).rejects.toThrowError();
 	});
 

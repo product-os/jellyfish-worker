@@ -1,5 +1,5 @@
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { JsonSchema, Kernel } from 'autumndb';
+import type { AutumnDBSession, JsonSchema, Kernel } from 'autumndb';
 import type { PostOptions, PostResults } from './consumer';
 import type {
 	ExecuteContract,
@@ -67,7 +67,7 @@ export const getExecuteEventSlug = (options: { id: string }): string => {
 export const post = async (
 	logContext: LogContext,
 	kernel: Kernel,
-	session: string,
+	session: AutumnDBSession,
 	options: PostOptions,
 	results: PostResults,
 ): Promise<ExecuteContract> => {
@@ -127,7 +127,7 @@ export const post = async (
 export const getLastExecutionEvent = async (
 	logContext: LogContext,
 	kernel: Kernel,
-	session: string,
+	session: AutumnDBSession,
 	originator: string,
 ): Promise<any> => {
 	const events = await kernel.query(
@@ -197,7 +197,7 @@ export interface WaitOptions {
 export const wait = async (
 	logContext: LogContext,
 	kernel: Kernel,
-	session: string,
+	session: AutumnDBSession,
 	options: WaitOptions,
 ): Promise<ExecuteContract> => {
 	const slug = `${EXECUTION_EVENT_TYPE}-${options.id}`;

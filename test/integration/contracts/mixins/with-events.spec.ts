@@ -109,12 +109,11 @@ describe('with-events mixin', () => {
 	test('formulas work as expected', async () => {
 		const username = autumndbTestUtils.generateRandomId();
 		const testUser = await ctx.createUser(username);
-		const testSession = await ctx.createSession(testUser);
 
 		// Create initial contract
 		const foo = await ctx.worker.insertCard(
 			ctx.logContext,
-			testSession.id,
+			{ actor: testUser },
 			ctx.worker.typeContracts['foo@1.0.0'],
 			{
 				attachEvents: true,
@@ -165,7 +164,7 @@ describe('with-events mixin', () => {
 		// Add an event
 		const bar = await ctx.createEvent(
 			testUser.id,
-			testSession.id,
+			{ actor: testUser },
 			foo,
 			'test',
 			'bar',
@@ -174,7 +173,7 @@ describe('with-events mixin', () => {
 		// Set a few properties on event
 		const updated = await ctx.worker.patchCard(
 			ctx.logContext,
-			testSession.id,
+			{ actor: testUser },
 			ctx.worker.typeContracts['bar@1.0.0'],
 			{
 				actor: testUser.id,
@@ -209,7 +208,7 @@ describe('with-events mixin', () => {
 		// Trigger formula execution
 		await ctx.worker.patchCard(
 			ctx.logContext,
-			testSession.id,
+			{ actor: testUser },
 			ctx.worker.typeContracts['foo@1.0.0'],
 			{
 				actor: testUser.id,

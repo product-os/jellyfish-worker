@@ -105,7 +105,7 @@ describe('action-complete-password-reset', () => {
 	test('should replace the user password when the requestToken is valid', async () => {
 		const username = autumndbTestUtils.generateRandomSlug();
 		const user = await ctx.createUser(username, hash);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 
 		const passwordReset = await ctx.processAction(ctx.session, {
 			type: 'action-request@1.0.0',
@@ -148,7 +148,7 @@ describe('action-complete-password-reset', () => {
 		};
 		Reflect.deleteProperty(completePasswordReset, 'logContext');
 
-		const completePasswordResetResult = await ctx.processAction(session.id, {
+		const completePasswordResetResult = await ctx.processAction(session, {
 			type: 'action-request@1.0.0',
 			data: completePasswordReset,
 		});
@@ -415,7 +415,7 @@ describe('action-complete-password-reset', () => {
 	test('should fail if the user becomes inactive between requesting and completing the password reset', async () => {
 		const username = autumndbTestUtils.generateRandomSlug();
 		const user = await ctx.createUser(username, hash);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 
 		const passwordReset = await ctx.processAction(ctx.session, {
 			type: 'action-request@1.0.0',
@@ -477,7 +477,7 @@ describe('action-complete-password-reset', () => {
 		Reflect.deleteProperty(completePasswordReset, 'logContext');
 
 		await expect(
-			ctx.processAction(session.id, {
+			ctx.processAction(session, {
 				type: 'action-request@1.0.0',
 				data: completePasswordReset,
 			}),

@@ -214,7 +214,7 @@ describe('action-send-first-time-login-link', () => {
 	test('should throw error if the user is inactive', async () => {
 		nockRequest();
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
 			ctx.session,
@@ -243,7 +243,7 @@ describe('action-send-first-time-login-link', () => {
 		expect(requestDelete.error).toBe(false);
 
 		await expect(
-			ctx.processAction(session.id, {
+			ctx.processAction(session, {
 				type: 'action-request@1.0.0',
 				data: {
 					action: 'action-send-first-time-login-link@1.0.0',
@@ -521,7 +521,7 @@ describe('action-send-first-time-login-link', () => {
 		const requester = await ctx.createUser(
 			autumndbTestUtils.generateRandomSlug(),
 		);
-		const requesterSession = await ctx.createSession(requester);
+		const requesterSession = { actor: requester };
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
@@ -533,7 +533,7 @@ describe('action-send-first-time-login-link', () => {
 		);
 
 		await expect(
-			ctx.processAction(requesterSession.id, {
+			ctx.processAction(requesterSession, {
 				type: 'action-request@1.0.0',
 				data: {
 					action: 'action-send-first-time-login-link@1.0.0',
@@ -773,7 +773,7 @@ describe('action-send-first-time-login-link', () => {
 		const communityUser = await ctx.createUser(
 			autumndbTestUtils.generateRandomId(),
 		);
-		const session = await ctx.createSession(communityUser);
+		const session = { actor: communityUser };
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
 			ctx.session,
@@ -793,7 +793,7 @@ describe('action-send-first-time-login-link', () => {
 
 		await expect(
 			handler(
-				session.id,
+				session,
 				actionContext,
 				targetUser,
 				makeHandlerRequest(ctx, actionSendFirstTimeLoginLink.contract),

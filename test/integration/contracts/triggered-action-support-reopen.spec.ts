@@ -1,16 +1,20 @@
 import { strict as assert } from 'assert';
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	AutumnDBSession,
+	testUtils as autumndbTestUtils,
+	UserContract,
+} from 'autumndb';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
-let user: any = {};
-let session: any = {};
+let user: UserContract;
+let session: AutumnDBSession;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
 	user = await ctx.createUser(autumndbTestUtils.generateRandomId());
-	session = await ctx.createSession(user);
+	session = { actor: user };
 });
 
 afterAll(() => {
@@ -20,7 +24,7 @@ afterAll(() => {
 test('should re-open a closed support thread if a new message is added', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'closed',
@@ -28,7 +32,7 @@ test('should re-open a closed support thread if a new message is added', async (
 	);
 
 	// Add a new message to the thread, and then wait for the support thread to be re-opened
-	await ctx.createMessage(user.id, session.id, supportThread, 'buz');
+	await ctx.createMessage(user.id, session, supportThread, 'buz');
 
 	await ctx.waitForMatch({
 		type: 'object',
@@ -53,7 +57,7 @@ test('should re-open a closed support thread if a new message is added', async (
 test('should not re-open a closed thread by marking a message as read', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'open',
@@ -63,7 +67,7 @@ test('should not re-open a closed thread by marking a message as read', async ()
 	// Add a new message to the thread
 	const message = await ctx.createMessage(
 		user.id,
-		session.id,
+		session,
 		supportThread,
 		'buz',
 	);
@@ -71,7 +75,7 @@ test('should not re-open a closed thread by marking a message as read', async ()
 	// Close the thread
 	await ctx.worker.patchCard(
 		ctx.logContext,
-		session.id,
+		session,
 		ctx.worker.typeContracts[supportThread.type],
 		{
 			attachEvents: true,
@@ -86,12 +90,12 @@ test('should not re-open a closed thread by marking a message as read', async ()
 			},
 		],
 	);
-	await ctx.flushAll(session.id);
+	await ctx.flushAll(session);
 
 	// Mark the message as read
 	await ctx.worker.patchCard(
 		ctx.logContext,
-		session.id,
+		session,
 		ctx.worker.typeContracts[message.type],
 		{
 			attachEvents: true,
@@ -106,7 +110,7 @@ test('should not re-open a closed thread by marking a message as read', async ()
 			},
 		],
 	);
-	await ctx.flushAll(session.id);
+	await ctx.flushAll(session);
 
 	// Wait a while to verify no triggered actions run
 	await new Promise((resolve) => {
@@ -127,13 +131,13 @@ test('should not re-open a closed thread by marking a message as read', async ()
 test('should not re-open a closed thread with a whisper', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'closed',
 		},
 	);
-	await ctx.createWhisper(user.id, session.id, supportThread, 'buz');
+	await ctx.createWhisper(user.id, session, supportThread, 'buz');
 
 	// Wait a while to verify no triggered actions run
 	await new Promise((resolve) => {
@@ -154,13 +158,13 @@ test('should not re-open a closed thread with a whisper', async () => {
 test('should re-open an archived thread with a message', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'archived',
 		},
 	);
-	await ctx.createMessage(user.id, session.id, supportThread, 'buz');
+	await ctx.createMessage(user.id, session, supportThread, 'buz');
 
 	const thread = await ctx.waitForMatch({
 		type: 'object',
@@ -187,13 +191,13 @@ test('should re-open an archived thread with a message', async () => {
 test('should not re-open an archived thread with a whisper', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'archived',
 		},
 	);
-	await ctx.createWhisper(user.id, session.id, supportThread, 'buz');
+	await ctx.createWhisper(user.id, session, supportThread, 'buz');
 
 	// Wait a while to verify no triggered actions run
 	await new Promise((resolve) => {

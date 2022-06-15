@@ -15,10 +15,10 @@ afterAll(() => {
 
 test('Should aggregate reactions', async () => {
 	const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
-	const session = await ctx.createSession(user);
+	const session = { actor: user };
 	const message = await ctx.createContract(
 		user.id,
-		session.id,
+		session,
 		'message@1.0.0',
 		'test message',
 		{
@@ -32,7 +32,7 @@ test('Should aggregate reactions', async () => {
 
 	const reaction = await ctx.createContract(
 		user.id,
-		session.id,
+		session,
 		'reaction@1.0.0',
 		null,
 		{
@@ -42,7 +42,7 @@ test('Should aggregate reactions', async () => {
 
 	await ctx.createLinkThroughWorker(
 		user.id,
-		session.id,
+		session,
 		reaction,
 		message,
 		'is attached to',

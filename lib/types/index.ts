@@ -1,5 +1,6 @@
 import type { LogContext } from '@balena/jellyfish-logger';
 import type {
+	AutumnDBSession,
 	Contract,
 	ContractData,
 	ContractDefinition,
@@ -61,13 +62,13 @@ export interface Stream extends NodeJS.EventEmitter {
 
 export interface Action {
 	handler: <TData = ContractData>(
-		session: string,
+		session: AutumnDBSession,
 		context: WorkerContext,
 		contract: Contract<ContractData>,
 		request: ActionHandlerRequest,
 	) => Promise<null | ContractSummary<TData> | Array<ContractSummary<TData>>>;
 	pre?: (
-		session: string,
+		session: AutumnDBSession,
 		context: WorkerContext,
 		request: ActionPreRequest,
 	) => Promise<any> | any;
@@ -99,16 +100,22 @@ export interface ActionPreRequest {
 export interface WorkerContext {
 	sync: any;
 	getEventSlug: (type: string) => string;
-	getCardById: (lsession: string, id: string) => Promise<Contract | null>;
-	getCardBySlug: (lsession: string, slug: string) => Promise<Contract | null>;
+	getCardById: (
+		lsession: AutumnDBSession,
+		id: string,
+	) => Promise<Contract | null>;
+	getCardBySlug: (
+		lsession: AutumnDBSession,
+		slug: string,
+	) => Promise<Contract | null>;
 	query: <T extends Contract = Contract>(
-		lsession: string,
+		lsession: AutumnDBSession,
 		schema: Parameters<Kernel['query']>[2],
 		options?: Parameters<Kernel['query']>[3],
 	) => Promise<T[]>;
-	privilegedSession: string;
+	privilegedSession: AutumnDBSession;
 	insertCard: (
-		lsession: string,
+		lsession: AutumnDBSession,
 		typeCard: TypeContract,
 		options: {
 			timestamp?: string | number | Date;
@@ -120,7 +127,7 @@ export interface WorkerContext {
 		card: Partial<Contract>,
 	) => Promise<Contract | null>;
 	replaceCard: (
-		lsession: string,
+		lsession: AutumnDBSession,
 		typeCard: TypeContract,
 		options: {
 			timestamp?: string | number | Date;
@@ -132,7 +139,7 @@ export interface WorkerContext {
 		card: Partial<Contract>,
 	) => Promise<Contract | null>;
 	patchCard: (
-		lsession: string,
+		lsession: AutumnDBSession,
 		typeCard: TypeContract,
 		options: {
 			timestamp?: string | number | Date;

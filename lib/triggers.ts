@@ -1,6 +1,12 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import { Contract, JsonSchema, Kernel, LinkContract } from 'autumndb';
+import {
+	AutumnDBSession,
+	Contract,
+	JsonSchema,
+	Kernel,
+	LinkContract,
+} from 'autumndb';
 import jsone = require('json-e');
 import _ from 'lodash';
 import * as skhema from 'skhema';
@@ -25,13 +31,13 @@ interface GetRequestOptions {
 	currentDate: Date;
 	mode?: 'update' | 'insert';
 	logContext: LogContext;
-	session: string;
+	session: AutumnDBSession;
 }
 
 export const matchesContract = async (
 	logContext: LogContext,
 	kernel: Kernel,
-	session: string,
+	session: AutumnDBSession,
 	filter: JsonSchema,
 	contract: Contract | null,
 ): Promise<Contract | false | void> => {
@@ -337,7 +343,7 @@ export const getRequest = async (
 export const getTypeTriggers = async (
 	logContext: LogContext,
 	kernel: Kernel,
-	session: string,
+	session: AutumnDBSession,
 	type: string,
 ): Promise<TriggeredActionContract[]> => {
 	return kernel.query<TriggeredActionContract>(logContext, session, {

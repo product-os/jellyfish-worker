@@ -1,7 +1,7 @@
 import type {
+	AutumnDBSession,
 	Contract,
 	JsonSchema,
-	SessionContract,
 	TypeContract,
 } from 'autumndb';
 import type { CreateContract } from './types';
@@ -31,17 +31,14 @@ export interface EvaluateOptions {
 	getTypeContract: (type: string) => TypeContract;
 	insertContract: (
 		typeCard: TypeContract,
-		actorSession: string,
+		actorSession: AutumnDBSession,
 		object: any,
 	) => Promise<Contract | null>;
-	getSession: (userId: string) => Promise<SessionContract | null>;
 	query: <TContract extends Contract = Contract>(
 		schema: JsonSchema,
 		opts?: { sortBy?: string; sortDir?: 'asc' | 'desc'; limit?: number },
 	) => Promise<TContract[]>;
-	getContractById: <TContract extends Contract = Contract>(
-		id: string,
-	) => Promise<TContract | null>;
+	getCreatorSession(creatorId: string): Promise<AutumnDBSession | null>;
 }
 
 /*
@@ -52,8 +49,7 @@ export const evaluate = async ({
 	newContract,
 	getTypeContract,
 	insertContract,
-	getSession,
-	getContractById,
+	getCreatorSession,
 	query,
 }: EvaluateOptions) => {
 	if (
@@ -137,13 +133,7 @@ export const evaluate = async ({
 				return;
 			}
 
-			const creator = await getContractById(creatorId);
-
-			if (!creator) {
-				return;
-			}
-
-			const creatorSession = await getSession(creatorId);
+			const creatorSession = await getCreatorSession(creatorId);
 
 			if (!creatorSession) {
 				return;
@@ -157,12 +147,12 @@ export const evaluate = async ({
 
 			const notification = await insertContract(
 				notificationTypeContract,
-				creatorSession.id,
+				creatorSession,
 				{
 					version: '1.0.0',
 					type: 'notification@1.0.0',
-					markers: [creator.slug],
-					slug: `notification-${creator.id}-${message.id}`,
+					markers: [creatorSession.actor.slug],
+					slug: `notification-${creatorSession.actor.id}-${message.id}`,
 					tags: [],
 					links: {},
 					requires: [],
@@ -181,7 +171,7 @@ export const evaluate = async ({
 				return;
 			}
 
-			await insertContract(linkTypeContract, creatorSession.id, {
+			await insertContract(linkTypeContract, creatorSession, {
 				version: '1.0.0',
 				type: 'link@1.0.0',
 				slug: `link-${message.id}-has-attached-${notification.id}`,

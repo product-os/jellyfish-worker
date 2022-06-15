@@ -1,14 +1,14 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { getLogger } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
-import type { ContractSummary } from 'autumndb';
+import type { AutumnDBSession, ContractSummary } from 'autumndb';
 import type { ActionHandlerRequest, WorkerContext } from '../types';
 
 const logger = getLogger(__filename);
 
 const mirror = async (
 	type: string,
-	session: string,
+	session: AutumnDBSession,
 	context: WorkerContext,
 	card: ContractSummary,
 	request: ActionHandlerRequest,

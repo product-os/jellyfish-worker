@@ -1,5 +1,6 @@
 import { strict as assert } from 'assert';
 import {
+	AutumnDBSession,
 	Contract,
 	errors as autumndbErrors,
 	Kernel,
@@ -26,7 +27,7 @@ beforeAll(async () => {
 			actions: [
 				{
 					handler: async (
-						session: string,
+						session: AutumnDBSession,
 						handlerCtx: any,
 						contract: any,
 						request: any,

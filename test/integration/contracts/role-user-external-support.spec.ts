@@ -57,10 +57,10 @@ afterAll(() => {
 describe('role-user-community', () => {
 	it('users should not be able to create threads with product values other than balenaCloud', async () => {
 		const user = await createUser(['user-external-support'], balenaOrg);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 
 		await expect(
-			ctx.createSupportThread(user.id, session.id, 'foobar', {
+			ctx.createSupportThread(user.id, session, 'foobar', {
 				product: 'test-product',
 				inbox: 'S/Paid_Support',
 				status: 'open',
@@ -70,15 +70,15 @@ describe('role-user-community', () => {
 
 	it('the message sent by external support user should be only visible for balena organisation users', async () => {
 		const supportUser1 = await createUser(['user-external-support'], testOrg);
-		const supportUser1Session = await ctx.createSession(supportUser1);
+		const supportUser1Session = { actor: supportUser1 };
 		const supportUser2 = await createUser(['user-external-support'], testOrg);
-		const supportUser2Session = await ctx.createSession(supportUser2);
+		const supportUser2Session = { actor: supportUser2 };
 		const communityUser = await createUser(['user-community'], balenaOrg);
-		const communityUserSession = await ctx.createSession(communityUser);
+		const communityUserSession = { actor: communityUser };
 
 		const thread = await ctx.createSupportThread(
 			supportUser1.id,
-			supportUser1Session.id,
+			supportUser1Session,
 			'foobar',
 			{
 				product: 'balenaCloud',
@@ -89,7 +89,7 @@ describe('role-user-community', () => {
 		);
 		const message = await ctx.createMessage(
 			supportUser1.id,
-			supportUser1Session.id,
+			supportUser1Session,
 			thread,
 			'buz',
 		);
@@ -98,14 +98,14 @@ describe('role-user-community', () => {
 		expect(
 			await ctx.kernel.getContractById(
 				ctx.logContext,
-				supportUser2Session.id,
+				supportUser2Session,
 				thread.id,
 			),
 		).toBeNull();
 		expect(
 			await ctx.kernel.getContractById(
 				ctx.logContext,
-				supportUser2Session.id,
+				supportUser2Session,
 				message.id,
 			),
 		).toBeNull();
@@ -113,14 +113,14 @@ describe('role-user-community', () => {
 		// Try getting thread and message using communityUser
 		const thread2 = await ctx.kernel.getContractById(
 			ctx.logContext,
-			communityUserSession.id,
+			communityUserSession,
 			thread.id,
 		);
 		assert(thread2);
 		expect(thread2.id).toEqual(thread.id);
 		const message2 = await ctx.kernel.getContractById(
 			ctx.logContext,
-			communityUserSession.id,
+			communityUserSession,
 			message.id,
 		);
 		assert(message2);
@@ -129,12 +129,12 @@ describe('role-user-community', () => {
 
 	it('external support user should not be able to create a thread with markers other than <user.slug>+org-balena', async () => {
 		const user = await createUser(['user-external-support'], testOrg);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 
 		await expect(
 			ctx.createSupportThread(
 				user.id,
-				session.id,
+				session,
 				'foobar',
 				{
 					product: 'balenaCloud',
@@ -148,7 +148,7 @@ describe('role-user-community', () => {
 		await expect(
 			ctx.createSupportThread(
 				user.id,
-				session.id,
+				session,
 				'foobar',
 				{
 					product: 'balenaCloud',
@@ -162,10 +162,10 @@ describe('role-user-community', () => {
 
 	it('external support user should not be able to view other card types', async () => {
 		const user = await createUser(['user-external-support'], testOrg);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 
 		const types = (
-			await ctx.kernel.query(ctx.logContext, session.id, {
+			await ctx.kernel.query(ctx.logContext, session, {
 				type: 'object',
 				additionalProperties: true,
 				required: ['type'],

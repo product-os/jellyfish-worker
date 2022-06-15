@@ -1226,7 +1226,6 @@ describe('.execute()', () => {
 
 	test('should execute a triggered action using the initial sessions actor', async () => {
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomId());
-		const session = await ctx.createSession(user);
 
 		const foo = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
@@ -1265,7 +1264,7 @@ describe('.execute()', () => {
 
 		const request = await ctx.worker.insertCard(
 			ctx.logContext,
-			session.id,
+			{ actor: user },
 			ctx.worker.typeContracts['card@1.0.0'],
 			{},
 			{

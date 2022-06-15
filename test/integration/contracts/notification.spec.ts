@@ -14,10 +14,10 @@ afterAll(() => {
 
 test('Should crate a notification if a message is attached to a subscribed support-thread', async () => {
 	const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
-	const session = await ctx.createSession(user);
+	const session = { actor: user };
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'open',
@@ -25,14 +25,14 @@ test('Should crate a notification if a message is attached to a subscribed suppo
 	);
 	const subscription = await ctx.createContract(
 		user.id,
-		session.id,
+		session,
 		'subscription@1.0.0',
 		`Subscription to ${supportThread.slug}`,
 		{},
 	);
 	await ctx.createLinkThroughWorker(
 		user.id,
-		session.id,
+		session,
 		supportThread,
 		subscription,
 		'has attached',
@@ -40,7 +40,7 @@ test('Should crate a notification if a message is attached to a subscribed suppo
 	);
 	const message = await ctx.createMessage(
 		user.id,
-		session.id,
+		session,
 		supportThread,
 		'buz',
 	);
@@ -76,10 +76,10 @@ test('Should crate a notification if a message is attached to a subscribed suppo
 	const otherUser = await ctx.createUser(
 		autumndbTestUtils.generateRandomSlug(),
 	);
-	const otherUserSession = await ctx.createSession(otherUser);
+	const otherUserSession = { actor: otherUser };
 	const response = await ctx.createMessage(
 		otherUser.id,
-		otherUserSession.id,
+		otherUserSession,
 		supportThread,
 		'baz',
 	);

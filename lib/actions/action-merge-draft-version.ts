@@ -1,6 +1,11 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger } from '@balena/jellyfish-logger';
-import type { Contract, ContractSummary, TypeContract } from 'autumndb';
+import type {
+	AutumnDBSession,
+	Contract,
+	ContractSummary,
+	TypeContract,
+} from 'autumndb';
 import _ from 'lodash';
 import * as semver from 'semver';
 import { retagArtifact } from './registry';
@@ -107,17 +112,40 @@ export const actionMergeDraftVersion: ActionDefinition = {
 			// This action is doing too much. Mostly because of the weak integration between the registry artifacts
 			// and the contracts. Also the explicit support for the local env stems from that
 
-			const sessionContract = (await context.getCardById(session, session))!;
-			const actorContract = (await context.getCardById(
+			// Generate a shortlived session token to allow authentication with the registry
+			const sessionTypeContract = (await context.getCardBySlug(
 				session,
-				sessionContract.data.actor as any,
+				'session@1.0.0',
+			))! as TypeContract;
+			// Set the expiration date to be 10 minutes from now
+			const expirationDate = new Date();
+			expirationDate.setMinutes(expirationDate.getMinutes() + 10);
+
+			const sessionContract = (await context.insertCard(
+				session,
+				sessionTypeContract,
+				{
+					timestamp: request.timestamp,
+					actor: request.actor,
+					originator: request.originator,
+					attachEvents: true,
+				},
+				{
+					data: {
+						actor: session.actor.id,
+						expiration: expirationDate.toISOString(),
+					},
+				},
 			))!;
+
+			const token = sessionContract.id;
+
 			await retagArtifact(
 				request.logContext,
 				card,
 				finalVersionCard,
-				actorContract.slug,
 				session,
+				token,
 			);
 
 			// this should be used, but as that string typically contains artifact references
@@ -222,7 +250,7 @@ const makeFinal = (version: string): string => {
 
 const linkCards = async (
 	context: WorkerContext,
-	session: string,
+	session: AutumnDBSession,
 	request: any,
 	card: ContractSummary,
 	insertedFinalCard: ContractSummary,

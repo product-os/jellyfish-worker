@@ -1,16 +1,21 @@
 import { strict as assert } from 'assert';
-import { testUtils as autumndbTestUtils, Contract } from 'autumndb';
+import {
+	testUtils as autumndbTestUtils,
+	Contract,
+	UserContract,
+	AutumnDBSession,
+} from 'autumndb';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
-let user: any = {};
-let session: any = {};
+let user: UserContract;
+let session: AutumnDBSession;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
 	user = await ctx.createUser(autumndbTestUtils.generateRandomId());
-	session = await ctx.createSession(user);
+	session = { actor: user };
 });
 
 afterAll(() => {
@@ -36,7 +41,7 @@ async function waitForTag(tagName: string): Promise<Contract> {
 test('should sanely handle line breaks before tags in messages/whispers', async () => {
 	const thread = await ctx.createContract(
 		user.id,
-		session.id,
+		session,
 		'thread@1.0.0',
 		'foobar',
 		{},
@@ -45,13 +50,7 @@ test('should sanely handle line breaks before tags in messages/whispers', async 
 		prefix: 'test-tag',
 	});
 
-	await ctx.createEvent(
-		user.id,
-		session.id,
-		thread,
-		`\n#${tagName}`,
-		'whisper',
-	);
+	await ctx.createEvent(user.id, session, thread, `\n#${tagName}`, 'whisper');
 	const tag = await waitForTag(`tag-${tagName}`);
 	expect(tag).toEqual({
 		created_at: tag.created_at,
@@ -78,7 +77,7 @@ test('should sanely handle line breaks before tags in messages/whispers', async 
 test('should sanely handle multiple tags in messages/whispers', async () => {
 	const thread = await ctx.createContract(
 		user.id,
-		session.id,
+		session,
 		'thread@1.0.0',
 		'foobar',
 		{},
@@ -95,7 +94,7 @@ test('should sanely handle multiple tags in messages/whispers', async () => {
 
 	await ctx.createEvent(
 		user.id,
-		session.id,
+		session,
 		thread,
 		`#${tagName1}\n#${tagName2}\n#${tagName3}`,
 		'whisper',
@@ -171,7 +170,7 @@ test('should sanely handle multiple tags in messages/whispers', async () => {
 test('should create a new tag when one is found in a message', async () => {
 	const thread = await ctx.createContract(
 		user.id,
-		session.id,
+		session,
 		'thread@1.0.0',
 		'foobar',
 		{},
@@ -180,7 +179,7 @@ test('should create a new tag when one is found in a message', async () => {
 		prefix: 'test-tag',
 	});
 
-	await ctx.createEvent(user.id, session.id, thread, `#${tagName}`, 'whisper');
+	await ctx.createEvent(user.id, session, thread, `#${tagName}`, 'whisper');
 	const tag = await waitForTag(`tag-${tagName}`);
 	expect(tag).toEqual({
 		created_at: tag.created_at,

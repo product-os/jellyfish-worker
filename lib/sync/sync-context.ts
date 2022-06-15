@@ -1,7 +1,7 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import { strict } from 'assert';
-import { Contract, Kernel, TypeContract } from 'autumndb';
+import { AutumnDBSession, Contract, Kernel, TypeContract } from 'autumndb';
 import jsonpatch, { Operation } from 'fast-json-patch';
 import _ from 'lodash';
 import { OauthProviderContract } from '../contracts/oauth-provider';
@@ -54,17 +54,10 @@ export const getActionContext = (
 	provider: string,
 	workerContext: WorkerContext,
 	logContext: LogContext,
-	session: string,
+	session: AutumnDBSession,
 ) => {
-	const getDefaultActor = async (): Promise<null | string> => {
-		const sessionContract = await workerContext.getCardById(session, session);
-
-		if (!sessionContract) {
-			return null;
-		}
-
-		// TODO: Replace this return type with the session contract interface
-		return sessionContract.data.actor as string;
+	const getDefaultActor = async (): Promise<string> => {
+		return session.actor.id;
 	};
 
 	const contextObject = {
