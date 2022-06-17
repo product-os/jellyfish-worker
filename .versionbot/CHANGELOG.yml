@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typescript from 4.7.3 to 4.7.4
+      hash: 9949221d5e355b40d318750bb7e05d4800cda5de
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 30.0.15
+  title: "'Update typescript from 4.7.3 to 4.7.4'"
+  date: 2022-06-17T20:38:47.621Z
+- commits:
     - subject: Update axios from 0.26.1 to 0.27.2
       hash: 87254ab212ae9179d7419a464bb2ce0765a9e40c
       body: ""
