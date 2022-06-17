@@ -1,6 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
 import type { Contract } from '@balena/jellyfish-types/build/core';
-import Bluebird from 'bluebird';
 import jsone from 'json-e';
 import _ from 'lodash';
 import * as errors from './errors';
@@ -141,96 +140,92 @@ export const importCards = async (
 
 	for (const [index, value] of sequence.entries()) {
 		const step = _.castArray(value);
-		await Bluebird.map(
-			step,
-			async (segment, subindex, length) => {
-				const path = ['cards', index];
-				if (length !== 1) {
-					path.push(subindex);
-				}
+		let subindex = 0;
+		for (const segment of step) {
+			const path = ['cards', index];
+			if (step.length !== 1) {
+				path.push(subindex);
+			}
 
-				let object = {};
-				let finalObject: Partial<Contract> = {};
-				const type = segment.card.type;
+			let object = {};
+			let finalObject: Partial<Contract> = {};
+			const type = segment.card.type;
 
-				// Check if this is a JSONpatch or a slug-based upsert
-				if ('patch' in segment.card) {
-					// If the patch doesn't update the origin, add it now
-					if (
-						!_.find(segment.card.patch, {
-							path: '/data/origin',
-						})
-					) {
-						if (
-							options.origin &&
-							options.origin.type === 'external-event@1.0.0'
-						) {
-							segment.card.patch.push({
-								op: 'add',
-								path: '/data/origin',
-								value: `${options.origin.slug}@${options.origin.version}`,
-							});
-						}
-					}
-					finalObject = evaluateObject(
-						_.omit(segment.card, ['links']),
-						references,
-					);
-				} else {
-					object = evaluateObject(_.omit(segment.card, ['links']), references);
-					assert.INTERNAL(context, !!object, errors.SyncInvalidTemplate, () => {
-						return `Could not evaluate template in: ${JSON.stringify(
-							segment.card,
-							null,
-							2,
-						)}`;
-					});
-
-					finalObject = Object.assign(
-						{
-							active: true,
-							version: '1.0.0',
-							tags: [],
-							markers: [],
-							links: {},
-							requires: [],
-							capabilities: [],
-							data: {},
-						},
-						object,
-					);
-
+			// Check if this is a JSONpatch or a slug-based upsert
+			if ('patch' in segment.card) {
+				// If the patch doesn't update the origin, add it now
+				if (
+					!_.find(segment.card.patch, {
+						path: '/data/origin',
+					})
+				) {
 					if (
 						options.origin &&
-						options.origin.type === 'external-event@1.0.0' &&
-						!segment.skipOriginator
+						options.origin.type === 'external-event@1.0.0'
 					) {
-						finalObject.data!.origin = `${options.origin.slug}@${options.origin.version}`;
+						segment.card.patch.push({
+							op: 'add',
+							path: '/data/origin',
+							value: `${options.origin.slug}@${options.origin.version}`,
+						});
 					}
 				}
-
-				assert.INTERNAL(context, !!segment.actor, errors.SyncNoActor, () => {
-					return `No actor in segment: ${JSON.stringify(segment)}`;
+				finalObject = evaluateObject(
+					_.omit(segment.card, ['links']),
+					references,
+				);
+			} else {
+				object = evaluateObject(_.omit(segment.card, ['links']), references);
+				assert.INTERNAL(context, !!object, errors.SyncInvalidTemplate, () => {
+					return `Could not evaluate template in: ${JSON.stringify(
+						segment.card,
+						null,
+						2,
+					)}`;
 				});
 
-				const result = await context.upsertElement(type, finalObject, {
-					timestamp: segment.time,
-					actor: segment.actor,
-					originator: segment.skipOriginator
-						? null
-						: _.get(options, ['origin', 'id']),
-				});
+				finalObject = Object.assign(
+					{
+						active: true,
+						version: '1.0.0',
+						tags: [],
+						markers: [],
+						links: {},
+						requires: [],
+						capabilities: [],
+						data: {},
+					},
+					object,
+				);
 
-				if (result) {
-					insertedContracts.push(result);
+				if (
+					options.origin &&
+					options.origin.type === 'external-event@1.0.0' &&
+					!segment.skipOriginator
+				) {
+					finalObject.data!.origin = `${options.origin.slug}@${options.origin.version}`;
 				}
+			}
 
-				_.set(references, path, result);
-			},
-			{
-				concurrency: 3,
-			},
-		);
+			assert.INTERNAL(context, !!segment.actor, errors.SyncNoActor, () => {
+				return `No actor in segment: ${JSON.stringify(segment)}`;
+			});
+
+			const result = await context.upsertElement(type, finalObject, {
+				timestamp: segment.time,
+				actor: segment.actor,
+				originator: segment.skipOriginator
+					? null
+					: _.get(options, ['origin', 'id']),
+			});
+
+			if (result) {
+				insertedContracts.push(result);
+			}
+
+			_.set(references, path, result);
+			subindex++;
+		}
 	}
 
 	return insertedContracts;
