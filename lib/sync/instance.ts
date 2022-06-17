@@ -14,10 +14,10 @@ import type {
 	PipelineOpts,
 } from './types';
 
-const httpRequest = async <T = any>(
+const httpRequest = async (
 	options: HttpRequestOptions,
 	retries: number = 30,
-): Promise<{ code: number; body: T }> => {
+): Promise<{ code: number; body: unknown }> => {
 	try {
 		const path =
 			options.useQuerystring && options.data
