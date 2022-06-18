@@ -1,4 +1,18 @@
 - commits:
+    - subject: Use standard redis image
+      hash: 23b72d2097fb9f59586864b2e71801354bf6a91c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.0.16
+  title: "'Use standard redis image'"
+  date: 2022-06-18T08:55:15.485Z
+- commits:
     - subject: Update typescript from 4.7.3 to 4.7.4
       hash: 9949221d5e355b40d318750bb7e05d4800cda5de
       body: ""
