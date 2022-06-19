@@ -1,3 +1,26 @@
 {
-  "extends": "./node_modules/@balena/jellyfish-config/config/tsconfig.json"
+  "extends": "@balena/lint/tsconfig.json",
+  "compilerOptions": {
+    "target": "es2020",
+    "noImplicitAny": false,
+    "allowJs": false,
+    "outDir": "build",
+    "esModuleInterop": true,
+    "removeComments": false,
+    "resolveJsonModule": true,
+    "strict": true,
+    "declaration": true,
+    "skipLibCheck": true
+  },
+  "typedocOptions": {
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeExternals": true,
+    "gitRevision": "master",
+    "out": "docs"
+  },
+  "include": [
+    "lib/**/*.ts",
+    "test/**/*.ts"
+  ]
 }
