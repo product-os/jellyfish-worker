@@ -1,4 +1,18 @@
 - commits:
+    - subject: Fix incorrect comparison when setting type contract cache
+      hash: 6f36deee15114c0d5f44eff1281fd589f854bef3
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 30.0.22
+  title: "'Fix incorrect comparison when setting type contract cache'"
+  date: 2022-06-21T08:42:22.808Z
+- commits:
     - subject: Move nock from dev deps
       hash: f74b3b029f4d5aa64438fd5994c59ecd56284ddb
       body: |
