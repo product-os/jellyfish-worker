@@ -1,4 +1,20 @@
 - commits:
+    - subject: Move nock from dev deps
+      hash: f74b3b029f4d5aa64438fd5994c59ecd56284ddb
+      body: |
+        Moved nock to dev deps yesterday mistakenly.
+        Need to keep in main deps as used in exported test utils.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.0.21
+  title: "'Move nock from dev deps'"
+  date: 2022-06-21T00:59:51.710Z
+- commits:
     - subject: Bump dependencies
       hash: 06734b3c16c7eadc6cc11b6afd7fba0f607772a9
       body: ""
