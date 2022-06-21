@@ -535,7 +535,7 @@ export class Worker {
 			this.setTransformers(logContext, transformers as TransformerContract[]);
 		}
 
-		if (!_.isEqual(types, this.getTypeContracts())) {
+		if (!_.isEqual(types, Object.values(this.getTypeContracts()))) {
 			logger.info(logContext, 'Loading types', {
 				types: types.length,
 			});
