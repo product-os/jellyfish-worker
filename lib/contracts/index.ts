@@ -1,4 +1,6 @@
 import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import { agentChannelSettings } from './agent-channel-settings';
+import { channel } from './channel';
 import { contact } from './contact';
 import { create } from './create';
 import { genericSource } from './generic-source';
@@ -6,6 +8,8 @@ import { image } from './image';
 import { imageSource } from './image-source';
 import { oauthProvider } from './oauth-provider';
 import { relationshipAnyIsCreatorOfAny } from './relationship-any-is-creator-of-any';
+import { relationshipChannelHasAgentUser } from './relationship-channel-has-agent-user';
+import { relationshipChannelHasSettingsAgentChannelSettings } from './relationship-channel-has-settings-agent-channel-settings';
 import { relationshipContactHasBackupOwnerUser } from './relationship-contact-has-backup-owner-user';
 import { relationshipContactIsAttachedToUser } from './relationship-contact-is-attached-to-user';
 import { relationshipContactIsOwnedByUser } from './relationship-contact-is-owned-by-user';
@@ -17,7 +21,9 @@ import { relationshipTransformerGeneratedTask } from './relationship-transformer
 import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
+import { relationshipUserHasSettingsAgentChannelSettings } from './relationship-user-has-settings-agent-channel-settings';
 import { relationshipUserHasSettingsWorkingHours } from './relationship-user-has-settings-working-hours';
+import { relationshipViewIsAttachedToChannel } from './relationship-view-is-attached-to-channel';
 import { roleTransformerWorker } from './role-transformer-worker';
 import { scheduledAction } from './scheduled-action';
 import { serviceSource } from './service-source';
@@ -25,6 +31,7 @@ import { task } from './task';
 import { transformer } from './transformer';
 import { transformerWorker } from './transformer-worker';
 import { triggeredAction } from './triggered-action';
+import { triggeredActionBootstrapChannel } from './triggered-action-bootstrap-channel';
 import { triggeredActionMatchmakeTask } from './triggered-action-matchmake-task';
 import { triggeredActionMergeDraftVersion } from './triggered-action-merge-draft-version';
 import { update } from './update';
@@ -36,12 +43,16 @@ import { viewScheduledActions } from './view-scheduled-actions';
 import { workingHours } from './working-hours';
 
 export const contracts: ContractDefinition[] = [
+	agentChannelSettings,
+	channel,
 	contact,
 	create,
 	genericSource,
 	image,
 	imageSource,
 	relationshipAnyIsCreatorOfAny,
+	relationshipChannelHasAgentUser,
+	relationshipChannelHasSettingsAgentChannelSettings,
 	relationshipContactHasBackupOwnerUser,
 	relationshipContactIsAttachedToUser,
 	relationshipContactIsOwnedByUser,
@@ -53,7 +64,9 @@ export const contracts: ContractDefinition[] = [
 	relationshipTransformerWorkerOwnsTask,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
+	relationshipUserHasSettingsAgentChannelSettings,
 	relationshipUserHasSettingsWorkingHours,
+	relationshipViewIsAttachedToChannel,
 	oauthProvider,
 	roleTransformerWorker,
 	scheduledAction,
@@ -62,6 +75,7 @@ export const contracts: ContractDefinition[] = [
 	transformer,
 	transformerWorker,
 	triggeredAction,
+	triggeredActionBootstrapChannel,
 	triggeredActionMatchmakeTask,
 	triggeredActionMergeDraftVersion,
 	update,

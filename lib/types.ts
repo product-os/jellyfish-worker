@@ -181,3 +181,18 @@ export interface TransformerContractDefinition
 export interface TransformerContract
 	extends Omit<Contract, 'data'>,
 		TransformerData {}
+
+export interface ChannelData {
+	/**
+	 * Contracts matching this filter will be handled by the channel
+	 */
+	filter: {
+		[k: string]: unknown;
+	};
+	[k: string]: unknown;
+}
+
+export interface ChannelContractDefinition
+	extends ContractDefinition<ChannelData> {}
+
+export interface ChannelContract extends Contract<ChannelData> {}
