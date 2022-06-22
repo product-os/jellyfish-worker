@@ -204,6 +204,9 @@ function getUser(
 	return context.query(context.privilegedSession, {
 		type: 'object',
 		properties: {
+			active: {
+				const: true,
+			},
 			type: {
 				type: 'string',
 				const: 'user@1.0.0',
@@ -218,6 +221,9 @@ function getUser(
 				type: 'object',
 				required: ['type'],
 				properties: {
+					active: {
+						const: true,
+					},
 					type: {
 						const: 'authentication-password@1.0.0',
 					},
