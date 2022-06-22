@@ -1,4 +1,19 @@
 - commits:
+    - subject: Make sure the `user` and its `authorization-password` contracts are
+        active before creating a session
+      hash: fd3952805441a5a88d1744b265c1d0e2d6101b52
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carol Schulze <carol@balena.io>
+        signed-off-by: Carol Schulze <carol@balena.io>
+      author: Carol Schulze
+      nested: []
+  version: 30.0.23
+  title: "'Make sure the  and its  contracts are active before creating a session'"
+  date: 2022-06-22T12:36:54.706Z
+- commits:
     - subject: Fix incorrect comparison when setting type contract cache
       hash: 6f36deee15114c0d5f44eff1281fd589f854bef3
       body: ""
