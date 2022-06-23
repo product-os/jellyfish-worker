@@ -1,4 +1,21 @@
 - commits:
+    - subject: Add working-hours override contract
+      hash: 850d85d7eb5deb44eba863249949afff97e12307
+      body: |
+        The working-hours contract will act as a users default
+        preferred working hours. Overrides will override the default
+        working hours during a specified date range.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.1.0
+  title: "'Add working-hours override contract'"
+  date: 2022-06-23T04:52:06.762Z
+- commits:
     - subject: Make sure the `user` and its `authorization-password` contracts are
         active before creating a session
       hash: fd3952805441a5a88d1744b265c1d0e2d6101b52
