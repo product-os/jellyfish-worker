@@ -18,7 +18,7 @@ export function asTimeSlot() {
 	return slot;
 }
 
-function timeSlots() {
+export function timeSlots() {
 	const properties: any = {};
 	for (const day of [
 		'Monday',
@@ -75,21 +75,10 @@ export const workingHours: ContractDefinition = {
 				},
 				data: {
 					type: 'object',
-					required: ['timeZone'],
 					properties: {
 						timeZone: {
 							title: 'Time zone',
 							...asTimeZone(),
-						},
-						startDate: {
-							title: 'Start date',
-							type: 'string',
-							format: 'date-time',
-						},
-						endDate: {
-							title: 'End date',
-							type: 'string',
-							format: 'date-time',
 						},
 						timeSlots: {
 							title: 'Preferred working hours',

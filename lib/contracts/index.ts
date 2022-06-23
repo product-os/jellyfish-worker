@@ -34,6 +34,7 @@ import { viewAllTransformers } from './view-all-transformers';
 import { viewAllViews } from './view-all-views';
 import { viewScheduledActions } from './view-scheduled-actions';
 import { workingHours } from './working-hours';
+import { workingHoursOverride } from './working-hours-override';
 
 export const contracts: ContractDefinition[] = [
 	contact,
@@ -71,4 +72,5 @@ export const contracts: ContractDefinition[] = [
 	viewAllViews,
 	viewScheduledActions,
 	workingHours,
+	workingHoursOverride,
 ];
