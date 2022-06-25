@@ -95,7 +95,7 @@
     "simple-git-hooks": "^2.8.0",
     "sinon": "^14.0.0",
     "ts-jest": "^28.0.5",
-    "typedoc": "^0.22.17",
+    "typedoc": "^0.22.18",
     "typescript": "^4.7.4"
   },
   "simple-git-hooks": {
