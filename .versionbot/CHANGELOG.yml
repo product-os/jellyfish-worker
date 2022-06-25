@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typedoc from 0.22.17 to 0.22.18
+      hash: b615d168b5fddb048b7259cc8329096a937f9755
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 30.0.24
+  title: "'Update typedoc from 0.22.17 to 0.22.18'"
+  date: 2022-06-25T03:34:35.015Z
+- commits:
     - subject: Make sure the `user` and its `authorization-password` contracts are
         active before creating a session
       hash: fd3952805441a5a88d1744b265c1d0e2d6101b52
