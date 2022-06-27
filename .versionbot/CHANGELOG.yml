@@ -1,4 +1,16 @@
 - commits:
+    - subject: "Update: update dependencies (internal patch bumps)"
+      hash: 10f7df29738db05e73bc528941f898fb74a0c2ea
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 30.0.25
+  title: "'Update: update dependencies (internal patch bumps)'"
+  date: 2022-06-27T05:53:16.986Z
+- commits:
     - subject: "Update: update internal-patch (internal patch bumps)"
       hash: 212062a2821095fcf29e67786493a077bbefa914
       body: ""
