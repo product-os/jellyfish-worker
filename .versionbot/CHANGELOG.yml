@@ -1,4 +1,19 @@
 - commits:
+    - subject: Bring in channels
+      hash: ce2293aca93472b113c8a9fa8ed86d8598534608
+      body: |
+        Bring in all contracts and actions defined by plugin-channels
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.1.0
+  title: "'Bring in channels'"
+  date: 2022-06-28T03:38:34.871Z
+- commits:
     - subject: "Update: update dependencies (internal patch bumps)"
       hash: 10f7df29738db05e73bc528941f898fb74a0c2ea
       body: ""
