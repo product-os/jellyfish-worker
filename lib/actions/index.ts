@@ -1,4 +1,5 @@
 import type { ActionDefinition } from '../plugin';
+import { actionBootstrapChannel } from './action-bootstrap-channel';
 import { actionCreateCard } from './action-create-card';
 import { actionCreateEvent } from './action-create-event';
 import { actionCreateSession } from './action-create-session';
@@ -8,6 +9,7 @@ import { actionSetAdd } from './action-set-add';
 import { actionUpdateCard } from './action-update-card';
 
 export const actions: ActionDefinition[] = [
+	actionBootstrapChannel,
 	actionCreateCard,
 	actionCreateEvent,
 	actionCreateSession,
