@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update autumndb from 20.1.23 to 20.2.0
+      hash: f910b129640b0ac5d4337c7ac4f576a793151b38
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 30.1.1
+  title: "'Update autumndb from 20.1.23 to 20.2.0'"
+  date: 2022-06-28T23:54:00.666Z
+- commits:
     - subject: Bring in channels
       hash: ce2293aca93472b113c8a9fa8ed86d8598534608
       body: |
