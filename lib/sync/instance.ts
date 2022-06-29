@@ -1,8 +1,8 @@
 import * as assert from '@balena/jellyfish-assert';
 import type { Contract } from '@balena/jellyfish-types/build/core';
 import axios from 'axios';
-import Bluebird from 'bluebird';
 import _ from 'lodash';
+import { setTimeout as delay } from 'timers/promises';
 import * as errors from './errors';
 import * as oauth from './oauth';
 import type { SyncActionContext } from './sync-context';
@@ -47,7 +47,7 @@ const httpRequest = async (
 					`External service responded with ${error.response.status} to ${options.uri}`,
 				);
 
-				await Bluebird.delay(2000);
+				await delay(2000);
 				return httpRequest(options, retries - 1);
 			}
 
@@ -60,7 +60,7 @@ const httpRequest = async (
 					`External service rate limit with ${error.response.status} to ${options.uri}`,
 				);
 
-				await Bluebird.delay(5000);
+				await delay(5000);
 				return httpRequest(options, retries - 1);
 			}
 

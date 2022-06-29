@@ -1,5 +1,4 @@
 import type { Contract } from '@balena/jellyfish-types/build/core';
-import Bluebird from 'bluebird';
 import _ from 'lodash';
 import nock from 'nock';
 import querystring from 'querystring';
@@ -135,7 +134,7 @@ class OAuthTokenRefreshTestIntegration implements Integration {
 
 	// eslint-disable-next-line class-methods-use-this
 	async destroy() {
-		return Bluebird.resolve();
+		return Promise.resolve();
 	}
 
 	async translate(_event: any, options: { actor: string }) {

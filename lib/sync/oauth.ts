@@ -1,8 +1,8 @@
 import * as assert from '@balena/jellyfish-assert';
 import axios from 'axios';
-import Bluebird from 'bluebird';
 import _ from 'lodash';
 import qs from 'qs';
+import { setTimeout as delay } from 'timers/promises';
 import { TypedError } from 'typed-error';
 import { OauthProviderContract } from '../contracts/oauth-provider';
 
@@ -54,7 +54,7 @@ export const request = async (
 		if (axios.isAxiosError(error) && error.response) {
 			// Automatically retry on server failures
 			if (error.response.status >= 500 && retries > 0) {
-				await Bluebird.delay(2000);
+				await delay(2000);
 				return request(accessToken, options, retries - 1);
 			}
 
