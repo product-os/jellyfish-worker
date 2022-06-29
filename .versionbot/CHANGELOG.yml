@@ -1,4 +1,18 @@
 - commits:
+    - subject: Drop bluebird
+      hash: bd51f9754727167136667139d9c572795fd8d74c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.1.3
+  title: "'Drop bluebird'"
+  date: 2022-06-29T12:59:46.150Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 12.0.12 to 12.1.0
       hash: 304789e0d0d0e0269e310a865026fd0810253c69
       body: ""
