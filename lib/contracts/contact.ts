@@ -37,12 +37,12 @@ export const contact: ContractDefinition = {
 								email: {
 									anyOf: [
 										{
-											title: 'string',
+											title: 'Email',
 											type: 'string',
 											format: 'email',
 										},
 										{
-											title: 'array',
+											title: 'Email',
 											type: 'array',
 											uniqueItems: true,
 											minItems: 1,

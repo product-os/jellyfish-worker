@@ -28,7 +28,8 @@
     "test:compose": "docker build -t balena/jellyfish-sut:latest . && docker-compose -f docker-compose.test.yml -f docker-compose.yml up --exit-code-from=sut",
     "doc": "typedoc ./lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
-    "compose": "docker-compose up"
+    "compose": "docker-compose up",
+    "types": "npm run build && autumndb generate-contract-interfaces"
   },
   "deplint": {
     "files": [
@@ -39,6 +40,11 @@
     ]
   },
   "lint-staged": {
+    "lib/contracts/*.ts": [
+      "npm run types",
+      "balena-lint --fix lib/types/contracts",
+      "git add lib/types/contracts/*"
+    ],
     "*.{ts,tsx}": [
       "balena-lint --fix"
     ]
