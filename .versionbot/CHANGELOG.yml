@@ -1,4 +1,22 @@
 - commits:
+    - subject: Remove notification subscription test
+      hash: 919fa988bc803a9f8a941c63d029a9b7a72b8f58
+      body: |
+        The notification generation logic depends on support-thread and
+        message contract types which do not exist in the worker. Moving
+        this test over to jellyfish-plugin-default where those
+        types exist.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 30.1.4
+  title: "'Remove notification subscription test'"
+  date: 2022-07-05T05:48:59.445Z
+- commits:
     - subject: Drop bluebird
       hash: bd51f9754727167136667139d9c572795fd8d74c
       body: ""
