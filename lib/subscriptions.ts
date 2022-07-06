@@ -1,10 +1,10 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
 import type {
 	Contract,
+	JsonSchema,
 	SessionContract,
 	TypeContract,
-} from '@balena/jellyfish-types/build/core';
-import type { CreateContract } from '@balena/jellyfish-types/build/worker';
+} from 'autumndb';
+import type { CreateContract } from './types';
 import { find } from 'lodash';
 
 /*

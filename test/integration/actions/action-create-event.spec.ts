@@ -1,10 +1,10 @@
-import type { TypeContract } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
 import {
 	errors as autumndbErrors,
 	Kernel,
 	RelationshipContractDefinition,
 	testUtils as autumndbTestUtils,
+	TypeContract,
 } from 'autumndb';
 import {
 	ActionRequestContract,

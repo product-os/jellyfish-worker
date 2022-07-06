@@ -1,5 +1,5 @@
-import type { Stream } from '@balena/jellyfish-types/build/core';
 import { testUtils } from '../../../lib';
+import type { Stream } from '../../../lib/types';
 
 let ctx: testUtils.TestContext;
 

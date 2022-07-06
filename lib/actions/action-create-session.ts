@@ -1,8 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import type {
-	Contract,
-	TypeContract,
-} from '@balena/jellyfish-types/build/core';
+import type { Contract, TypeContract } from 'autumndb';
 import * as bcrypt from 'bcrypt';
 import { v4 as isUUID } from 'is-uuid';
 import * as skhema from 'skhema';

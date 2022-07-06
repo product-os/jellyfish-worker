@@ -1,11 +1,7 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type {
-	Contract,
-	TypeContract,
-} from '@balena/jellyfish-types/build/core';
 import { strict } from 'assert';
-import { Kernel } from 'autumndb';
+import { Contract, Kernel, TypeContract } from 'autumndb';
 import jsonpatch, { Operation } from 'fast-json-patch';
 import _ from 'lodash';
 import { OauthProviderContract } from '../contracts/oauth-provider';

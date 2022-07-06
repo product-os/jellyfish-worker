@@ -1,4 +1,4 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from 'autumndb';
 import { TriggeredActionData } from '../types';
 
 export const triggeredActionBootstrapChannel: ContractDefinition<TriggeredActionData> =

@@ -1,4 +1,4 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from 'autumndb';
 
 export const viewAllTransformerTypes: ContractDefinition = {
 	slug: 'view-all-transformer-types',

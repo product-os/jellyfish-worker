@@ -1,8 +1,11 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from 'autumndb';
+import { action } from './action';
+import { actionRequest } from './action-request';
 import { agentChannelSettings } from './agent-channel-settings';
 import { channel } from './channel';
 import { contact } from './contact';
 import { create } from './create';
+import { execute } from './execute';
 import { genericSource } from './generic-source';
 import { image } from './image';
 import { imageSource } from './image-source';
@@ -43,10 +46,13 @@ import { viewScheduledActions } from './view-scheduled-actions';
 import { workingHours } from './working-hours';
 
 export const contracts: ContractDefinition[] = [
+	action,
+	actionRequest,
 	agentChannelSettings,
 	channel,
 	contact,
 	create,
+	execute,
 	genericSource,
 	image,
 	imageSource,

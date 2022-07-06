@@ -1,5 +1,5 @@
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
-import type { JsonSchema } from '@balena/jellyfish-types';
+import type { JsonSchema } from 'autumndb';
 import { contractMixins } from '../../lib';
 
 describe('contractMixins', () => {

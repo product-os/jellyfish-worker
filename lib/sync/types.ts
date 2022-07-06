@@ -1,5 +1,5 @@
 import type { LogContext } from '@balena/jellyfish-logger';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { Contract } from 'autumndb';
 import type { Method } from 'axios';
 import type { Operation } from 'fast-json-patch';
 import type { Map } from '../types';

@@ -1,4 +1,4 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from 'autumndb';
 
 export const scheduledAction: ContractDefinition = {
 	slug: 'scheduled-action',

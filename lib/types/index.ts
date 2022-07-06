@@ -4,13 +4,60 @@ import type {
 	ContractData,
 	ContractDefinition,
 	ContractSummary,
+	JsonSchema,
+	Kernel,
 	TypeContract,
-} from '@balena/jellyfish-types/build/core';
-import type { Kernel } from 'autumndb';
+} from 'autumndb';
 import type { Operation } from 'fast-json-patch';
-import type { ActionContract } from '../queue';
+import type { ActionContract } from './contracts/action';
 
+export type { ActionContract };
 export * from './contracts';
+
+/**
+ * The interface that all Jellyfish Error classes should
+ * implement.
+ */
+export interface JellyfishError extends Error {
+	/**
+	 * True if the error could be expected in normal circumstances.
+	 *
+	 * i.e. if expected is true, this error isn't a result of a bug
+	 * or an out-of-memory or segmentation-fault error etc.
+	 */
+	expected: boolean;
+}
+
+export interface JellyfishErrorConstructor {
+	new (message?: string): JellyfishError;
+	(message?: string): JellyfishError;
+	readonly prototype: JellyfishError;
+}
+
+export declare var JellyfishError: JellyfishErrorConstructor;
+
+export interface QuerySelect {
+	[key: string]: any;
+}
+
+export interface StreamPayload {
+	id: string;
+	slug: string;
+	type: string;
+	cardType: string;
+}
+
+export interface Stream extends NodeJS.EventEmitter {
+	query: <TContract extends Contract>(
+		select: QuerySelect,
+		schema: JsonSchema,
+		options: any,
+	) => Promise<TContract[]>;
+	setSchema: (select: QuerySelect, schema: JsonSchema, options: any) => void;
+	push: (payload: StreamPayload) => Promise<void>;
+	tryEmitEvent: (payload: StreamPayload) => Promise<boolean>;
+	close: () => void;
+}
 
 export interface Action {
 	handler: <TData = ContractData>(

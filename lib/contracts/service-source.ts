@@ -1,4 +1,4 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from 'autumndb';
 import { mergeProperties } from './transformer-merge-properties';
 
 export const serviceSource: ContractDefinition = {

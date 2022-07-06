@@ -1,11 +1,10 @@
-import type {
+import { strict as assert } from 'assert';
+import {
+	testUtils as autumndbTestUtils,
 	Contract,
 	LinkContract,
 	SessionContract,
-} from '@balena/jellyfish-types/build/core';
-import { ExecuteContract } from '@balena/jellyfish-types/build/queue';
-import { strict as assert } from 'assert';
-import { testUtils as autumndbTestUtils } from 'autumndb';
+} from 'autumndb';
 import permutations from 'just-permutations';
 import _ from 'lodash';
 import nock from 'nock';
@@ -13,8 +12,7 @@ import path from 'path';
 import { v4 as uuid } from 'uuid';
 import { Worker } from '.';
 import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
-import type { ActionRequestContract } from './queue/types';
-import { Action, Map } from './types';
+import { Action, ActionRequestContract, ExecuteContract, Map } from './types';
 
 /**
  * Context that can be used in tests against the worker.

@@ -1,5 +1,4 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
-import { contractMixins } from 'autumndb';
+import { ContractDefinition, contractMixins } from 'autumndb';
 
 const eventsPartial = `FILTER(contract.links['has attached element'], function (c) { return c && c.type && c.type !== 'create@1.0.0' && c.type !== 'update@1.0.0' })`;
 

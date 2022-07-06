@@ -1,13 +1,11 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { ContractData } from '@balena/jellyfish-types/build/core';
 import { strict as nativeAssert } from 'assert';
-import { Kernel } from 'autumndb';
+import type { ContractData, Kernel } from 'autumndb';
 import { parseExpression } from 'cron-parser';
 import * as graphileWorker from 'graphile-worker';
 import type { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
-import { contracts } from './contracts';
 import {
 	QueueInvalidAction,
 	QueueInvalidRequest,
@@ -18,7 +16,7 @@ import type {
 	ActionRequestContract,
 	ExecuteContract,
 	ScheduledActionData,
-} from './types';
+} from '../types';
 
 const logger = getLogger(__filename);
 
@@ -67,13 +65,14 @@ export function getNextExecutionDate(
 ): Date | null {
 	const now = new Date();
 	if (schedule.once) {
-		const next = new Date(schedule.once.date);
+		// TS-TODO: Stop casting
+		const next = new Date((schedule.once as any).date);
 		if (next > now) {
-			return schedule.once.date;
+			return (schedule.once as any).date;
 		}
 	} else if (schedule.recurring) {
-		const endDate = new Date(schedule.recurring.end);
-		const startDate = new Date(schedule.recurring.start);
+		const endDate = new Date((schedule.recurring as any).end);
+		const startDate = new Date((schedule.recurring as any).start);
 
 		// Ignore anything that will have already ended
 		if (endDate > now) {
@@ -89,7 +88,8 @@ export function getNextExecutionDate(
 						  };
 
 				// Create iterator based on provided configuration
-				const iterator = parseExpression(schedule.recurring.interval, {
+				// TS-TODO: Stop casting
+				const iterator = parseExpression((schedule.recurring as any).interval, {
 					endDate,
 					...options,
 				});
@@ -177,13 +177,6 @@ export class Producer implements QueueProducer {
 	 * @param logContext - log context
 	 */
 	async initialize(logContext: LogContext): Promise<void> {
-		logger.info(logContext, 'Inserting essential contracts');
-		await Promise.all(
-			Object.values(contracts).map(async (contract) => {
-				return this.kernel.replaceContract(logContext, this.session, contract);
-			}),
-		);
-
 		// Set up the graphile worker to ensure that the graphile_worker schema
 		// exists in the DB before we attempt to enqueue a job.
 		const workerUtils = await this.makeWorkerUtils(logContext);

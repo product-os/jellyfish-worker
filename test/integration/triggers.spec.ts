@@ -1,9 +1,10 @@
-import type {
-	Contract,
-	TypeContract,
-} from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
-import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	Contract,
+	Kernel,
+	testUtils as autumndbTestUtils,
+	TypeContract,
+} from 'autumndb';
 import _ from 'lodash';
 import {
 	errors,

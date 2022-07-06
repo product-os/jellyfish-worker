@@ -1,5 +1,4 @@
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { Contract, JsonSchema } from 'autumndb';
 import type { ActionContract } from '.';
 import * as utils from './utils';
 
