@@ -4,6 +4,7 @@ import { actionRequest } from './action-request';
 import { agentChannelSettings } from './agent-channel-settings';
 import { channel } from './channel';
 import { contact } from './contact';
+import { contractRepository } from './contract-repository';
 import { create } from './create';
 import { execute } from './execute';
 import { genericSource } from './generic-source';
@@ -54,21 +55,25 @@ export const contracts: ContractDefinition[] = [
 	agentChannelSettings,
 	channel,
 	contact,
+	contractRepository,
 	create,
 	execute,
 	genericSource,
 	image,
 	imageSource,
 	relationshipAnyIsCreatorOfAny,
+	relationshipAnyWasTransformedToAny,
 	relationshipChannelHasAgentUser,
 	relationshipChannelHasSettingsAgentChannelSettings,
 	relationshipContactHasBackupOwnerUser,
 	relationshipContactIsAttachedToUser,
 	relationshipContactIsOwnedByUser,
+	relationshipContractRepositoryHasMemberAny,
 	relationshipCreateIsAttachedToAny,
 	relationshipExecuteExecutesActionRequest,
 	relationshipLoopOwnsTransformer,
 	relationshipTaskGeneratedAny,
+	relationshipTaskHasResultAny,
 	relationshipTransformerGeneratedTask,
 	relationshipTransformerWorkerOwnsTask,
 	relationshipUpdateIsAttachedToAny,
