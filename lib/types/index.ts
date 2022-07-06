@@ -8,7 +8,9 @@ import type {
 } from '@balena/jellyfish-types/build/core';
 import type { Kernel } from 'autumndb';
 import type { Operation } from 'fast-json-patch';
-import type { ActionContract } from './queue';
+import type { ActionContract } from '../queue';
+
+export * from './contracts';
 
 export interface Action {
 	handler: <TData = ContractData>(
