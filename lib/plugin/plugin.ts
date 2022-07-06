@@ -1,12 +1,7 @@
-import type {
-	ActionContract,
-	Contract,
-	ContractDefinition,
-} from '@balena/jellyfish-types/build/core';
-import { contractMixins } from 'autumndb';
+import { Contract, ContractDefinition, contractMixins } from 'autumndb';
 import _ from 'lodash';
 import type { IntegrationDefinition } from '../sync';
-import type { Action, Map } from '../types';
+import type { Action, ActionContract, Map } from '../types';
 
 export class Plugin {
 	public slug: string;

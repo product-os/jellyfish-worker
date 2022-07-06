@@ -1,6 +1,10 @@
-import { TypeContract, UserContract } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
-import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	Kernel,
+	testUtils as autumndbTestUtils,
+	TypeContract,
+	UserContract,
+} from 'autumndb';
 import _ from 'lodash';
 import { setTimeout as delay } from 'timers/promises';
 import {

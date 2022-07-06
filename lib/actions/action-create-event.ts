@@ -1,6 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { TypeContract } from '@balena/jellyfish-types/build/core';
-import { errors as coreErrors } from 'autumndb';
+import { errors as coreErrors, TypeContract } from 'autumndb';
 import { WorkerNoElement } from '../errors';
 import type { ActionDefinition } from '../plugin';
 

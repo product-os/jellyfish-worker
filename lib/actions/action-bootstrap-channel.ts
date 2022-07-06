@@ -1,9 +1,6 @@
 import { getLogger } from '@balena/jellyfish-logger';
-import type {
-	ContractDefinition,
-	TypeContract,
-} from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
+import type { ContractDefinition, TypeContract } from 'autumndb';
 import _ from 'lodash';
 import slugify from 'slugify';
 import type { ActionDefinition } from '../plugin';

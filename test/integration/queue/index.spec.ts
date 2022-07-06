@@ -1,6 +1,9 @@
-import type { SessionContract } from '@balena/jellyfish-types/build/core';
 import { strict as assert } from 'assert';
-import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	Kernel,
+	testUtils as autumndbTestUtils,
+	SessionContract,
+} from 'autumndb';
 import {
 	ActionContract,
 	ActionRequestData,

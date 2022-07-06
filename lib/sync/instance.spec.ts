@@ -1,4 +1,4 @@
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { Contract } from 'autumndb';
 import _ from 'lodash';
 import nock from 'nock';
 import querystring from 'querystring';

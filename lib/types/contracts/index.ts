@@ -5,48 +5,93 @@
  */
 
 export type {
+	ActionContract,
+	ActionContractDefinition,
+	ActionData,
+} from './action';
+export type {
+	ActionRequestContract,
+	ActionRequestContractDefinition,
+	ActionRequestData,
+} from './action-request';
+export type {
 	AgentChannelSettingsContract,
 	AgentChannelSettingsContractDefinition,
+	AgentChannelSettingsData,
 } from './agent-channel-settings';
-export type { ChannelContract, ChannelContractDefinition } from './channel';
-export type { ContactContract, ContactContractDefinition } from './contact';
-export type { CreateContract, CreateContractDefinition } from './create';
+export type {
+	ChannelContract,
+	ChannelContractDefinition,
+	ChannelData,
+} from './channel';
+export type {
+	ContactContract,
+	ContactContractDefinition,
+	ContactData,
+} from './contact';
+export type {
+	CreateContract,
+	CreateContractDefinition,
+	CreateData,
+} from './create';
+export type {
+	ExecuteContract,
+	ExecuteContractDefinition,
+	ExecuteData,
+} from './execute';
 export type {
 	GenericSourceContract,
 	GenericSourceContractDefinition,
+	GenericSourceData,
 } from './generic-source';
-export type { ImageContract, ImageContractDefinition } from './image';
+export type {
+	ImageContract,
+	ImageContractDefinition,
+	ImageData,
+} from './image';
 export type {
 	ImageSourceContract,
 	ImageSourceContractDefinition,
+	ImageSourceData,
 } from './image-source';
 export type {
 	OauthProviderContract,
 	OauthProviderContractDefinition,
+	OauthProviderData,
 } from './oauth-provider';
 export type {
 	ScheduledActionContract,
 	ScheduledActionContractDefinition,
+	ScheduledActionData,
 } from './scheduled-action';
 export type {
 	ServiceSourceContract,
 	ServiceSourceContractDefinition,
+	ServiceSourceData,
 } from './service-source';
-export type { TaskContract, TaskContractDefinition } from './task';
+export type { TaskContract, TaskContractDefinition, TaskData } from './task';
 export type {
 	TransformerContract,
 	TransformerContractDefinition,
+	TransformerData,
 } from './transformer';
 export type {
 	TransformerWorkerContract,
 	TransformerWorkerContractDefinition,
+	TransformerWorkerData,
 } from './transformer-worker';
 export type {
 	TriggeredActionContract,
 	TriggeredActionContractDefinition,
+	TriggeredActionData,
 } from './triggered-action';
-export type { UpdateContract, UpdateContractDefinition } from './update';
+export type {
+	UpdateContract,
+	UpdateContractDefinition,
+	UpdateData,
+} from './update';
 export type {
 	WorkingHoursContract,
 	WorkingHoursContractDefinition,
+	WorkingHoursData,
 } from './working-hours';

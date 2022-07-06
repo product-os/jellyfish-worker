@@ -1,8 +1,11 @@
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import { Kernel } from 'autumndb';
+import type { JsonSchema, Kernel } from 'autumndb';
 import type { PostOptions, PostResults } from './consumer';
-import type { ExecuteContract, ExecuteContractDefinition } from './types';
+import type {
+	ExecuteContract,
+	ExecuteContractDefinition,
+	ExecuteData,
+} from '../types';
 
 const logger = getLogger(__filename);
 
@@ -69,7 +72,7 @@ export const post = async (
 	results: PostResults,
 ): Promise<ExecuteContract> => {
 	const date = new Date();
-	const data = {
+	const data: ExecuteData = {
 		timestamp: date.toISOString(),
 		target: options.id,
 		actor: options.actor,

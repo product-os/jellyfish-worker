@@ -1,10 +1,5 @@
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
-	Contract,
-	SessionContract,
-} from '@balena/jellyfish-types/build/core';
-import type { Kernel } from 'autumndb';
+import type { Contract, JsonSchema, Kernel, SessionContract } from 'autumndb';
 import iso8601Duration from 'iso8601-duration';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';

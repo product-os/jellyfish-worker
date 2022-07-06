@@ -1,4 +1,4 @@
-import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import type { TypeContract } from 'autumndb';
 import _ from 'lodash';
 import type { ActionDefinition } from '../plugin';
 

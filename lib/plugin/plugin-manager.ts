@@ -1,4 +1,4 @@
-import { Contract } from '@balena/jellyfish-types/build/core';
+import type { Contract } from 'autumndb';
 import _ from 'lodash';
 import * as semver from 'semver';
 import type { IntegrationDefinition } from '../sync/types';

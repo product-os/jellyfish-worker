@@ -1,10 +1,6 @@
 import { getLogger } from '@balena/jellyfish-logger';
 import type { LogContext } from '@balena/jellyfish-logger';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
-	Contract,
-	TypeContract,
-} from '@balena/jellyfish-types/build/core';
+import type { Contract, JsonSchema, TypeContract } from 'autumndb';
 import _ from 'lodash';
 import * as skhema from 'skhema';
 import { v4 as uuidv4 } from 'uuid';

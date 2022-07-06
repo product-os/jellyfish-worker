@@ -1,9 +1,6 @@
 import type { LinkConstraint } from '@balena/jellyfish-client-sdk';
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
-import type {
-	Contract,
-	TypeContract,
-} from '@balena/jellyfish-types/build/core';
+import type { Contract, TypeContract } from 'autumndb';
 import type { Dictionary } from 'lodash';
 import { reverseLink } from './link-traversal';
 import type { TriggeredActionContract } from './types';

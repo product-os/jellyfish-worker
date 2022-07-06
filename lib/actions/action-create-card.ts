@@ -1,5 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import type { TypeContract } from 'autumndb';
 import skhema from 'skhema';
 import type { ActionDefinition } from '../plugin';
 

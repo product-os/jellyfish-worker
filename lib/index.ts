@@ -2,16 +2,17 @@ import * as assert from '@balena/jellyfish-assert';
 import { defaultEnvironment as environment } from '@balena/jellyfish-environment';
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
+import { strict } from 'assert';
+import {
+	CONTRACTS,
 	Contract,
 	ContractData,
 	ContractDefinition,
+	JsonSchema,
+	Kernel,
 	SessionContract,
 	TypeContract,
-} from '@balena/jellyfish-types/build/core';
-import { strict } from 'assert';
-import { CONTRACTS, Kernel } from 'autumndb';
+} from 'autumndb';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
 import _ from 'lodash';
@@ -25,14 +26,7 @@ import { contracts } from './contracts';
 import * as errors from './errors';
 import * as formulas from './formulas';
 import { PluginDefinition, PluginManager } from './plugin';
-import {
-	ActionContract,
-	ActionRequestContract,
-	ActionRequestData,
-	Consumer,
-	Producer,
-	ScheduledActionContract,
-} from './queue';
+import { Consumer, Producer } from './queue';
 import type { OnMessageEventHandler } from './queue/consumer';
 import { enqueue, getNextExecutionDate } from './queue/producer';
 import * as subscriptionsLib from './subscriptions';
@@ -41,8 +35,12 @@ import { evaluate as evaluateTransformers } from './transformers';
 import * as triggersLib from './triggers';
 import type {
 	Action,
+	ActionContract,
 	ActionPreRequest,
+	ActionRequestContract,
+	ActionRequestData,
 	Map,
+	ScheduledActionContract,
 	TransformerContract,
 	TriggeredActionContract,
 	WorkerContext,
@@ -75,20 +73,12 @@ export {
 	PluginIdentity,
 } from './plugin';
 export {
-	ActionContract,
-	ActionData,
-	ActionRequestContract,
-	ActionRequestData,
 	Consumer,
-	contracts as queueContracts,
 	errors as queueErrors,
 	events,
-	ExecuteContract,
-	ExecuteData,
 	Producer,
 	ProducerOptions,
 	ProducerResults,
-	ScheduledActionData,
 } from './queue';
 export * as testUtils from './test-utils';
 export * from './types';
@@ -1918,7 +1908,12 @@ export class Worker {
 				session,
 				id,
 			);
-		if (scheduledAction && scheduledAction.active) {
+		if (
+			scheduledAction &&
+			scheduledAction.active &&
+			scheduledAction.data.options.card &&
+			scheduledAction.data.options.arguments
+		) {
 			const runAt = getNextExecutionDate(scheduledAction.data.schedule);
 			if (runAt) {
 				// Create new action-request contract

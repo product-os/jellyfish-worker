@@ -1,5 +1,4 @@
-import type { ContractDefinition } from '@balena/jellyfish-types/build/core';
-import { contractMixins } from 'autumndb';
+import { ContractDefinition, contractMixins } from 'autumndb';
 
 export const contact: ContractDefinition = {
 	slug: 'contact',

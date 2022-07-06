@@ -1,11 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type {
-	Contract,
-	LinkContract,
-} from '@balena/jellyfish-types/build/core';
-import type { Kernel } from 'autumndb';
+import type { Contract, JsonSchema, Kernel, LinkContract } from 'autumndb';
 import jsone = require('json-e');
 import _ from 'lodash';
 import * as skhema from 'skhema';

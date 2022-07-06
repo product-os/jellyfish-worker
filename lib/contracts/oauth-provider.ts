@@ -1,8 +1,4 @@
-import {
-	Contract,
-	ContractData,
-	ContractDefinition,
-} from '@balena/jellyfish-types/build/core';
+import type { Contract, ContractData, ContractDefinition } from 'autumndb';
 
 export interface OauthProviderContractData extends ContractData {
 	authorizeUrl: string;

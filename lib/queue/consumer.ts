@@ -1,15 +1,13 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
-import type { LinkContract } from '@balena/jellyfish-types/build/core';
 import { Logger } from '@graphile/logger';
-import { Kernel } from 'autumndb';
+import type { Kernel, LinkContract } from 'autumndb';
 import * as graphileWorker from 'graphile-worker';
 import _ from 'lodash';
 import type { Pool } from 'pg';
-import { contracts } from './contracts';
 import { post } from './events';
-import type { ActionRequestContract, ExecuteContract } from './types';
+import type { ActionRequestContract, ExecuteContract } from '../types';
 
 const logger = getLogger(__filename);
 
@@ -109,13 +107,6 @@ export class Consumer implements QueueConsumer {
 		logContext: LogContext,
 		onMessageEventHandler: OnMessageEventHandler,
 	): Promise<void> {
-		logger.info(logContext, 'Inserting essential contracts');
-		await Promise.all(
-			Object.values(contracts).map(async (contract) => {
-				return this.kernel.replaceContract(logContext, this.session, contract);
-			}),
-		);
-
 		await this.run(logContext, onMessageEventHandler);
 		this.graphileRunner!.stop = _.once(this.graphileRunner!.stop);
 	}

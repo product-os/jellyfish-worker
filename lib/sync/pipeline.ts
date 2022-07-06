@@ -1,5 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { Contract } from 'autumndb';
 import jsone from 'json-e';
 import _ from 'lodash';
 import * as errors from './errors';

@@ -1,9 +1,6 @@
-import type {
-	ContractDefinition,
-	TypeData,
-} from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from 'autumndb';
 
-export const channel: ContractDefinition<TypeData> = {
+export const channel: ContractDefinition = {
 	slug: 'channel',
 	name: 'Channel',
 	type: 'type@1.0.0',

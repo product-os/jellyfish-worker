@@ -1,7 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger } from '@balena/jellyfish-logger';
-import type { JsonSchema } from '@balena/jellyfish-types';
-import type { TypeContract } from '@balena/jellyfish-types/build/core';
+import type { JsonSchema, TypeContract } from 'autumndb';
 import _ from 'lodash';
 import * as skhema from 'skhema';
 import * as errors from '../errors';

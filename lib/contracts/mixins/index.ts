@@ -1,8 +1,4 @@
-import type {
-	ContractData,
-	ContractDefinition,
-} from '@balena/jellyfish-types/build/core';
-import { contractMixins } from 'autumndb';
+import { ContractData, ContractDefinition, contractMixins } from 'autumndb';
 import _ from 'lodash';
 
 export { asPipelineItem } from './as-pipeline-item';

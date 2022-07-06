@@ -1,9 +1,6 @@
-import {
-	ContractDefinition,
-	TypeData,
-} from '@balena/jellyfish-types/build/core';
+import type { ContractDefinition } from 'autumndb';
 
-export const execute: ContractDefinition<TypeData> = {
+export const execute: ContractDefinition = {
 	slug: 'execute',
 	type: 'type@1.0.0',
 	version: '1.0.0',
@@ -40,14 +37,6 @@ export const execute: ContractDefinition<TypeData> = {
 							properties: {
 								action: {
 									type: 'string',
-									anyOf: [
-										{
-											format: 'uuid',
-										},
-										{
-											pattern: '^[a-z0-9-]+(@\\d+)?(\\.\\d+)?(\\.\\d+)?$',
-										},
-									],
 								},
 								card: {
 									type: 'string',

@@ -1,5 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { Contract } from '@balena/jellyfish-types/build/core';
+import type { Contract } from 'autumndb';
 import axios from 'axios';
 import _ from 'lodash';
 import { setTimeout as delay } from 'timers/promises';
