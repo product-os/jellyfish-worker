@@ -1,4 +1,21 @@
 - commits:
+    - subject: Drop jellyfish-types
+      hash: 938db2fe884a882bc9b2986b22915132b21a2005
+      body: |
+        Remove jellyfish-types dependency, using instead types provided
+        locally and/or from autumndb. This results in some exports changing,
+        meaning it could be breaking for some consumers.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 31.0.0
+  title: "'Drop jellyfish-types'"
+  date: 2022-07-06T06:35:05.402Z
+- commits:
     - subject: Add contract type interface definitions
       hash: 9c02e42be692af839e1d1b2414a1d0f09225be72
       body: ""
