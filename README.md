@@ -1,10 +1,16 @@
 # Jellyfish Worker
 
-Jellyfish workers are in charge of consuming action requests from the queue,
-executing them, and reporting back the results. This module provides an lower
-level interface to write a worker server. The intention is that we can write
-multiple types of workers, optimised for different tasks using a single shared
-framework.
+The Jellyfish worker is a layer over the top of [`AutumnDB`](https://github.com/product-os/autumndb) that adds a queue and job processing.
+To perform writes to the underlying data store, you create a job as an `action-request` contract and the worker will process it.
+The Jellyfish worker also provides:
+
+- a framework for building integrations with 3rd party services
+- support for formula fields using [Jellyscript](https://github.com/product-os/jellyfish-jellyscript)
+- automatic paper trails for updates, creation and authorship
+- support for hook functionality using triggered actions
+- support for time delayed and recurring actions
+
+Multiple worker instances can be safely run in parralel, as the system utilises postgraphile to enqueue and dequeue jobs.
 
 # Usage
 
