@@ -967,7 +967,7 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				name: 'was transformed into',
+				name: 'was transformed to',
 				data: {
 					inverseName: 'was transformed from',
 					from: {
@@ -1216,7 +1216,7 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				name: 'was transformed into',
+				name: 'was transformed to',
 				data: {
 					inverseName: 'was transformed from',
 					from: {
