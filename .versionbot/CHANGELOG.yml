@@ -1,4 +1,24 @@
 - commits:
+    - subject: Fix bug where triggers are not recalculated when a relationship is added
+      hash: dd360ad78d517e39700a3dda5c4d85e946507551
+      body: >
+        Fixes a bug where some materialized fields won't be calculated
+        correctly.
+
+        What happens is that because we now use relationships to create the triggered actions, used to process materialized fields, if you insert the relationship after the type then the triggered action won't be generated.  The triggered actions only get generated when a type contract is inserted.
+
+        We need to changes this so that the formulas will get parsed and the appropriate triggered actions generated when a new relationship is inserted.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 31.0.2
+  title: "'Fix bug where triggers are not recalculated when a relationship is added'"
+  date: 2022-07-07T13:54:31.106Z
+- commits:
     - subject: Drop client-sdk
       hash: bd743740c8e8383d8c1ecbf82f60487ed72aef19
       body: |
