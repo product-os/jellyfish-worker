@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update README
+      hash: 8f20929e50e659e15fce3d191b80191d740d9ab6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 31.0.3
+  title: "'Update README'"
+  date: 2022-07-07T15:59:29.987Z
+- commits:
     - subject: Fix bug where triggers are not recalculated when a relationship is added
       hash: dd360ad78d517e39700a3dda5c4d85e946507551
       body: >
