@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { Contract, JsonSchema, Kernel, LinkContract } from 'autumndb';
+import { Contract, JsonSchema, Kernel, LinkContract } from 'autumndb';
 import jsone = require('json-e');
 import _ from 'lodash';
 import * as skhema from 'skhema';
@@ -113,6 +113,7 @@ export const matchesContract = async (
 		const linkContract: LinkContract = contract as LinkContract;
 		if (schema.$$links) {
 			const verb = Object.keys(schema.$$links)[0];
+
 			// If the link being inserted joins different types together
 			// than what is defined in the filter schema, we can use
 			// this as a heuristic to validate the trigger
@@ -176,11 +177,11 @@ export const matchesContract = async (
 	}
 
 	// Run the query
-	return _.first(
-		await kernel.query(logContext, session, schema, {
-			limit: 1,
-		}),
-	);
+	const [result] = await kernel.query(logContext, session, schema, {
+		limit: 1,
+	});
+
+	return result;
 };
 
 /**
