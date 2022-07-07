@@ -2,6 +2,24 @@ import * as assert from '@balena/jellyfish-assert';
 import type { TypeContract } from 'autumndb';
 import skhema from 'skhema';
 import type { ActionDefinition } from '../plugin';
+import * as errors from '../errors';
+
+interface LinkTarget {
+	name: string;
+	inverseName: string;
+	to: {
+		id: string;
+		type: string;
+	};
+}
+
+interface Links {
+	[key: string]: Array<{
+		id: string;
+		slug: string;
+		type: string;
+	}>;
+}
 
 const handler: ActionDefinition['handler'] = async (
 	session,
@@ -19,6 +37,59 @@ const handler: ActionDefinition['handler'] = async (
 		'You may not use contract actions to create an event',
 	);
 
+	// Validate links if set
+	const linkTargets: LinkTarget[] = [];
+	if (request.arguments.properties.links) {
+		const from = request.arguments.properties.type.split('@')[0];
+		const links: Links = request.arguments.properties.links;
+		await Promise.all(
+			(Object.keys(links) as string[]).map(async (name) => {
+				for (const target of links[name]) {
+					// Assert target contract exists
+					const targetContract = await context.getCardById(session, target.id);
+					if (!targetContract) {
+						throw new errors.SyncNoElement(
+							`Target contract ${target.id} does not exist`,
+						);
+					}
+
+					// Assert relationship contract exists
+					const to = target.type.split('@')[0];
+					const [match] = context.relationships.filter((relationship) => {
+						return (
+							(relationship.name === name &&
+								(relationship.data.from.type === from ||
+									relationship.data.from.type === '*') &&
+								(relationship.data.to.type === to ||
+									relationship.data.to.type === '*')) ||
+							(relationship.data.inverseName === name &&
+								(relationship.data.from.type === to ||
+									relationship.data.from.type === '*') &&
+								(relationship.data.to.type === from ||
+									relationship.data.to.type === '*'))
+						);
+					});
+					if (!match) {
+						throw new errors.SyncNoElement(
+							`No relationship found for: ${from} ${name} ${to}`,
+						);
+					}
+
+					// Everything necessary exists, add to link targets
+					linkTargets.push({
+						name: match.name === name ? name : match.data.inverseName!,
+						inverseName: match.data.inverseName === name ? match.name! : name,
+						to: {
+							id: target.id,
+							type: target.type,
+						},
+					});
+				}
+			}),
+		);
+	}
+
+	// Create contract
 	const result = await context.insertCard(
 		session,
 		typeContract as TypeContract,
@@ -34,6 +105,34 @@ const handler: ActionDefinition['handler'] = async (
 
 	if (!result) {
 		return null;
+	}
+
+	// Create link(s) if necessary
+	if (linkTargets.length > 0) {
+		await Promise.all(
+			linkTargets.map(async (linkTarget) => {
+				await context.insertCard(
+					session,
+					context.cards['link@1.0.0'] as TypeContract,
+					{},
+					{
+						type: 'link@1.0.0',
+						name: linkTarget.name,
+						data: {
+							inverseName: linkTarget.inverseName,
+							from: {
+								id: result.id,
+								type: result.type,
+							},
+							to: {
+								id: linkTarget.to.id,
+								type: linkTarget.to.type,
+							},
+						},
+					},
+				);
+			}),
+		);
 	}
 
 	return {
