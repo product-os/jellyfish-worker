@@ -1,4 +1,20 @@
 - commits:
+    - subject: Drop client-sdk
+      hash: bd743740c8e8383d8c1ecbf82f60487ed72aef19
+      body: |
+        Remove jellyfish-client-sdk dependency and update link-constraint
+        logic to work with relationships.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 31.0.1
+  title: "'Drop client-sdk'"
+  date: 2022-07-07T03:20:37.596Z
+- commits:
     - subject: Drop jellyfish-types
       hash: 938db2fe884a882bc9b2986b22915132b21a2005
       body: |
