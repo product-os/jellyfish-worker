@@ -1843,27 +1843,32 @@ export class Worker {
 			);
 
 			await Promise.all(
-				formulas.getTypeTriggers(insertedContract as TypeContract).map(
-					async (trigger) => {
-						// We don't want to use the actions queue here
-						// so that watchers are applied right away
-						const triggeredActionContract = await this.kernel.replaceContract(
-							logContext,
-							session,
-							trigger,
-						);
+				formulas
+					.getTypeTriggers(
+						this.kernel.getRelationships(),
+						insertedContract as TypeContract,
+					)
+					.map(
+						async (trigger) => {
+							// We don't want to use the actions queue here
+							// so that watchers are applied right away
+							const triggeredActionContract = await this.kernel.replaceContract(
+								logContext,
+								session,
+								trigger,
+							);
 
-						// Registered the newly created trigger
-						// right away for performance reasons
-						return this.setTriggers(
-							logContext,
-							this.triggers.concat([triggeredActionContract]),
-						);
-					},
-					{
-						concurrency: INSERT_CONCURRENCY,
-					},
-				),
+							// Registered the newly created trigger
+							// right away for performance reasons
+							return this.setTriggers(
+								logContext,
+								this.triggers.concat([triggeredActionContract]),
+							);
+						},
+						{
+							concurrency: INSERT_CONCURRENCY,
+						},
+					),
 			);
 		}
 
