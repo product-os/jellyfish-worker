@@ -12,6 +12,7 @@ import {
 	Kernel,
 	SessionContract,
 	TypeContract,
+	RelationshipContract,
 } from 'autumndb';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -20,6 +21,7 @@ import type { Pool } from 'pg';
 import * as semver from 'semver';
 import { serializeError } from 'serialize-error';
 import * as skhema from 'skhema';
+import { setTimeout as delay } from 'timers/promises';
 import { v4 as uuidv4 } from 'uuid';
 import { actions } from './actions';
 import { contracts } from './contracts';
@@ -783,6 +785,7 @@ export class Worker {
 					object,
 					typeContract,
 				);
+
 				// TS-TODO: Remove this any casting
 				const newPatch = formulaParser.evaluatePatch(
 					typeContract.data.schema,
@@ -1842,34 +1845,40 @@ export class Worker {
 				),
 			);
 
-			await Promise.all(
-				formulas
-					.getTypeTriggers(
-						this.kernel.getRelationships(),
-						insertedContract as TypeContract,
-					)
-					.map(
-						async (trigger) => {
-							// We don't want to use the actions queue here
-							// so that watchers are applied right away
-							const triggeredActionContract = await this.kernel.replaceContract(
-								logContext,
-								session,
-								trigger,
-							);
-
-							// Registered the newly created trigger
-							// right away for performance reasons
-							return this.setTriggers(
-								logContext,
-								this.triggers.concat([triggeredActionContract]),
-							);
-						},
-						{
-							concurrency: INSERT_CONCURRENCY,
-						},
-					),
+			await this.generateFormulaTypeTriggers(
+				logContext,
+				session,
+				insertedContract as TypeContract,
 			);
+		}
+
+		if (insertedContract.type.split('@')[0] === 'relationship') {
+			const relationship = insertedContract as RelationshipContract;
+			// There is potential for a race condition here where we try to get
+			// the relationship before its been set in the kernel cache.
+			// Set up a small loop to ensure the relationship is available before proceeding
+			while (true) {
+				if (
+					_.find(this.kernel.getRelationships(), { slug: relationship.slug })
+				) {
+					break;
+				}
+				await delay(50);
+			}
+			const fromType = relationship.data.from.type;
+			const toType = relationship.data.to.type;
+			for (const slug of [fromType, toType]) {
+				// Calculate the formulas for the most recent version of the type
+				const contract = await this.kernel.getContractBySlug<TypeContract>(
+					logContext,
+					session,
+					`${slug}@latest`,
+				);
+				// The type not be available yet if the relationship is inserted first
+				if (contract) {
+					await this.generateFormulaTypeTriggers(logContext, session, contract);
+				}
+			}
 		}
 
 		// Add inserted action-request contracts to queue
@@ -1883,6 +1892,38 @@ export class Worker {
 		}
 
 		return insertedContract;
+	}
+
+	async generateFormulaTypeTriggers(
+		logContext: LogContext,
+		session: string,
+		typeContract: TypeContract,
+	) {
+		await Promise.all(
+			formulas
+				.getTypeTriggers(this.kernel.getRelationships(), typeContract)
+				.map(
+					async (trigger) => {
+						// We don't want to use the actions queue here
+						// so that watchers are applied right away
+						const triggeredActionContract = await this.kernel.replaceContract(
+							logContext,
+							session,
+							trigger,
+						);
+
+						// Registered the newly created trigger
+						// right away for performance reasons
+						return this.setTriggers(
+							logContext,
+							this.triggers.concat([triggeredActionContract]),
+						);
+					},
+					{
+						concurrency: INSERT_CONCURRENCY,
+					},
+				),
+		);
 	}
 
 	/**
