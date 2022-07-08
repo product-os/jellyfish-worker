@@ -1,4 +1,26 @@
 - commits:
+    - subject: "Sync: Don't auto-add an origin field to synced contracts"
+      hash: 38c4b97d9dbd59f30df5559cc7fee04f8b89856b
+      body: >
+        The origin field can be used to debug synced data, as it is a reference
+        to the original webhook event.
+
+        However this is largely redundant since we have request tracing via the log context id, and in the future will generate more complete graphs when executing action requests.
+
+        Removing this logic simplifies the code, and prevents situations where
+
+        contracts are needlessly updated.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 31.0.5
+  title: "'Sync: Don't auto-add an origin field to synced contracts'"
+  date: 2022-07-08T13:28:39.602Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 12.1.0 to 12.2.0
       hash: 3b48015e7f0af03a99efb421666bb2c6faa62c88
       body: ""
