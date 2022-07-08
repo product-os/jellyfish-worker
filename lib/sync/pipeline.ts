@@ -153,23 +153,6 @@ export const importCards = async (
 
 			// Check if this is a JSONpatch or a slug-based upsert
 			if ('patch' in segment.card) {
-				// If the patch doesn't update the origin, add it now
-				if (
-					!_.find(segment.card.patch, {
-						path: '/data/origin',
-					})
-				) {
-					if (
-						options.origin &&
-						options.origin.type === 'external-event@1.0.0'
-					) {
-						segment.card.patch.push({
-							op: 'add',
-							path: '/data/origin',
-							value: `${options.origin.slug}@${options.origin.version}`,
-						});
-					}
-				}
 				finalObject = evaluateObject(
 					_.omit(segment.card, ['links']),
 					references,
