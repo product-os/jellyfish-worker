@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 12.1.0 to 12.2.0
+      hash: 3b48015e7f0af03a99efb421666bb2c6faa62c88
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 31.0.4
+  title: "'Update @balena/jellyfish-environment from 12.1.0 to 12.2.0'"
+  date: 2022-07-08T04:36:09.426Z
+- commits:
     - subject: Update README
       hash: 8f20929e50e659e15fce3d191b80191d740d9ab6
       body: ""
