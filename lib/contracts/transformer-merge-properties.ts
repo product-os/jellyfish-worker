@@ -42,14 +42,14 @@ export const mergeProperties = {
 		else if isFinalVersion
 			this.links.was merged from.mergeConfirmed
 		else
-			this.links.was transformed into.all(c => c.merged && c.mergeConfirmed)
+			this.links.was transformed to.all(c => c.merged && c.mergeConfirmed)
 	*/
 	mergeConfirmed: {
 		description: 'all downstream contracts are merged',
 		type: 'boolean',
 		$$formula: `(${isDraftVersion}
-									&& EVERY(contract.links["was transformed into"], "data.$transformer.merged")
-									&& EVERY(contract.links["was transformed into"], "data.$transformer.mergeConfirmed")
+									&& EVERY(contract.links["was transformed to"], "data.$transformer.merged")
+									&& EVERY(contract.links["was transformed to"], "data.$transformer.mergeConfirmed")
 								) || (${isFinalVersion}
 									&& PROPERTY(contract.links["was merged from"][0], "data.$transformer.mergeConfirmed") === true )`,
 		readOnly: true,
