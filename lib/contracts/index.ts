@@ -13,6 +13,7 @@ import { imageSource } from './image-source';
 import { oauthProvider } from './oauth-provider';
 import { relationshipAnyIsCreatorOfAny } from './relationship-any-is-creator-of-any';
 import { relationshipAnyWasTransformedToAny } from './relationship-any-was-transformed-to-any';
+import { relationshipAnyWasBuiltIntoAny } from './relationship-any-was-built-into-any';
 import { relationshipChannelHasAgentUser } from './relationship-channel-has-agent-user';
 import { relationshipChannelHasSettingsAgentChannelSettings } from './relationship-channel-has-settings-agent-channel-settings';
 import { relationshipContactHasBackupOwnerUser } from './relationship-contact-has-backup-owner-user';
@@ -23,8 +24,8 @@ import { relationshipCreateIsAttachedToAny } from './relationship-create-is-atta
 import { relationshipExecuteExecutesActionRequest } from './relationship-execute-executes-action-request';
 import { relationshipLoopOwnsTransformer } from './relationship-loop-owns-transformer';
 import { relationshipTaskGeneratedAny } from './relationship-task-generated-any';
-import { relationshipTaskHasResultAny } from './relationship-task-has-result-any';
 import { relationshipTransformerGeneratedTask } from './relationship-transformer-generated-task';
+import { relationshipTaskHasResultAny } from './relationship-task-has-result-any';
 import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
@@ -63,6 +64,7 @@ export const contracts: ContractDefinition[] = [
 	imageSource,
 	relationshipAnyIsCreatorOfAny,
 	relationshipAnyWasTransformedToAny,
+	relationshipAnyWasBuiltIntoAny,
 	relationshipChannelHasAgentUser,
 	relationshipChannelHasSettingsAgentChannelSettings,
 	relationshipContactHasBackupOwnerUser,
@@ -73,8 +75,8 @@ export const contracts: ContractDefinition[] = [
 	relationshipExecuteExecutesActionRequest,
 	relationshipLoopOwnsTransformer,
 	relationshipTaskGeneratedAny,
-	relationshipTaskHasResultAny,
 	relationshipTransformerGeneratedTask,
+	relationshipTaskHasResultAny,
 	relationshipTransformerWorkerOwnsTask,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
