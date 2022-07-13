@@ -1,4 +1,18 @@
 - commits:
+    - subject: Upgrade to Jellyscript 7.1.0 that supports COUNT_BY
+      hash: 4e9385905a1319990253b9db2ed7643d28ec051f
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 31.1.0
+  title: "'Upgrade to Jellyscript 7.1.0 that supports COUNT_BY'"
+  date: 2022-07-13T09:08:09.784Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 12.1.0 to 12.2.0
       hash: 3b48015e7f0af03a99efb421666bb2c6faa62c88
       body: ""
