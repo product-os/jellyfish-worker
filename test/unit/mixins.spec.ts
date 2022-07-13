@@ -1,6 +1,6 @@
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import type { JsonSchema } from 'autumndb';
-import { contractMixins } from '../../lib';
+import * as contractMixins from '../../lib/contracts/mixins';
 
 describe('contractMixins', () => {
 	describe('.withEvents()', () => {
