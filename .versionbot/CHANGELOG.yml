@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bring in plugin-default and plugin-product-os
+      hash: f2079878b59e29e68e19b31e8f746ec149aa4240
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 32.0.0
+  title: "'Bring in plugin-default and plugin-product-os'"
+  date: 2022-07-13T07:27:51.013Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 12.1.0 to 12.2.0
       hash: 3b48015e7f0af03a99efb421666bb2c6faa62c88
       body: ""
