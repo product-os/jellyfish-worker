@@ -880,7 +880,7 @@ describe('.insertCard()', () => {
 									linkedProperty: {
 										type: 'number',
 										$$formula:
-											'contract.links["was built from"].length && contract.links["was built from"][0].data.prop',
+											'contract.links["was transformed from"].length && contract.links["was transformed from"][0].data.prop',
 									},
 								},
 								additionalProperties: true,
@@ -967,9 +967,9 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				name: 'was built into',
+				name: 'was transformed to',
 				data: {
-					inverseName: 'was built from',
+					inverseName: 'was transformed from',
 					from: {
 						id: linkedContract.id,
 						slug: linkedContract.slug,
@@ -1128,7 +1128,7 @@ describe('.insertCard()', () => {
 									linkedProperty: {
 										type: 'number',
 										$$formula:
-											'contract.links["was built from"].length && contract.links["was built from"][0].data.prop',
+											'contract.links["was transformed from"].length && contract.links["was transformed from"][0].data.prop',
 									},
 								},
 								additionalProperties: true,
@@ -1216,9 +1216,9 @@ describe('.insertCard()', () => {
 				reason: null,
 			},
 			{
-				name: 'was built into',
+				name: 'was transformed to',
 				data: {
-					inverseName: 'was built from',
+					inverseName: 'was transformed from',
 					from: {
 						id: linkedContract.id,
 						slug: linkedContract.slug,

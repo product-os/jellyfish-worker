@@ -4,6 +4,7 @@ import { actionRequest } from './action-request';
 import { agentChannelSettings } from './agent-channel-settings';
 import { channel } from './channel';
 import { contact } from './contact';
+import { contractRepository } from './contract-repository';
 import { create } from './create';
 import { execute } from './execute';
 import { genericSource } from './generic-source';
@@ -11,16 +12,20 @@ import { image } from './image';
 import { imageSource } from './image-source';
 import { oauthProvider } from './oauth-provider';
 import { relationshipAnyIsCreatorOfAny } from './relationship-any-is-creator-of-any';
+import { relationshipAnyWasTransformedToAny } from './relationship-any-was-transformed-to-any';
+import { relationshipAnyWasBuiltIntoAny } from './relationship-any-was-built-into-any';
 import { relationshipChannelHasAgentUser } from './relationship-channel-has-agent-user';
 import { relationshipChannelHasSettingsAgentChannelSettings } from './relationship-channel-has-settings-agent-channel-settings';
 import { relationshipContactHasBackupOwnerUser } from './relationship-contact-has-backup-owner-user';
 import { relationshipContactIsAttachedToUser } from './relationship-contact-is-attached-to-user';
 import { relationshipContactIsOwnedByUser } from './relationship-contact-is-owned-by-user';
+import { relationshipContractRepositoryHasMemberAny } from './relationship-contract-repository-has-member-any';
 import { relationshipCreateIsAttachedToAny } from './relationship-create-is-attached-to-any';
 import { relationshipExecuteExecutesActionRequest } from './relationship-execute-executes-action-request';
 import { relationshipLoopOwnsTransformer } from './relationship-loop-owns-transformer';
 import { relationshipTaskGeneratedAny } from './relationship-task-generated-any';
 import { relationshipTransformerGeneratedTask } from './relationship-transformer-generated-task';
+import { relationshipTaskHasResultAny } from './relationship-task-has-result-any';
 import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
@@ -51,22 +56,27 @@ export const contracts: ContractDefinition[] = [
 	agentChannelSettings,
 	channel,
 	contact,
+	contractRepository,
 	create,
 	execute,
 	genericSource,
 	image,
 	imageSource,
 	relationshipAnyIsCreatorOfAny,
+	relationshipAnyWasTransformedToAny,
+	relationshipAnyWasBuiltIntoAny,
 	relationshipChannelHasAgentUser,
 	relationshipChannelHasSettingsAgentChannelSettings,
 	relationshipContactHasBackupOwnerUser,
 	relationshipContactIsAttachedToUser,
 	relationshipContactIsOwnedByUser,
+	relationshipContractRepositoryHasMemberAny,
 	relationshipCreateIsAttachedToAny,
 	relationshipExecuteExecutesActionRequest,
 	relationshipLoopOwnsTransformer,
 	relationshipTaskGeneratedAny,
 	relationshipTransformerGeneratedTask,
+	relationshipTaskHasResultAny,
 	relationshipTransformerWorkerOwnsTask,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,

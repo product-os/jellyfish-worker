@@ -68,10 +68,13 @@ const handler: ActionDefinition['handler'] = async (
 		matcher,
 		{
 			type: 'object',
-			required: ['active', 'updated_at'],
+			required: ['active', 'type', 'updated_at'],
 			properties: {
 				active: {
 					const: true,
+				},
+				type: {
+					const: 'transformer-worker@1.0.0',
 				},
 				updated_at: {
 					type: 'string',
