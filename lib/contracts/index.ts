@@ -25,7 +25,6 @@ import { relationshipExecuteExecutesActionRequest } from './relationship-execute
 import { relationshipLoopOwnsTransformer } from './relationship-loop-owns-transformer';
 import { relationshipTaskGeneratedAny } from './relationship-task-generated-any';
 import { relationshipTransformerGeneratedTask } from './relationship-transformer-generated-task';
-import { relationshipTriggeredActionOwnsTask } from './relationship-triggered-action-owns-task';
 import { relationshipTaskHasResultAny } from './relationship-task-has-result-any';
 import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
@@ -79,7 +78,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipTransformerGeneratedTask,
 	relationshipTaskHasResultAny,
 	relationshipTransformerWorkerOwnsTask,
-	relationshipTriggeredActionOwnsTask,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
 	relationshipUserHasSettingsAgentChannelSettings,
