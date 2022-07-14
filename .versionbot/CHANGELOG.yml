@@ -1,4 +1,84 @@
 - commits:
+    - subject: Fixup transformer-worker matching query.
+      hash: a7bd65f7bb4de640e55305eeb4593203f73c4c2f
+      body: |
+        Removes the unnecessary relationship 'triggered-action owns task'.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+    - subject: Adds contract for 'triggered action owns task' relationship.
+      hash: a2c23db0904666385490e05682047c1aa6959127
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+    - subject: Adds existing relationship 'any was built into any' and 'contract repo
+        contains any'.
+      hash: 68c5fe1571556f6e2dba7bd9e9c82a88cfafdae5
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+    - subject: Update transform link name references
+      hash: c7b8a64eb597fe04e403795ca9e4fa5224647364
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Fixup transformers relationship contracts typos.
+      hash: 98076f65331b2fff37d63f40e3f5207f08885563
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+    - subject: Add contract-repository contract, lint fix
+      hash: aae3931ee0e44be5b9e7bd62085b9e72fb00588a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+    - subject: Add relationships for transformers.
+      hash: fdf02e23821f772d8c196a0f73501e62f0a07c26
+      body: |
+        Adds the following relationships:
+        - Any was transformed into any
+        - Contract repository has member any
+        - Task has result any
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+  version: 31.1.1
+  title: "'Add relationships for transformers.'"
+  date: 2022-07-14T11:24:31.303Z
+- commits:
     - subject: Upgrade to Jellyscript 7.1.0 that supports COUNT_BY
       hash: 4e9385905a1319990253b9db2ed7643d28ec051f
       body: ""
