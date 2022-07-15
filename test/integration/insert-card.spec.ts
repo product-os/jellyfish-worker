@@ -72,11 +72,18 @@ describe('.insertCard()', () => {
 
 		assert(typeContract !== null);
 
+		// Will be used to filter and also as the slug of the created card
 		const command = autumndbTestUtils.generateRandomSlug({
 			prefix: 'originator-test',
 		});
 		const id = autumndbTestUtils.generateRandomId();
 
+		// Disabling worker.cacheRefreshInterval since we're adding to the triggers collection directly
+		ctx.worker.disableDataCache();
+
+		// Adds a trigger that will fire when a card with data.command = ${command}, whose action is an action-test-originator
+		// ( see beforeAll ) which forwards to actionCreateCard,
+		// meaning that it will call `insertCard`
 		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
 			Kernel.defaults<TriggeredActionData>({
@@ -107,7 +114,7 @@ describe('.insertCard()', () => {
 					arguments: {
 						reason: null,
 						properties: {
-							slug: command,
+							slug: command, // the created contract will have slug == command
 							version: '1.0.0',
 						},
 					},
@@ -115,6 +122,7 @@ describe('.insertCard()', () => {
 			}) as TriggeredActionContract,
 		]);
 
+		// We now insert a card that will fire the trigger action ( data.command = ${command})
 		await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -136,6 +144,7 @@ describe('.insertCard()', () => {
 
 		await ctx.flushAll(ctx.session);
 
+		// And validate that the card was created by the trigger ( slug == command)
 		const contract = await ctx.kernel.getContractBySlug(
 			ctx.logContext,
 			ctx.session,
@@ -157,6 +166,9 @@ describe('.insertCard()', () => {
 
 		const command = autumndbTestUtils.generateRandomSlug();
 		const id = autumndbTestUtils.generateRandomId();
+		// Disabling worker.cacheRefreshInterval since we're adding to the triggers collection directly
+		ctx.worker.disableDataCache();
+
 		ctx.worker.setTriggers(ctx.logContext, [
 			...ctx.worker.getTriggers(),
 			Kernel.defaults<TriggeredActionData>({
@@ -235,6 +247,9 @@ describe('.insertCard()', () => {
 		);
 
 		assert(typeContract !== null);
+
+		// Disabling worker.cacheRefreshInterval since we're adding to the triggers collection directly
+		ctx.worker.disableDataCache();
 
 		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.logContext, [
@@ -338,6 +353,9 @@ describe('.insertCard()', () => {
 		assert(typeContract !== null);
 
 		const command = autumndbTestUtils.generateRandomSlug();
+		// Disabling worker.cacheRefreshInterval since we're adding to the triggers collection directly
+		ctx.worker.disableDataCache();
+
 		ctx.worker.setTriggers(ctx.logContext, [
 			Kernel.defaults<TriggeredActionData>({
 				id: autumndbTestUtils.generateRandomId(),
@@ -412,6 +430,8 @@ describe('.insertCard()', () => {
 
 		assert(typeContract !== null);
 
+		// Disabling worker.cacheRefreshInterval since we're adding to the triggers collection directly
+		ctx.worker.disableDataCache();
 		const prefix = 'triggered-action-test';
 		const command1 = autumndbTestUtils.generateRandomSlug({ prefix });
 		const command2 = autumndbTestUtils.generateRandomSlug({ prefix });
@@ -530,6 +550,8 @@ describe('.insertCard()', () => {
 
 		assert(typeContract !== null);
 
+		// Disabling worker.cacheRefreshInterval since we're adding to the triggers collection directly
+		ctx.worker.disableDataCache();
 		const command1 = autumndbTestUtils.generateRandomSlug();
 		const command2 = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.setTriggers(ctx.logContext, [
@@ -1044,7 +1066,8 @@ describe('.insertCard()', () => {
 			[{ op: 'replace', path: '/data/prop', value: magicNumber }],
 		);
 
-		await ctx.flush(ctx.session);
+		// FIXME had to put flushAll here instead of flush. But now with flushAll like 100 eevnts appear!!!!
+		await ctx.flushAll(ctx.session);
 
 		const testContractAfterUpdate = await ctx.waitForMatch({
 			type: 'object',

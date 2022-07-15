@@ -147,6 +147,29 @@ export interface WorkerContext {
 	cards: {
 		[slug: string]: ContractDefinition<ContractData>;
 	};
+	executeAsyncTriggers: (
+		currentContract: Contract<
+			ContractData,
+			{ [key: string]: Array<Contract<ContractData, any>> }
+		> | null,
+		insertedContract:
+			| TypeContract
+			| Contract<
+					ContractData,
+					{ [key: string]: Array<Contract<ContractData, any>> }
+			  >,
+		options: {
+			actor: any;
+			originator: any;
+			attachEvents: any;
+			timestamp: string | number | Date;
+			reason: any;
+			eventType: any;
+			eventPayload: any;
+		},
+		currentTime: Date,
+		session: string,
+	) => Promise<void>;
 }
 
 export interface EnqueueOptions {

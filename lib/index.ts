@@ -108,6 +108,18 @@ const CONTRACT_TYPE_TYPE = 'type@1.0.0';
 const INSERT_CONCURRENCY = 3;
 
 /**
+ * @summary Queue priority for Async Triggers. Using a value that would give less priority to these actions
+ * @private
+ */
+const PRIORITY_FOR_ASYNC_TRIGGERS = 16;
+
+/**
+ * @summary Queue priority for Standard Triggers.
+ * @private
+ */
+const PRIORITY_FOR_STANDARD_TRIGGERS = 0;
+
+/**
  * @summary Query for stream to watch for new triggered action contracts
  * @private
  */
@@ -301,6 +313,7 @@ export class Worker {
 	id: string = '0';
 	sync: Sync;
 	private cacheRefreshInterval: null | NodeJS.Timeout = null;
+	initialized: boolean = false;
 
 	/**
 	 * @summary The Jellyfish Actions Worker
@@ -394,6 +407,7 @@ export class Worker {
 			if (!contract) {
 				return;
 			}
+
 			const current = await this.kernel.getContractBySlug(
 				logContext,
 				this.session,
@@ -440,12 +454,8 @@ export class Worker {
 			}
 		};
 
-		// Initialize producer and consumer
+		// Initialize producer. Consumer is initialized once all needed contracts are present
 		await this.producer.initialize(logContext);
-		await this.consumer.initializeWithEventHandler(
-			logContext,
-			onMessageEventHandler,
-		);
 
 		const [defaultTypeContracts, nonTypeContracts] = _.partition(
 			Object.values(contracts),
@@ -454,11 +464,21 @@ export class Worker {
 			},
 		);
 
+		const [defaultRelationshipContracts, nonRelationshipContracts] =
+			_.partition(Object.values(nonTypeContracts), (contract) => {
+				return contract.type.split('@')[0] === 'relationship';
+			});
+
 		const [defaultLoopContracts, defaultContracts] = _.partition(
-			Object.values(nonTypeContracts),
+			Object.values(nonRelationshipContracts),
 			(contract) => {
 				return contract.type.split('@')[0] === 'loop';
 			},
+		);
+
+		// Insert relationships as prerequisite
+		await Promise.all(
+			defaultRelationshipContracts.map(checkThenReplaceContract),
 		);
 
 		// Insert type contracts as prerequisite
@@ -504,6 +524,12 @@ export class Worker {
 
 		await Promise.all(contractsToLoad.map(checkThenReplaceContract));
 
+		// Initialize consumer
+		await this.consumer.initializeWithEventHandler(
+			logContext,
+			onMessageEventHandler,
+		);
+
 		// For better performance, commonly accessed contracts are stored in cache in the worker.
 		// Periodically poll for these contracts, so the worker always has the most up to date version of them.
 		await this.fetchCacheData(logContext);
@@ -512,6 +538,8 @@ export class Worker {
 		this.cacheRefreshInterval = setInterval(async () => {
 			await this.fetchCacheData(logContext);
 		}, 10 * 1000);
+
+		this.initialized = true;
 	}
 
 	async fetchCacheData(logContext: LogContext) {
@@ -611,6 +639,38 @@ export class Worker {
 				...CONTRACTS,
 				...self.getTypeContracts(),
 			},
+			executeAsyncTriggers: (
+				currentContract: Contract<
+					ContractData,
+					{ [key: string]: Array<Contract<ContractData, any>> }
+				> | null,
+				insertedContract:
+					| TypeContract
+					| Contract<
+							ContractData,
+							{ [key: string]: Array<Contract<ContractData, any>> }
+					  >,
+				options: {
+					actor: any;
+					originator: any;
+					attachEvents: any;
+					timestamp: string | number | Date;
+					reason: any;
+					eventType: any;
+					eventPayload: any;
+				},
+				currentTime: Date,
+				session: string,
+			) => {
+				return self.executeAsyncTriggers(
+					logContext,
+					currentContract,
+					insertedContract,
+					options,
+					session,
+					currentTime,
+				);
+			},
 		};
 	}
 
@@ -652,7 +712,7 @@ export class Worker {
 
 		object.type = `${typeContract.slug}@${typeContract.version}`;
 
-		if (typeof object.name !== 'string') {
+		if (object.name && typeof object.name !== 'string') {
 			Reflect.deleteProperty(object, 'name');
 		}
 
@@ -1534,209 +1594,6 @@ export class Worker {
 			return null;
 		}
 
-		evaluateTransformers({
-			transformers: this.latestTransformers,
-			oldContract: currentContract,
-			newContract: insertedContract,
-			logContext,
-			getTypeContract: (type) => {
-				return this.typeContracts[type];
-			},
-			query: (querySchema, queryOpts) => {
-				return this.kernel.query(
-					logContext,
-					workerContext.privilegedSession,
-					querySchema,
-					queryOpts,
-				);
-			},
-			executeAndAwaitAction: async (actionRequest) => {
-				const req = await this.insertCard(
-					logContext,
-					workerContext.privilegedSession,
-					this.typeContracts['action-request@1.0.0'],
-					{
-						actor: options.actor,
-						timestamp: new Date().toISOString(),
-					},
-					actionRequest,
-				);
-				const result = await this.producer.waitResults(
-					logContext,
-					req as ActionRequestContract,
-				);
-
-				return result;
-			},
-		});
-
-		subscriptionsLib
-			.evaluate({
-				oldContract: currentContract,
-				newContract: insertedContract,
-				getTypeContract: (type) => {
-					return this.typeContracts[type];
-				},
-				getSession: async (userId: string) => {
-					return utils.getActorKey(
-						logContext,
-						this.kernel,
-						workerContext.privilegedSession,
-						userId,
-					);
-				},
-				insertContract: async (
-					insertedContractType: TypeContract,
-					actorSession: string,
-					object: any,
-				) => {
-					return workerContext.insertCard(
-						actorSession,
-						insertedContractType,
-						{
-							...options,
-							attachEvents: true,
-							timestamp: Date.now(),
-						},
-						object,
-					);
-				},
-				query: (querySchema, queryOpts = {}) => {
-					return this.kernel.query(
-						logContext,
-						workerContext.privilegedSession,
-						querySchema,
-						queryOpts,
-					);
-				},
-				getContractById: (id: string) => {
-					return this.kernel.getContractById(logContext, session, id);
-				},
-			})
-			.catch((error) => {
-				const errorObject = serializeError(error, { maxDepth: 5 });
-
-				const logData = {
-					error: errorObject,
-					input: insertedContract.slug,
-				};
-
-				if (error.expected) {
-					logger.warn(logContext, 'Execute error in subscriptions', logData);
-				} else {
-					logger.error(logContext, 'Execute error', logData);
-				}
-			});
-
-		const sessionContract = await this.kernel.getContractById<SessionContract>(
-			logContext,
-			session,
-			session,
-		);
-		await Promise.all(
-			this.triggers.map(async (trigger: TriggeredActionContract) => {
-				try {
-					// Ignore triggered actions whose start date is in the future
-					if (currentTime < triggersLib.getStartDate(trigger)) {
-						return null;
-					}
-
-					const request = await triggersLib.getRequest(
-						this.kernel,
-						trigger,
-						currentContract,
-						insertedContract,
-						{
-							currentDate: new Date(),
-							mode: currentContract ? 'update' : 'insert',
-							logContext,
-							session,
-						},
-					);
-
-					if (!request) {
-						return null;
-					}
-
-					// trigger.target might result in multiple contracts in a single action request
-					const identifiers = _.uniq(_.castArray(request.card));
-
-					await Promise.all(
-						identifiers.map(async (identifier) => {
-							const triggerContract = await getInputContract(
-								logContext,
-								this.kernel,
-								session,
-								identifier,
-							);
-
-							if (!triggerContract) {
-								throw new errors.WorkerNoElement(
-									`No such input contract for trigger ${trigger.slug}: ${identifier}`,
-								);
-							}
-
-							logger.info(
-								logContext,
-								'Enqueing new action request due to triggered-action',
-								{
-									trigger: trigger.slug,
-									contract: triggerContract.id,
-									arguments: request.arguments,
-									session,
-									actor: sessionContract!.data.actor,
-								},
-							);
-
-							return this.insertCard(
-								request.logContext,
-								this.session,
-								this.typeContracts['action-request@1.0.0'],
-								{
-									timestamp: request.currentDate.toISOString(),
-									actor: sessionContract!.data.actor,
-									originator: options.originator || request.originator,
-								},
-								{
-									data: {
-										card: triggerContract.id,
-										action: request.action!,
-										actor: sessionContract!.data.actor,
-										context: request.logContext,
-										input: {
-											id: triggerContract.id,
-										},
-										epoch: request.currentDate.valueOf(),
-										timestamp: request.currentDate.toISOString(),
-										originator: options.originator || request.originator,
-										arguments: request.arguments,
-									},
-								},
-							);
-						}),
-					);
-				} catch (error: any) {
-					const errorObject = serializeError(error, { maxDepth: 5 });
-
-					const logData = {
-						error: errorObject,
-						input: insertedContract.slug,
-						trigger: trigger.slug,
-					};
-
-					if (error.expected) {
-						logger.warn(
-							logContext,
-							'Execute error in asynchronous trigger',
-							logData,
-						);
-					} else {
-						logger.error(logContext, 'Execute error', logData);
-					}
-				}
-			}),
-		);
-
 		if (options.attachEvents) {
 			const time = options.timestamp
 				? new Date(options.timestamp)
@@ -1891,6 +1748,22 @@ export class Worker {
 			}
 		}
 
+		const actionEvaluateTriggers =
+			insertedContract.data.action === 'action-evaluate-triggers@1.0.0';
+
+		// Avoid infinite loop
+		if (this.initialized && !actionEvaluateTriggers) {
+			// Create an action to evaluate the trigger-like objects ( triggers, subscriptions, transformers )
+			await this.createEvaluateTriggerAction(
+				logContext,
+				session,
+				currentTime,
+				currentContract,
+				insertedContract,
+				options,
+			);
+		}
+
 		// Add inserted action-request contracts to queue
 		if (insertedContract.type.split('@')[0] === 'action-request') {
 			await enqueue(
@@ -1898,6 +1771,11 @@ export class Worker {
 				this.pool,
 				options.actor,
 				insertedContract as ActionRequestContract,
+				{
+					priority: actionEvaluateTriggers
+						? PRIORITY_FOR_ASYNC_TRIGGERS
+						: PRIORITY_FOR_STANDARD_TRIGGERS,
+				},
 			);
 		}
 
@@ -1934,6 +1812,348 @@ export class Worker {
 					},
 				),
 		);
+	}
+
+	async executeAsyncTriggers(
+		logContext: LogContext,
+		currentContract: Contract<
+			ContractData,
+			{ [key: string]: Array<Contract<ContractData, any>> }
+		> | null,
+		insertedContract:
+			| TypeContract
+			| Contract<
+					ContractData,
+					{ [key: string]: Array<Contract<ContractData, any>> }
+			  >,
+		options: {
+			actor: any;
+			originator: any;
+			attachEvents: any;
+			timestamp: string | number | Date;
+			reason: any;
+			eventType: any;
+			eventPayload: any;
+		},
+		session: string,
+		currentTime: Date,
+	) {
+		await this.executeEvaluateTransformers(
+			logContext,
+			currentContract,
+			insertedContract,
+			options,
+		);
+
+		await this.executeSubscriptionsLib(
+			logContext,
+			currentContract,
+			insertedContract,
+			options,
+			session,
+		);
+
+		await this.executeTriggers(
+			logContext,
+			currentContract,
+			insertedContract,
+			currentTime,
+			options,
+			session,
+		);
+	}
+
+	private async executeTriggers(
+		logContext: LogContext,
+		currentContract: Contract<
+			ContractData,
+			{ [key: string]: Array<Contract<ContractData, any>> }
+		> | null,
+		insertedContract:
+			| TypeContract
+			| Contract<
+					ContractData,
+					{ [key: string]: Array<Contract<ContractData, any>> }
+			  >,
+		currentTime: Date,
+		options: {
+			actor: any;
+			originator: any;
+			attachEvents: any;
+			timestamp: string | number | Date;
+			reason: any;
+			eventType: any;
+			eventPayload: any;
+		},
+		session: string,
+	) {
+		const myLogContext = _.cloneDeep(logContext);
+		myLogContext.id = myLogContext.id + '-executeTriggers';
+		logContext = myLogContext;
+		logger.debug(myLogContext, 'executeTriggers:', {
+			slug: insertedContract.slug,
+			triggers: this.triggers,
+		});
+
+		const sessionContract = await this.kernel.getContractById<SessionContract>(
+			logContext,
+			session,
+			session,
+		);
+
+		await Promise.all(
+			this.triggers.map(async (trigger: TriggeredActionContract) => {
+				try {
+					// Ignore triggered actions whose start date is in the future
+					if (currentTime < triggersLib.getStartDate(trigger)) {
+						return null;
+					}
+
+					const request = await triggersLib.getRequest(
+						this.kernel,
+						trigger,
+						currentContract,
+						insertedContract,
+						{
+							currentDate: new Date(),
+							mode: currentContract ? 'update' : 'insert',
+							logContext,
+							session,
+						},
+					);
+
+					if (!request) {
+						return null;
+					}
+
+					// trigger.target might result in multiple contracts in a single action request
+					const identifiers = _.uniq(_.castArray(request.card));
+
+					await Promise.all(
+						identifiers.map(async (identifier) => {
+							const triggerContract = await getInputContract(
+								logContext,
+								this.kernel,
+								session,
+								identifier,
+							);
+
+							if (!triggerContract) {
+								throw new errors.WorkerNoElement(
+									`No such input contract for trigger ${trigger.slug}: ${identifier}`,
+								);
+							}
+
+							logger.info(
+								logContext,
+								'Inserting ( will enqueue ) new action request due to triggered-action',
+								{
+									trigger: trigger.slug,
+									contract: triggerContract.id,
+									arguments: request.arguments,
+									session,
+									actor: sessionContract!.data.actor,
+								},
+							);
+
+							return this.insertCard(
+								request.logContext,
+								this.session,
+								this.typeContracts['action-request@1.0.0'],
+								{
+									timestamp: request.currentDate.toISOString(),
+									actor: sessionContract!.data.actor,
+									originator: options.originator || request.originator,
+								},
+								{
+									data: {
+										card: triggerContract.id,
+										action: request.action!,
+										actor: sessionContract!.data.actor,
+										context: request.logContext,
+										input: {
+											id: triggerContract.id,
+										},
+										epoch: request.currentDate.valueOf(),
+										timestamp: request.currentDate.toISOString(),
+										originator: options.originator || request.originator,
+										arguments: request.arguments,
+									},
+								},
+							);
+						}),
+					);
+				} catch (error: any) {
+					const errorObject = serializeError(error, { maxDepth: 5 });
+
+					const logData = {
+						error: errorObject,
+						input: insertedContract.slug,
+						trigger: trigger.slug,
+					};
+
+					if (error.expected) {
+						logger.warn(
+							logContext,
+							'Execute error in asynchronous trigger',
+							logData,
+						);
+					} else {
+						logger.error(logContext, 'Execute error', logData);
+					}
+				}
+			}),
+		);
+	}
+
+	private async executeSubscriptionsLib(
+		logContext: LogContext,
+		currentContract: Contract<
+			ContractData,
+			{ [key: string]: Array<Contract<ContractData, any>> }
+		> | null,
+		insertedContract:
+			| TypeContract
+			| Contract<
+					ContractData,
+					{ [key: string]: Array<Contract<ContractData, any>> }
+			  >,
+		options: {
+			actor: any;
+			originator: any;
+			attachEvents: any;
+			timestamp: string | number | Date;
+			reason: any;
+			eventType: any;
+			eventPayload: any;
+		},
+		session: string,
+	) {
+		const myLogContext = _.cloneDeep(logContext);
+		myLogContext.id = myLogContext.id + '-executeSubscriptionsLib';
+		logContext = myLogContext;
+
+		await subscriptionsLib
+			.evaluate({
+				oldContract: currentContract,
+				newContract: insertedContract,
+				getTypeContract: (type) => {
+					return this.typeContracts[type];
+				},
+				getSession: async (userId: string) => {
+					return utils.getActorKey(
+						logContext,
+						this.kernel,
+						this.session,
+						userId,
+					);
+				},
+				insertContract: async (
+					insertedContractType: TypeContract,
+					actorSession: string,
+					object: any,
+				) => {
+					return this.insertCard(
+						logContext,
+						actorSession,
+						insertedContractType,
+						{
+							...options,
+							attachEvents: true,
+							timestamp: Date.now(),
+						},
+						object,
+					);
+				},
+				query: (querySchema, queryOpts = {}) => {
+					return this.kernel.query(
+						logContext,
+						this.session,
+						querySchema,
+						queryOpts,
+					);
+				},
+				getContractById: (id: string) => {
+					return this.kernel.getContractById(logContext, session, id);
+				},
+			})
+			.catch((error) => {
+				const errorObject = serializeError(error, { maxDepth: 5 });
+
+				const logData = {
+					error: errorObject,
+					input: insertedContract.slug,
+				};
+
+				if (error.expected) {
+					logger.warn(logContext, 'Execute error in subscriptions', logData);
+				} else {
+					logger.error(logContext, 'Execute error', logData);
+				}
+			});
+	}
+
+	private async executeEvaluateTransformers(
+		logContext: LogContext,
+		currentContract: Contract<
+			ContractData,
+			{ [key: string]: Array<Contract<ContractData, any>> }
+		> | null,
+		insertedContract:
+			| TypeContract
+			| Contract<
+					ContractData,
+					{ [key: string]: Array<Contract<ContractData, any>> }
+			  >,
+		options: {
+			actor: any;
+			originator: any;
+			attachEvents: any;
+			timestamp: string | number | Date;
+			reason: any;
+			eventType: any;
+			eventPayload: any;
+		},
+	) {
+		const myLogContext = _.cloneDeep(logContext);
+		myLogContext.id = myLogContext.id + '-executeEvaluateTransformers';
+		logContext = myLogContext;
+
+		evaluateTransformers({
+			transformers: this.latestTransformers,
+			oldContract: currentContract,
+			newContract: insertedContract,
+			logContext,
+			getTypeContract: (type) => {
+				return this.typeContracts[type];
+			},
+			query: (querySchema, queryOpts) => {
+				return this.kernel.query(
+					logContext,
+					this.session,
+					querySchema,
+					queryOpts,
+				);
+			},
+			executeAndAwaitAction: async (actionRequest) => {
+				const req = await this.insertCard(
+					logContext,
+					this.session,
+					this.typeContracts['action-request@1.0.0'],
+					{
+						actor: options.actor,
+						timestamp: new Date().toISOString(),
+					},
+					actionRequest,
+				);
+				const result = await this.producer.waitResults(
+					logContext,
+					req as ActionRequestContract,
+				);
+
+				return result;
+			},
+		});
 	}
 
 	/**
@@ -2008,8 +2228,10 @@ export class Worker {
 
 				// Enqueue new action-request
 				await enqueue(logContext, this.pool, actor, actionRequest, {
-					runAt,
-					contract: scheduledAction.id,
+					schedule: {
+						runAt,
+						contract: scheduledAction.id,
+					},
 				});
 			}
 		}
@@ -2021,5 +2243,100 @@ export class Worker {
 		if (this.cacheRefreshInterval) {
 			clearInterval(this.cacheRefreshInterval);
 		}
+	}
+
+	public async disableDataCache() {
+		if (this.cacheRefreshInterval) {
+			clearInterval(this.cacheRefreshInterval);
+		}
+	}
+
+	/**
+	 * Creates an action-evaluate-trigger that will process the trigger-like objects
+	 *
+	 */
+	private async createEvaluateTriggerAction(
+		logContext: LogContext,
+		session: string,
+		currentTime: Date,
+		currentContract: Contract<
+			ContractData,
+			{ [key: string]: Array<Contract<ContractData, any>> }
+		> | null,
+		insertedContract:
+			| Contract<
+					ContractData,
+					{ [key: string]: Array<Contract<ContractData, any>> }
+			  >
+			| TypeContract,
+		options: {
+			actor: any;
+			originator: any;
+			attachEvents: any;
+			timestamp: string | number | Date;
+			reason: any;
+			eventType: any;
+			eventPayload: any;
+		},
+	) {
+		const sessionContract = await this.kernel.getContractById<SessionContract>(
+			logContext,
+			session,
+			session,
+		);
+		const actionContract =
+			this.typeContracts['action-request@1.0.0'] ||
+			(await this.kernel.getContractBySlug<ActionContract>(
+				logContext,
+				this.session,
+				'action-request@1.0.0',
+			));
+
+		assert.INTERNAL(
+			logContext,
+			actionContract,
+			errors.WorkerNoElement,
+			`Invalid type: ${actionContract}`,
+		);
+
+		return this.insertCard(
+			logContext,
+			this.session,
+			actionContract,
+			{
+				timestamp: currentTime.toISOString(),
+				actor: sessionContract!.data.actor,
+				originator: options.originator,
+			},
+			{
+				data: {
+					action: 'action-evaluate-triggers@1.0.0',
+					card: insertedContract.id,
+					actor: sessionContract!.data.actor,
+					context: logContext,
+					input: {
+						id: insertedContract.id,
+					},
+					epoch: currentTime.valueOf(),
+					timestamp: currentTime.toISOString(),
+					originator: options.originator,
+					arguments: {
+						session,
+						currentTime: currentTime.toISOString(),
+						currentContract,
+						insertedContract,
+						options: {
+							actor: options.actor,
+							originator: options.originator,
+							attachEvents: options.attachEvents,
+							timestamp: currentTime.toISOString(),
+							reason: options.reason,
+							eventType: options.eventType,
+							eventPayload: options.eventPayload,
+						},
+					},
+				},
+			},
+		);
 	}
 }

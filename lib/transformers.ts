@@ -35,7 +35,11 @@ export const evaluate = async ({
 	query,
 	executeAndAwaitAction,
 }: EvaluateOptions): Promise<null> => {
-	if (!transformers || !Array.isArray(transformers)) {
+	if (
+		!transformers ||
+		!Array.isArray(transformers) ||
+		transformers.length === 0
+	) {
 		logger.info(logContext, 'No transformers');
 		return null;
 	}
@@ -184,16 +188,20 @@ export const evaluate = async ({
 	);
 
 	if (!results.includes(true)) {
-		logger.info(logContext, 'Did not execute any transformers', {
-			newContract: {
-				id: newContract.id,
-				type: newContract.type,
+		logger.info(
+			logContext,
+			`Did not execute any of ${transformers.length} transformers`,
+			{
+				newContract: {
+					id: newContract.id,
+					type: newContract.type,
+				},
+				oldContract: {
+					id: oldContract?.id,
+					type: oldContract?.type,
+				},
 			},
-			oldContract: {
-				id: oldContract?.id,
-				type: oldContract?.type,
-			},
-		});
+		);
 	}
 	return null;
 };

@@ -55,6 +55,26 @@ export interface QueueProducer {
 }
 
 /**
+ * Enqueing options, took from Graphile
+ * See https://github.com/graphile/worker#addjob
+ */
+export interface ProducerEnqueueOptions {
+	/**
+	 * Flags for the job, can be used to dynamically filter which jobs can and
+	 * cannot run at runtime. (Default: null)
+	 * See forbiddenFlags on the graphile doc
+	 */
+	flags?: string[];
+	/**
+	 * Jobs are executed in numerically ascending order of priority (jobs with a
+	 * numerically smaller priority are run first). (Default: 0)
+	 */
+	priority?: number;
+
+	schedule?: ProducerOptionsSchedule;
+}
+
+/**
  * @summary Get the next execute date-time for a scheduled action
  *
  * @param schedule - schedule configuration
@@ -117,7 +137,7 @@ export function getNextExecutionDate(
  * @param pool - database connection pool
  * @param actor - actor id
  * @param actionRequest - action request contract
- * @param schedule - scheduling options
+ * @param options - enqueueing options
  * @returns enqueued action request contract
  */
 export async function enqueue(
@@ -125,20 +145,40 @@ export async function enqueue(
 	pool: Pool,
 	actor: string,
 	actionRequest: ActionRequestContract,
-	schedule?: ProducerOptionsSchedule,
+	options?: ProducerEnqueueOptions,
 ): Promise<ActionRequestContract> {
+	// Note that jobNames must be unique for each parameter combination
 	let jobName = 'enqueue-action-request';
 	const jobParameters: string[] = [`'actionRequest'`, '$1'];
 	const values: any[] = [actionRequest];
 
+	let nextParam = 2;
+	if (options?.flags) {
+		jobParameters.push('flags := $' + nextParam++);
+		values.push(options.flags);
+		jobName = jobName + '-flags';
+	}
+
+	if (options?.priority) {
+		jobParameters.push('priority := $' + nextParam++);
+		values.push(options.priority);
+		jobName = jobName + '-prio';
+	}
+
 	// Handle scheduled actions
-	if (schedule) {
-		jobName = `enqueue-action-request-${uuidv4()}`;
-		jobParameters.push('run_at := $2', 'job_key := $3');
-		values.push(schedule.runAt, schedule.contract);
+	if (options?.schedule) {
+		jobName = jobName + uuidv4();
+		jobParameters.push(
+			'run_at := $' + nextParam++,
+			'job_key := $' + nextParam++,
+		);
+		values.push(options.schedule.runAt, options.schedule.contract);
 	}
 
 	logger.info(logContext, 'Enqueueing action request', {
+		options,
+		jobParameters,
+		values,
 		actor,
 		request: {
 			slug: actionRequest.slug,

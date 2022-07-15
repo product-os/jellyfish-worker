@@ -1,11 +1,14 @@
+import { getLogger } from '@balena/jellyfish-logger';
 import { strict as assert } from 'assert';
+import { Contract } from 'autumndb';
 import {
 	testUtils as autumndbTestUtils,
 	RelationshipContractDefinition,
 } from 'autumndb';
 import _ from 'lodash';
-import { testUtils, TransformerContract } from '../../lib';
+import { ActionRequestData, testUtils, TransformerContract } from '../../lib';
 
+const logger = getLogger(__filename);
 let ctx: testUtils.TestContext;
 let loop: any;
 
@@ -33,7 +36,7 @@ describe('transformers', () => {
 			},
 			{
 				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'transformer',
+					prefix: 'transformer-1-',
 				}),
 				type: ctx.worker.typeContracts['transformer@1.0.0'].type,
 				active: true,
@@ -194,7 +197,7 @@ describe('transformers', () => {
 			},
 			{
 				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'transformer',
+					prefix: 'transformer-2-',
 				}),
 				type: ctx.worker.typeContracts['transformer@1.0.0'].type,
 				active: true,
@@ -212,6 +215,7 @@ describe('transformers', () => {
 			},
 		);
 		assert(transformer);
+		await ctx.flushAll(ctx.session);
 
 		// Link the loop as the owner of the transformer
 		await ctx.createLink(loop, transformer, 'owns', 'is owned by');
@@ -267,11 +271,11 @@ describe('transformers', () => {
 				},
 			],
 		);
-		await ctx.flushAll(ctx.session);
 
-		// Assert than expected task contracts were created
+		// Assert that expected task contracts were created
 		await ctx.retry(
 			() => {
+				ctx.flushAll(ctx.session);
 				return ctx.kernel.query(ctx.logContext, ctx.session, {
 					type: 'object',
 					properties: {
@@ -354,7 +358,7 @@ describe('transformers', () => {
 			},
 			{
 				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'transformer',
+					prefix: 'transformer-3-',
 				}),
 				type: ctx.worker.typeContracts['transformer@1.0.0'].type,
 				active: true,
@@ -531,7 +535,7 @@ describe('transformers', () => {
 			},
 			{
 				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'transformer',
+					prefix: 'transformer-4-',
 				}),
 				type: ctx.worker.typeContracts['transformer@1.0.0'].type,
 				active: true,
@@ -658,7 +662,7 @@ describe('transformers', () => {
 			},
 			{
 				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'transformer',
+					prefix: 'transformer-5-',
 				}),
 				type: ctx.worker.typeContracts['transformer@1.0.0'].type,
 				active: true,
@@ -800,7 +804,7 @@ describe('transformers', () => {
 			},
 			{
 				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'transformer',
+					prefix: 'transformer-6-',
 				}),
 				type: ctx.worker.typeContracts['transformer@1.0.0'].type,
 				active: true,
@@ -895,7 +899,7 @@ describe('transformers', () => {
 				},
 				data: {
 					type: 'object',
-					required: ['status', 'transformer'],
+					required: ['status', 'transformer', 'input'],
 					properties: {
 						transformer: {
 							type: 'object',
@@ -906,10 +910,21 @@ describe('transformers', () => {
 								},
 							},
 						},
+						input: {
+							type: 'object',
+							properties: {
+								type: {
+									const: 'card@1.0.0',
+								},
+							},
+						},
 					},
 				},
 			},
 		});
+		if (tasks.length > 1) {
+			logger.error(ctx.logContext, 'unexpected task contracts created', tasks);
+		}
 		expect(tasks.length).toBe(1);
 
 		// Assert than only one link contract were created
@@ -943,10 +958,13 @@ describe('transformers', () => {
 						},
 						to: {
 							type: 'object',
-							required: ['type'],
+							required: ['id', 'type'],
 							properties: {
 								type: {
 									const: 'task@1.0.0',
+								},
+								id: {
+									const: tasks[0].id,
 								},
 							},
 						},
@@ -954,6 +972,9 @@ describe('transformers', () => {
 				},
 			},
 		});
+		if (links.length > 1) {
+			logger.error(ctx.logContext, 'unexpected link contracts created', links);
+		}
 		expect(links.length).toBe(1);
 	});
 
@@ -968,7 +989,7 @@ describe('transformers', () => {
 			},
 			{
 				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'transformer',
+					prefix: 'transformer-7-',
 				}),
 				type: ctx.worker.typeContracts['transformer@1.0.0'].type,
 				active: true,
@@ -1079,6 +1100,92 @@ describe('transformers', () => {
 			},
 		});
 		expect(task.length).toEqual(0);
+	});
+
+	test('should create an action-evaluate-triggers action if a transformer matches a contract', async () => {
+		// Process triggers created by method `beforeAll`
+		await ctx.flushAll(ctx.session);
+
+		// Insert a new transformer
+		const transformer = await ctx.worker.insertCard<TransformerContract>(
+			ctx.logContext,
+			ctx.session,
+			ctx.worker.typeContracts['transformer@1.0.0'],
+			{
+				actor: ctx.adminUserId,
+			},
+			{
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'transformer-',
+				}),
+				type: ctx.worker.typeContracts['transformer@1.0.0'].type,
+				active: true,
+				version: '1.0.0',
+				data: {
+					inputFilter: {
+						type: 'object',
+					},
+					$transformer: {
+						artifactReady: true,
+					},
+					workerFilter: {},
+					requirements: {},
+				},
+			},
+		);
+		assert(transformer);
+		// Process triggers created by inserting the transformer
+		await ctx.flushAll(ctx.session);
+
+		// Link the loop as the owner of the transformer
+		await ctx.createLink(loop, transformer, 'owns', 'is owned by');
+
+		// Wait for the stream to update the worker
+		await ctx.retry(
+			() => {
+				return _.concat(
+					_.filter(ctx.worker.transformers, { id: transformer.id }),
+					_.filter(ctx.worker.latestTransformers, { id: transformer.id }),
+				);
+			},
+			(matches: TransformerContract[]) => {
+				return matches.length === 2;
+			},
+			30,
+		);
+
+		// Insert a new contract
+		const newContractSlug = autumndbTestUtils.generateRandomId();
+		const contract = await ctx.worker.insertCard(
+			ctx.logContext,
+			ctx.session,
+			ctx.worker.typeContracts['card@1.0.0'],
+			{},
+			{
+				slug: newContractSlug,
+				type: 'card@1.0.0',
+				markers: [],
+				data: {
+					$transformer: {
+						artifactReady: false,
+					},
+				},
+			},
+		);
+		assert(contract);
+
+		const triggerActionRequest = await ctx.dequeueTrigger();
+		assert(triggerActionRequest);
+
+		const actionRequestData: ActionRequestData = (triggerActionRequest as any)
+			.data;
+
+		expect(actionRequestData.action).toEqual('action-evaluate-triggers@1.0.0');
+		expect(actionRequestData.card).toEqual(contract.id);
+		expect(actionRequestData.input.id).toEqual(contract.id);
+		expect(
+			(actionRequestData.arguments.insertedContract as Contract).slug,
+		).toEqual(newContractSlug);
 	});
 });
 

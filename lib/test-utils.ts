@@ -20,10 +20,12 @@ import { Action, ActionRequestContract, ExecuteContract, Map } from './types';
 export interface TestContext extends autumndbTestUtils.TestContext {
 	actor: string;
 	dequeue: (times?: number) => Promise<ActionRequestContract | null>;
+	dequeueTrigger: (times?: number) => Promise<ActionRequestContract | null>;
 	worker: Worker;
 	adminUserId: string;
 	actionLibrary: Map<Action>;
 	flush: (session: string) => Promise<void>;
+	flushTrigger: (session: string) => Promise<void>;
 	flushAll: (session: string) => Promise<void>;
 	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
 	processAction: (session: string, action: any) => Promise<any>;
@@ -72,6 +74,8 @@ export const newContext = async (
 	const autumndbTestContext = await autumndbTestUtils.newContext(options);
 
 	const consumedActionRequests: ActionRequestContract[] = [];
+	const consumedTriggeredActionRequests: ActionRequestContract[] = [];
+
 	const dequeue = async (
 		times: number = 50,
 	): Promise<ActionRequestContract | null> => {
@@ -80,6 +84,21 @@ export const newContext = async (
 				return consumedActionRequests.shift()!;
 			}
 
+			await new Promise((resolve) => {
+				setTimeout(resolve, 10);
+			});
+		}
+
+		return null;
+	};
+
+	const dequeueTrigger = async (
+		times: number = 50,
+	): Promise<ActionRequestContract | null> => {
+		for (let i = 0; i < times; i++) {
+			if (consumedTriggeredActionRequests.length > 0) {
+				return consumedTriggeredActionRequests.shift()!;
+			}
 			await new Promise((resolve) => {
 				setTimeout(resolve, 10);
 			});
@@ -112,6 +131,10 @@ export const newContext = async (
 	await worker.initialize(
 		autumndbTestContext.logContext,
 		async (payload: ActionRequestContract) => {
+			if (payload.data.action === 'action-evaluate-triggers@1.0.0') {
+				consumedTriggeredActionRequests.push(payload);
+				return;
+			}
 			consumedActionRequests.push(payload);
 		},
 	);
@@ -120,6 +143,18 @@ export const newContext = async (
 		const request = await dequeue();
 		if (!request) {
 			throw new Error('No message dequeued');
+		}
+
+		const result = await worker.execute(session, request);
+		if (result.error) {
+			throw new Error(result.data.message);
+		}
+	};
+
+	const flushTrigger = async (session: string) => {
+		const request = await dequeueTrigger();
+		if (!request) {
+			throw new Error('No trigger message dequeued');
 		}
 
 		const result = await worker.execute(session, request);
@@ -150,14 +185,29 @@ export const newContext = async (
 	};
 
 	const flushAll = async (session: string) => {
-		try {
-			while (true) {
-				await flush(session);
+		await new Promise((resolve) => {
+			setTimeout(resolve, 10);
+		});
+		while (
+			consumedActionRequests.length + consumedTriggeredActionRequests.length >
+			0
+		) {
+			try {
+				while (true) {
+					await flush(session);
+				}
+			} catch {
+				// Once an error is thrown, there are no more requests to dequeue.
 			}
-		} catch {
-			// Once an error is thrown, there are no more requests to dequeue.
-			return;
+			try {
+				while (true) {
+					await flushTrigger(session);
+				}
+			} catch {
+				// Once an error is thrown, there are no more requests to dequeue.
+			}
 		}
+		return;
 	};
 
 	const processAction = async (
@@ -333,9 +383,11 @@ export const newContext = async (
 	return {
 		actor: uuid(),
 		dequeue,
+		dequeueTrigger,
 		adminUserId: adminSessionContract.data.actor,
 		actionLibrary,
 		flush,
+		flushTrigger,
 		waitForMatch,
 		flushAll,
 		processAction,

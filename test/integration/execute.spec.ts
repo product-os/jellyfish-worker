@@ -182,6 +182,7 @@ describe('.execute()', () => {
 		assert(typeContract !== null);
 		assert(actionContract !== null);
 
+		ctx.worker.disableDataCache();
 		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
@@ -421,6 +422,7 @@ describe('.execute()', () => {
 		assert(typeContract !== null);
 		assert(actionContract !== null);
 
+		ctx.worker.disableDataCache();
 		const command = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,
@@ -1228,6 +1230,7 @@ describe('.execute()', () => {
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomId());
 		const session = await ctx.createSession(user);
 
+		ctx.worker.disableDataCache();
 		const foo = autumndbTestUtils.generateRandomSlug();
 		ctx.worker.upsertTrigger(
 			ctx.logContext,

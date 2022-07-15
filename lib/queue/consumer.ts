@@ -1,7 +1,7 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
-import { Logger } from '@graphile/logger';
+import { Logger, LogLevel, LogMeta } from '@graphile/logger';
 import type { Kernel, LinkContract } from 'autumndb';
 import * as graphileWorker from 'graphile-worker';
 import _ from 'lodash';
@@ -122,13 +122,18 @@ export class Consumer implements QueueConsumer {
 				pgPool: this.pool,
 				concurrency: defaultEnvironment.queue.concurrency,
 				pollInterval: 1000,
-				logger: new Logger((_scope) => {
-					return _.noop;
-				}),
+				logger: new Logger(graphileLoggerToJellyfishLogger(logContext)),
 				taskList: {
-					actionRequest: async (result) => {
+					actionRequest: async (graphilePayload, helpers) => {
 						// TS-TODO: Update graphile types to support Task list type parmaeterisation so we don't need to cast
-						const payload = result as ActionRequestContract;
+						const payload = graphilePayload as ActionRequestContract;
+						helpers.logger.debug('Consuming job', {
+							priority: helpers.job.priority,
+							id: helpers.job.id,
+							created_at: helpers.job.created_at?.valueOf(),
+							slug: payload?.slug,
+							action: payload?.data?.action,
+						});
 						const action = payload.data.action.split('@')[0];
 						try {
 							this.messagesBeingHandled++;
@@ -215,4 +220,27 @@ export class Consumer implements QueueConsumer {
 
 		return eventContract;
 	}
+}
+function graphileLoggerToJellyfishLogger(logContext: LogContext) {
+	return (_scope) => {
+		return (level: LogLevel, message: string, meta?: LogMeta) => {
+			switch (level) {
+				case LogLevel.ERROR:
+					logger.error(logContext, message, meta);
+					break;
+				case LogLevel.WARNING:
+					logger.warn(logContext, message, meta);
+					break;
+				case LogLevel.INFO:
+					logger.info(logContext, message, meta);
+					break;
+				case LogLevel.DEBUG:
+					logger.debug(logContext, message, meta);
+					break;
+				default: // There are no other levels but just in case they're added
+					logger.debug(logContext, message, meta);
+					break;
+			}
+		};
+	};
 }

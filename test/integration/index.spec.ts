@@ -1569,6 +1569,7 @@ describe('Worker', () => {
 				},
 			);
 		assert(createUserRequest);
+
 		await ctx.flushAll(ctx.session);
 
 		const signupResult: any = await ctx.worker.producer.waitResults(
@@ -1606,6 +1607,7 @@ describe('Worker', () => {
 			},
 		);
 		assert(loginRequest);
+
 		await ctx.flushAll(ctx.session);
 
 		const loginResult: any = await ctx.worker.producer.waitResults(
@@ -1897,6 +1899,7 @@ describe('Worker', () => {
 	it('a triggered action can update a dynamic list of contracts (ids as array of strings)', async () => {
 		const contractIds: string[] = [];
 		const slug = autumndbTestUtils.generateRandomSlug();
+		// Insert 3 contracts with slug = 'target-card' + random slug+id
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
 				const contract = await ctx.kernel.insertContract(
@@ -1915,6 +1918,8 @@ describe('Worker', () => {
 			}),
 		);
 
+		ctx.worker.disableDataCache();
+		// Create a triggered-action that triggers an action-update-card when a contract with a data.cards property is inserted
 		ctx.worker.setTriggers(ctx.logContext, [
 			Kernel.defaults<TriggeredActionData>({
 				id: autumndbTestUtils.generateRandomId(),
@@ -1966,6 +1971,8 @@ describe('Worker', () => {
 		);
 		assert(typeContract);
 
+		// Insert an action-crete-card action that creates a card contract that will trigger the action above
+		// because it has the data.cards property
 		const request = await ctx.worker.insertCard<ActionRequestContract>(
 			ctx.logContext,
 			ctx.session,
@@ -2004,6 +2011,7 @@ describe('Worker', () => {
 		expect(result.error).toBe(false);
 		await ctx.flushAll(ctx.session);
 
+		// All contracts should have their "data.updated" property to true
 		await Promise.all(
 			[1, 2, 3].map(async (idx) => {
 				const contract = await ctx.kernel.getContractBySlug(
@@ -2038,6 +2046,7 @@ describe('Worker', () => {
 			}),
 		);
 
+		ctx.worker.disableDataCache();
 		ctx.worker.setTriggers(ctx.logContext, [
 			Kernel.defaults<TriggeredActionData>({
 				id: 'cb3523c5-b37d-41c8-ae32-9e7cc9309165',
@@ -2207,6 +2216,7 @@ describe('Worker', () => {
 			},
 		);
 
+		ctx.worker.disableDataCache();
 		ctx.worker.setTriggers(ctx.logContext, [
 			Kernel.defaults<TriggeredActionData>({
 				id: autumndbTestUtils.generateRandomId(),
@@ -3624,7 +3634,7 @@ describe('scheduled actions', () => {
 		await new Promise((resolve) => {
 			setTimeout(resolve, 10000);
 		});
-		await ctx.flush(ctx.session);
+		await ctx.flushAll(ctx.session);
 
 		// Check that the expected contract was created
 		await ctx.waitForMatch({
