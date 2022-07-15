@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add relationship between loops and threads
+      hash: 1af573eb285cc27a2b9a52b8d3551d98d63d1b92
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 31.3.0
+  title: "'Add relationship between loops and threads'"
+  date: 2022-07-15T09:31:06.392Z
+- commits:
     - subject: Bring in plugin-product-os
       hash: 3dea854e10182e0d69e6c58a69bc0c3ab017ebf7
       body: |
