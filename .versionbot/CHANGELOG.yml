@@ -1,4 +1,20 @@
 - commits:
+    - subject: Bring in plugin-product-os
+      hash: 3dea854e10182e0d69e6c58a69bc0c3ab017ebf7
+      body: |
+        Bring in jellyfish-plugin-product-os as a prereq to bringing in
+        jellyfish-plugin-default.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 31.2.0
+  title: "'Bring in plugin-product-os'"
+  date: 2022-07-15T03:03:09.697Z
+- commits:
     - subject: Fixup transformer-worker matching query.
       hash: a7bd65f7bb4de640e55305eeb4593203f73c4c2f
       body: |
