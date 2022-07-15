@@ -1,4 +1,26 @@
 - commits:
+    - subject: Process trigger-like objects asynchronously
+      hash: d8d02bed97de5b7c502d94f2e35ca782a98e45c5
+      body: >
+        Instead of evaluating triggers, transformers and subscription on the
+        commit() method, an `action-evaluate-triggers` is pushed to the graphile
+        queue that will execute them asynchronously and with a lower priority.
+
+        This will give higher priority to the online tasks ( user or app inserting a contract ) over the trigger-like actions that can be done asyncronously
+
+
+        See https://jel.ly.fish/improvement-jip-improve-performance-triggers-47b1dc8
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+        signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+      author: Ramiro González Maciel
+      nested: []
+  version: 31.5.0
+  title: "'async triggers'"
+  date: 2022-07-15T17:52:17.351Z
+- commits:
     - subject: Add relationship between loops and channels
       hash: 436dac98e672fe4ab8106d1bcb45a7160b21f849
       body: |
