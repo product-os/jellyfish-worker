@@ -25,15 +25,15 @@ export type {
 	ChannelData,
 } from './channel';
 export type {
-	ContractRepositoryContract,
-	ContractRepositoryContractDefinition,
-	ContractRepositoryData,
-} from './contract-repository';
-export type {
 	ContactContract,
 	ContactContractDefinition,
 	ContactData,
 } from './contact';
+export type {
+	ContractRepositoryContract,
+	ContractRepositoryContractDefinition,
+	ContractRepositoryData,
+} from './contract-repository';
 export type {
 	CreateContract,
 	CreateContractDefinition,

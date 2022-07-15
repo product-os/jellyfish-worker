@@ -27,6 +27,7 @@ import { relationshipContactIsOwnedByUser } from './relationship-contact-is-owne
 import { relationshipContractRepositoryHasMemberAny } from './relationship-contract-repository-has-member-any';
 import { relationshipCreateIsAttachedToAny } from './relationship-create-is-attached-to-any';
 import { relationshipExecuteExecutesActionRequest } from './relationship-execute-executes-action-request';
+import { relationshipLoopHasThread } from './relationship-loop-has-thread';
 import { relationshipLoopOwnsTransformer } from './relationship-loop-owns-transformer';
 import { relationshipTaskGeneratedAny } from './relationship-task-generated-any';
 import { relationshipTransformerGeneratedTask } from './relationship-transformer-generated-task';
@@ -85,6 +86,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipContractRepositoryHasMemberAny,
 	relationshipCreateIsAttachedToAny,
 	relationshipExecuteExecutesActionRequest,
+	relationshipLoopHasThread,
 	relationshipLoopOwnsTransformer,
 	relationshipTaskGeneratedAny,
 	relationshipTransformerGeneratedTask,
