@@ -447,15 +447,25 @@ export class Worker {
 			onMessageEventHandler,
 		);
 
-		const [defaultTypeContracts, defaultContracts] = _.partition(
+		const [defaultTypeContracts, nonTypeContracts] = _.partition(
 			Object.values(contracts),
 			(contract) => {
 				return contract.type.split('@')[0] === 'type';
 			},
 		);
 
+		const [defaultLoopContracts, defaultContracts] = _.partition(
+			Object.values(nonTypeContracts),
+			(contract) => {
+				return contract.type.split('@')[0] === 'loop';
+			},
+		);
+
 		// Insert type contracts as prerequisite
 		await Promise.all(defaultTypeContracts.map(checkThenReplaceContract));
+
+		// Insert loop contracts as prerequisite
+		await Promise.all(defaultLoopContracts.map(checkThenReplaceContract));
 
 		// Insert other worker contracts
 		await Promise.all(defaultContracts.map(checkThenReplaceContract));
