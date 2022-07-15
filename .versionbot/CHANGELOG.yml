@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add relationship between loops and channels
+      hash: 436dac98e672fe4ab8106d1bcb45a7160b21f849
+      body: |
+        Fixes https://github.com/product-os/jellyfish/issues/8852
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 31.4.0
+  title: "'Add relationship between loops and channels'"
+  date: 2022-07-15T10:14:07.271Z
+- commits:
     - subject: Add relationship between loops and threads
       hash: 1af573eb285cc27a2b9a52b8d3551d98d63d1b92
       body: ""
