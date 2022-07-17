@@ -339,11 +339,7 @@ describe('Worker', () => {
 	});
 
 	it('should not re-enqueue requests after duplicated execute events', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -407,11 +403,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on insertion', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'type@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['type@1.0.0'];
 		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -679,11 +671,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch move', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'type@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['type@1.0.0'];
 		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -850,11 +838,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch copy', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'type@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['type@1.0.0'];
 		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -1021,11 +1005,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch replace', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'type@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['type@1.0.0'];
 		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -1190,11 +1170,7 @@ describe('Worker', () => {
 	});
 
 	it('should evaluate a simple computed property on a JSON Patch addition', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'type@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['type@1.0.0'];
 		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -1357,11 +1333,7 @@ describe('Worker', () => {
 	});
 
 	it('should throw if the result of the formula is incompatible with the given type', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'type@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['type@1.0.0'];
 		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -1455,11 +1427,7 @@ describe('Worker', () => {
 	});
 
 	it('should not re-enqueue requests after execute failure', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract);
 
 		await ctx.worker.insertCard(
@@ -1528,11 +1496,7 @@ describe('Worker', () => {
 	});
 
 	it('should be able to login as a user with a password', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'user@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['user@1.0.0'];
 		assert(typeContract);
 
 		const request1: any = await ctx.worker.pre(ctx.session, {
@@ -1809,11 +1773,7 @@ describe('Worker', () => {
 	});
 
 	it('should fail if signing up with the wrong password', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'user@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['user@1.0.0'];
 		assert(typeContract);
 
 		const request1: any = await ctx.worker.pre(ctx.session, {
@@ -1959,11 +1919,7 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract);
 
 		const request = await ctx.worker.insertCard<ActionRequestContract>(
@@ -2091,11 +2047,7 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract);
 
 		const request = await ctx.worker.insertCard<ActionRequestContract>(
@@ -2262,11 +2214,7 @@ describe('Worker', () => {
 			}) as TriggeredActionContract,
 		]);
 
-		const typeContract = await ctx.kernel.getContractBySlug(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract);
 
 		const userJohnDoe = await ctx.createUser(
@@ -2328,12 +2276,7 @@ describe('.getTriggers()', () => {
 
 describe('.replaceCard()', () => {
 	test('should update type contract schema', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'type@latest',
-		);
-
+		const typeContract = ctx.worker.typeContracts['type@1.0.0'];
 		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -2398,12 +2341,7 @@ describe('.replaceCard()', () => {
 	});
 
 	test('updating a contract must have the correct tail', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -2498,12 +2436,7 @@ describe('.replaceCard()', () => {
 	});
 
 	test('should be able to disable event creation', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -2552,12 +2485,7 @@ describe('.replaceCard()', () => {
 
 describe('.insertCard()', () => {
 	test('should insert a contract', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract !== null);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
@@ -2601,13 +2529,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should ignore an explicit type property', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const result = await ctx.worker.insertCard(
@@ -2646,12 +2569,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should default active to true', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -2676,12 +2595,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set active to false', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -2707,12 +2622,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for links', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -2737,12 +2648,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for tags', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -2767,12 +2674,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should provide sane defaults for data', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -2797,13 +2700,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set a slug', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 
 		const slug = autumndbTestUtils.generateRandomSlug();
 		const result = await ctx.worker.insertCard(
@@ -2830,12 +2728,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should be able to set a name', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -2868,12 +2762,8 @@ describe('.insertCard()', () => {
 			version: '1.0.0',
 		});
 
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		await expect(
 			ctx.worker.insertCard(
 				ctx.logContext,
@@ -2893,12 +2783,8 @@ describe('.insertCard()', () => {
 	});
 
 	test('should add a create event if attachEvents is true', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -2943,13 +2829,8 @@ describe('.insertCard()', () => {
 
 describe('.patchCard()', () => {
 	test('should ignore pointless updates', async () => {
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result1 = await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
@@ -3019,12 +2900,8 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		await ctx.worker.patchCard(
 			ctx.logContext,
 			ctx.session,
@@ -3048,12 +2925,8 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		await ctx.worker.patchCard(
 			ctx.logContext,
 			ctx.session,
@@ -3091,12 +2964,8 @@ describe('.patchCard()', () => {
 			},
 		);
 
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		const result = await ctx.worker.patchCard(
 			ctx.logContext,
 			ctx.session,
@@ -3153,12 +3022,8 @@ describe('.patchCard()', () => {
 			},
 		});
 
-		const typeContract = await ctx.kernel.getContractBySlug<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			'card@latest',
-		);
-		assert(typeContract !== null);
+		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
+		assert(typeContract);
 		await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
 			type: 'triggered-action@1.0.0',
 			slug: autumndbTestUtils.generateRandomSlug({
@@ -3627,22 +3492,25 @@ describe('scheduled actions', () => {
 		await ctx.flush(ctx.session);
 
 		// Check that the expected contract was created
-		await ctx.waitForMatch({
-			type: 'object',
-			required: ['data'],
-			properties: {
-				data: {
-					type: 'object',
-					required: ['foo'],
-					properties: {
-						foo: {
-							type: 'string',
-							const: foo,
+		await ctx.waitForMatch(
+			{
+				type: 'object',
+				required: ['data'],
+				properties: {
+					data: {
+						type: 'object',
+						required: ['foo'],
+						properties: {
+							foo: {
+								type: 'string',
+								const: foo,
+							},
 						},
 					},
 				},
 			},
-		});
+			50,
+		);
 
 		// Check that no new job is enqueued
 		const job = await ctx.pool.query({

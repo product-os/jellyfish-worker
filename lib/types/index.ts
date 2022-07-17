@@ -169,79 +169,9 @@ export interface Map<T> {
 	[key: string]: T;
 }
 
-export type TriggeredActionData = TriggeredActionData1 & TriggeredActionData2;
-export type TriggeredActionData2 = {
-	[k: string]: unknown;
-};
-
-export interface TriggeredActionData1 {
-	mode?: 'insert' | 'update';
-	type?: string;
-	action?: string;
-	filter?: {
-		[k: string]: unknown;
-	};
-	target?:
-		| string
-		| {
-				[k: string]: unknown;
-		  }
-		| string[];
-	interval?: string;
-	/**
-	 * Indicates whether the triggered action should be executed synchronously, asynchronously or enqueued
-	 */
-	schedule?: 'async' | 'sync' | 'enqueue';
-	arguments?: {
-		[k: string]: unknown;
-	};
-	startDate?: string;
-	[k: string]: unknown;
+export interface GoogleMeetCredentials {
+	project_id: string;
+	client_email: string;
+	private_key: string;
+	client_id: string;
 }
-
-export interface TriggeredActionContractDefinition
-	extends ContractDefinition<TriggeredActionData> {}
-
-export interface TriggeredActionContract
-	extends Contract<TriggeredActionData> {}
-
-export interface TransformerData {
-	data: {
-		requirements: {
-			os?: string;
-			architecture?: string;
-			[k: string]: unknown;
-		};
-		inputFilter: {
-			[k: string]: unknown;
-		};
-		workerFilter: {
-			[k: string]: unknown;
-		};
-		[k: string]: unknown;
-	};
-	[k: string]: unknown;
-}
-
-export interface TransformerContractDefinition
-	extends Omit<ContractDefinition, 'data'>,
-		TransformerData {}
-
-export interface TransformerContract
-	extends Omit<Contract, 'data'>,
-		TransformerData {}
-
-export interface ChannelData {
-	/**
-	 * Contracts matching this filter will be handled by the channel
-	 */
-	filter: {
-		[k: string]: unknown;
-	};
-	[k: string]: unknown;
-}
-
-export interface ChannelContractDefinition
-	extends ContractDefinition<ChannelData> {}
-
-export interface ChannelContract extends Contract<ChannelData> {}

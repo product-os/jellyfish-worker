@@ -8,7 +8,7 @@ export const viewAllViews: ViewContractDefinition = {
 	data: {
 		allOf: [
 			{
-				name: 'Contract type view',
+				name: 'Card type view',
 				schema: {
 					type: 'object',
 					anyOf: [
