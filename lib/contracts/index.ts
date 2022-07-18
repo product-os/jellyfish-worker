@@ -29,6 +29,7 @@ import { relationshipCreateIsAttachedToAny } from './relationship-create-is-atta
 import { relationshipExecuteExecutesActionRequest } from './relationship-execute-executes-action-request';
 import { relationshipLoopHasThread } from './relationship-loop-has-thread';
 import { relationshipLoopOwnsTransformer } from './relationship-loop-owns-transformer';
+import { relationshipLoopHasSubLoop } from './relationship-loop-has-sub-loop';
 import { relationshipTaskGeneratedAny } from './relationship-task-generated-any';
 import { relationshipTransformerGeneratedTask } from './relationship-transformer-generated-task';
 import { relationshipTaskHasResultAny } from './relationship-task-has-result-any';
@@ -88,6 +89,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipExecuteExecutesActionRequest,
 	relationshipLoopHasThread,
 	relationshipLoopOwnsTransformer,
+	relationshipLoopHasSubLoop,
 	relationshipTaskGeneratedAny,
 	relationshipTransformerGeneratedTask,
 	relationshipTaskHasResultAny,
