@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add sub-loop relationship
+      hash: 43e7db810204f26a045bd4aa23cd98a28ac2192c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 31.4.1
+  title: "'Add sub-loop relationship'"
+  date: 2022-07-18T08:55:05.857Z
+- commits:
     - subject: Add relationship between loops and channels
       hash: 436dac98e672fe4ab8106d1bcb45a7160b21f849
       body: |
