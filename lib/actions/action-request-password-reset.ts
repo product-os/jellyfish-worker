@@ -1,5 +1,5 @@
 import { getLogger } from '@balena/jellyfish-logger';
-import type { Contract, TypeContract } from 'autumndb';
+import type { AutumnDBSession, Contract, TypeContract } from 'autumndb';
 import crypto from 'crypto';
 import { actionSendEmail } from './action-send-email';
 import { PASSWORDLESS_USER_HASH } from './constants';
@@ -20,9 +20,9 @@ const logger = getLogger(__filename);
  * @returns user card
  */
 export async function getUserBySlug(
-	session: string,
+	session: AutumnDBSession,
 	query: (
-		session: string,
+		session: AutumnDBSession,
 		query: object,
 		options: object,
 	) => Promise<Contract[]>,

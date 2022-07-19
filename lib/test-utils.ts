@@ -1,9 +1,9 @@
 import { strict as assert } from 'assert';
 import {
+	AutumnDBSession,
 	testUtils as autumndbTestUtils,
 	Contract,
 	LinkContract,
-	SessionContract,
 } from 'autumndb';
 import permutations from 'just-permutations';
 import _ from 'lodash';
@@ -23,20 +23,20 @@ export interface TestContext extends autumndbTestUtils.TestContext {
 	worker: Worker;
 	adminUserId: string;
 	actionLibrary: Map<Action>;
-	flush: (session: string) => Promise<void>;
-	flushAll: (session: string) => Promise<void>;
+	flush: (session: AutumnDBSession) => Promise<void>;
+	flushAll: (session: AutumnDBSession) => Promise<void>;
 	waitForMatch: <T extends Contract>(query: any, times?: number) => Promise<T>;
-	processAction: (session: string, action: any) => Promise<any>;
+	processAction: (session: AutumnDBSession, action: any) => Promise<any>;
 	createEvent: (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		target: Contract,
 		body: string,
 		type: string,
 	) => Promise<any>;
 	createLinkThroughWorker: (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		fromContract: Contract,
 		toContract: Contract,
 		verb: string,
@@ -44,7 +44,7 @@ export interface TestContext extends autumndbTestUtils.TestContext {
 	) => Promise<LinkContract>;
 	createContract: (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		type: string,
 		name: string | null,
 		data: any,
@@ -52,20 +52,20 @@ export interface TestContext extends autumndbTestUtils.TestContext {
 	) => Promise<Contract>;
 	createSupportThread: (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		name: string | null,
 		data: any,
 		markers?: any,
 	) => Promise<Contract>;
 	createMessage: (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		target: Contract,
 		body: string,
 	) => Promise<Contract>;
 	createWhisper: (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		target: Contract,
 		body: string,
 	) => Promise<Contract>;
@@ -107,14 +107,6 @@ export const newContext = async (
 		return null;
 	};
 
-	const adminSessionContract =
-		(await autumndbTestContext.kernel.getContractById(
-			autumndbTestContext.logContext,
-			autumndbTestContext.session,
-			autumndbTestContext.session,
-		)) as SessionContract;
-	assert(adminSessionContract);
-
 	// Initialize plugins.
 	const pluginManager = new PluginManager(options.plugins || []);
 
@@ -135,7 +127,7 @@ export const newContext = async (
 		},
 	);
 
-	const flush = async (session: string) => {
+	const flush = async (session: AutumnDBSession) => {
 		const request = await dequeue();
 		if (!request) {
 			throw new Error('No message dequeued');
@@ -168,7 +160,7 @@ export const newContext = async (
 		return waitForMatch<T>(waitQuery, times - 1);
 	};
 
-	const flushAll = async (session: string) => {
+	const flushAll = async (session: AutumnDBSession) => {
 		try {
 			while (true) {
 				await flush(session);
@@ -180,7 +172,7 @@ export const newContext = async (
 	};
 
 	const processAction = async (
-		session: string,
+		session: AutumnDBSession,
 		action: ActionRequestContract,
 	) => {
 		const createRequest = await worker.insertCard(
@@ -203,7 +195,7 @@ export const newContext = async (
 
 	const createEvent = async (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		target: Contract,
 		body: string,
 		type: string,
@@ -261,7 +253,7 @@ export const newContext = async (
 
 	const createLinkThroughWorker = async (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		fromContract: Contract,
 		toContract: Contract,
 		verb: string,
@@ -313,7 +305,7 @@ export const newContext = async (
 
 	const createContract = async (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		type: string,
 		name: string | null,
 		data: any,
@@ -351,7 +343,7 @@ export const newContext = async (
 
 	const createSupportThread = async (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		name: string | null,
 		data: any,
 		markers = [],
@@ -368,7 +360,7 @@ export const newContext = async (
 
 	const createMessage = (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		target: Contract,
 		body: string,
 	) => {
@@ -377,7 +369,7 @@ export const newContext = async (
 
 	const createWhisper = (
 		actor: string,
-		session: string,
+		session: AutumnDBSession,
 		target: Contract,
 		body: string,
 	) => {
@@ -387,7 +379,7 @@ export const newContext = async (
 	return {
 		actor: uuid(),
 		dequeue,
-		adminUserId: adminSessionContract.data.actor,
+		adminUserId: autumndbTestContext.session.actor.id,
 		actionLibrary,
 		flush,
 		waitForMatch,

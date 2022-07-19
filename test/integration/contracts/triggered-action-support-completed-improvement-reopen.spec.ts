@@ -1,15 +1,19 @@
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	AutumnDBSession,
+	testUtils as autumndbTestUtils,
+	UserContract,
+} from 'autumndb';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
-let user: any = {};
-let session: any = {};
+let user: UserContract;
+let session: AutumnDBSession;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
 	user = await ctx.createUser(autumndbTestUtils.generateRandomId());
-	session = await ctx.createSession(user);
+	session = { actor: user };
 });
 
 afterAll(() => {
@@ -19,7 +23,7 @@ afterAll(() => {
 test('should re-open a closed support thread if an improvement attached to an attached pattern is completed', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'closed',
@@ -27,7 +31,7 @@ test('should re-open a closed support thread if an improvement attached to an at
 	);
 	const pattern = await ctx.createContract(
 		user.id,
-		session.id,
+		session,
 		'pattern@1.0.0',
 		'My pattern',
 		{
@@ -36,7 +40,7 @@ test('should re-open a closed support thread if an improvement attached to an at
 	);
 	await ctx.createLinkThroughWorker(
 		user.id,
-		session.id,
+		session,
 		supportThread,
 		pattern,
 		'has attached',
@@ -44,7 +48,7 @@ test('should re-open a closed support thread if an improvement attached to an at
 	);
 	const improvement = await ctx.createContract(
 		user.id,
-		session.id,
+		session,
 		'improvement@1.0.0',
 		'My improvement',
 		{
@@ -53,7 +57,7 @@ test('should re-open a closed support thread if an improvement attached to an at
 	);
 	await ctx.createLinkThroughWorker(
 		user.id,
-		session.id,
+		session,
 		pattern,
 		improvement,
 		'has attached',
@@ -63,7 +67,7 @@ test('should re-open a closed support thread if an improvement attached to an at
 	// Complete the improvement, and then wait for the support thread to be re-opened
 	await ctx.worker.patchCard(
 		ctx.logContext,
-		session.id,
+		session,
 		ctx.worker.typeContracts[improvement.type],
 		{
 			attachEvents: true,
@@ -78,7 +82,7 @@ test('should re-open a closed support thread if an improvement attached to an at
 			},
 		],
 	);
-	await ctx.flushAll(session.id);
+	await ctx.flushAll(session);
 
 	await ctx.waitForMatch({
 		type: 'object',

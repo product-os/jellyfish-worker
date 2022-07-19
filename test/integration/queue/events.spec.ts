@@ -263,41 +263,36 @@ describe('events', () => {
 			);
 		});
 
-		test('should be able to access the event payload of a huge event', (done) => {
-			expect.assertions(2);
+		test('should be able to access the event payload of a huge event', async () => {
 			const BIG_EXECUTE_CARD = require('./big-execute.json');
 
-			events
-				.wait(ctx.logContext, ctx.kernel, ctx.session, {
+			const execute = await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.session,
+				BIG_EXECUTE_CARD,
+			);
+
+			expect(_.omit(execute, ['id', 'loop'])).toEqual(
+				Object.assign({}, BIG_EXECUTE_CARD, {
+					created_at: execute.created_at,
+					linked_at: execute.linked_at,
+					links: execute.links,
+				}),
+			);
+
+			const contract = await events.wait(
+				ctx.logContext,
+				ctx.kernel,
+				ctx.session,
+				{
 					id: BIG_EXECUTE_CARD.slug.replace(/^execute-/g, ''),
 					action: BIG_EXECUTE_CARD.data.action,
 					card: BIG_EXECUTE_CARD.data.target,
 					actor: BIG_EXECUTE_CARD.data.actor,
-				})
-				.then((contract) => {
-					assert(contract);
-					expect(contract.data.payload).toEqual(BIG_EXECUTE_CARD.data.payload);
-					done();
-				})
-				.catch(done);
-
-			setTimeout(() => {
-				try {
-					ctx.kernel
-						.insertContract(ctx.logContext, ctx.session, BIG_EXECUTE_CARD)
-						.then((execute) => {
-							expect(_.omit(execute, ['id', 'loop'])).toEqual(
-								Object.assign({}, BIG_EXECUTE_CARD, {
-									created_at: execute.created_at,
-									linked_at: execute.linked_at,
-									links: execute.links,
-								}),
-							);
-						});
-				} catch (_err) {
-					done();
-				}
-			}, 100);
+				},
+			);
+			assert(contract);
+			expect(contract.data.payload).toEqual(BIG_EXECUTE_CARD.data.payload);
 		});
 
 		test('should be able to access the event payload', async () => {

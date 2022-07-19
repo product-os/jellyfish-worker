@@ -2,7 +2,7 @@ import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
 import { Logger } from '@graphile/logger';
-import type { Kernel, LinkContract } from 'autumndb';
+import type { AutumnDBSession, Kernel, LinkContract } from 'autumndb';
 import * as graphileWorker from 'graphile-worker';
 import _ from 'lodash';
 import type { Pool } from 'pg';
@@ -70,7 +70,7 @@ const getExecuteLinkSlug = (actionRequest: ActionRequestContract): string => {
 const linkExecuteEvent = async (
 	kernel: Kernel,
 	logContext: LogContext,
-	session: string,
+	session: AutumnDBSession,
 	eventContract: ExecuteContract,
 	actionRequest: ActionRequestContract,
 ): Promise<LinkContract> => {
@@ -100,7 +100,7 @@ export class Consumer implements QueueConsumer {
 	constructor(
 		private kernel: Kernel,
 		private pool: Pool,
-		private session: string,
+		private session: AutumnDBSession,
 	) {}
 
 	async initializeWithEventHandler(

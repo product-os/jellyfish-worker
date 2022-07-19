@@ -1,11 +1,9 @@
-import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { Contract, JsonSchema, Kernel, SessionContract } from 'autumndb';
+import { LogContext } from '@balena/jellyfish-logger';
+import type { AutumnDBSession, Contract, JsonSchema, Kernel } from 'autumndb';
 import iso8601Duration from 'iso8601-duration';
 import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import type { ActionContract } from '.';
-
-const logger = getLogger('worker');
 
 /**
  * @summary Get the current timestamp
@@ -78,7 +76,7 @@ export const getActionArgumentsSchema = (
 export const hasContract = async (
 	logContext: LogContext,
 	kernel: Kernel,
-	session: string,
+	session: AutumnDBSession,
 	object: Pick<Contract, 'slug' | 'version' | 'id'>,
 ): Promise<boolean> => {
 	if (
@@ -130,39 +128,6 @@ export const durationToMs = (duration: string): number => {
 	} catch (err) {
 		return 0;
 	}
-};
-
-export const getActorKey = async (
-	context: LogContext,
-	kernel: Kernel,
-	session: string,
-	actorId: string,
-): Promise<SessionContract> => {
-	const keySlug = `session-action-${actorId}`;
-	const key = await kernel.getContractBySlug<SessionContract>(
-		context,
-		session,
-		`${keySlug}@1.0.0`,
-	);
-
-	if (key && key.active && key.data.actor === actorId) {
-		return key;
-	}
-
-	logger.info(context, 'Create worker key', {
-		slug: keySlug,
-		actor: actorId,
-	});
-
-	return kernel.replaceContract<SessionContract>(context, session, {
-		slug: keySlug,
-		active: true,
-		version: '1.0.0',
-		type: 'session@1.0.0',
-		data: {
-			actor: actorId,
-		},
-	});
 };
 
 export const getQueryWithOptionalLinks = (

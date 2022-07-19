@@ -1,16 +1,20 @@
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	AutumnDBSession,
+	testUtils as autumndbTestUtils,
+	UserContract,
+} from 'autumndb';
 import _ from 'lodash';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
-let user: any = {};
-let session: any = {};
+let user: UserContract;
+let session: AutumnDBSession;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
 	user = await ctx.createUser(autumndbTestUtils.generateRandomId());
-	session = await ctx.createSession(user);
+	session = { actor: user };
 });
 
 afterAll(() => {
@@ -21,7 +25,7 @@ describe('role-user-community', () => {
 	it('users should be able to query views', async () => {
 		expect(user.data.roles).toEqual(['user-community']);
 
-		const results = await ctx.kernel.query(ctx.logContext, session.id, {
+		const results = await ctx.kernel.query(ctx.logContext, session, {
 			type: 'object',
 			required: ['type'],
 			properties: {
@@ -39,11 +43,11 @@ describe('role-user-community', () => {
 			autumndbTestUtils.generateRandomId(),
 		);
 		expect(otherUser.data.roles).toEqual(['user-community']);
-		const otherUserSession = await ctx.createSession(otherUser);
+		const otherUserSession = { actor: otherUser };
 
 		const supportThread = await ctx.createSupportThread(
 			user.id,
-			session.id,
+			session,
 			'foobar',
 			{
 				status: 'open',
@@ -51,7 +55,7 @@ describe('role-user-community', () => {
 		);
 		await ctx.worker.patchCard(
 			ctx.logContext,
-			session.id,
+			session,
 			ctx.worker.typeContracts[supportThread.type],
 			{
 				attachEvents: true,
@@ -68,14 +72,14 @@ describe('role-user-community', () => {
 		);
 		const message = await ctx.createMessage(
 			user.id,
-			session.id,
+			session,
 			supportThread,
 			'buz',
 		);
 
 		const result = await ctx.kernel.getContractById(
 			ctx.logContext,
-			otherUserSession.id,
+			otherUserSession,
 			message.id,
 		);
 		expect(result).toBeNull();

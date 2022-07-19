@@ -1,15 +1,19 @@
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	AutumnDBSession,
+	testUtils as autumndbTestUtils,
+	UserContract,
+} from 'autumndb';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
-let user: any = {};
-let session: any = {};
+let user: UserContract;
+let session: AutumnDBSession;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
 	user = await ctx.createUser(autumndbTestUtils.generateRandomId());
-	session = await ctx.createSession(user);
+	session = { actor: user };
 });
 
 afterAll(() => {
@@ -19,13 +23,13 @@ afterAll(() => {
 test('should close a thread with a #summary whisper', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'open',
 		},
 	);
-	await ctx.createWhisper(user.id, session.id, supportThread, '#summary buz');
+	await ctx.createWhisper(user.id, session, supportThread, '#summary buz');
 
 	await ctx.waitForMatch({
 		type: 'object',

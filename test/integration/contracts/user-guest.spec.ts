@@ -1,5 +1,4 @@
 import { strict as assert } from 'assert';
-import { Kernel } from 'autumndb';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
@@ -21,43 +20,27 @@ describe('user-guest', () => {
 		);
 		assert(guestUser);
 
-		const guestUserSession = await ctx.kernel.replaceContract(
-			ctx.logContext,
-			ctx.session,
-			Kernel.defaults({
-				slug: 'session-guest',
-				version: '1.0.0',
-				type: 'session@1.0.0',
-				data: {
-					actor: guestUser.id,
-				},
-			}),
-		);
-		assert(guestUserSession);
+		const guestUserSession = { actor: guestUser };
 
-		const results = await ctx.kernel.query(
-			ctx.logContext,
-			guestUserSession.id,
-			{
-				type: 'object',
-				required: ['type', 'data'],
-				additionalProperties: true,
-				properties: {
-					type: {
-						type: 'string',
-						const: 'user@1.0.0',
-					},
-					data: {
-						type: 'object',
-						properties: {
-							email: {
-								type: 'string',
-							},
+		const results = await ctx.kernel.query(ctx.logContext, guestUserSession, {
+			type: 'object',
+			required: ['type', 'data'],
+			additionalProperties: true,
+			properties: {
+				type: {
+					type: 'string',
+					const: 'user@1.0.0',
+				},
+				data: {
+					type: 'object',
+					properties: {
+						email: {
+							type: 'string',
 						},
 					},
 				},
 			},
-		);
+		});
 
 		expect(results.length).toEqual(1);
 		expect(results[0].slug).toEqual('user-guest');

@@ -1,17 +1,21 @@
 import { strict as assert } from 'assert';
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	AutumnDBSession,
+	testUtils as autumndbTestUtils,
+	UserContract,
+} from 'autumndb';
 import { isBefore, isValid } from 'date-fns';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
-let user: any = {};
-let session: any = {};
+let user: UserContract;
+let session: AutumnDBSession;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
 	user = await ctx.createUser(autumndbTestUtils.generateRandomId());
-	session = await ctx.createSession(user);
+	session = { actor: user };
 });
 
 afterAll(() => {
@@ -21,7 +25,7 @@ afterAll(() => {
 test('editing a message triggers an update to the edited_at field', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		autumndbTestUtils.generateRandomId(),
 		{
 			status: 'open',
@@ -33,7 +37,7 @@ test('editing a message triggers an update to the edited_at field', async () => 
 	// Verify that initial the edited_at field is undefined
 	const message = await ctx.createMessage(
 		user.id,
-		session.id,
+		session,
 		supportThread,
 		autumndbTestUtils.generateRandomId(),
 	);
@@ -42,7 +46,7 @@ test('editing a message triggers an update to the edited_at field', async () => 
 	// Now update the message text
 	await ctx.worker.patchCard(
 		ctx.logContext,
-		session.id,
+		session,
 		ctx.worker.typeContracts[message.type],
 		{
 			attachEvents: true,
@@ -57,7 +61,7 @@ test('editing a message triggers an update to the edited_at field', async () => 
 			},
 		],
 	);
-	await ctx.flushAll(session.id);
+	await ctx.flushAll(session);
 	let updatedMessage = await ctx.kernel.getContractById(
 		ctx.logContext,
 		ctx.session,
@@ -73,7 +77,7 @@ test('editing a message triggers an update to the edited_at field', async () => 
 	// Now modify the message text again
 	await ctx.worker.patchCard(
 		ctx.logContext,
-		session.id,
+		session,
 		ctx.worker.typeContracts[message.type],
 		{
 			attachEvents: true,
@@ -88,7 +92,7 @@ test('editing a message triggers an update to the edited_at field', async () => 
 			},
 		],
 	);
-	await ctx.flushAll(session.id);
+	await ctx.flushAll(session);
 	updatedMessage = await ctx.kernel.getContractById(
 		ctx.logContext,
 		ctx.session,
@@ -107,7 +111,7 @@ test('editing a message triggers an update to the edited_at field', async () => 
 test('updating a meta field in the message payload triggers an update to the edited_at field', async () => {
 	const supportThread = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		autumndbTestUtils.generateRandomId(),
 		{
 			status: 'open',
@@ -120,7 +124,7 @@ test('updating a meta field in the message payload triggers an update to the edi
 	// Verify that initial the edited_at field is undefined
 	const message = await ctx.createMessage(
 		user.id,
-		session.id,
+		session,
 		supportThread,
 		'test',
 	);
@@ -129,7 +133,7 @@ test('updating a meta field in the message payload triggers an update to the edi
 	// Now add a mentionsUser item
 	await ctx.worker.patchCard(
 		ctx.logContext,
-		session.id,
+		session,
 		ctx.worker.typeContracts[message.type],
 		{
 			attachEvents: true,
@@ -145,7 +149,7 @@ test('updating a meta field in the message payload triggers an update to the edi
 		],
 	);
 
-	await ctx.flushAll(session.id);
+	await ctx.flushAll(session);
 	let updatedMessage = await ctx.kernel.getContractById(
 		ctx.logContext,
 		ctx.session,
@@ -163,7 +167,7 @@ test('updating a meta field in the message payload triggers an update to the edi
 	// Now remove the mentioned user
 	await ctx.worker.patchCard(
 		ctx.logContext,
-		session.id,
+		session,
 		ctx.worker.typeContracts[message.type],
 		{
 			attachEvents: true,

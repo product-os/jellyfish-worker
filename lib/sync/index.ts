@@ -2,7 +2,7 @@ import * as assert from '@balena/jellyfish-assert';
 import type { LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
 import { strict } from 'assert';
-import type { Contract } from 'autumndb';
+import type { AutumnDBSession, Contract } from 'autumndb';
 import _ from 'lodash';
 import type { Map, WorkerContext } from '../types';
 import * as errors from './errors';
@@ -450,7 +450,7 @@ export class Sync {
 		provider: string,
 		workerContext: WorkerContext,
 		context: any,
-		session: string,
+		session: AutumnDBSession,
 	) {
 		return syncContext.getActionContext(
 			provider,

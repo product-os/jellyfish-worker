@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger } from '@balena/jellyfish-logger';
-import type { Contract, TypeContract } from 'autumndb';
+import type { AutumnDBSession, Contract, TypeContract } from 'autumndb';
 import { get, includes, intersectionBy } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import * as errors from '../errors';
@@ -286,7 +286,7 @@ export async function checkOrgs(
  */
 async function setCommunityRole(
 	context: WorkerContext,
-	session: string,
+	session: AutumnDBSession,
 	userCard: Contract,
 	request: ActionHandlerRequest,
 ): Promise<void> {

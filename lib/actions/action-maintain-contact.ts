@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger } from '@balena/jellyfish-logger';
-import type { Contract, TypeContract } from 'autumndb';
+import type { AutumnDBSession, Contract, TypeContract } from 'autumndb';
 import { v4 as isUUID } from 'is-uuid';
 import _ from 'lodash';
 import * as errors from '../errors';
@@ -10,7 +10,7 @@ import type { ActionHandlerRequest, WorkerContext } from '../types';
 const logger = getLogger(__filename);
 
 const handler: ActionDefinition['handler'] = async (
-	session: string,
+	session: AutumnDBSession,
 	context: WorkerContext,
 	card: Contract,
 	request: ActionHandlerRequest,

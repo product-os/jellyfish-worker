@@ -1,7 +1,7 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import { strict as nativeAssert } from 'assert';
-import type { ContractData, Kernel } from 'autumndb';
+import type { AutumnDBSession, ContractData, Kernel } from 'autumndb';
 import { parseExpression } from 'cron-parser';
 import * as graphileWorker from 'graphile-worker';
 import type { Pool } from 'pg';
@@ -166,7 +166,7 @@ export class Producer implements QueueProducer {
 	constructor(
 		private kernel: Kernel,
 		private pool: Pool,
-		private session: string,
+		private session: AutumnDBSession,
 	) {}
 
 	/**

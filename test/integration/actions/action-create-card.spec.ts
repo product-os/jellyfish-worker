@@ -2,6 +2,7 @@ import { strict as assert } from 'assert';
 import {
 	errors as autumndbErrors,
 	testUtils as autumndbTestUtils,
+	UserContract,
 } from 'autumndb';
 import { ActionRequestContract, testUtils, WorkerContext } from '../../../lib';
 import { actionCreateCard } from '../../../lib/actions/action-create-card';
@@ -9,8 +10,7 @@ import { makeRequest } from './helpers';
 
 let ctx: testUtils.TestContext;
 let actionContext: WorkerContext;
-let guestUser: any;
-let guestUserSession: any;
+let guestUser: UserContract;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
@@ -22,8 +22,6 @@ beforeAll(async () => {
 		undefined,
 		['user-guest'],
 	);
-
-	guestUserSession = await ctx.createSession(guestUser);
 });
 
 afterAll(async () => {
@@ -421,14 +419,12 @@ describe('action-create-card', () => {
 			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
 		expect(user.data.roles).toEqual(['user-community']);
-		const session = await ctx.createSession(user);
-
 		const otherUser = autumndbTestUtils.generateRandomId();
 		assert(user.id !== otherUser);
 
 		await expect(
 			actionCreateCard.handler(
-				session.id,
+				{ actor: user },
 				actionContext,
 				ctx.worker.typeContracts['session@1.0.0'],
 				{
@@ -457,11 +453,10 @@ describe('action-create-card', () => {
 			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
 		expect(user.data.roles).toEqual(['user-community']);
-		const session = await ctx.createSession(user);
 
 		await expect(
 			actionCreateCard.handler(
-				session.id,
+				{ actor: user },
 				actionContext,
 				ctx.worker.typeContracts['role@1.0.0'],
 				{
@@ -491,7 +486,7 @@ describe('action-create-card', () => {
 	test('creating a role with the guest user session should fail', async () => {
 		await expect(
 			actionCreateCard.handler(
-				guestUserSession.id,
+				{ actor: guestUser },
 				actionContext,
 				ctx.worker.typeContracts['role@1.0.0'],
 				{
@@ -521,7 +516,7 @@ describe('action-create-card', () => {
 	test('creating a user with the guest user session should fail', async () => {
 		await expect(
 			actionCreateCard.handler(
-				guestUserSession.id,
+				{ actor: guestUser },
 				actionContext,
 				ctx.worker.typeContracts['user@1.0.0'],
 				{
@@ -550,7 +545,6 @@ describe('action-create-card', () => {
 		const user = await ctx.createUser(
 			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
-		const session = await ctx.createSession(user);
 		const targetUser = await ctx.createUser(
 			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
@@ -575,7 +569,7 @@ describe('action-create-card', () => {
 
 		await expect(
 			actionCreateCard.handler(
-				session.id,
+				{ actor: user },
 				actionContext,
 				ctx.worker.typeContracts['session@1.0.0'],
 				{
@@ -596,18 +590,17 @@ describe('action-create-card', () => {
 					},
 				} as any,
 			),
-		).rejects.toThrow(autumndbErrors.JellyfishUnknownCardType);
+		).rejects.toThrow(autumndbErrors.JellyfishPermissionsError);
 	});
 
 	test('users should not be able to create action requests', async () => {
 		const user = await ctx.createUser(
 			autumndbTestUtils.generateRandomId().split('-')[0],
 		);
-		const session = await ctx.createSession(user);
 
 		await expect(
 			actionCreateCard.handler(
-				session.id,
+				{ actor: user },
 				actionContext,
 				ctx.worker.typeContracts['action-request@1.0.0'],
 				{

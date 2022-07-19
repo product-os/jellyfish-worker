@@ -4,13 +4,13 @@ import { Jellyscript } from '@balena/jellyfish-jellyscript';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import { strict } from 'assert';
 import {
+	AutumnDBSession,
 	CONTRACTS,
 	Contract,
 	ContractData,
 	ContractDefinition,
 	JsonSchema,
 	Kernel,
-	SessionContract,
 	TypeContract,
 	RelationshipContract,
 } from 'autumndb';
@@ -221,7 +221,7 @@ export const ensureTypeHasVersion = (type: string): string => {
 const getInputContract = async (
 	logContext: LogContext,
 	kernel: Kernel,
-	session: string,
+	session: AutumnDBSession,
 	identifier: string,
 ): Promise<Contract | null> => {
 	if (identifier.includes('@')) {
@@ -253,7 +253,7 @@ export async function getObjectWithLinks<
 >(
 	logContext: LogContext,
 	kernel: Kernel,
-	session: string,
+	session: AutumnDBSession,
 	contract: PContract,
 	typeContract: TypeContract,
 ): Promise<PContract> {
@@ -297,7 +297,7 @@ export class Worker {
 	transformers: TransformerContract[];
 	latestTransformers: TransformerContract[];
 	typeContracts: { [key: string]: TypeContract };
-	session: string;
+	session: AutumnDBSession;
 	library: Map<Action>;
 	id: string = '0';
 	sync: Sync;
@@ -324,7 +324,7 @@ export class Worker {
 	 */
 	constructor(
 		kernel: Kernel,
-		session: string,
+		session: AutumnDBSession,
 		pool: Pool,
 		plugins: PluginDefinition[],
 	) {
@@ -557,14 +557,14 @@ export class Worker {
 		return {
 			sync: this.sync,
 			getEventSlug: utils.getEventSlug,
-			getCardById: (lsession: string, id: string) => {
+			getCardById: (lsession: AutumnDBSession, id: string) => {
 				return self.kernel.getContractById(logContext, lsession, id);
 			},
-			getCardBySlug: (lsession: string, slug: string) => {
+			getCardBySlug: (lsession: AutumnDBSession, slug: string) => {
 				return self.kernel.getContractBySlug(logContext, lsession, slug);
 			},
 			query: (
-				lsession: string,
+				lsession: AutumnDBSession,
 				schema: Parameters<Kernel['query']>[2],
 				options: Parameters<Kernel['query']>[3],
 			) => {
@@ -572,7 +572,7 @@ export class Worker {
 			},
 			privilegedSession: this.session,
 			insertCard: (
-				lsession: string,
+				lsession: AutumnDBSession,
 				typeCard: Parameters<Worker['insertCard']>[2],
 				options: Parameters<Worker['insertCard']>[3],
 				card: Parameters<Worker['insertCard']>[4],
@@ -580,7 +580,7 @@ export class Worker {
 				return self.insertCard(logContext, lsession, typeCard, options, card);
 			},
 			replaceCard: (
-				lsession: string,
+				lsession: AutumnDBSession,
 				typeCard: Parameters<Worker['replaceCard']>[2],
 				options: Parameters<Worker['replaceCard']>[3],
 				card: Parameters<Worker['replaceCard']>[4],
@@ -588,7 +588,7 @@ export class Worker {
 				return self.replaceCard(logContext, lsession, typeCard, options, card);
 			},
 			patchCard: (
-				lsession: string,
+				lsession: AutumnDBSession,
 				typeCard: Parameters<Worker['patchCard']>[2],
 				options: Parameters<Worker['patchCard']>[3],
 				card: Parameters<Worker['patchCard']>[4],
@@ -625,7 +625,7 @@ export class Worker {
 	 */
 	async insertCard<T extends Contract = Contract>(
 		logContext: LogContext,
-		insertSession: string,
+		insertSession: AutumnDBSession,
 		typeContract: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
@@ -737,7 +737,7 @@ export class Worker {
 	 */
 	patchCard(
 		logContext: LogContext,
-		insertSession: string,
+		insertSession: AutumnDBSession,
 		typeContract: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
@@ -825,7 +825,7 @@ export class Worker {
 	// be an insert or update.
 	async replaceCard(
 		logContext: LogContext,
-		insertSession: string,
+		insertSession: AutumnDBSession,
 		typeContract: TypeContract,
 		// TS-TODO: Use a common type for these options
 		options: {
@@ -1176,7 +1176,7 @@ export class Worker {
 	 * @param request - action request options
 	 * @returns request arguments
 	 */
-	async pre(session: string, request: ActionPreRequest) {
+	async pre(session: AutumnDBSession, request: ActionPreRequest) {
 		const actionDefinition = this.library[request.action.split('@')[0]];
 		assert.USER(
 			request.logContext,
@@ -1219,7 +1219,7 @@ export class Worker {
 	 * console.log(result.error);
 	 * console.log(result.data);
 	 */
-	async execute(session: string, request: ActionRequestContract) {
+	async execute(session: AutumnDBSession, request: ActionRequestContract) {
 		const logContext: LogContext = request.data.context || {
 			id: `EXECUTE-${request.id}`,
 		};
@@ -1471,7 +1471,7 @@ export class Worker {
 	// TS-TODO: Improve the typings for the `options` parameter
 	private async commit<T extends Contract | TypeContract>(
 		logContext: LogContext,
-		session: string,
+		session: AutumnDBSession,
 		typeContract: TypeContract,
 		currentContract: Contract | null,
 		options: {
@@ -1559,6 +1559,11 @@ export class Worker {
 
 				return result;
 			},
+		}).catch((err) => {
+			logger.error(logContext, 'Error evaluating transformers', {
+				contract: insertedContract.id,
+				error: err,
+			});
 		});
 
 		subscriptionsLib
@@ -1568,17 +1573,9 @@ export class Worker {
 				getTypeContract: (type) => {
 					return this.typeContracts[type];
 				},
-				getSession: async (userId: string) => {
-					return utils.getActorKey(
-						logContext,
-						this.kernel,
-						workerContext.privilegedSession,
-						userId,
-					);
-				},
 				insertContract: async (
 					insertedContractType: TypeContract,
-					actorSession: string,
+					actorSession: AutumnDBSession,
 					object: any,
 				) => {
 					return workerContext.insertCard(
@@ -1600,8 +1597,13 @@ export class Worker {
 						queryOpts,
 					);
 				},
-				getContractById: (id: string) => {
-					return this.kernel.getContractById(logContext, session, id);
+				getCreatorSession: async (creatorId: string) => {
+					const actor = await this.kernel.getContractById(
+						logContext,
+						workerContext.privilegedSession,
+						creatorId,
+					);
+					return actor ? { actor } : null;
 				},
 			})
 			.catch((error) => {
@@ -1619,11 +1621,6 @@ export class Worker {
 				}
 			});
 
-		const sessionContract = await this.kernel.getContractById<SessionContract>(
-			logContext,
-			session,
-			session,
-		);
 		await Promise.all(
 			this.triggers.map(async (trigger: TriggeredActionContract) => {
 				try {
@@ -1675,7 +1672,7 @@ export class Worker {
 									contract: triggerContract.id,
 									arguments: request.arguments,
 									session,
-									actor: sessionContract!.data.actor,
+									actor: session.actor.id,
 								},
 							);
 
@@ -1685,14 +1682,14 @@ export class Worker {
 								this.typeContracts['action-request@1.0.0'],
 								{
 									timestamp: request.currentDate.toISOString(),
-									actor: sessionContract!.data.actor,
+									actor: session.actor.id,
 									originator: options.originator || request.originator,
 								},
 								{
 									data: {
 										card: triggerContract.id,
 										action: request.action!,
-										actor: sessionContract!.data.actor,
+										actor: session.actor.id,
 										context: request.logContext,
 										input: {
 											id: triggerContract.id,
@@ -1897,7 +1894,7 @@ export class Worker {
 
 	async generateFormulaTypeTriggers(
 		logContext: LogContext,
-		session: string,
+		session: AutumnDBSession,
 		typeContract: TypeContract,
 	) {
 		await Promise.all(
@@ -1939,7 +1936,7 @@ export class Worker {
 	 */
 	async scheduleAction(
 		logContext: LogContext,
-		session: string,
+		session: AutumnDBSession,
 		actor: string,
 		epoch: number,
 		id: string,

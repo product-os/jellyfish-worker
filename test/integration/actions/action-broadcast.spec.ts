@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { testUtils as autumndbTestUtils } from 'autumndb';
-import { cloneDeep, isArray, isNull, map, pick, sortBy } from 'lodash';
+import { isArray, isNull, map, pick, sortBy } from 'lodash';
 import { testUtils } from '../../../lib';
 import { actionBroadcast } from '../../../lib/actions/action-broadcast';
 import type { ActionRequestContract, WorkerContext } from '../../../lib/types';
@@ -86,24 +86,6 @@ describe('action-broadcast', () => {
 			},
 		} as any);
 		expect(result).toBeNull();
-	});
-
-	test('should throw an error on invalid session', async () => {
-		const localContext = cloneDeep(actionContext);
-		const session = autumndbTestUtils.generateRandomId();
-		localContext.privilegedSession = session;
-
-		await expect(
-			handler(session, localContext, ctx.worker.typeContracts['user@1.0.0'], {
-				context: {
-					id: `TEST-${autumndbTestUtils.generateRandomId()}`,
-				},
-				timestamp: new Date().toISOString(),
-				actor: ctx.adminUserId,
-				originator: autumndbTestUtils.generateRandomId(),
-				arguments: {},
-			} as any),
-		).rejects.toThrow();
 	});
 
 	test('should post a broadcast message to an empty thread', async () => {

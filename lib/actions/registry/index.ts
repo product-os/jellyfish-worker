@@ -1,6 +1,6 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import type { ContractSummary } from 'autumndb';
+import type { AutumnDBSession, ContractSummary } from 'autumndb';
 import axios from 'axios';
 import { TypedError } from 'typed-error';
 
@@ -25,8 +25,8 @@ export const retagArtifact = async (
 	logContext: LogContext,
 	src: ContractSummary,
 	target: ContractSummary,
-	userSlug: string,
-	session: string,
+	session: AutumnDBSession,
+	token: string,
 ) => {
 	// This function should do the same as the following curl statements
 	// curl registry.ly.fish.local/v2/transformer-service-source2multi-arch-service/manifests/1.0.0-with-contract  -v -X PUT
@@ -34,6 +34,8 @@ export const retagArtifact = async (
 	// export TOKEN=$(curl -v -u USER_SLUG:SESSION_TOKEN 'http://api.ly.fish.local/api/v2/registry?service=registry.ly.fish.local&scope=repository:transformer-service-source2multi-arch-service:pull,push' | jq -j .token)
 	// curl -H "Authorization: bearer $TOKEN" registry.ly.fish.local/v2/transformer-service-source2multi-arch-service/manifests/1.0.0-with-contract  -H 'accept: application/vnd.docker.distribution.manifest.v2+json' -v | jq .
 	// curl -H "Authorization: bearer $TOKEN" registry.ly.fish.local/v2/transformer-service-source2multi-arch-service/manifests/1.0.0-with-contract -X PUT -H 'content-type: application/vnd.docker.distribution.manifest.v2+json' -d '@manifest-1.0.0.json' -v
+
+	const userSlug = session.actor.slug;
 
 	const srcManifestUrl = manifestUrl(src);
 	const targetManifestUrl = manifestUrl(target);
@@ -69,7 +71,7 @@ export const retagArtifact = async (
 
 		// login with session user
 		const loginResp: any = await axios.get(authUrl.href, {
-			auth: { username: userSlug, password: session },
+			auth: { username: userSlug, password: token },
 		});
 		if (!loginResp.data.token) {
 			throw new Error(

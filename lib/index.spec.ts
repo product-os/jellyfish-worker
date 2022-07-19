@@ -1,4 +1,4 @@
-import type { Kernel } from 'autumndb';
+import type { AutumnDBSession, Kernel } from 'autumndb';
 import type { Pool } from 'pg';
 import { Worker } from './index';
 import { TransformerContract } from './types';
@@ -41,7 +41,11 @@ describe('Worker.updateCurrentTransformers()', () => {
 		// TS-TODO: is there a better way to instantiate a simple Worker?
 		const worker = new Worker(
 			{} as any as Kernel,
-			'session-foo',
+			{
+				actor: {
+					slug: 'use-foo',
+				},
+			} as AutumnDBSession,
 			{} as any as Pool,
 			[],
 		);

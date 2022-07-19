@@ -219,7 +219,7 @@ describe('action-set-password', () => {
 	test('a community user should not be able to reset other users passwords', async () => {
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 		expect(user.data.roles).toEqual(['user-community']);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 
 		const password = autumndbTestUtils.generateRandomId().split('-')[0];
 		const hash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
@@ -261,14 +261,14 @@ describe('action-set-password', () => {
 		);
 
 		await expect(() => {
-			return ctx.flush(session.id);
+			return ctx.flush(session);
 		}).rejects.toThrowError();
 	});
 
 	test('a community user should not be able to set a first time password for another user', async () => {
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 		expect(user.data.roles).toEqual(['user-community']);
-		const session = await ctx.createSession(user);
+		const session = { actor: user };
 
 		const otherUser = await ctx.createUser(
 			autumndbTestUtils.generateRandomSlug(),
@@ -308,7 +308,7 @@ describe('action-set-password', () => {
 		);
 
 		await expect(() => {
-			return ctx.flush(session.id);
+			return ctx.flush(session);
 		}).rejects.toThrowError();
 	});
 });

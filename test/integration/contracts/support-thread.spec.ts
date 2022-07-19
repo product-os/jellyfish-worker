@@ -1,16 +1,20 @@
 import { strict as assert } from 'assert';
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	AutumnDBSession,
+	testUtils as autumndbTestUtils,
+	UserContract,
+} from 'autumndb';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
-let user: any = {};
-let session: any = {};
+let user: UserContract;
+let session: AutumnDBSession;
 
 beforeAll(async () => {
 	ctx = await testUtils.newContext();
 
 	user = await ctx.createUser(autumndbTestUtils.generateRandomId());
-	session = await ctx.createSession(user);
+	session = { actor: user };
 });
 
 afterAll(() => {
@@ -62,7 +66,7 @@ const waitForThreadWithLastMessage = async (thread: any, event: any) => {
 test('should evaluate the last message in a support thread', async () => {
 	const supportThreadSummary = await ctx.createSupportThread(
 		user.id,
-		session.id,
+		session,
 		'foobar',
 		{
 			status: 'open',
@@ -81,7 +85,7 @@ test('should evaluate the last message in a support thread', async () => {
 	// Now we add a message to the thread's timeline
 	const message0Summary = await ctx.createMessage(
 		user.id,
-		session.id,
+		session,
 		supportThread,
 		'buz',
 	);
@@ -99,7 +103,7 @@ test('should evaluate the last message in a support thread', async () => {
 	// Now let's add another message to the thread's timeline
 	const message1Summary = await ctx.createMessage(
 		user.id,
-		session.id,
+		session,
 		supportThread,
 		'baz',
 	);
@@ -113,7 +117,7 @@ test('should evaluate the last message in a support thread', async () => {
 	// If we add an update to the thread, this does not affect the evaluated lastMessage field
 	await ctx.worker.patchCard(
 		ctx.logContext,
-		session.id,
+		session,
 		ctx.worker.typeContracts[supportThread.type],
 		{
 			attachEvents: true,
