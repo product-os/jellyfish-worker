@@ -50,6 +50,25 @@ export interface TestContext extends autumndbTestUtils.TestContext {
 		data: any,
 		markers?: any,
 	) => Promise<Contract>;
+	createSupportThread: (
+		actor: string,
+		session: string,
+		name: string | null,
+		data: any,
+		markers?: any,
+	) => Promise<Contract>;
+	createMessage: (
+		actor: string,
+		session: string,
+		target: Contract,
+		body: string,
+	) => Promise<Contract>;
+	createWhisper: (
+		actor: string,
+		session: string,
+		target: Contract,
+		body: string,
+	) => Promise<Contract>;
 }
 
 /**
@@ -330,6 +349,41 @@ export const newContext = async (
 		return contract;
 	};
 
+	const createSupportThread = async (
+		actor: string,
+		session: string,
+		name: string | null,
+		data: any,
+		markers = [],
+	) => {
+		return createContract(
+			actor,
+			session,
+			'support-thread@1.0.0',
+			name,
+			data,
+			markers,
+		);
+	};
+
+	const createMessage = (
+		actor: string,
+		session: string,
+		target: Contract,
+		body: string,
+	) => {
+		return createEvent(actor, session, target, body, 'message');
+	};
+
+	const createWhisper = (
+		actor: string,
+		session: string,
+		target: Contract,
+		body: string,
+	) => {
+		return createEvent(actor, session, target, body, 'whisper');
+	};
+
 	return {
 		actor: uuid(),
 		dequeue,
@@ -342,6 +396,9 @@ export const newContext = async (
 		createEvent,
 		createLinkThroughWorker,
 		createContract,
+		createSupportThread,
+		createMessage,
+		createWhisper,
 		worker,
 		...autumndbTestContext,
 	};
