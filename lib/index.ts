@@ -409,7 +409,7 @@ export class Worker {
 				);
 
 				if (typeContract) {
-					logger.info(logContext, 'Inserting default contract', {
+					logger.debug(logContext, 'Inserting default contract', {
 						slug: contract.slug,
 						type: contract.type,
 					});
@@ -423,11 +423,6 @@ export class Worker {
 						},
 						contract,
 					);
-
-					logger.info(logContext, 'Inserted default contract using worker', {
-						slug: contract.slug,
-						type: contract.type,
-					});
 				} else {
 					logger.warn(
 						logContext,
@@ -1228,7 +1223,7 @@ export class Worker {
 		const logContext: LogContext = request.data.context || {
 			id: `EXECUTE-${request.id}`,
 		};
-		logger.info(logContext, 'Executing request', {
+		logger.debug(logContext, 'Executing request', {
 			request: {
 				id: request.id,
 				card: request.data.input.id,
@@ -1372,7 +1367,7 @@ export class Worker {
 			});
 
 			const endDate = new Date();
-			logger.info(logContext, 'Execute success', {
+			logger.debug(logContext, 'Execute success', {
 				data,
 				input: request.data.input,
 				action: actionContract.slug,
@@ -1445,7 +1440,7 @@ export class Worker {
 			`Could not create execute event for request: ${request.id}`,
 		);
 
-		logger.info(logContext, 'Execute event posted', {
+		logger.debug(logContext, 'Execute event posted', {
 			slug: event.slug,
 			type: event.type,
 			target: event.data.target,
@@ -1501,11 +1496,6 @@ export class Worker {
 		const workerContext = this.getActionContext(logContext);
 
 		const insertedContract = await fn();
-
-		logger.info(
-			logContext,
-			'Worker function complete, now running commit logic',
-		);
 
 		if (!insertedContract) {
 			return null;
@@ -1677,7 +1667,7 @@ export class Worker {
 								);
 							}
 
-							logger.info(
+							logger.debug(
 								logContext,
 								'Enqueing new action request due to triggered-action',
 								{
