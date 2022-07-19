@@ -1,4 +1,23 @@
 - commits:
+    - subject: Use session identity instead of session tokens
+      hash: 8dae10ebe040483c57c72fedff88d84dcddd4ebf
+      body: >
+        This change brings in the [update to
+        autumndb](https://github.com/product-os/autumndb/pull/1363) that removes
+        direct session handling.
+
+        Instead of AutumnDB handling session tokens, it only deals with the identity/actor making requests. Authorization of users should be hoisted up to the route layer at the top of the call stack, where it can eventually be delegated to an external service, such as Ory Kratos.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.0.0
+  title: "'Use session identity instead of session tokens'"
+  date: 2022-07-19T14:41:05.313Z
+- commits:
     - subject: Reduce verbosity of logging
       hash: e14271fe56188fdd501daada1dfa3a44e0c2f566
       body: ""
