@@ -1,4 +1,18 @@
 - commits:
+    - subject: Reduce verbosity of logging
+      hash: e14271fe56188fdd501daada1dfa3a44e0c2f566
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 31.5.1
+  title: "'Reduce verbosity of logging'"
+  date: 2022-07-19T07:16:57.947Z
+- commits:
     - subject: Bring in plugin-default
       hash: d0907c62689c73b92c41a041e39d3432c98effa0
       body: ""
