@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bring in plugin-default
+      hash: d0907c62689c73b92c41a041e39d3432c98effa0
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 31.5.0
+  title: "'Bring in plugin-default'"
+  date: 2022-07-19T00:16:40.493Z
+- commits:
     - subject: Add sub-loop relationship
       hash: 43e7db810204f26a045bd4aa23cd98a28ac2192c
       body: ""
