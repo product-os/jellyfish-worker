@@ -115,6 +115,7 @@ import { relationshipTaskHasResultAny } from './relationship-task-has-result-any
 import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
+import { relationshipUserHasNotification } from './relationship-user-has-notification';
 import { relationshipUserHasSettingsAgentChannelSettings } from './relationship-user-has-settings-agent-channel-settings';
 import { relationshipUserHasSettingsWorkingHours } from './relationship-user-has-settings-working-hours';
 import { relationshipUserOwnsRating } from './relationship-user-owns-rating';
@@ -307,6 +308,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipTransformerWorkerOwnsTask,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
+	relationshipUserHasNotification,
 	relationshipUserHasSettingsAgentChannelSettings,
 	relationshipUserHasSettingsWorkingHours,
 	relationshipUserOwnsRating,

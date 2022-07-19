@@ -3,9 +3,10 @@ import type {
 	Contract,
 	JsonSchema,
 	TypeContract,
+	UserContract,
 } from 'autumndb';
 import type { CreateContract } from './types';
-import { find } from 'lodash';
+import { find, without } from 'lodash';
 
 /*
  * Get creator user from linked create contract
@@ -25,9 +26,121 @@ const getCreatorId = (contract: Contract) => {
 	return createContract.data.actor;
 };
 
+const getMentions = (message: Contract<any>): string[] => {
+	return (
+		message.data.payload?.mentionsUser?.concat(
+			message.data.payload?.alertsUser || [],
+		) || []
+	);
+};
+
+const attachNotificationToMessage = async (
+	{
+		getTypeContract,
+		insertContract,
+		privilegedSession,
+	}: {
+		getTypeContract: EvaluateOptions['getTypeContract'];
+		insertContract: EvaluateOptions['insertContract'];
+		privilegedSession: EvaluateOptions['privilegedSession'];
+	},
+	{
+		message,
+		creatorSession,
+		receiver,
+	}: {
+		message: Contract;
+		creatorSession: AutumnDBSession;
+		receiver: UserContract;
+	},
+) => {
+	const notificationTypeContract = getTypeContract('notification@1.0.0');
+
+	if (!notificationTypeContract) {
+		return;
+	}
+	// Since the current permissioning system doesn't allow us to create a contract that
+	// has markers that we can't read we have to use the priviliged session here.
+	// TODO: This is an abomination caused by lack of granular write permissions, fix this!
+	const session =
+		creatorSession.actor.id === receiver.id
+			? creatorSession
+			: privilegedSession;
+
+	const notification = await insertContract(notificationTypeContract, session, {
+		version: '1.0.0',
+		type: 'notification@1.0.0',
+		markers: [receiver.slug],
+		slug: `notification-${receiver.slug}-${message.id}`,
+		tags: [],
+		links: {},
+		requires: [],
+		capabilities: [],
+		active: true,
+	});
+
+	if (!notification) {
+		return;
+	}
+
+	const linkTypeContract = getTypeContract('link@1.0.0');
+
+	if (!linkTypeContract) {
+		return;
+	}
+
+	await insertContract(linkTypeContract, session, {
+		version: '1.0.0',
+		type: 'link@1.0.0',
+		slug: `link-${message.id}-has-attached-${notification.id}`,
+		tags: [],
+		links: {},
+		requires: [],
+		capabilities: [],
+		active: true,
+		name: 'has attached',
+		data: {
+			inverseName: 'is attached to',
+			from: {
+				id: message.id,
+				type: message.type,
+			},
+			to: {
+				id: notification.id,
+				type: notification.type,
+			},
+		},
+	});
+
+	await insertContract(linkTypeContract, session, {
+		version: '1.0.0',
+		type: 'link@1.0.0',
+		slug: `link-${receiver.slug}-has-${notification.id}`,
+		tags: [],
+		links: {},
+		requires: [],
+		capabilities: [],
+		active: true,
+		name: 'has',
+		data: {
+			inverseName: 'notifies',
+			from: {
+				id: receiver.id,
+				type: receiver.type,
+			},
+			to: {
+				id: notification.id,
+				type: notification.type,
+			},
+		},
+	});
+};
+
 export interface EvaluateOptions {
 	oldContract: Contract<any> | null;
 	newContract: Contract<any>;
+	session: AutumnDBSession;
+	privilegedSession: AutumnDBSession;
 	getTypeContract: (type: string) => TypeContract;
 	insertContract: (
 		typeCard: TypeContract,
@@ -47,11 +160,54 @@ export interface EvaluateOptions {
 export const evaluate = async ({
 	oldContract,
 	newContract,
+	session,
+	privilegedSession,
 	getTypeContract,
 	insertContract,
 	getCreatorSession,
 	query,
 }: EvaluateOptions) => {
+	if (newContract.type === 'message@1.0.0' || newContract.type === 'whisper') {
+		const oldMentions = oldContract ? getMentions(oldContract) : [];
+		const currentMentions = getMentions(newContract);
+		const newMentions = without(currentMentions, ...oldMentions);
+
+		if (newMentions.length) {
+			await Promise.all(
+				newMentions.map(async (newMention) => {
+					const [receiver] = await query<UserContract>(
+						{
+							type: 'object',
+							properties: {
+								slug: {
+									const: newMention,
+								},
+							},
+						},
+						{ limit: 1 },
+					);
+
+					if (receiver) {
+						return attachNotificationToMessage(
+							{
+								getTypeContract,
+								insertContract,
+								privilegedSession,
+							},
+							{
+								message: newContract,
+								creatorSession: session,
+								receiver,
+							},
+						);
+					}
+				}),
+			);
+		}
+
+		return;
+	}
+
 	if (
 		oldContract ||
 		newContract.type !== 'link@1.0.0' ||
@@ -139,60 +295,23 @@ export const evaluate = async ({
 				return;
 			}
 
-			const notificationTypeContract = getTypeContract('notification@1.0.0');
-
-			if (!notificationTypeContract) {
+			// User already got notification, because he was mentioned
+			if (getMentions(message).includes(creatorSession.actor.slug)) {
 				return;
 			}
 
-			const notification = await insertContract(
-				notificationTypeContract,
-				creatorSession,
+			await attachNotificationToMessage(
 				{
-					version: '1.0.0',
-					type: 'notification@1.0.0',
-					markers: [creatorSession.actor.slug],
-					slug: `notification-${creatorSession.actor.id}-${message.id}`,
-					tags: [],
-					links: {},
-					requires: [],
-					capabilities: [],
-					active: true,
+					getTypeContract,
+					insertContract,
+					privilegedSession,
+				},
+				{
+					message,
+					creatorSession,
+					receiver: creatorSession.actor as UserContract,
 				},
 			);
-
-			if (!notification) {
-				return;
-			}
-
-			const linkTypeContract = getTypeContract('link@1.0.0');
-
-			if (!linkTypeContract) {
-				return;
-			}
-
-			await insertContract(linkTypeContract, creatorSession, {
-				version: '1.0.0',
-				type: 'link@1.0.0',
-				slug: `link-${message.id}-has-attached-${notification.id}`,
-				tags: [],
-				links: {},
-				requires: [],
-				capabilities: [],
-				active: true,
-				name: 'has attached',
-				data: {
-					inverseName: 'is attached to',
-					from: {
-						id: message.id,
-						type: message.type,
-					},
-					to: {
-						id: notification.id,
-						type: notification.type,
-					},
-				},
-			});
 		}),
 	);
 };

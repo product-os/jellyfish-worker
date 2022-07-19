@@ -12,7 +12,65 @@ afterAll(() => {
 	return testUtils.destroyContext(ctx);
 });
 
-test('Should crate a notification if a message is attached to a subscribed support-thread', async () => {
+test('Should create a notification if user is mentioned', async () => {
+	const user1 = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
+	const user2 = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
+	const session = { actor: user1 };
+	const supportThread = await ctx.createSupportThread(
+		user1.id,
+		session,
+		'foobar',
+		{
+			status: 'open',
+		},
+	);
+
+	const message = await ctx.createMessage(
+		user1.id,
+		session,
+		supportThread,
+		`ping @${user2.slug.replace('user-', '')}`,
+	);
+
+	await ctx.flushAll(ctx.session);
+
+	const notification = await ctx.waitForMatch(
+		{
+			type: 'object',
+			properties: {
+				type: {
+					const: 'notification@1.0.0',
+				},
+			},
+			required: ['type'],
+			$$links: {
+				'is attached to': {
+					type: 'object',
+					properties: {
+						id: {
+							const: message.id,
+						},
+					},
+					required: ['id'],
+				},
+				notifies: {
+					type: 'object',
+					properties: {
+						id: {
+							const: user2.id,
+						},
+					},
+					required: ['id'],
+				},
+			},
+		},
+		3,
+	);
+
+	expect(notification).toBeDefined();
+});
+
+test('Should create a notification if a message is attached to a subscribed support-thread', async () => {
 	const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 	const session = { actor: user };
 	const supportThread = await ctx.createSupportThread(
