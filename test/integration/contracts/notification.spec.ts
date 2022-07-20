@@ -12,7 +12,7 @@ afterAll(() => {
 	return testUtils.destroyContext(ctx);
 });
 
-test('Should crate a notification if a message is attached to a subscribed support-thread', async () => {
+test('Should create a notification if a message is attached to a subscribed support-thread', async () => {
 	const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 	const session = await ctx.createSession(user);
 	const supportThread = await ctx.createSupportThread(

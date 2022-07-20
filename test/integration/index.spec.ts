@@ -402,7 +402,7 @@ describe('Worker', () => {
 		expect(enqueuedRequest2).toBeFalsy();
 	});
 
-	it('should evaluate a simple computed property on insertion', async () => {
+	it.only('should evaluate a simple computed property on insertion', async () => {
 		const typeContract = ctx.worker.typeContracts['type@1.0.0'];
 		assert(typeContract);
 

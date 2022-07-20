@@ -1,10 +1,7 @@
-import type {
-	Contract,
-	TypeContract,
-} from '@balena/jellyfish-types/build/core';
-import { ActionDefinition, errors, WorkerContext } from '../';
 import { strict as assert } from 'assert';
+import type { Contract, TypeContract } from 'autumndb';
 import _ from 'lodash';
+import { ActionDefinition, errors, WorkerContext } from '../';
 
 /**
  * Search through a contract query result for a matching settings link
@@ -97,30 +94,22 @@ const handler: ActionDefinition['handler'] = async (
 			},
 		},
 	});
-	console.log(
-		'worker.agentWithSettings:',
-		JSON.stringify(agentWithSettings, null, 4),
-	);
 
 	// Create working-hours contract if necessary
-	// TODO: Move to worker
 	if (
 		!agentHasSettings(agentWithSettings, {
 			type: 'working-hours@1.0.0',
 		})
 	) {
-		console.log('=== Creating working-hours contract');
 		await createSettingsForAgent(session, context, agent, 'working-hours');
 	}
 
 	// Create agent-settings contract if necessary
-	// TODO: Move to worker
 	if (
 		!agentHasSettings(agentWithSettings, {
 			type: 'agent-settings@1.0.0',
 		})
 	) {
-		console.log('=== Creating agent-settings contract');
 		await createSettingsForAgent(session, context, agent, 'agent-settings');
 	}
 

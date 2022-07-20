@@ -120,11 +120,13 @@ const handler: ActionDefinition['handler'] = async (
 ) => {
 	logger.info(request.logContext, `Bootstrapping channel '${contract.slug}'`);
 
-	const viewTypeContract = await context.getCardBySlug(session, 'view@latest');
-	assert(!!viewTypeContract, 'View type contract not found');
-
-	const linkTypeContract = await context.getCardBySlug(session, 'link@latest');
-	assert(!!linkTypeContract, 'Link type contract not found');
+    const [viewTypeContract, linkTypeContract, triggeredActionTypeContract] =
+        await Promise.all([
+			context.getCardBySlug(session, 'view@latest'),
+			context.getCardBySlug(session, 'link@latest'),
+			context.getCardBySlug(session, 'triggered-action@latest'),
+		]);
+    assert(viewTypeContract && linkTypeContract && triggeredActionTypeContract);
 
 	// Create views based on the channel's base filter
 	const views = [
@@ -186,6 +188,55 @@ const handler: ActionDefinition['handler'] = async (
 				},
 			);
 		}),
+	);
+
+    // Create triggered actions based on the channel's base filter
+	const triggeredActionContract = await context.replaceCard(
+		session,
+		triggeredActionTypeContract as TypeContract,
+		{
+			attachEvents: false,
+		},
+		{
+			slug: `triggered-action-${contract.slug}-matchmake`,
+			data: {
+				filter: (contract.data.filter as any).schema,
+				action: 'action-matchmake@1.0.0',
+				target: '${source.id}',
+				arguments: {
+					source: contract.id,
+				},
+			},
+		},
+	);
+	assert(triggeredActionContract, 'Triggered action contract is null');
+
+    // And create a link contract between the view and the channel
+	await context.replaceCard(
+		session,
+		linkTypeContract as TypeContract,
+		{
+			timestamp: request.timestamp,
+			actor: request.actor,
+			originator: request.originator,
+			attachEvents: false,
+		},
+		{
+			slug: `link-${triggeredActionContract.id}-is-attached-to-${contract.id}`,
+			type: 'link@1.0.0',
+			name: 'is attached to',
+			data: {
+				inverseName: 'has attached element',
+				from: {
+					id: triggeredActionContract.id,
+					type: triggeredActionContract.type,
+				},
+				to: {
+					id: contract.id,
+					type: contract.type,
+				},
+			},
+		},
 	);
 
 	const result = contract;

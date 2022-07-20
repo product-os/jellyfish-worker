@@ -1,5 +1,6 @@
 import { getLogger } from '@balena/jellyfish-logger';
 import { strict as assert } from 'assert';
+import type { TypeContract } from 'autumndb';
 import _ from 'lodash';
 import * as errors from '../errors';
 import type { ActionDefinition } from '../plugin';
@@ -104,9 +105,45 @@ const handler: ActionDefinition['handler'] = async (
 			},
 		},
 	});
-	console.log('agents:', JSON.stringify(agents, null, 4));
-	if (agents.length > 0) {
-		console.log('Need to notify agent!');
+
+	if (agents.length > 0 && agents[0].links && agents[0].links['has agent']) {
+        // Send whisper using bot user to create notification for selected agent
+        const agent = agents[0].links['has agent'][0];
+		const typeContract = context.cards['action-request@1.0.0'] as TypeContract;
+		const date = new Date();
+		await context.insertCard(
+		    context.privilegedSession,
+			typeContract,
+			{
+				timestamp: request.timestamp,
+				actor: request.actor,
+				originator: request.originator,
+				attachEvents: false,
+			},
+			{
+				data: {
+					actor: request.actor,
+					context: request.logContext,
+					action: 'action-create-event@1.0.0',
+					card: contract.id,
+					type: contract.type,
+					epoch: date.valueOf(),
+					timestamp: date.toISOString(),
+					input: {
+						id: contract.id,
+					},
+					arguments: {
+						type: 'whisper',
+						payload: {
+							message: `@${agent.slug.replace(
+								'user-',
+								'',
+							)} - You have been chosen, take ownership if possible!`,
+						},
+					},
+				},
+			},
+		);
 	} else {
 		console.log('Not attempting matchmake, no agents found');
 		logger.debug(
