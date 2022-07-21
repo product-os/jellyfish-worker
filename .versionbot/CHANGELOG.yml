@@ -1,4 +1,19 @@
 - commits:
+    - subject: Remove statuspage from translate sources
+      hash: 8e5860bb24030d65dbcd733a2915fb63d71e7718
+      body: |
+        Going the route of handling webhooks with triggered actions
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 32.0.2
+  title: "'Remove statuspage from translate sources'"
+  date: 2022-07-21T05:20:18.001Z
+- commits:
     - subject: Add statuspage to translate sources
       hash: ddf73a33b254f7ff95e9e322ee0ac7bf4d6125c5
       body: ""
