@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert';
-import { testUtils as autumndbTestUtils } from 'autumndb';
+import { RelationshipContract, testUtils as autumndbTestUtils } from 'autumndb';
 import _ from 'lodash';
 import { testUtils } from '../../../lib';
 
@@ -64,6 +64,60 @@ describe('role-user-community', () => {
 				product: 'test-product',
 				inbox: 'S/Paid_Support',
 				status: 'open',
+			}),
+		).rejects.toThrowError();
+	});
+
+	it('users should be able to read, but not write relationship contracts', async () => {
+		const user = await createUser(['user-external-support'], balenaOrg);
+		const session = { actor: user };
+
+		const relationships = await ctx.kernel.query<RelationshipContract>(
+			ctx.logContext,
+			session,
+			{
+				type: 'object',
+				properties: {
+					type: {
+						const: 'relationship@1.0.0',
+					},
+				},
+			},
+		);
+
+		await expect(relationships.length).toBeGreaterThan(0);
+
+		await expect(
+			ctx.kernel.patchContractBySlug(
+				ctx.logContext,
+				session,
+				relationships[0].slug,
+				[
+					{
+						op: 'replace',
+						path: '/name',
+						value: 'new name',
+					},
+				],
+			),
+		).rejects.toThrowError();
+
+		await expect(
+			ctx.kernel.insertContract<RelationshipContract>(ctx.logContext, session, {
+				type: 'relationship@1.0.0',
+				name: 'flies',
+				slug: 'relationship-pilot-flies-plane',
+				data: {
+					title: 'Plane',
+					inverseName: 'is flown by',
+					inverseTitle: 'Pilot',
+					from: {
+						type: 'pilot',
+					},
+					to: {
+						type: 'plane',
+					},
+				},
 			}),
 		).rejects.toThrowError();
 	});
