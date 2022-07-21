@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add relationship between support threads and subscriptions
+      hash: edd1d81e263bc5ac9c7fc5cc20c7d8f2263efa5c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.0.4
+  title: "'Add relationship between support threads and subscriptions'"
+  date: 2022-07-21T10:22:29.933Z
+- commits:
     - subject: Update autumndb from 21.0.0 to 21.1.1
       hash: eae35554e0afd8487517deef7c3af8e171a53c85
       body: ""
