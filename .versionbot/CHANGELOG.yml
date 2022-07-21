@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add statuspage to translate sources
+      hash: ddf73a33b254f7ff95e9e322ee0ac7bf4d6125c5
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 32.0.1
+  title: "'Add statuspage to translate sources'"
+  date: 2022-07-21T03:53:41.844Z
+- commits:
     - subject: Use session identity instead of session tokens
       hash: 8dae10ebe040483c57c72fedff88d84dcddd4ebf
       body: >
