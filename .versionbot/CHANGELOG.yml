@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update autumndb from 21.0.0 to 21.1.1
+      hash: eae35554e0afd8487517deef7c3af8e171a53c85
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 32.0.3
+  title: "'Update autumndb from 21.0.0 to 21.1.1'"
+  date: 2022-07-21T05:43:34.143Z
+- commits:
     - subject: Remove statuspage from translate sources
       hash: 8e5860bb24030d65dbcd733a2915fb63d71e7718
       body: |
