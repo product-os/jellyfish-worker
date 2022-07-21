@@ -23,7 +23,7 @@ export const roleUserExternalSupport: RoleContractDefinition = {
 					properties: {
 						type: {
 							type: 'string',
-							enum: ['link@1.0.0', 'subscription@1.0.0'],
+							enum: ['link@1.0.0', 'subscription@1.0.0', 'relationship@1.0.0'],
 						},
 					},
 				},
