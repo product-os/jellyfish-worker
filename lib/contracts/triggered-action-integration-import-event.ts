@@ -30,6 +30,7 @@ export const triggeredActionIntegrationImportEvent: TriggeredActionContractDefin
 									'outreach',
 									'flowdock',
 									'typeform',
+									'statuspage',
 								],
 							},
 						},
