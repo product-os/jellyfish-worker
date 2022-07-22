@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 12.2.0 to 12.3.0
+      hash: 20a3d1ab885145e883f69f519be0a169c5c505b9
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 32.0.5
+  title: "'Update @balena/jellyfish-environment from 12.2.0 to 12.3.0'"
+  date: 2022-07-21T11:28:35.042Z
+- commits:
     - subject: Allow external support users to read but not write relationships
       hash: 3c87beccff545ed8bf50116b10ed1a8deb6efa09
       body: ""
