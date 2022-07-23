@@ -554,25 +554,29 @@ describe('action-send-first-time-login-link', () => {
 
 	test("throws an error when the first-time-login user does not belong to the requester's org", async () => {
 		nockRequest();
-		const newOrg = await ctx.createContract(
-			ctx.adminUserId,
-			ctx.session,
+		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
+		const userSession = { actor: user };
+		await ctx.createContract(
+			user.id,
+			userSession,
 			'org@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{},
 		);
-		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
-		await ctx.createLinkThroughWorker(
-			ctx.adminUserId,
-			ctx.session,
-			user,
-			newOrg,
-			'is member of',
-			'has member',
+		const requester = await ctx.createUser(
+			autumndbTestUtils.generateRandomSlug(),
+		);
+		const requesterSession = { actor: requester };
+		await ctx.createContract(
+			requester.id,
+			requesterSession,
+			'org@1.0.0',
+			autumndbTestUtils.generateRandomSlug(),
+			{},
 		);
 
 		await expect(
-			ctx.processAction(ctx.session, {
+			ctx.processAction(requesterSession, {
 				type: 'action-request@1.0.0',
 				data: {
 					action: 'action-send-first-time-login-link@1.0.0',

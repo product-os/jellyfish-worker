@@ -13,6 +13,7 @@ import {
 	Kernel,
 	TypeContract,
 	RelationshipContract,
+	LinkContract,
 } from 'autumndb';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -281,6 +282,85 @@ export async function getObjectWithLinks<
 
 	return contractWithLinks as PContract;
 }
+
+// Only org members can add other users to an org
+// Here we check to see if the user is an org member, or the creator of the org, before allowing the link creation
+// TODO: This is a temporary solution until we have a better way to handle this.
+// Once we are able to distinctly permission writes in AutumnDB, we can remove this.
+const validateOrgMembership = async (
+	logContext: LogContext,
+	kernel: Kernel,
+	session: AutumnDBSession,
+	contract: Partial<Contract>,
+): Promise<void> => {
+	if (contract.type === 'link@1.0.0' && session.actor.slug !== 'user-admin') {
+		const linkContract: Partial<LinkContract> = contract as any;
+		if (
+			linkContract.name === 'is creator of' &&
+			linkContract?.data?.from.type === 'user@1.0.0' &&
+			linkContract.data.inverseName === 'was created by'
+		) {
+			throw new Error('Cannot create link with reserved name "is creator of"');
+		}
+		if (
+			linkContract.name === 'has member' &&
+			linkContract?.data?.from.type === 'org@1.0.0' &&
+			linkContract.data.to.type === 'user@1.0.0'
+		) {
+			const [sessionUserWithOrg] = await kernel.query(
+				logContext,
+				session,
+				{
+					type: 'object',
+					properties: {
+						id: {
+							const: session.actor.id,
+						},
+					},
+					anyOf: [
+						{
+							$$links: {
+								'is member of': {
+									type: 'object',
+									properties: {
+										type: {
+											const: 'org@1.0.0',
+										},
+										id: {
+											const: linkContract?.data.from.id,
+										},
+									},
+								},
+							},
+						},
+						{
+							$$links: {
+								'is creator of': {
+									type: 'object',
+									properties: {
+										type: {
+											const: 'org@1.0.0',
+										},
+										id: {
+											const: linkContract?.data.from.id,
+										},
+									},
+								},
+							},
+						},
+					],
+				},
+				{
+					limit: 1,
+				},
+			);
+
+			if (!sessionUserWithOrg) {
+				throw new Error('You are not a member of this org');
+			}
+		}
+	}
+};
 
 /**
  * Jellyfish worker library module.
@@ -680,6 +760,14 @@ export class Worker {
 					typeContract.data.schema,
 					objectWithLinks as any,
 				);
+
+				await validateOrgMembership(
+					logContext,
+					kernel,
+					insertSession,
+					evaluatedContract,
+				);
+
 				const result = await kernel.insertContract<T>(
 					logContext,
 					insertSession,
@@ -798,6 +886,14 @@ export class Worker {
 					objectWithLinks as any,
 					patch,
 				);
+
+				await validateOrgMembership(
+					logContext,
+					kernel,
+					insertSession,
+					objectWithLinks,
+				);
+
 				return kernel.patchContractBySlug(
 					logContext,
 					session,

@@ -145,6 +145,7 @@ import { triggeredActionIncrementTag } from './triggered-action-increment-tag';
 import { triggeredActionIntegrationImportEvent } from './triggered-action-integration-import-event';
 import { triggeredActionMatchmakeTask } from './triggered-action-matchmake-task';
 import { triggeredActionMergeDraftVersion } from './triggered-action-merge-draft-version';
+import { triggeredActionOrgCreationMembership } from './triggered-action-org-creation-membership';
 import { triggeredActionSetUserAvatar } from './triggered-action-set-user-avatar';
 import { triggeredActionSupportCompletedImprovementReopen } from './triggered-action-support-completed-improvement-reopen';
 import { triggeredActionSupportReopen } from './triggered-action-support-reopen';
@@ -336,6 +337,7 @@ export const contracts: ContractDefinition[] = [
 	triggeredActionIntegrationImportEvent,
 	triggeredActionMatchmakeTask,
 	triggeredActionMergeDraftVersion,
+	triggeredActionOrgCreationMembership,
 	triggeredActionSetUserAvatar,
 	triggeredActionSupportCompletedImprovementReopen,
 	triggeredActionSupportReopen,
