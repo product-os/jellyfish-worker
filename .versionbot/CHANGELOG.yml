@@ -1,4 +1,20 @@
 - commits:
+    - subject: Update type contract interface definitions
+      hash: 9b22be56cb56d70050004b3912fa4b6da53d7cba
+      body: |
+        Update autumndb to version with interface generation alphabetization
+        fix, and regenerate type contract interfaces.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 32.0.6
+  title: "'Update type contract interface definitions'"
+  date: 2022-07-23T09:03:46.889Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 12.2.0 to 12.3.0
       hash: 20a3d1ab885145e883f69f519be0a169c5c505b9
       body: ""
