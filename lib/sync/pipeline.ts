@@ -181,7 +181,7 @@ export const importCards = async (
 						segment.card,
 						null,
 						2,
-					)}`;
+					)} with references ${JSON.stringify(references, null, 2)}`;
 				});
 
 				finalObject = Object.assign(
