@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update autumndb from 21.1.4 to 21.2.0
+      hash: a551b2582b535c7cc0c2308c2ffc0df7965a3987
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 32.1.1
+  title: "'Update autumndb from 21.1.4 to 21.2.0'"
+  date: 2022-07-25T17:44:25.829Z
+- commits:
     - subject: Only allow org members to add other users to an org
       hash: dae5c12286663b389a7d018546745dd16265a0a7
       body: >
