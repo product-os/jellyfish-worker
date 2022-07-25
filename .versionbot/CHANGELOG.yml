@@ -1,4 +1,36 @@
 - commits:
+    - subject: Only allow org members to add other users to an org
+      hash: dae5c12286663b389a7d018546745dd16265a0a7
+      body: >
+        This change adds a check to see if the user is an org member before
+        allowing link creation between user and org.
+
+        This link is used to calculate marker permissions so needs to be specially protected.
+
+        It also closes some other holes that would affect the ability to "join" an org.
+
+
+        - Users can no longer create a link between a user and an org if they
+
+        are not a member or creator of the org
+
+        - When a user creates an org, they automatically become a member of the org
+
+        - Users can no longer create "was created by" links manually, as this could be used to bypass org creator validation
+
+
+        Note: This is a temporary solution until we have a better way to handle this. Once we are able to distinctly permission writes in AutumnDB, we can remove this.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.1.0
+  title: "'Only allow org members to add other users to an org'"
+  date: 2022-07-25T06:29:32.189Z
+- commits:
     - subject: Log references on failed evaluation
       hash: 780665ee396c3be2078954a4bb99e37c0aa82c76
       body: ""
