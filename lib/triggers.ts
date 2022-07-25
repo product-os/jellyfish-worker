@@ -25,6 +25,12 @@ interface CompileContext {
 		str: string,
 	) => RegExpMatchArray;
 	source?: Contract;
+	actor: {
+		id: string;
+		slug: string;
+		type: string;
+		version: string;
+	};
 }
 
 interface GetRequestOptions {
@@ -211,6 +217,12 @@ const compileTrigger = (
 	trigger: string | Record<any, any>,
 	contract: Contract | null,
 	currentDate: Date,
+	actor: {
+		id: string;
+		slug: string;
+		type: string;
+		version: string;
+	},
 ) => {
 	const context: CompileContext = {
 		timestamp: currentDate.toISOString(),
@@ -224,6 +236,7 @@ const compileTrigger = (
 			const match = str.match(regEx);
 			return match || [];
 		},
+		actor,
 	};
 
 	if (contract) {
@@ -305,13 +318,19 @@ export const getRequest = async (
 		},
 		newContractMatches || newContract,
 		options.currentDate,
+		{
+			id: options.session.actor.id,
+			type: options.session.actor.type,
+			slug: options.session.actor.slug,
+			version: options.session.actor.version,
+		},
 	);
 
 	if (!compiledTrigger) {
 		return null;
 	}
 
-	return {
+	const result = {
 		action: trigger.data.action,
 		arguments: compiledTrigger.arguments,
 		originator: trigger.id,
@@ -319,6 +338,8 @@ export const getRequest = async (
 		currentDate: options.currentDate,
 		card: compiledTrigger.target,
 	};
+
+	return result;
 };
 
 /**
