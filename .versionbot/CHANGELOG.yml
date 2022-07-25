@@ -1,4 +1,18 @@
 - commits:
+    - subject: Log references on failed evaluation
+      hash: 780665ee396c3be2078954a4bb99e37c0aa82c76
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 32.0.8
+  title: "'Log references on failed evaluation'"
+  date: 2022-07-25T05:41:22.928Z
+- commits:
     - subject: Update repo.yml
       hash: 0a226a332d9018bddc1caa6bf672474c58253cd9
       body: ""
