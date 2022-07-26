@@ -7,6 +7,7 @@ import type {
 } from 'autumndb';
 import type { CreateContract } from './types';
 import { find, without } from 'lodash';
+import _ from 'lodash';
 
 /*
  * Get creator user from linked create contract
@@ -30,6 +31,14 @@ const getMentions = (message: Contract<any>): string[] => {
 	return (
 		message.data.payload?.mentionsUser?.concat(
 			message.data.payload?.alertsUser || [],
+		) || []
+	);
+};
+
+const getChatGroups = (message: Contract<any>): string[] => {
+	return (
+		message.data.payload?.mentionsGroup?.concat(
+			message.data.payload?.alertsGroup || [],
 		) || []
 	);
 };
@@ -172,20 +181,57 @@ export const evaluate = async ({
 		const currentMentions = getMentions(newContract);
 		const newMentions = without(currentMentions, ...oldMentions);
 
-		if (newMentions.length) {
-			await Promise.all(
-				newMentions.map(async (newMention) => {
-					const [receiver] = await query<UserContract>(
-						{
+		const oldGroupMentions = oldContract ? getChatGroups(oldContract) : [];
+		const currentGroupMentions = getChatGroups(newContract);
+		const newGroupMentions = without(currentGroupMentions, ...oldGroupMentions);
+
+		if (newGroupMentions.length) {
+			for (const group of newGroupMentions) {
+				const users = await query({
+					type: 'object',
+					properties: {
+						type: {
+							const: 'user@1.0.0',
+						},
+					},
+					$$links: {
+						'is group member of': {
 							type: 'object',
 							properties: {
-								slug: {
-									const: newMention,
+								type: {
+									const: 'group@1.0.0',
+								},
+								name: {
+									const: group,
 								},
 							},
 						},
-						{ limit: 1 },
-					);
+					},
+				});
+
+				newMentions.push(..._.map(users, 'slug'));
+			}
+		}
+
+		if (newMentions.length) {
+			await Promise.all(
+				newMentions.map(async (newMention) => {
+					const receiver =
+						typeof newMention === 'string'
+							? _.first(
+									await query<UserContract>(
+										{
+											type: 'object',
+											properties: {
+												slug: {
+													const: newMention,
+												},
+											},
+										},
+										{ limit: 1 },
+									),
+							  )
+							: newMention;
 
 					if (receiver) {
 						return attachNotificationToMessage(

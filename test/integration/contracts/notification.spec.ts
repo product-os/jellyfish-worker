@@ -1,4 +1,5 @@
 import { testUtils as autumndbTestUtils } from 'autumndb';
+import { strict as assert } from 'assert';
 import _ from 'lodash';
 import { testUtils } from '../../../lib';
 
@@ -33,6 +34,85 @@ test('Should create a notification if user is mentioned', async () => {
 	);
 
 	await ctx.flushAll(ctx.session);
+
+	const notification = await ctx.waitForMatch(
+		{
+			type: 'object',
+			properties: {
+				type: {
+					const: 'notification@1.0.0',
+				},
+			},
+			required: ['type'],
+			$$links: {
+				'is attached to': {
+					type: 'object',
+					properties: {
+						id: {
+							const: message.id,
+						},
+					},
+					required: ['id'],
+				},
+				notifies: {
+					type: 'object',
+					properties: {
+						id: {
+							const: user2.id,
+						},
+					},
+					required: ['id'],
+				},
+			},
+		},
+		3,
+	);
+
+	expect(notification).toBeDefined();
+});
+
+test("Should create a notification if a user's group is mentioned", async () => {
+	const user1 = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
+	const user2 = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
+	const session = { actor: user1 };
+	const supportThread = await ctx.createSupportThread(
+		user1.id,
+		session,
+		'foobar',
+		{
+			status: 'open',
+		},
+	);
+
+	const group = await ctx.worker.insertCard(
+		ctx.logContext,
+		session,
+		ctx.worker.typeContracts['group@1.0.0'],
+		{},
+		{
+			name: 'test-group',
+		},
+	);
+
+	assert(group);
+
+	await ctx.flushAll(ctx.session);
+
+	await ctx.createLinkThroughWorker(
+		session.actor.id,
+		session,
+		group,
+		user2,
+		'has group member',
+		'is group member of',
+	);
+
+	const message = await ctx.createMessage(
+		user1.id,
+		session,
+		supportThread,
+		`ping @@${group.name}`,
+	);
 
 	const notification = await ctx.waitForMatch(
 		{
