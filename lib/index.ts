@@ -14,6 +14,7 @@ import {
 	TypeContract,
 	RelationshipContract,
 	LinkContract,
+	contractMixins,
 } from 'autumndb';
 import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
@@ -470,11 +471,13 @@ export class Worker {
 
 		// Get the existing contract and if it is not found or is different, replace it
 		const checkThenReplaceContract = async (
-			contract: Partial<Contract> & { type: string },
+			baseContract: Partial<Contract> & { type: string },
 		) => {
-			if (!contract) {
+			if (!baseContract) {
 				return;
 			}
+			// Add sane defaults to the contract, such as a uiSchema reset
+			const contract = contractMixins.initialize(baseContract as Contract);
 			const current = await this.kernel.getContractBySlug(
 				logContext,
 				this.session,
