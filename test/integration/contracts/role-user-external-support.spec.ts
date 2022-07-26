@@ -1,11 +1,17 @@
 import { strict as assert } from 'assert';
-import { RelationshipContract, testUtils as autumndbTestUtils } from 'autumndb';
+import {
+	RelationshipContract,
+	testUtils as autumndbTestUtils,
+	UserContract,
+} from 'autumndb';
 import _ from 'lodash';
-import { testUtils } from '../../../lib';
+import { ActionContract, testUtils, WorkerContext } from '../../../lib';
+import { actionUpdateCard } from '../../../lib/actions/action-update-card';
 
 let ctx: testUtils.TestContext;
 let balenaOrg: any;
 let testOrg: any;
+let actionContext: WorkerContext;
 
 async function createUser(roles: string[], org: any): Promise<any> {
 	// Create user
@@ -48,6 +54,7 @@ beforeAll(async () => {
 		{},
 	);
 	assert(testOrg);
+	actionContext = ctx.worker.getActionContext(ctx.logContext);
 });
 
 afterAll(() => {
@@ -247,5 +254,91 @@ describe('role-user-community', () => {
 			'update',
 			'view',
 		]);
+	});
+
+	test('should not be able to update other user contracts', async () => {
+		const user = await ctx.createUser(
+			autumndbTestUtils.generateRandomId(),
+			undefined,
+			['user-external-support'],
+		);
+		expect(user.data.roles).toEqual(['user-external-support']);
+		const otherUser = await ctx.createUser(
+			autumndbTestUtils.generateRandomId(),
+		);
+
+		await expect(() => {
+			return actionUpdateCard.handler(
+				{
+					actor: user,
+				},
+				actionContext,
+				otherUser,
+				{
+					action: {} as ActionContract,
+					card: otherUser.id,
+					timestamp: new Date().toISOString(),
+					actor: user.id,
+					logContext: ctx.logContext,
+					epoch: new Date().valueOf(),
+					arguments: {
+						reason: null,
+						patch: [
+							{
+								op: 'replace',
+								path: '/data/email',
+								value: 'foo@bar.com',
+							},
+						],
+					},
+				},
+			);
+		}).rejects.toThrow();
+	});
+
+	test('should not be able to change own roles', async () => {
+		const user = await ctx.createUser(
+			autumndbTestUtils.generateRandomId(),
+			undefined,
+			['user-external-support'],
+		);
+		expect(user.data.roles).toEqual(['user-external-support']);
+		user.data.roles.push('user-operator');
+
+		await expect(() => {
+			return actionUpdateCard.handler(
+				{
+					actor: user,
+				},
+				actionContext,
+				user,
+				{
+					action: {} as ActionContract,
+					card: user.id,
+					timestamp: new Date().toISOString(),
+					actor: user.id,
+					logContext: ctx.logContext,
+					epoch: new Date().valueOf(),
+					arguments: {
+						reason: null,
+						patch: [
+							{
+								op: 'replace',
+								path: '/data/roles',
+								value: user.data.roles,
+							},
+						],
+					},
+				},
+			);
+		}).rejects.toThrow();
+
+		const updated = await ctx.kernel.getContractById<UserContract>(
+			ctx.logContext,
+			ctx.kernel.adminSession()!,
+			user.id,
+		);
+		assert(updated);
+		expect(updated.data.roles).toEqual(['user-external-support']);
 	});
 });

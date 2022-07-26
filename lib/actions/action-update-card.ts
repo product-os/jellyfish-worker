@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
-import type { TypeContract } from 'autumndb';
-import { WorkerNoElement } from '../errors';
+import type { TypeContract, UserContract } from 'autumndb';
+import { WorkerInvalidActionRequest, WorkerNoElement } from '../errors';
 import type { ActionDefinition } from '../plugin';
 
 const handler: ActionDefinition['handler'] = async (
@@ -20,6 +20,20 @@ const handler: ActionDefinition['handler'] = async (
 		WorkerNoElement,
 		`No such type: ${contract.type}`,
 	);
+
+	// Restrict user contract updates
+	// TODO: This is a temporary solution until we have a better way to handle this.
+	// Once we are able to distinctly permission writes in AutumnDB, we can remove this.
+	if (typeContract.slug === 'user') {
+		assert.USER(
+			request.logContext,
+			contract.id === session.actor.id ||
+				session.actor.slug === 'user-admin' ||
+				(session.actor as UserContract).data.roles.includes('user-operator'),
+			WorkerInvalidActionRequest,
+			'You are not allowed to update other user contracts',
+		);
+	}
 
 	const result = await context.patchCard(
 		session,
