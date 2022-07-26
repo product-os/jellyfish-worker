@@ -1,4 +1,25 @@
 - commits:
+    - subject: "action-create-event: Populate metadata extracted from message body"
+      hash: af9221f4c3d7981fec2905b3f3355eaca6624a5e
+      body: >
+        This change pulls in logic from the Jellyfish UI that populates event
+        metadata by parsing the message body.
+
+        This makes behaviour more consistent and testable, especially when interacting with Jellyfish using the client SDK or directly over http instead of through the UI.
+
+
+        The code was originally copied from here https://github.com/product-os/jellyfish/blob/v56.3.6/apps/ui/lib/services/helpers.ts#L971
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.1.4
+  title: "'action-create-event: Populate metadata extracted from message body'"
+  date: 2022-07-26T14:18:38.490Z
+- commits:
     - subject: Initialize default contracts before inserting them
       hash: 52fd4dd1fcba4ee51f15a913491fcc2cf8e41534
       body: >
