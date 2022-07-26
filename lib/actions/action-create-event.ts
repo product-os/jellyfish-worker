@@ -1,7 +1,68 @@
 import * as assert from '@balena/jellyfish-assert';
 import { errors as coreErrors, TypeContract } from 'autumndb';
+import * as _ from 'lodash';
 import { WorkerNoElement } from '../errors';
 import type { ActionDefinition } from '../plugin';
+
+// Matches all multi-line and inline code blocks
+const CODE_BLOCK_REGEXP = /`{1,3}[^`]*`{1,3}/g;
+
+export const createPrefixRegExp = (prefix: string) => {
+	const regExp = new RegExp(
+		`(\\s|^)((${prefix})[a-z\\d-_\\/]+(\\.[a-z\\d-_\\/]+)*)`,
+		'gmi',
+	);
+	return regExp;
+};
+
+/**
+ * @summary match words prefixed with a specific value
+ *
+ * @param {String} prefix - The prefix used
+ * @param {String} source - The text to analyse
+ *
+ * @returns {String[]} An array of matching strings
+ */
+export const findWordsByPrefix = (prefix: string, source: string) => {
+	const regExp = createPrefixRegExp(prefix);
+	return _.invokeMap(_.compact(source.match(regExp)), 'trim');
+};
+
+/**
+ * @summary match keys using a prefix and map them to the keys themselves
+ *
+ * @param {String} prefix - The prefix used to indicate a key
+ * @param {String} source - The text to analyse
+ * @param {String} replacement - The string to replace the prefix with
+ *
+ * @returns {String[]} An array of matched keys
+ */
+export const getSlugsByPrefix = (
+	prefix: string,
+	source: string,
+	replacement = '',
+) => {
+	const words = findWordsByPrefix(prefix, source);
+
+	return _.uniq(
+		words.map((name) => {
+			return name.trim().replace(prefix, replacement);
+		}),
+	);
+};
+
+export const getMessageMetaData = (message: string) => {
+	const sanitizedMessage = message.replace(CODE_BLOCK_REGEXP, '');
+	return {
+		mentionsUser: getSlugsByPrefix('@', sanitizedMessage, 'user-'),
+		alertsUser: getSlugsByPrefix('!', sanitizedMessage, 'user-'),
+		mentionsGroup: getSlugsByPrefix('@@', sanitizedMessage),
+		alertsGroup: getSlugsByPrefix('!!', sanitizedMessage),
+		tags: findWordsByPrefix('#', sanitizedMessage).map((tag) => {
+			return tag.slice(1).toLowerCase();
+		}),
+	};
+};
 
 const handler: ActionDefinition['handler'] = async (
 	session,
@@ -32,11 +93,30 @@ const handler: ActionDefinition['handler'] = async (
 		`No such type: ${request.arguments.type}`,
 	);
 
+	let tags: string[] = [];
+	let payload = request.arguments.payload;
+
+	if (typeContract.slug === 'message' || typeContract.slug === 'whisper') {
+		const metadata = getMessageMetaData(
+			request.arguments.payload.message || '',
+		);
+		const { mentionsUser, alertsUser, mentionsGroup, alertsGroup } = metadata;
+
+		tags = metadata.tags;
+		payload = {
+			mentionsUser,
+			alertsUser,
+			mentionsGroup,
+			alertsGroup,
+			...request.arguments.payload,
+		};
+	}
+
 	const data = {
 		timestamp: request.timestamp,
 		target: fullContract.id,
 		actor: request.actor,
-		payload: request.arguments.payload,
+		payload,
 	};
 
 	const result = (await context
@@ -55,7 +135,7 @@ const handler: ActionDefinition['handler'] = async (
 					(await context.getEventSlug(typeContract.slug)),
 				version: '1.0.0',
 				name: request.arguments.name || null,
-				tags: request.arguments.tags || [],
+				tags: request.arguments.tags || tags,
 
 				// Events always inherit the head contracts markers
 				markers: fullContract.markers,

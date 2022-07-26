@@ -9,6 +9,7 @@ import {
 import {
 	ActionRequestContract,
 	errors,
+	MessageContract,
 	testUtils,
 	WorkerContext,
 } from '../../../lib';
@@ -337,6 +338,64 @@ describe('action-create-event', () => {
 		);
 		assert(result);
 		expect(result.markers).toEqual([marker]);
+	});
+
+	test('should correctly populate metadata', async () => {
+		const root = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.session,
+			'card@1.0.0',
+			null,
+			{ payload: 'test' },
+		);
+
+		const eventRequest = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
+			{
+				data: {
+					action: 'action-create-event@1.0.0',
+					context: ctx.logContext,
+					card: root.id,
+					type: root.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: root.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						type: 'message',
+						name: 'Hello world',
+						payload: {
+							message: '@johndoe !janedoe @@group1 !!group2 #test ',
+						},
+					},
+				},
+			},
+		);
+		assert(eventRequest);
+		await ctx.flushAll(ctx.session);
+		const eventResult: any = await ctx.worker.producer.waitResults(
+			ctx.logContext,
+			eventRequest,
+		);
+		expect(eventResult.error).toBe(false);
+
+		const event = await ctx.kernel.getContractById<MessageContract>(
+			ctx.logContext,
+			ctx.session,
+			eventResult.data.id,
+		);
+		assert(event);
+
+		expect(event.data?.payload?.mentionsUser).toEqual(['user-johndoe']);
+		expect(event.data?.payload?.alertsUser).toEqual(['user-janedoe']);
+		expect(event.data?.payload?.mentionsGroup).toEqual(['group1']);
+		expect(event.data?.payload?.alertsGroup).toEqual(['group2']);
+		expect(event.tags).toEqual(['test']);
 	});
 });
 
