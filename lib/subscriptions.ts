@@ -259,7 +259,7 @@ export const evaluate = async ({
 		newContract.type !== 'link@1.0.0' ||
 		newContract.data.from.type !== 'message@1.0.0' ||
 		newContract.name !== 'is attached to' ||
-		newContract.data.to.type !== 'support-thread@1.0.0'
+		!['support-thread@1.0.0', 'thread@1.0.0'].includes(newContract.data.to.type)
 	) {
 		return;
 	}
@@ -278,7 +278,7 @@ export const evaluate = async ({
 				required: ['type'],
 				properties: {
 					type: {
-						const: 'support-thread@1.0.0',
+						enum: ['thread@1.0.0', 'support-thread@1.0.0'],
 					},
 				},
 				$$links: {
