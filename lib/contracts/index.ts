@@ -141,6 +141,7 @@ import { transformer } from './transformer';
 import { transformerWorker } from './transformer-worker';
 import { triggeredAction } from './triggered-action';
 import { triggeredActionBootstrapChannel } from './triggered-action-bootstrap-channel';
+import { triggeredActionDirectMessageSubscription } from './triggered-action-direct-message-subscription';
 import { triggeredActionHangoutsLink } from './triggered-action-hangouts-link';
 import { triggeredActionIncrementTag } from './triggered-action-increment-tag';
 import { triggeredActionIntegrationImportEvent } from './triggered-action-integration-import-event';
@@ -334,6 +335,7 @@ export const contracts: ContractDefinition[] = [
 	transformerWorker,
 	triggeredAction,
 	triggeredActionBootstrapChannel,
+	triggeredActionDirectMessageSubscription,
 	triggeredActionHangoutsLink,
 	triggeredActionIncrementTag,
 	triggeredActionIntegrationImportEvent,
