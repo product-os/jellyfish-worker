@@ -1,4 +1,20 @@
 - commits:
+    - subject: Update integration tests to use `was transformed to`.
+      hash: cee01c1251b2a46a316779ccdbdc32799f3e335d
+      body: |
+        This is part of the renaming of the relationship
+        from `was built into` to `was transformed to`.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+        signed-off-by: Carlo Miguel F. Cruz <carloc@balena.io>
+      author: Carlo Miguel F. Cruz
+      nested: []
+  version: 32.1.5
+  title: "'Update integration tests to use .'"
+  date: 2022-07-28T02:16:37.416Z
+- commits:
     - subject: "action-create-event: Populate metadata extracted from message body"
       hash: af9221f4c3d7981fec2905b3f3355eaca6624a5e
       body: >
