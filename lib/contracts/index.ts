@@ -115,6 +115,7 @@ import { relationshipTaskHasResultAny } from './relationship-task-has-result-any
 import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
+import { relationshipUserHasNotification } from './relationship-user-has-notification';
 import { relationshipUserHasSettingsAgentChannelSettings } from './relationship-user-has-settings-agent-channel-settings';
 import { relationshipUserHasSettingsWorkingHours } from './relationship-user-has-settings-working-hours';
 import { relationshipUserOwnsRating } from './relationship-user-owns-rating';
@@ -140,6 +141,7 @@ import { transformer } from './transformer';
 import { transformerWorker } from './transformer-worker';
 import { triggeredAction } from './triggered-action';
 import { triggeredActionBootstrapChannel } from './triggered-action-bootstrap-channel';
+import { triggeredActionDirectMessageSubscription } from './triggered-action-direct-message-subscription';
 import { triggeredActionHangoutsLink } from './triggered-action-hangouts-link';
 import { triggeredActionIncrementTag } from './triggered-action-increment-tag';
 import { triggeredActionIntegrationImportEvent } from './triggered-action-integration-import-event';
@@ -307,6 +309,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipTransformerWorkerOwnsTask,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
+	relationshipUserHasNotification,
 	relationshipUserHasSettingsAgentChannelSettings,
 	relationshipUserHasSettingsWorkingHours,
 	relationshipUserOwnsRating,
@@ -332,6 +335,7 @@ export const contracts: ContractDefinition[] = [
 	transformerWorker,
 	triggeredAction,
 	triggeredActionBootstrapChannel,
+	triggeredActionDirectMessageSubscription,
 	triggeredActionHangoutsLink,
 	triggeredActionIncrementTag,
 	triggeredActionIntegrationImportEvent,

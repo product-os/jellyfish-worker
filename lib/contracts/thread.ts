@@ -21,6 +21,19 @@ export const thread: ContractDefinition = contractMixins.mixin(
 							type: 'string',
 							fullTextSearch: true,
 						},
+						dms: {
+							description:
+								'If true, indicates that this thread is used for direct messaging between users',
+							type: 'boolean',
+						},
+						actors: {
+							description:
+								'If this is a direct message thread, this field should contrain an array of slugs, for each of the participating users',
+							type: 'array',
+							items: {
+								type: 'string',
+							},
+						},
 					},
 				},
 			},

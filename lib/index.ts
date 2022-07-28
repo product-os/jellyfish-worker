@@ -1669,6 +1669,8 @@ export class Worker {
 			.evaluate({
 				oldContract: currentContract,
 				newContract: insertedContract,
+				session,
+				privilegedSession: workerContext.privilegedSession,
 				getTypeContract: (type) => {
 					return this.typeContracts[type];
 				},
