@@ -1,4 +1,50 @@
 - commits:
+    - subject: Automatically subscribe users to direct message threads
+      hash: 63cd1eed2383569164235de23802a235aa53aa23
+      body: >
+        Direct message threads are indicated by `dms: true` and `actors: [
+        'user-1', 'user-2' ]`.
+
+        A triggered action detects new threads of this type being created and runs a dedicated action that will iterate over the actors participating in the thread and create a subscription on behalf of each of them.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Add support for subscribing to thread contracts
+      hash: 882180f928e3d9b25b11698e65c1bfc875ee5fe6
+      body: |
+        When a new message is attached to a thread that has a subscription,
+        a notification will be generated.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Generate notifications for group mentions
+      hash: 40d061a79ebae539d0a93438fa334a435640787c
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Lucian Buzzo
+      nested: []
+    - subject: Generate notification when mentioning a user
+      hash: 539bb2f146e6e8376c9d4769752e1eea3905713e
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: karaxuna
+      nested: []
+  version: 32.2.0
+  title: "'Generate notification when mentioning a user'"
+  date: 2022-07-28T13:25:19.838Z
+- commits:
     - subject: Update integration tests to use `was transformed to`.
       hash: cee01c1251b2a46a316779ccdbdc32799f3e335d
       body: |
