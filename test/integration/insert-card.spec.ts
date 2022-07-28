@@ -847,7 +847,7 @@ describe('.insertCard()', () => {
 		assert(typeType && linkType && relationshipType);
 
 		// Insert required relationship
-		await createWasBuiltIntoRelationship(relationshipType);
+		await createWasTransformedToRelationship(relationshipType);
 
 		const typeSlug = autumndbTestUtils.generateRandomSlug();
 		const initialValue = 1;
@@ -1087,7 +1087,7 @@ describe('.insertCard()', () => {
 		assert(typeType && linkType && relationshipType);
 
 		// Insert required relationship
-		await createWasBuiltIntoRelationship(relationshipType);
+		await createWasTransformedToRelationship(relationshipType);
 
 		const typeSlug = autumndbTestUtils.generateRandomSlug();
 		const initialValue = 1;
@@ -1635,7 +1635,9 @@ describe('.insertCard()', () => {
 	});
 });
 
-async function createWasBuiltIntoRelationship(relationshipType: TypeContract) {
+async function createWasTransformedToRelationship(
+	relationshipType: TypeContract,
+) {
 	await ctx.worker.replaceCard(
 		ctx.logContext,
 		ctx.session,
@@ -1644,13 +1646,13 @@ async function createWasBuiltIntoRelationship(relationshipType: TypeContract) {
 			attachEvents: false,
 		},
 		{
-			slug: `relationship-any-was-built-into-any`,
+			slug: `relationship-any-was-transformed-to-any`,
 			type: 'relationship@1.0.0',
-			name: 'was built into',
+			name: 'was transformed to',
 			data: {
-				inverseName: 'was built from',
-				title: 'Any',
-				inverseTitle: 'Any',
+				inverseName: 'was transformed from',
+				title: 'Transformation output',
+				inverseTitle: 'Transformation input',
 				from: {
 					type: '*',
 				},
