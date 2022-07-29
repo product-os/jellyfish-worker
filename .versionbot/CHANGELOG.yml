@@ -1,4 +1,19 @@
 - commits:
+    - subject: Add whisper to any relationship
+      hash: 36034d34803b1ea86332a701c64c626b2b766fb0
+      body: |
+        Like messages, whispers can be in the timeline for any contract.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 32.2.1
+  title: "'Add whisper to any relationship'"
+  date: 2022-07-29T01:16:14.901Z
+- commits:
     - subject: Automatically subscribe users to direct message threads
       hash: 63cd1eed2383569164235de23802a235aa53aa23
       body: >
