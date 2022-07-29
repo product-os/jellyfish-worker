@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add relationship between orgs and threads
+      hash: ec38d8b379d915a21760b1dde2be8fd8a502a92c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.2.2
+  title: "'Add relationship between orgs and threads'"
+  date: 2022-07-29T08:39:36.983Z
+- commits:
     - subject: Add whisper to any relationship
       hash: 36034d34803b1ea86332a701c64c626b2b766fb0
       body: |
