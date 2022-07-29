@@ -88,6 +88,7 @@ import { relationshipOpportunityHasBackupOwnerUser } from './relationship-opport
 import { relationshipOpportunityIsAttachedToAccount } from './relationship-opportunity-is-attached-to-account';
 import { relationshipOpportunityIsOwnedByUser } from './relationship-opportunity-is-owned-by-user';
 import { relationshipOrgHasThread } from './relationship-org-has-thread';
+import { relationshipOrgHasLoop } from './relationship-org-has-loop';
 import { relationshipPasswordResetIsAttachedToUser } from './relationship-password-reset-is-attached-to-user';
 import { relationshipPatternIsAttachedToSalesThread } from './relationship-pattern-is-attached-to-sales-thread';
 import { relationshipPatternIsAttachedToSupportThread } from './relationship-pattern-is-attached-to-support-thread';
@@ -280,6 +281,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipOpportunityIsAttachedToAccount,
 	relationshipOpportunityIsOwnedByUser,
 	relationshipOrgHasThread,
+	relationshipOrgHasLoop,
 	relationshipPasswordResetIsAttachedToUser,
 	relationshipPatternIsAttachedToSalesThread,
 	relationshipPatternIsAttachedToSupportThread,
