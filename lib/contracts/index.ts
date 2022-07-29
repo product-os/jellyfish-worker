@@ -120,10 +120,7 @@ import { relationshipUserHasSettingsAgentChannelSettings } from './relationship-
 import { relationshipUserHasSettingsWorkingHours } from './relationship-user-has-settings-working-hours';
 import { relationshipUserOwnsRating } from './relationship-user-owns-rating';
 import { relationshipViewIsAttachedToChannel } from './relationship-view-is-attached-to-channel';
-import { relationshipWhisperIsAttachedToMilestone } from './relationship-whisper-is-attached-to-milestone';
-import { relationshipWhisperIsAttachedToSalesThread } from './relationship-whisper-is-attached-to-sales-thread';
-import { relationshipWhisperIsAttachedToSupportThread } from './relationship-whisper-is-attached-to-support-thread';
-import { relationshipWhisperIsAttachedToThread } from './relationship-whisper-is-attached-to-thread';
+import { relationshipWhisperIsAttachedToAny } from './relationship-whisper-is-attached-to-any';
 import { roleLoop } from './role-loop';
 import { roleTransformerWorker } from './role-transformer-worker';
 import { roleUserExternalSupport } from './role-user-external-support';
@@ -314,10 +311,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipUserHasSettingsWorkingHours,
 	relationshipUserOwnsRating,
 	relationshipViewIsAttachedToChannel,
-	relationshipWhisperIsAttachedToMilestone,
-	relationshipWhisperIsAttachedToSalesThread,
-	relationshipWhisperIsAttachedToSupportThread,
-	relationshipWhisperIsAttachedToThread,
+	relationshipWhisperIsAttachedToAny,
 	roleLoop,
 	roleTransformerWorker,
 	roleUserExternalSupport,
