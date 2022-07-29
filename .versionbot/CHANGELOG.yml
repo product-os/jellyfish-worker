@@ -1,4 +1,18 @@
 - commits:
+    - subject: Create relationship between orgs and loops
+      hash: b8d3219b95eac6b43ee2b8b3732bb721854812b2
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.3.0
+  title: "'Create relationship between orgs and loops'"
+  date: 2022-07-29T09:28:59.539Z
+- commits:
     - subject: Add relationship between orgs and threads
       hash: ec38d8b379d915a21760b1dde2be8fd8a502a92c
       body: ""
