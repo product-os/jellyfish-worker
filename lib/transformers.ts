@@ -184,7 +184,7 @@ export const evaluate = async ({
 	);
 
 	if (!results.includes(true)) {
-		logger.info(logContext, 'Did not execute any transformers', {
+		logger.debug(logContext, 'Did not execute any transformers', {
 			newContract: {
 				id: newContract.id,
 				type: newContract.type,

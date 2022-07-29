@@ -1026,7 +1026,7 @@ export class Worker {
 		triggerContracts: TriggeredActionContract[],
 	) {
 		logger.info(logContext, 'Setting triggers', {
-			count: contracts.length,
+			count: triggerContracts.length,
 		});
 
 		this.triggers = triggerContracts;
