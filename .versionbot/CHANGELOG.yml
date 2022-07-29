@@ -1,4 +1,28 @@
 - commits:
+    - subject: Use correct value when logging trigger contract count
+      hash: 5ba8ba2d70dbf2a3e7dbd8d03d4aa104caf5695d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Reduce transformers logging verbosity
+      hash: 98773bd173c80f7e2cb2560b4cc2e367a009f8a6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.3.1
+  title: "'Lucianbuzzo/spring cleaning'"
+  date: 2022-07-29T11:32:45.947Z
+- commits:
     - subject: Create relationship between orgs and loops
       hash: b8d3219b95eac6b43ee2b8b3732bb721854812b2
       body: ""
