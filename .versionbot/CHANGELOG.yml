@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 12.3.0 to 12.3.1
+      hash: 7ca5db8c8f4c0a990bd8ebcb45b34d68a5264aec
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 32.3.2
+  title: "'Update @balena/jellyfish-environment from 12.3.0 to 12.3.1'"
+  date: 2022-07-31T11:02:41.354Z
+- commits:
     - subject: Use correct value when logging trigger contract count
       hash: 5ba8ba2d70dbf2a3e7dbd8d03d4aa104caf5695d
       body: ""
