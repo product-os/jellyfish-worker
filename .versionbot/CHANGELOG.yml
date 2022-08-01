@@ -1,4 +1,18 @@
 - commits:
+    - subject: Correctly load loop/channel relationship
+      hash: 4aa2fb60efe44f7dbfdeca0554643ee5fd9f55ef
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.3.12
+  title: "'Correctly load loop/channel relationship'"
+  date: 2022-08-01T13:18:14.474Z
+- commits:
     - subject: Update autumndb from 21.2.0 to 21.3.14
       hash: 946800af4bd0e287219f994566e30bc8036fe05d
       body: ""
