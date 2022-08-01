@@ -76,6 +76,7 @@ import { relationshipImprovementIsContributedToByUser } from './relationship-imp
 import { relationshipImprovementIsGuidedByUser } from './relationship-improvement-is-guided-by-user';
 import { relationshipImprovementIsImplementedByProject } from './relationship-improvement-is-implemented-by-project';
 import { relationshipImprovementIsOwnedByUser } from './relationship-improvement-is-owned-by-user';
+import { relationshipLoopHasChannel } from './relationship-loop-has-channel';
 import { relationshipLoopHasThread } from './relationship-loop-has-thread';
 import { relationshipLoopOwnsTransformer } from './relationship-loop-owns-transformer';
 import { relationshipLoopHasSubLoop } from './relationship-loop-has-sub-loop';
@@ -269,6 +270,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipImprovementIsGuidedByUser,
 	relationshipImprovementIsImplementedByProject,
 	relationshipImprovementIsOwnedByUser,
+	relationshipLoopHasChannel,
 	relationshipLoopHasThread,
 	relationshipLoopOwnsTransformer,
 	relationshipLoopHasSubLoop,
