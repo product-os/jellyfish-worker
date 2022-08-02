@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 7.1.9 to 7.1.10
+      hash: a9162b43520863ef171c06f23495c68fc959b11f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 32.3.13
+  title: "'Update @balena/jellyfish-jellyscript from 7.1.9 to 7.1.10'"
+  date: 2022-08-02T03:52:47.955Z
+- commits:
     - subject: Correctly load loop/channel relationship
       hash: 4aa2fb60efe44f7dbfdeca0554643ee5fd9f55ef
       body: ""
