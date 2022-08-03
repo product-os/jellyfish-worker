@@ -8,6 +8,9 @@ import type {
 import type { CreateContract } from './types';
 import { find, without } from 'lodash';
 import _ from 'lodash';
+import { getLogger, LogContext } from '@balena/jellyfish-logger';
+
+const logger = getLogger('subscriptions');
 
 /*
  * Get creator user from linked create contract
@@ -161,12 +164,14 @@ export interface EvaluateOptions {
 		opts?: { sortBy?: string; sortDir?: 'asc' | 'desc'; limit?: number },
 	) => Promise<TContract[]>;
 	getCreatorSession(creatorId: string): Promise<AutumnDBSession | null>;
+	logContext: LogContext;
 }
 
 /*
  * Notification will be generated if the message is linked to the thread and user is subscribed to the thread
  */
 export const evaluate = async ({
+	logContext,
 	oldContract,
 	newContract,
 	session,
@@ -190,6 +195,9 @@ export const evaluate = async ({
 				const users = await query({
 					type: 'object',
 					properties: {
+						active: {
+							const: true,
+						},
 						type: {
 							const: 'user@1.0.0',
 						},
@@ -216,34 +224,46 @@ export const evaluate = async ({
 		if (newMentions.length) {
 			await Promise.all(
 				newMentions.map(async (newMention) => {
-					const receiver =
-						typeof newMention === 'string'
-							? _.first(
-									await query<UserContract>(
-										{
-											type: 'object',
-											properties: {
-												slug: {
-													const: newMention,
+					try {
+						const receiver =
+							typeof newMention === 'string'
+								? _.first(
+										await query<UserContract>(
+											{
+												type: 'object',
+												properties: {
+													slug: {
+														const: newMention,
+													},
 												},
 											},
-										},
-										{ limit: 1 },
-									),
-							  )
-							: newMention;
+											{ limit: 1 },
+										),
+								  )
+								: newMention;
 
-					if (receiver) {
-						return attachNotificationToMessage(
+						if (receiver) {
+							return attachNotificationToMessage(
+								{
+									getTypeContract,
+									insertContract,
+									privilegedSession,
+								},
+								{
+									message: newContract,
+									creatorSession: session,
+									receiver,
+								},
+							);
+						}
+					} catch (e) {
+						logger.error(
+							logContext,
+							'Failed to attach notification to message',
 							{
-								getTypeContract,
-								insertContract,
-								privilegedSession,
-							},
-							{
-								message: newContract,
-								creatorSession: session,
-								receiver,
+								user: newMention,
+								message: newContract.id,
+								error: e,
 							},
 						);
 					}
