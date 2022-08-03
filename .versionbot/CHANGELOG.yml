@@ -1,4 +1,20 @@
 - commits:
+    - subject: Only consider active groups in subscriptions
+      hash: efd8d6399fc8ff766a9b8200be9ea82e709b4710
+      body: >
+        This change also improves logging for critical errors when generating
+        notifications.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.4.1
+  title: "'Only consider active groups in subscriptions'"
+  date: 2022-08-03T15:04:12.647Z
+- commits:
     - subject: Add relationship between thread and any contract
       hash: 7c11a45818d812200a3b9d06364b590b6c77c19c
       body: ""
