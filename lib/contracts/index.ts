@@ -113,6 +113,7 @@ import { relationshipSupportThreadHasAttachedRating } from './relationship-suppo
 import { relationshipSupportThreadIsOwnedByUser } from './relationship-support-thread-is-owned-by-user';
 import { relationshipSupportThreadIsSourceForFeedbackItem } from './relationship-support-thread-is-source-for-feedback-item';
 import { relationshipTaskGeneratedAny } from './relationship-task-generated-any';
+import { relationshipThreadIsOfAny } from './relationship-thread-is-of-any';
 import { relationshipTransformerGeneratedTask } from './relationship-transformer-generated-task';
 import { relationshipTaskHasResultAny } from './relationship-task-has-result-any';
 import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
@@ -307,6 +308,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipSupportThreadIsOwnedByUser,
 	relationshipSupportThreadIsSourceForFeedbackItem,
 	relationshipTaskGeneratedAny,
+	relationshipThreadIsOfAny,
 	relationshipTransformerGeneratedTask,
 	relationshipTaskHasResultAny,
 	relationshipTransformerWorkerOwnsTask,
