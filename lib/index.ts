@@ -1667,6 +1667,7 @@ export class Worker {
 
 		subscriptionsLib
 			.evaluate({
+				logContext,
 				oldContract: currentContract,
 				newContract: insertedContract,
 				session,
