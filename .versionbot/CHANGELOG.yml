@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add relationship between thread and any contract
+      hash: 7c11a45818d812200a3b9d06364b590b6c77c19c
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.4.0
+  title: "'Add relationship between thread and any contract'"
+  date: 2022-08-03T14:23:43.385Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 7.1.11 to 7.1.12
       hash: 70f1fae18a8f610bb9be5a7734a8abfd24422333
       body: ""
