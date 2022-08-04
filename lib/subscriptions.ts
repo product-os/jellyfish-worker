@@ -51,14 +51,15 @@ const attachNotificationToMessage = async (
 		getTypeContract,
 		insertContract,
 		privilegedSession,
+		logContext,
 	}: {
+		logContext: LogContext;
 		getTypeContract: EvaluateOptions['getTypeContract'];
 		insertContract: EvaluateOptions['insertContract'];
 		privilegedSession: EvaluateOptions['privilegedSession'];
 	},
 	{
 		message,
-		creatorSession,
 		receiver,
 	}: {
 		message: Contract;
@@ -71,81 +72,50 @@ const attachNotificationToMessage = async (
 	if (!notificationTypeContract) {
 		return;
 	}
-	// Since the current permissioning system doesn't allow us to create a contract that
-	// has markers that we can't read we have to use the priviliged session here.
-	// TODO: This is an abomination caused by lack of granular write permissions, fix this!
-	const session =
-		creatorSession.actor.id === receiver.id
-			? creatorSession
-			: privilegedSession;
 
-	const notification = await insertContract(notificationTypeContract, session, {
-		version: '1.0.0',
-		type: 'notification@1.0.0',
-		markers: [receiver.slug],
-		slug: `notification-${receiver.slug}-${message.id}`,
-		tags: [],
-		links: {},
-		requires: [],
-		capabilities: [],
-		active: true,
-	});
+	const date = new Date();
 
-	if (!notification) {
-		return;
-	}
-
-	const linkTypeContract = getTypeContract('link@1.0.0');
-
-	if (!linkTypeContract) {
-		return;
-	}
-
-	await insertContract(linkTypeContract, session, {
-		version: '1.0.0',
-		type: 'link@1.0.0',
-		slug: `link-${message.id}-has-attached-${notification.id}`,
-		tags: [],
-		links: {},
-		requires: [],
-		capabilities: [],
-		active: true,
-		name: 'has attached',
-		data: {
-			inverseName: 'is attached to',
-			from: {
-				id: message.id,
-				type: message.type,
-			},
-			to: {
-				id: notification.id,
-				type: notification.type,
+	return insertContract(
+		getTypeContract('action-request@1.0.0'),
+		privilegedSession,
+		{
+			data: {
+				card: notificationTypeContract.id,
+				action: 'action-create-card@1.0.0',
+				actor: privilegedSession.actor.id,
+				context: logContext,
+				input: {
+					id: notificationTypeContract.id,
+				},
+				epoch: date.valueOf(),
+				timestamp: date.toISOString(),
+				arguments: {
+					reason: null,
+					properties: {
+						markers: [receiver.slug],
+						slug: `notification-${receiver.slug}-${message.id}`,
+						links: {
+							'is attached to': [
+								{
+									id: message.id,
+									slug: message.slug,
+									type: message.type,
+								},
+							],
+							notifies: [
+								{
+									id: receiver.id,
+									slug: receiver.slug,
+									type: receiver.type,
+								},
+							],
+						},
+					},
+				},
 			},
 		},
-	});
-
-	await insertContract(linkTypeContract, session, {
-		version: '1.0.0',
-		type: 'link@1.0.0',
-		slug: `link-${receiver.slug}-has-${notification.id}`,
-		tags: [],
-		links: {},
-		requires: [],
-		capabilities: [],
-		active: true,
-		name: 'has',
-		data: {
-			inverseName: 'notifies',
-			from: {
-				id: receiver.id,
-				type: receiver.type,
-			},
-			to: {
-				id: notification.id,
-				type: notification.type,
-			},
-		},
-	});
+		receiver.id,
+	);
 };
 
 export interface EvaluateOptions {
@@ -158,6 +128,7 @@ export interface EvaluateOptions {
 		typeCard: TypeContract,
 		actorSession: AutumnDBSession,
 		object: any,
+		actor: string,
 	) => Promise<Contract | null>;
 	query: <TContract extends Contract = Contract>(
 		schema: JsonSchema,
@@ -223,7 +194,6 @@ export const evaluate = async ({
 
 		if (newMentions.length) {
 			// Batch the notification creation in blocks of 5 to avoid overwhelming the DB
-			// TODO: Distribute this workload on the queue
 			const chunks = _.chunk(newMentions, 5);
 			for (const batch of chunks) {
 				await Promise.all(
@@ -252,6 +222,7 @@ export const evaluate = async ({
 										getTypeContract,
 										insertContract,
 										privilegedSession,
+										logContext,
 									},
 									{
 										message: newContract,
@@ -261,6 +232,7 @@ export const evaluate = async ({
 								);
 							}
 						} catch (e) {
+							console.error(e);
 							logger.error(
 								logContext,
 								'Failed to attach notification to message',
@@ -376,6 +348,7 @@ export const evaluate = async ({
 					getTypeContract,
 					insertContract,
 					privilegedSession,
+					logContext,
 				},
 				{
 					message,
