@@ -222,53 +222,58 @@ export const evaluate = async ({
 		}
 
 		if (newMentions.length) {
-			await Promise.all(
-				newMentions.map(async (newMention) => {
-					try {
-						const receiver =
-							typeof newMention === 'string'
-								? _.first(
-										await query<UserContract>(
-											{
-												type: 'object',
-												properties: {
-													slug: {
-														const: newMention,
+			// Batch the notification creation in blocks of 5 to avoid overwhelming the DB
+			// TODO: Distribute this workload on the queue
+			const chunks = _.chunk(newMentions, 5);
+			for (const batch of chunks) {
+				await Promise.all(
+					batch.map(async (newMention) => {
+						try {
+							const receiver =
+								typeof newMention === 'string'
+									? _.first(
+											await query<UserContract>(
+												{
+													type: 'object',
+													properties: {
+														slug: {
+															const: newMention,
+														},
 													},
 												},
-											},
-											{ limit: 1 },
-										),
-								  )
-								: newMention;
+												{ limit: 1 },
+											),
+									  )
+									: newMention;
 
-						if (receiver) {
-							return attachNotificationToMessage(
+							if (receiver) {
+								return attachNotificationToMessage(
+									{
+										getTypeContract,
+										insertContract,
+										privilegedSession,
+									},
+									{
+										message: newContract,
+										creatorSession: session,
+										receiver,
+									},
+								);
+							}
+						} catch (e) {
+							logger.error(
+								logContext,
+								'Failed to attach notification to message',
 								{
-									getTypeContract,
-									insertContract,
-									privilegedSession,
-								},
-								{
-									message: newContract,
-									creatorSession: session,
-									receiver,
+									user: newMention,
+									message: newContract.id,
+									error: e,
 								},
 							);
 						}
-					} catch (e) {
-						logger.error(
-							logContext,
-							'Failed to attach notification to message',
-							{
-								user: newMention,
-								message: newContract.id,
-								error: e,
-							},
-						);
-					}
-				}),
-			);
+					}),
+				);
+			}
 		}
 
 		return;
