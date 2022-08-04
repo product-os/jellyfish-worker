@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update autumndb from 21.3.14 to 21.3.15
+      hash: e88c560a5e489b34e31c38fbe4cad1560cabe93b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 32.5.2
+  title: "'Update autumndb from 21.3.14 to 21.3.15'"
+  date: 2022-08-04T16:44:51.241Z
+- commits:
     - subject: Distribute notification generation on the queue
       hash: 5b87ed873ecfb666e2c2f0d7cc671c2644ba6b35
       body: |
