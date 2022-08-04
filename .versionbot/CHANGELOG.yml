@@ -1,4 +1,35 @@
 - commits:
+    - subject: Distribute notification generation on the queue
+      hash: 5b87ed873ecfb666e2c2f0d7cc671c2644ba6b35
+      body: |
+        This changes notification creation and linking to be done through
+        a distributed action request, instead of in-band. This allows better
+        scalability and performance.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+    - subject: Limit notification generation for mentions to a maximum concurrency of 5
+      hash: febd25446fd7a323766ebf71928a241693e9315a
+      body: |
+        Ideally what needs to happen is that the work is distributed on the
+        queue, though this would appear to need the ability to create links in
+        action-create-card.
+        See https://github.com/product-os/jellyfish-worker/pull/1619/files
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.5.1
+  title: "'Distribute notification generation on the queue'"
+  date: 2022-08-04T11:33:42.001Z
+- commits:
     - subject: Add option to create links with action-create-card
       hash: 0ca05d9316ed50fef69eca7821cb48de251111a9
       body: |
