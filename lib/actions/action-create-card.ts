@@ -40,7 +40,7 @@ const handler: ActionDefinition['handler'] = async (
 	// Validate links if set
 	const linkTargets: LinkTarget[] = [];
 	if (request.arguments.properties.links) {
-		const from = request.arguments.properties.type.split('@')[0];
+		const from = typeContract.slug;
 		const links: Links = request.arguments.properties.links;
 		await Promise.all(
 			(Object.keys(links) as string[]).map(async (name) => {
@@ -77,8 +77,11 @@ const handler: ActionDefinition['handler'] = async (
 
 					// Everything necessary exists, add to link targets
 					linkTargets.push({
-						name: match.name === name ? name : match.data.inverseName!,
-						inverseName: match.data.inverseName === name ? match.name! : name,
+						name: match.name === name ? name : match.data.inverseName,
+						inverseName:
+							match.data.inverseName === name
+								? match.name!
+								: match.data.inverseName,
 						to: {
 							id: target.id,
 							type: target.type,

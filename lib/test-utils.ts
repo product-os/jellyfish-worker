@@ -195,7 +195,7 @@ export const newContext = async (
 
 	const createEvent = async (
 		actor: string,
-		session: AutumnDBSession,
+		_session: AutumnDBSession,
 		target: Contract,
 		body: string,
 		type: string,
@@ -233,14 +233,14 @@ export const newContext = async (
 		);
 		assert(req);
 
-		await flushAll(session);
+		await flushAll(autumndbTestContext.session);
 		const result: any = await worker.producer.waitResults(
 			autumndbTestContext.logContext,
 			req as ActionRequestContract,
 		);
 		expect(result.error).toBe(false);
 		assert(result.data);
-		await flushAll(session);
+		await flushAll(autumndbTestContext.session);
 		const contract = (await autumndbTestContext.kernel.getContractById(
 			autumndbTestContext.logContext,
 			autumndbTestContext.session,

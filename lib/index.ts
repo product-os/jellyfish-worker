@@ -1680,14 +1680,15 @@ export class Worker {
 					insertedContractType: TypeContract,
 					actorSession: AutumnDBSession,
 					object: any,
+					actor: string,
 				) => {
 					return workerContext.insertCard(
 						actorSession,
 						insertedContractType,
 						{
-							...options,
-							attachEvents: true,
+							actor,
 							timestamp: Date.now(),
+							attachEvents: false,
 						},
 						object,
 					);
