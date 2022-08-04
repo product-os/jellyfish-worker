@@ -7,6 +7,7 @@ import type {
 	ContractSummary,
 	JsonSchema,
 	Kernel,
+	RelationshipContract,
 	TypeContract,
 } from 'autumndb';
 import type { Operation } from 'fast-json-patch';
@@ -154,6 +155,7 @@ export interface WorkerContext {
 	cards: {
 		[slug: string]: ContractDefinition<ContractData>;
 	};
+	relationships: RelationshipContract[];
 }
 
 export interface EnqueueOptions {

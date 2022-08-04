@@ -690,6 +690,7 @@ export class Worker {
 				...CONTRACTS,
 				...self.getTypeContracts(),
 			},
+			relationships: self.kernel.getRelationships(),
 		};
 	}
 

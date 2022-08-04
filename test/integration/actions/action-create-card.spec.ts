@@ -4,7 +4,13 @@ import {
 	testUtils as autumndbTestUtils,
 	UserContract,
 } from 'autumndb';
-import { ActionRequestContract, testUtils, WorkerContext } from '../../../lib';
+import { v4 as uuidv4 } from 'uuid';
+import {
+	ActionRequestContract,
+	errors,
+	testUtils,
+	WorkerContext,
+} from '../../../lib';
 import { actionCreateCard } from '../../../lib/actions/action-create-card';
 import { makeRequest } from './helpers';
 
@@ -635,5 +641,194 @@ describe('action-create-card', () => {
 				} as any,
 			),
 		).rejects.toThrow(autumndbErrors.JellyfishPermissionsError);
+	});
+
+	test('should create specified links', async () => {
+		// Create an org
+		const org = await ctx.createOrg(autumndbTestUtils.generateRandomId());
+
+		const pattern = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.session,
+			'pattern@1.0.0',
+			'My pattern',
+			{
+				status: 'open',
+			},
+		);
+
+		// Create a user with link to org
+		const request = makeRequest(ctx, {
+			properties: {
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'user@1.0.0',
+				data: {
+					hash: autumndbTestUtils.generateRandomId(),
+					roles: [],
+				},
+				links: {
+					'is member of': [
+						{
+							id: org.id,
+							slug: org.slug,
+							type: 'org@1.0.0',
+						},
+					],
+					owns: [
+						{
+							id: pattern.id,
+							slug: pattern.slug,
+							type: pattern.type,
+						},
+					],
+				},
+			},
+		});
+
+		const result: any = await actionCreateCard.handler(
+			ctx.session,
+			actionContext,
+			ctx.worker.typeContracts['user@1.0.0'],
+			request,
+		);
+		assert(result);
+
+		await ctx.waitForMatch({
+			type: 'object',
+			properties: {
+				id: {
+					type: 'string',
+					const: result.id,
+				},
+			},
+			$$links: {
+				'is member of': {
+					type: 'object',
+					properties: {
+						id: {
+							const: org.id,
+						},
+					},
+				},
+				owns: {
+					type: 'object',
+					properties: {
+						id: {
+							const: pattern.id,
+						},
+					},
+				},
+			},
+		});
+	});
+
+	test('should throw on invalid link name', async () => {
+		// Create an org
+		const org = await ctx.createOrg(autumndbTestUtils.generateRandomId());
+
+		// Create a user with link to org
+		const request = makeRequest(ctx, {
+			properties: {
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'user@1.0.0',
+				data: {
+					hash: autumndbTestUtils.generateRandomId(),
+					roles: [],
+				},
+				links: {
+					foobar: [
+						{
+							id: org.id,
+							slug: org.slug,
+							type: org.type,
+						},
+					],
+				},
+			},
+		});
+
+		await expect(() => {
+			return actionCreateCard.handler(
+				ctx.session,
+				actionContext,
+				ctx.worker.typeContracts['user@1.0.0'],
+				request,
+			);
+		}).rejects.toThrowError(errors.SyncNoElement);
+	});
+
+	test('should throw on non-existent target contract', async () => {
+		// Create a user with link to non-existent org
+		const request = makeRequest(ctx, {
+			properties: {
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'user@1.0.0',
+				data: {
+					hash: autumndbTestUtils.generateRandomId(),
+					roles: [],
+				},
+				links: {
+					'is member of': [
+						{
+							id: uuidv4(),
+							slug: `org-${uuidv4()}`,
+							type: 'org@1.0.0',
+						},
+					],
+				},
+			},
+		});
+
+		await expect(() => {
+			return actionCreateCard.handler(
+				ctx.session,
+				actionContext,
+				ctx.worker.typeContracts['user@1.0.0'],
+				request,
+			);
+		}).rejects.toThrowError(errors.SyncNoElement);
+	});
+
+	test('should throw on invalid relationship', async () => {
+		// Attempt to link one user to another with "is member of" link
+		const otherUser = await ctx.createUser(
+			autumndbTestUtils.generateRandomId().split('-')[0],
+		);
+		const request = makeRequest(ctx, {
+			properties: {
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'user@1.0.0',
+				data: {
+					hash: autumndbTestUtils.generateRandomId(),
+					roles: [],
+				},
+				links: {
+					'is member of': [
+						{
+							id: otherUser.id,
+							slug: otherUser.slug,
+							type: otherUser.type,
+						},
+					],
+				},
+			},
+		});
+
+		await expect(() => {
+			return actionCreateCard.handler(
+				ctx.session,
+				actionContext,
+				ctx.worker.typeContracts['user@1.0.0'],
+				request,
+			);
+		}).rejects.toThrowError(errors.SyncNoElement);
 	});
 });
