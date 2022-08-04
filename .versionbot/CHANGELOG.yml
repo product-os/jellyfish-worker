@@ -1,4 +1,20 @@
 - commits:
+    - subject: Add option to create links with action-create-card
+      hash: 0ca05d9316ed50fef69eca7821cb48de251111a9
+      body: |
+        Add the ability to create links between the contract being
+        created with action-create-card and other pre-existing contracts.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@balena.io>
+        signed-off-by: Josh Bowling <josh@balena.io>
+      author: Josh Bowling
+      nested: []
+  version: 32.5.0
+  title: "'Add option to create links with action-create-card'"
+  date: 2022-08-04T09:46:48.798Z
+- commits:
     - subject: Only consider active groups in subscriptions
       hash: efd8d6399fc8ff766a9b8200be9ea82e709b4710
       body: >
