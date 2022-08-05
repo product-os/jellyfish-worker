@@ -152,7 +152,8 @@ export const evaluate = async ({
 	getCreatorSession,
 	query,
 }: EvaluateOptions) => {
-	if (newContract.type === 'message@1.0.0' || newContract.type === 'whisper') {
+	const baseType = newContract.type.split('@')[0];
+	if (baseType === 'message' || baseType === 'whisper') {
 		const oldMentions = oldContract ? getMentions(oldContract) : [];
 		const currentMentions = getMentions(newContract);
 		const newMentions = without(currentMentions, ...oldMentions);
