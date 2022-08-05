@@ -1,4 +1,21 @@
 - commits:
+    - subject: Generate notifications when a user is mentioned in a whisper
+      hash: 1c65962ad8fcc41b3606bfdf13fd289e38e62bf6
+      body: >
+        This fixes a bug where the whisper type was not checked correctly, and
+
+        a notification would not be generated if there was a mention on a whisper.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.5.5
+  title: "'Generate notifications when a user is mentioned in a whisper'"
+  date: 2022-08-05T09:21:36.863Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 7.1.12 to 7.1.14
       hash: eb3637b1c096decde1523feda4021c1279ab46db
       body: ""
