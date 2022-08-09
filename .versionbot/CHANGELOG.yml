@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add a status field to notifications
+      hash: c4a45b36af0dea8e7bead7f31c8a0e40671c61d1
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 32.6.0
+  title: "'Add a status field to notifications'"
+  date: 2022-08-09T16:02:59.001Z
+- commits:
     - subject: Generate notifications when a user is mentioned in a whisper
       hash: 1c65962ad8fcc41b3606bfdf13fd289e38e62bf6
       body: >
