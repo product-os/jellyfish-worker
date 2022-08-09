@@ -8,7 +8,18 @@ export const notification: ContractDefinition = {
 	data: {
 		schema: {
 			type: 'object',
-			properties: {},
+			properties: {
+				data: {
+					type: 'object',
+					properties: {
+						status: {
+							type: 'string',
+							enum: ['open', 'archived'],
+						},
+					},
+				},
+			},
 		},
+		indexed_fields: [['data.status']],
 	},
 };

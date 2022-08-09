@@ -9,6 +9,7 @@
 import type { Contract, ContractDefinition } from 'autumndb';
 
 export interface NotificationData {
+	status?: 'open' | 'archived';
 	[k: string]: unknown;
 }
 
