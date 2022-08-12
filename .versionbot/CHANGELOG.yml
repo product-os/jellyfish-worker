@@ -1,4 +1,20 @@
 - commits:
+    - subject: Stop creating views for channels
+      hash: df3e77e3826c68c73b2aca45e8ae99797fec7745
+      body: |
+        We can now view the channel contract itself in the UI instead
+        of relying on generated views.
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 33.0.0
+  title: "'Stop creating views for channels'"
+  date: 2022-08-12T06:23:25.530Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 7.1.19 to 7.1.20
       hash: 9c0c63d3feb9e1872cc189ef561ac178e4578f17
       body: ""
