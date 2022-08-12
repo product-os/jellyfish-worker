@@ -1,5 +1,4 @@
 import type { ActionDefinition } from '../plugin';
-import { actionBootstrapChannel } from './action-bootstrap-channel';
 import { actionBroadcast } from './action-broadcast';
 import { actionCompleteFirstTimeLogin } from './action-complete-first-time-login';
 import { actionCompletePasswordReset } from './action-complete-password-reset';
@@ -29,7 +28,6 @@ import { actionSetUserAvatar } from './action-set-user-avatar';
 import { actionUpdateCard } from './action-update-card';
 
 export const actions: ActionDefinition[] = [
-	actionBootstrapChannel,
 	actionBroadcast,
 	actionCompleteFirstTimeLogin,
 	actionCompletePasswordReset,
