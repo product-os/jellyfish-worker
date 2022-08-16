@@ -28,7 +28,6 @@ export const triggeredActionIntegrationImportEvent: TriggeredActionContractDefin
 									'discourse',
 									'github',
 									'outreach',
-									'flowdock',
 									'typeform',
 								],
 							},
