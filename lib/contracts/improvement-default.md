@@ -68,4 +68,4 @@
 
 ## Links & References
 
-> Add links to recorded video brainstorms or discussions in flowdock
+> Add links to recorded video brainstorms or discussions
