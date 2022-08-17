@@ -133,7 +133,15 @@ export const newContext = async (
 			throw new Error('No message dequeued');
 		}
 
-		const result = await worker.execute(session, request);
+		// Use admin session if request actor is admin but provided session isn't
+		let executeSession = session;
+		if (
+			request.data.actor === autumndbTestContext.session.actor.id &&
+			session.actor.id !== autumndbTestContext.session.actor.id
+		) {
+			executeSession = autumndbTestContext.session;
+		}
+		const result = await worker.execute(executeSession, request);
 		if (result.error) {
 			throw new Error(result.data.message);
 		}
@@ -186,7 +194,7 @@ export const newContext = async (
 			action,
 		);
 		assert(createRequest);
-		await flush(session);
+		await flushAll(session);
 		return worker.producer.waitResults(
 			autumndbTestContext.logContext,
 			createRequest as ActionRequestContract,
@@ -195,7 +203,7 @@ export const newContext = async (
 
 	const createEvent = async (
 		actor: string,
-		_session: AutumnDBSession,
+		session: AutumnDBSession,
 		target: Contract,
 		body: string,
 		type: string,
@@ -233,14 +241,14 @@ export const newContext = async (
 		);
 		assert(req);
 
-		await flushAll(autumndbTestContext.session);
+		await flushAll(session);
 		const result: any = await worker.producer.waitResults(
 			autumndbTestContext.logContext,
 			req as ActionRequestContract,
 		);
 		expect(result.error).toBe(false);
 		assert(result.data);
-		await flushAll(autumndbTestContext.session);
+		await flushAll(session);
 		const contract = (await autumndbTestContext.kernel.getContractById(
 			autumndbTestContext.logContext,
 			autumndbTestContext.session,
