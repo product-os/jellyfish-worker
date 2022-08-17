@@ -285,26 +285,25 @@ describe('action-request-password-reset', () => {
 		});
 		expect(requestDelete.error).toBe(false);
 
-		await expect(
-			ctx.processAction(session, {
-				type: 'action-request@1.0.0',
-				data: {
-					action: 'action-request-password-reset@1.0.0',
-					context: ctx.logContext,
-					card: user.id,
-					type: user.type,
-					epoch: new Date().valueOf(),
-					timestamp: new Date().toISOString(),
-					actor: user.id,
-					input: {
-						id: user.id,
-					},
-					arguments: {
-						username,
-					},
+		const results = await ctx.processAction(session, {
+			type: 'action-request@1.0.0',
+			data: {
+				action: 'action-request-password-reset@1.0.0',
+				context: ctx.logContext,
+				card: user.id,
+				type: user.type,
+				epoch: new Date().valueOf(),
+				timestamp: new Date().toISOString(),
+				actor: user.id,
+				input: {
+					id: user.id,
 				},
-			}),
-		).rejects.toThrowError();
+				arguments: {
+					username,
+				},
+			},
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test('should fail silently if the user does not have a hash', async () => {
@@ -764,25 +763,24 @@ describe('action-request-password-reset', () => {
 		nockRequest();
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 
-		await expect(
-			ctx.processAction(ctx.session, {
-				type: 'action-request@1.0.0',
-				data: {
-					action: 'action-request-password-reset@1.0.0',
-					context: ctx.logContext,
-					card: user.id,
-					type: user.type,
-					epoch: new Date().valueOf(),
-					timestamp: new Date().toISOString(),
-					actor: user.id,
-					input: {
-						id: user.id,
-					},
-					arguments: {
-						username: 'foo@bar.com',
-					},
+		const results = await ctx.processAction(ctx.session, {
+			type: 'action-request@1.0.0',
+			data: {
+				action: 'action-request-password-reset@1.0.0',
+				context: ctx.logContext,
+				card: user.id,
+				type: user.type,
+				epoch: new Date().valueOf(),
+				timestamp: new Date().toISOString(),
+				actor: user.id,
+				input: {
+					id: user.id,
 				},
-			}),
-		).rejects.toThrowError();
+				arguments: {
+					username: 'foo@bar.com',
+				},
+			},
+		});
+		expect(results.error).toBe(true);
 	});
 });

@@ -194,7 +194,7 @@ export const newContext = async (
 			action,
 		);
 		assert(createRequest);
-		await flush(session);
+		await flushAll(session);
 		return worker.producer.waitResults(
 			autumndbTestContext.logContext,
 			createRequest as ActionRequestContract,

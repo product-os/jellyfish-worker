@@ -242,24 +242,23 @@ describe('action-send-first-time-login-link', () => {
 		});
 		expect(requestDelete.error).toBe(false);
 
-		await expect(
-			ctx.processAction(session, {
-				type: 'action-request@1.0.0',
-				data: {
-					action: 'action-send-first-time-login-link@1.0.0',
-					context: ctx.logContext,
-					card: user.id,
-					type: user.type,
-					epoch: new Date().valueOf(),
-					timestamp: new Date().toISOString(),
-					actor: user.id,
-					input: {
-						id: user.id,
-					},
-					arguments: {},
+		const results = await ctx.processAction(session, {
+			type: 'action-request@1.0.0',
+			data: {
+				action: 'action-send-first-time-login-link@1.0.0',
+				context: ctx.logContext,
+				card: user.id,
+				type: user.type,
+				epoch: new Date().valueOf(),
+				timestamp: new Date().toISOString(),
+				actor: user.id,
+				input: {
+					id: user.id,
 				},
-			}),
-		).rejects.toThrowError();
+				arguments: {},
+			},
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test('should invalidate previous first-time logins', async () => {
@@ -496,24 +495,23 @@ describe('action-send-first-time-login-link', () => {
 		nockRequest();
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 
-		await expect(
-			ctx.processAction(ctx.session, {
-				type: 'action-request@1.0.0',
-				data: {
-					action: 'action-send-first-time-login-link@1.0.0',
-					context: ctx.logContext,
-					card: user.id,
-					type: user.type,
-					epoch: new Date().valueOf(),
-					timestamp: new Date().toISOString(),
-					actor: user.id,
-					input: {
-						id: user.id,
-					},
-					arguments: {},
+		const results = await ctx.processAction(ctx.session, {
+			type: 'action-request@1.0.0',
+			data: {
+				action: 'action-send-first-time-login-link@1.0.0',
+				context: ctx.logContext,
+				card: user.id,
+				type: user.type,
+				epoch: new Date().valueOf(),
+				timestamp: new Date().toISOString(),
+				actor: user.id,
+				input: {
+					id: user.id,
 				},
-			}),
-		).rejects.toThrowError();
+				arguments: {},
+			},
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test('throws an error when the first-time-login requester has no org', async () => {
@@ -532,24 +530,23 @@ describe('action-send-first-time-login-link', () => {
 			'has member',
 		);
 
-		await expect(
-			ctx.processAction(requesterSession, {
-				type: 'action-request@1.0.0',
-				data: {
-					action: 'action-send-first-time-login-link@1.0.0',
-					context: ctx.logContext,
-					card: user.id,
-					type: user.type,
-					epoch: new Date().valueOf(),
-					timestamp: new Date().toISOString(),
-					actor: user.id,
-					input: {
-						id: user.id,
-					},
-					arguments: {},
+		const results = await ctx.processAction(requesterSession, {
+			type: 'action-request@1.0.0',
+			data: {
+				action: 'action-send-first-time-login-link@1.0.0',
+				context: ctx.logContext,
+				card: user.id,
+				type: user.type,
+				epoch: new Date().valueOf(),
+				timestamp: new Date().toISOString(),
+				actor: user.id,
+				input: {
+					id: user.id,
 				},
-			}),
-		).rejects.toThrowError();
+				arguments: {},
+			},
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test("throws an error when the first-time-login user does not belong to the requester's org", async () => {
@@ -575,24 +572,23 @@ describe('action-send-first-time-login-link', () => {
 			{},
 		);
 
-		await expect(
-			ctx.processAction(requesterSession, {
-				type: 'action-request@1.0.0',
-				data: {
-					action: 'action-send-first-time-login-link@1.0.0',
-					context: ctx.logContext,
-					card: user.id,
-					type: user.type,
-					epoch: new Date().valueOf(),
-					timestamp: new Date().toISOString(),
-					actor: ctx.adminUserId,
-					input: {
-						id: user.id,
-					},
-					arguments: {},
+		const results = await ctx.processAction(requesterSession, {
+			type: 'action-request@1.0.0',
+			data: {
+				action: 'action-send-first-time-login-link@1.0.0',
+				context: ctx.logContext,
+				card: user.id,
+				type: user.type,
+				epoch: new Date().valueOf(),
+				timestamp: new Date().toISOString(),
+				actor: ctx.adminUserId,
+				input: {
+					id: user.id,
 				},
-			}),
-		).rejects.toThrowError();
+				arguments: {},
+			},
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test('community role is added to a supplied user with no role set', async () => {

@@ -1,4 +1,4 @@
-import * as assert from '@balena/jellyfish-assert';
+import { strict as assert } from 'assert';
 import { errors as autumndbErrors, Contract, TypeContract } from 'autumndb';
 import bcrypt from 'bcrypt';
 import * as errors from '../errors';
@@ -122,11 +122,9 @@ const handler: ActionDefinition['handler'] = async (
 	request,
 ) => {
 	const passwordReset = await getPasswordResetCard(context, request);
-	assert.USER(
-		request.logContext,
+	assert(
 		passwordReset,
-		errors.WorkerAuthenticationError,
-		'Reset token invalid',
+		new errors.WorkerInvalidActionRequest('Reset token invalid'),
 	);
 
 	await invalidatePasswordReset(context, request, passwordReset);
@@ -135,21 +133,14 @@ const handler: ActionDefinition['handler'] = async (
 		passwordReset.links && passwordReset.links['is attached to']
 			? passwordReset.links['is attached to']
 			: [null];
-
-	assert.USER(
-		request.logContext,
-		user,
-		errors.WorkerAuthenticationError,
-		'Reset token invalid',
-	);
+	assert(user, new errors.WorkerInvalidActionRequest('Reset token invalid'));
 
 	const hasExpired =
 		new Date(passwordReset.data.expiresAt as string) < new Date();
 	if (hasExpired) {
-		const newError = new errors.WorkerAuthenticationError(
+		throw new errors.WorkerInvalidActionRequest(
 			'Password reset token has expired',
 		);
-		throw newError;
 	}
 
 	const userTypeCard = (await context.getCardBySlug(

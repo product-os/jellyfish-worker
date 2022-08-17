@@ -164,8 +164,29 @@ describe('action-complete-password-reset', () => {
 		await ctx.flushAll(ctx.session);
 	});
 
-	test('should fail when the reset token does not match a valid card', async () => {
-		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
+	test('should fail when the reset token does not match a valid contract', async () => {
+		const username = autumndbTestUtils.generateRandomSlug();
+		const user = await ctx.createUser(username, hash);
+
+		const requestPasswordReset = await ctx.processAction(ctx.session, {
+			type: 'action-request@1.0.0',
+			data: {
+				action: 'action-request-password-reset@1.0.0',
+				context: ctx.logContext,
+				card: user.id,
+				type: user.type,
+				epoch: new Date().valueOf(),
+				timestamp: new Date().toISOString(),
+				actor: user.id,
+				input: {
+					id: user.id,
+				},
+				arguments: {
+					username,
+				},
+			},
+		});
+		expect(requestPasswordReset.error).toBe(false);
 
 		const completePasswordReset = (await ctx.worker.pre(ctx.session, {
 			action: 'action-complete-password-reset@1.0.0',
@@ -173,7 +194,7 @@ describe('action-complete-password-reset', () => {
 			card: user.id,
 			type: user.type,
 			arguments: {
-				resetToken: 'fake-reset-token',
+				resetToken: resetToken.split('').reverse().join(''),
 				newPassword: autumndbTestUtils.generateRandomId(),
 			},
 		})) as any;
@@ -188,12 +209,11 @@ describe('action-complete-password-reset', () => {
 		};
 		Reflect.deleteProperty(completePasswordReset, 'logContext');
 
-		await expect(
-			ctx.processAction(ctx.session, {
-				type: 'action-request@1.0.0',
-				data: completePasswordReset,
-			}),
-		).rejects.toThrowError();
+		const results = await ctx.processAction(ctx.session, {
+			type: 'action-request@1.0.0',
+			data: completePasswordReset,
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test('should fail when the reset token has expired', async () => {
@@ -298,12 +318,11 @@ describe('action-complete-password-reset', () => {
 		};
 		Reflect.deleteProperty(completePasswordReset, 'logContext');
 
-		await expect(
-			ctx.processAction(ctx.session, {
-				type: 'action-request@1.0.0',
-				data: completePasswordReset,
-			}),
-		).rejects.toThrowError();
+		const results = await ctx.processAction(ctx.session, {
+			type: 'action-request@1.0.0',
+			data: completePasswordReset,
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test('should fail when the reset token is not active', async () => {
@@ -404,12 +423,11 @@ describe('action-complete-password-reset', () => {
 		};
 		Reflect.deleteProperty(completePasswordReset, 'logContext');
 
-		await expect(
-			ctx.processAction(ctx.session, {
-				type: 'action-request@1.0.0',
-				data: completePasswordReset,
-			}),
-		).rejects.toThrowError();
+		const results = await ctx.processAction(ctx.session, {
+			type: 'action-request@1.0.0',
+			data: completePasswordReset,
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test('should fail if the user becomes inactive between requesting and completing the password reset', async () => {
@@ -476,13 +494,11 @@ describe('action-complete-password-reset', () => {
 		};
 		Reflect.deleteProperty(completePasswordReset, 'logContext');
 
-		await expect(
-			ctx.processAction(session, {
-				type: 'action-request@1.0.0',
-				data: completePasswordReset,
-			}),
-		).rejects.toThrowError();
-		await ctx.flushAll(ctx.session);
+		const results = await ctx.processAction(session, {
+			type: 'action-request@1.0.0',
+			data: completePasswordReset,
+		});
+		expect(results.error).toBe(true);
 	});
 
 	test('should soft delete password reset card', async () => {
