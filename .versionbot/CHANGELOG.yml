@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update autumndb from 22.1.14 to 22.1.25
+      hash: 09757162c96a53d671ce40165755858471bd01ca
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.0.26
+  title: "'Update autumndb from 22.1.14 to 22.1.25'"
+  date: 2022-08-21T12:45:43.958Z
+- commits:
     - subject: Update @types/semver from 7.3.10 to 7.3.12
       hash: 370f70960d394dc1effdf9152d6360abc8d3c4e4
       body: ""
