@@ -1,4 +1,26 @@
 - commits:
+    - subject: Remove unnecessary scheduled actions test
+      hash: e6645912987d5dee8a89056a1285b1b129af1292
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+    - subject: Update jest monorepo
+      hash: 88fa84e54e589bb7a4c54b3bd709e3c96f2b2437
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.0.27
+  title: "'Update jest monorepo'"
+  date: 2022-08-21T23:54:19.811Z
+- commits:
     - subject: Update autumndb from 22.1.14 to 22.1.25
       hash: 09757162c96a53d671ce40165755858471bd01ca
       body: ""
