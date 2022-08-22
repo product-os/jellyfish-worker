@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-metrics from 2.0.130 to 2.0.131
+      hash: 7b75cfc91c95e15a9658a56bbbb88d4afde122c9
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.0.28
+  title: "'Update @balena/jellyfish-metrics from 2.0.130 to 2.0.131'"
+  date: 2022-08-22T07:17:19.180Z
+- commits:
     - subject: Remove unnecessary scheduled actions test
       hash: e6645912987d5dee8a89056a1285b1b129af1292
       body: ""
