@@ -3457,69 +3457,6 @@ describe('scheduled actions', () => {
 		expect(job.rows.length).toEqual(0);
 	});
 
-	test('scheduled actions should execute on specified date', async () => {
-		// Execute request to create new scheduled action
-		const foo = autumndbTestUtils.generateRandomId();
-		const request = await ctx.worker.insertCard<ActionRequestContract>(
-			ctx.logContext,
-			ctx.session,
-			ctx.worker.typeContracts['action-request@1.0.0'],
-			{},
-			{
-				data: getScheduledActionRequest(
-					ctx.adminUserId,
-					{
-						once: {
-							date: new Date(Date.now() + 3000),
-						},
-					},
-					foo,
-				),
-			},
-		);
-		assert(request);
-		await ctx.flushAll(ctx.session);
-		const result: any = await ctx.worker.producer.waitResults(
-			ctx.logContext,
-			request,
-		);
-		assert(result && result.data && result.data.id);
-
-		// Wait 10 seconds for scheduled job to execute
-		await new Promise((resolve) => {
-			setTimeout(resolve, 10000);
-		});
-		await ctx.flush(ctx.session);
-
-		// Check that the expected contract was created
-		await ctx.waitForMatch(
-			{
-				type: 'object',
-				required: ['data'],
-				properties: {
-					data: {
-						type: 'object',
-						required: ['foo'],
-						properties: {
-							foo: {
-								type: 'string',
-								const: foo,
-							},
-						},
-					},
-				},
-			},
-			50,
-		);
-
-		// Check that no new job is enqueued
-		const job = await ctx.pool.query({
-			text: `SELECT run_at,payload from graphile_worker.jobs where key=$1;`,
-			values: [result.data.id],
-		});
-		expect(job.rows.length).toEqual(0);
-	});
-
 	test('should enqueue subsequent iterations for recurring scheduled actions', async () => {
 		// Add a new scheduled action contract into the system
 		const schedule = {
