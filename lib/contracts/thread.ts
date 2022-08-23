@@ -14,6 +14,21 @@ export const thread: ContractDefinition = contractMixins.mixin(
 		schema: {
 			type: 'object',
 			properties: {
+				name: {
+					type: 'string',
+					$$formula: `contract.name ?
+						contract.name
+						: FILTER(
+								contract.links["has attached element"],
+								{ type: "message@1.0.0" }
+							).length ?
+								FILTER(
+									contract.links["has attached element"],
+									{ type: "message@1.0.0" }
+								)[0].data.payload.message
+								: contract.name
+					`,
+				},
 				data: {
 					type: 'object',
 					properties: {
