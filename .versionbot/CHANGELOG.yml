@@ -1,4 +1,18 @@
 - commits:
+    - subject: Set the name of threads to the first message in it's timeline
+      hash: 4238a9b36f6c63b0dc185c02418e97cd60f193ae
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 33.0.35
+  title: "'Set the name of threads to the first message in it's timeline'"
+  date: 2022-08-23T16:45:15.547Z
+- commits:
     - subject: Update autumndb from 22.1.27 to 22.1.28
       hash: 49b5f07c21152e8c478c31eb2594fbe2b0103fb4
       body: ""
