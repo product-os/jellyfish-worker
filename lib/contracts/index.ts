@@ -55,7 +55,6 @@ import { relationshipBrainstormTopicHasAttachedImprovement } from './relationshi
 import { relationshipBrainstormTopicHasAttachedPattern } from './relationship-brainstorm-topic-has-attached-pattern';
 import { relationshipBrainstormTopicHasAttachedSalesThread } from './relationship-brainstorm-topic-has-attached-sales-thread';
 import { relationshipBrainstormTopicHasAttachedSupportThread } from './relationship-brainstorm-topic-has-attached-support-thread';
-import { relationshipBrainstormTopicHasAttachedThread } from './relationship-brainstorm-topic-has-attached-thread';
 import { relationshipChannelHasAgentUser } from './relationship-channel-has-agent-user';
 import { relationshipChannelHasSettingsAgentChannelSettings } from './relationship-channel-has-settings-agent-channel-settings';
 import { relationshipChartConfigurationIsAttachedToView } from './relationship-chart-configuration-is-attached-to-view';
@@ -93,7 +92,6 @@ import { relationshipOrgHasLoop } from './relationship-org-has-loop';
 import { relationshipPasswordResetIsAttachedToUser } from './relationship-password-reset-is-attached-to-user';
 import { relationshipPatternIsAttachedToSalesThread } from './relationship-pattern-is-attached-to-sales-thread';
 import { relationshipPatternIsAttachedToSupportThread } from './relationship-pattern-is-attached-to-support-thread';
-import { relationshipPatternIsAttachedToThread } from './relationship-pattern-is-attached-to-thread';
 import { relationshipPatternIsOwnedByUser } from './relationship-pattern-is-owned-by-user';
 import { relationshipPatternRelatesToPattern } from './relationship-pattern-relates-to-pattern';
 import { relationshipProjectHasCheckin } from './relationship-project-has-checkin';
@@ -249,7 +247,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipBrainstormTopicHasAttachedPattern,
 	relationshipBrainstormTopicHasAttachedSalesThread,
 	relationshipBrainstormTopicHasAttachedSupportThread,
-	relationshipBrainstormTopicHasAttachedThread,
 	relationshipChannelHasAgentUser,
 	relationshipChannelHasSettingsAgentChannelSettings,
 	relationshipChartConfigurationIsAttachedToView,
@@ -287,7 +284,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipPasswordResetIsAttachedToUser,
 	relationshipPatternIsAttachedToSalesThread,
 	relationshipPatternIsAttachedToSupportThread,
-	relationshipPatternIsAttachedToThread,
 	relationshipPatternIsOwnedByUser,
 	relationshipPatternRelatesToPattern,
 	relationshipProjectHasCheckin,
