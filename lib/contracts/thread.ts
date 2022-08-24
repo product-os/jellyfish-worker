@@ -15,7 +15,7 @@ export const thread: ContractDefinition = contractMixins.mixin(
 			type: 'object',
 			properties: {
 				name: {
-					type: 'string',
+					type: ['string', 'null'],
 					$$formula: `contract.name ?
 						contract.name
 						: FILTER(
