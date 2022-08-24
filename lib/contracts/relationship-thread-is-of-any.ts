@@ -6,8 +6,8 @@ export const relationshipThreadIsOfAny: RelationshipContractDefinition = {
 	name: 'is of',
 	data: {
 		inverseName: 'has',
-		title: 'Thread',
-		inverseTitle: 'Contract',
+		inverseTitle: 'Thread',
+		title: 'Contract',
 		from: {
 			type: 'thread',
 		},

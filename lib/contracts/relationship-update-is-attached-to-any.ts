@@ -7,8 +7,8 @@ export const relationshipUpdateIsAttachedToAny: RelationshipContractDefinition =
 		name: 'is attached to',
 		data: {
 			inverseName: 'has attached element',
-			title: 'Update',
-			inverseTitle: 'Updated',
+			inverseTitle: 'Update',
+			title: 'Updated',
 			from: {
 				type: 'update',
 			},

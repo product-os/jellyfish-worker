@@ -7,8 +7,8 @@ export const relationshipWhisperIsAttachedToAny: RelationshipContractDefinition 
 		name: 'is attached to',
 		data: {
 			inverseName: 'has attached element',
-			title: 'Whisper',
-			inverseTitle: 'Contract',
+			inverseTitle: 'Whisper',
+			title: 'Contract',
 			from: {
 				type: 'whisper',
 			},

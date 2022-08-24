@@ -6,8 +6,8 @@ export const relationshipAnyIsCreatorOfAny: RelationshipContractDefinition = {
 	name: 'is creator of',
 	data: {
 		inverseName: 'was created by',
-		title: 'Creator',
-		inverseTitle: 'Contract',
+		inverseTitle: 'Creator',
+		title: 'Created Contract',
 		from: {
 			type: '*',
 		},
