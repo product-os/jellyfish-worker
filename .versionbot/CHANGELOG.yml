@@ -1,4 +1,18 @@
 - commits:
+    - subject: Allow thread name to be null
+      hash: 531aa739513557dfce15824dfeece4b51b270237
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 33.0.37
+  title: "'Allow thread name to be null'"
+  date: 2022-08-24T16:22:00.182Z
+- commits:
     - subject: Fix incorrect title metadata on a number of wildcard relationships
       hash: 9f90557bb5882d56f3abbd3e8e7ffb027d2f4e0d
       body: ""
