@@ -86,4 +86,29 @@ export class PluginManager {
 			_.mapValues(this.pluginMap, (plugin: Plugin) => plugin.getActions()),
 		);
 	}
+
+	/**
+	 * Get all loaded plugins in order of dependency requirements
+	 *
+	 * @returns loaded plugins ordered by dependency needs
+	 */
+	public getPlugins(): Plugin[] {
+		const plugins = Object.values(this.pluginMap);
+		const ordered: Plugin[] = [];
+		while (ordered.length < plugins.length) {
+			for (const plugin of plugins) {
+				if (!ordered.find((p) => p.slug === plugin.slug)) {
+					if (
+						plugin.requires.length === 0 ||
+						plugin.requires.every((required) =>
+							ordered.find((p) => p.slug === required.slug),
+						)
+					) {
+						ordered.push(plugin);
+					}
+				}
+			}
+		}
+		return ordered;
+	}
 }

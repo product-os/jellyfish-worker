@@ -90,6 +90,11 @@ export { mirror } from './actions/mirror';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
+// tslint:disable: no-var-requires
+const {
+	name: packageName,
+	version: packageVersion,
+} = require('../package.json');
 
 const formulaParser = new Jellyscript({
 	formulas: {
@@ -526,56 +531,80 @@ export class Worker {
 			onMessageEventHandler,
 		);
 
-		const [defaultTypeContracts, nonTypeContracts] = _.partition(
-			Object.values(contracts),
-			(contract) => {
-				return contract.type.split('@')[0] === 'type';
+		// Upsert worker contracts on new version
+		await this.kernel.runMigration(
+			logContext,
+			packageName,
+			packageVersion,
+			async (_context) => {
+				const [defaultTypeContracts, nonTypeContracts] = _.partition(
+					Object.values(contracts),
+					(contract) => {
+						return contract.type.split('@')[0] === 'type';
+					},
+				);
+
+				const [defaultLoopContracts, defaultContracts] = _.partition(
+					Object.values(nonTypeContracts),
+					(contract) => {
+						return contract.type.split('@')[0] === 'loop';
+					},
+				);
+
+				// Insert type contracts as prerequisite
+				await Promise.all(defaultTypeContracts.map(checkThenReplaceContract));
+
+				// Insert loop contracts as prerequisite
+				await Promise.all(defaultLoopContracts.map(checkThenReplaceContract));
+
+				// Insert other worker contracts
+				const contractsToSkip: string[] = [];
+				if (environment.isProduction() && !environment.isCI()) {
+					contractsToSkip.push('user-guest');
+				}
+				const defaultContractsToLoad = _.values(defaultContracts).filter(
+					(contract: ContractDefinition) => {
+						return !contractsToSkip.includes(contract.slug);
+					},
+				);
+				await Promise.all(defaultContractsToLoad.map(checkThenReplaceContract));
+
+				await Promise.all(
+					actions.map((action) => {
+						return checkThenReplaceContract(action.contract);
+					}),
+				);
 			},
 		);
 
-		const [defaultLoopContracts, defaultContracts] = _.partition(
-			Object.values(nonTypeContracts),
-			(contract) => {
-				return contract.type.split('@')[0] === 'loop';
-			},
-		);
-
-		// Insert type contracts as prerequisite
-		await Promise.all(defaultTypeContracts.map(checkThenReplaceContract));
-
-		// Insert loop contracts as prerequisite
-		await Promise.all(defaultLoopContracts.map(checkThenReplaceContract));
-
-		// Insert other worker contracts
-		const contractsToSkip: string[] = [];
-		if (environment.isProduction() && !environment.isCI()) {
-			contractsToSkip.push('user-guest');
+		// Upsert plugin contracts on new version(s)
+		// Execute plugin migrations sequentially to protect dependency requirements
+		for (const plugin of this.pluginManager.getPlugins()) {
+			await this.kernel.runMigration(
+				logContext,
+				plugin.slug,
+				plugin.version,
+				async (_context) => {
+					const [prereqs, rest] = _.partition(plugin.getCards(), (contract) => {
+						return contract.type.split('@')[0].match(/^(loop|action|type)$/);
+					});
+					await Promise.all(prereqs.map(checkThenReplaceContract));
+					await Promise.all(rest.map(checkThenReplaceContract));
+				},
+				Object.assign(
+					{
+						[packageName]: packageVersion,
+					},
+					plugin.requires.reduce(
+						(acc, required) => ({
+							...acc,
+							[required.slug]: required.version,
+						}),
+						{},
+					),
+				),
+			);
 		}
-		const defaultContractsToLoad = _.values(defaultContracts).filter(
-			(contract: ContractDefinition) => {
-				return !contractsToSkip.includes(contract.slug);
-			},
-		);
-		await Promise.all(defaultContractsToLoad.map(checkThenReplaceContract));
-
-		await Promise.all(
-			actions.map((action) => {
-				return checkThenReplaceContract(action.contract);
-			}),
-		);
-
-		// Get all contracts provided by plugins
-		const pluginContracts = this.pluginManager.getCards();
-
-		// Make sure certain contracts are initialized, as they can be prerequisites
-		const [pluginContractPreReqs, pluginContractsRest] = _.partition(
-			pluginContracts,
-			(contract) => {
-				return contract.type.split('@')[0].match(/^(loop|action|type)$/);
-			},
-		);
-		await Promise.all(pluginContractPreReqs.map(checkThenReplaceContract));
-		await Promise.all(pluginContractsRest.map(checkThenReplaceContract));
 
 		// For better performance, commonly accessed contracts are stored in cache in the worker.
 		// Periodically poll for these contracts, so the worker always has the most up to date version of them.

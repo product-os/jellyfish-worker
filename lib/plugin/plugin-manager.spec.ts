@@ -240,4 +240,34 @@ describe('PluginManager', () => {
 			});
 		});
 	});
+
+	describe('.getPlugins', () => {
+		test('returns plugins ordered by dependency requirements', () => {
+			const pluginManager = new PluginManager([
+				testPlugin({
+					slug: 'plugin-foo',
+					requires: [{ slug: 'plugin-bar', version: '1.0.0' }],
+				}),
+				testPlugin({ slug: 'plugin-bar' }),
+				testPlugin({
+					slug: 'plugin-buz',
+					requires: [
+						{ slug: 'plugin-bar', version: '1.0.0' },
+						{ slug: 'plugin-foo', version: '1.0.0' },
+						{ slug: 'plugin-baz', version: '1.0.0' },
+					],
+				}),
+				testPlugin({
+					slug: 'plugin-baz',
+					requires: [{ slug: 'plugin-foo', version: '1.0.0' }],
+				}),
+			]);
+			const plugins = pluginManager.getPlugins();
+			expect(plugins.length).toBe(4);
+			expect(plugins[0].slug).toBe('plugin-bar');
+			expect(plugins[1].slug).toBe('plugin-foo');
+			expect(plugins[2].slug).toBe('plugin-baz');
+			expect(plugins[3].slug).toBe('plugin-buz');
+		});
+	});
 });

@@ -58,7 +58,7 @@
     "@balena/jellyfish-metrics": "^2.0.154",
     "@graphile/logger": "^0.2.0",
     "@types/node": "^17.0.41",
-    "autumndb": "^22.2.25",
+    "autumndb": "22.3.0-joshbwlng-migrations-eccd0c14e4a223a8dc425ad358662bdd6b198a5c",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "blueimp-md5": "^2.19.0",
