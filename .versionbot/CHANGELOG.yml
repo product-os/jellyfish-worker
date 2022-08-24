@@ -1,4 +1,18 @@
 - commits:
+    - subject: Fix incorrect title metadata on a number of wildcard relationships
+      hash: 9f90557bb5882d56f3abbd3e8e7ffb027d2f4e0d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 33.0.36
+  title: "'Fix incorrect title metadata on a number of wildcard relationships'"
+  date: 2022-08-24T12:52:57.478Z
+- commits:
     - subject: Set the name of threads to the first message in it's timeline
       hash: 4238a9b36f6c63b0dc185c02418e97cd60f193ae
       body: ""
