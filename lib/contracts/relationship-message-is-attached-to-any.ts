@@ -7,8 +7,8 @@ export const relationshipMessageIsAttachedToAny: RelationshipContractDefinition 
 		name: 'is attached to',
 		data: {
 			inverseName: 'has attached element',
-			title: 'Message',
-			inverseTitle: 'Contract',
+			inverseTitle: 'Message',
+			title: 'Contract',
 			from: {
 				type: 'message',
 			},
