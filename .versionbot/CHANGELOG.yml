@@ -1,4 +1,22 @@
 - commits:
+    - subject: Fix skipped contracts on init
+      hash: 4a1360be0e1e59a76104542053b2df290bd9439e
+      body: |
+        The code to find dev/test contracts to skip in production was being
+        executed against the wrong set of contracts. Also, the role-user-test
+        contract is inserted by autumndb so trying to skip it here doesn't
+        make sense.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 33.0.38
+  title: "'Fix skipped contracts on init'"
+  date: 2022-08-25T01:00:21.583Z
+- commits:
     - subject: Allow thread name to be null
       hash: 531aa739513557dfce15824dfeece4b51b270237
       body: ""
