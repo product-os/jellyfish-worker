@@ -547,7 +547,16 @@ export class Worker {
 		await Promise.all(defaultLoopContracts.map(checkThenReplaceContract));
 
 		// Insert other worker contracts
-		await Promise.all(defaultContracts.map(checkThenReplaceContract));
+		const contractsToSkip: string[] = [];
+		if (environment.isProduction() && !environment.isCI()) {
+			contractsToSkip.push('user-guest');
+		}
+		const defaultContractsToLoad = _.values(defaultContracts).filter(
+			(contract: ContractDefinition) => {
+				return !contractsToSkip.includes(contract.slug);
+			},
+		);
+		await Promise.all(defaultContractsToLoad.map(checkThenReplaceContract));
 
 		await Promise.all(
 			actions.map((action) => {
@@ -566,22 +575,7 @@ export class Worker {
 			},
 		);
 		await Promise.all(pluginContractPreReqs.map(checkThenReplaceContract));
-
-		// Only need test user role during development and CI.
-		const contractsToSkip: string[] = [];
-		if (environment.isProduction() && !environment.isCI()) {
-			contractsToSkip.push('user-guest');
-			contractsToSkip.push('role-user-test');
-		}
-
-		// Insert all other contracts provided by plugins
-		const contractsToLoad = _.values(pluginContractsRest).filter(
-			(contract: ContractDefinition) => {
-				return !contractsToSkip.includes(contract.slug);
-			},
-		);
-
-		await Promise.all(contractsToLoad.map(checkThenReplaceContract));
+		await Promise.all(pluginContractsRest.map(checkThenReplaceContract));
 
 		// For better performance, commonly accessed contracts are stored in cache in the worker.
 		// Periodically poll for these contracts, so the worker always has the most up to date version of them.
