@@ -237,6 +237,7 @@ export const run = async (
 			getElementBySlug: options.context.getElementBySlug,
 			getElementById: options.context.getElementById,
 			getElementByMirrorId: options.context.getElementByMirrorId,
+			getElementByMirrorIds: options.context.getElementByMirrorIds,
 			request: async (actor: string, requestOptions: HttpRequestOptions) => {
 				assert.INTERNAL(
 					null,

@@ -87,6 +87,7 @@ export interface IntegrationInitializationOptions {
 		getElementById: SyncActionContext['getElementById'];
 		getContactByEmail: SyncActionContext['getContactByEmail'];
 		getElementByMirrorId: SyncActionContext['getElementByMirrorId'];
+		getElementByMirrorIds: SyncActionContext['getElementByMirrorIds'];
 		request: (
 			actor: string,
 			requestOptions: HttpRequestOptions,
