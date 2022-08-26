@@ -136,6 +136,92 @@ describe('context.getElementByMirrorId()', () => {
 	});
 });
 
+describe('context.getElementByMirrorIds()', () => {
+	test('should match mirrors exactly', async () => {
+		const mirrorId = `test://${uuidv4()}`;
+		const foo = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.worker.session,
+			'card@1.0.0',
+			`contract-${uuidv4()}`,
+			{
+				mirrors: [mirrorId],
+			},
+		);
+		await ctx.createContract(
+			ctx.adminUserId,
+			ctx.worker.session,
+			'card@1.0.0',
+			`contract-${uuidv4()}`,
+			{
+				mirrors: [`test://${uuidv4()}`],
+			},
+		);
+
+		const result: any = await actionContext.getElementByMirrorIds(
+			'card@1.0.0',
+			[mirrorId],
+		);
+		expect(result).toEqual(foo);
+	});
+
+	test('should match by type', async () => {
+		const mirrorId = `test://${uuidv4()}`;
+		const foo = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.worker.session,
+			'card@1.0.0',
+			`contract-${uuidv4()}`,
+			{
+				mirrors: [mirrorId],
+			},
+		);
+		await ctx.createContract(
+			ctx.adminUserId,
+			ctx.worker.session,
+			'org@1.0.0',
+			`card-${uuidv4()}`,
+			{
+				mirrors: [mirrorId],
+			},
+		);
+
+		const result: any = await actionContext.getElementByMirrorIds(
+			'card@1.0.0',
+			[mirrorId],
+		);
+		expect(result).toEqual(foo);
+	});
+
+	test('should not return anything if there is no match', async () => {
+		const mirrorId = `test://${uuidv4()}`;
+		await ctx.createContract(
+			ctx.adminUserId,
+			ctx.worker.session,
+			'card@1.0.0',
+			`contract-${uuidv4()}`,
+			{
+				mirrors: [mirrorId],
+			},
+		);
+		await ctx.createContract(
+			ctx.adminUserId,
+			ctx.worker.session,
+			'card@1.0.0',
+			`contract-${uuidv4()}`,
+			{
+				mirrors: [`test://${uuidv4()}`],
+			},
+		);
+
+		const result: any = await actionContext.getElementByMirrorIds(
+			'card@1.0.0',
+			['foobarbaz'],
+		);
+		expect(result).toBeFalsy();
+	});
+});
+
 describe('context.upsertElement()', () => {
 	test('should create a new element', async () => {
 		const newContract = {

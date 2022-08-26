@@ -353,6 +353,43 @@ export const getActionContext = (
 
 			return elements[0];
 		},
+		getElementByMirrorIds: async (type: string, mirrorIds: string[]) => {
+			strict(mirrorIds.length > 0, 'You must supply at least one mirrorId');
+
+			const elements = await workerContext.query(
+				session,
+				{
+					type: 'object',
+					required: ['type', 'data'],
+					additionalProperties: true,
+					properties: {
+						type: {
+							type: 'string',
+							const: type,
+						},
+						data: {
+							type: 'object',
+							required: ['mirrors'],
+							additionalProperties: true,
+							properties: {
+								mirrors: {
+									type: 'array',
+									contains: {
+										type: 'string',
+										enum: mirrorIds,
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					limit: 1,
+				},
+			);
+
+			return elements[0];
+		},
 	};
 
 	return contextObject;
