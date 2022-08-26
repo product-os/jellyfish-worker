@@ -1,4 +1,21 @@
 - commits:
+    - subject: Add getElementByMirrorIds enum query function
+      hash: 7648c5e5101409cac9619351945a203e126c4b68
+      body: |
+        Add a new function for searching for contracts by mirror IDs using
+        an enum as a more efficient alternative to the pattern search option
+        provided by getElementByMirrorId.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 33.1.0
+  title: "'Add getElementByMirrorIds enum query function'"
+  date: 2022-08-26T23:25:37.040Z
+- commits:
     - subject: Fix skipped contracts on init
       hash: 4a1360be0e1e59a76104542053b2df290bd9439e
       body: |
