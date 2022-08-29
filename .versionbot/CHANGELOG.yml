@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update nock from 13.2.7 to 13.2.9
+      hash: 251ad4330ec7cbf842b48ab616668c77fbdbf43b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.1.11
+  title: "'Update nock from 13.2.7 to 13.2.9'"
+  date: 2022-08-29T09:33:39.654Z
+- commits:
     - subject: Remove incorrect Thread relationships
       hash: d05227f1b3f9889e301c8e8ae56f72cb700bc9ab
       body: |
