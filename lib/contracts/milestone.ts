@@ -37,14 +37,6 @@ export const milestone: ContractDefinition = contractMixins.mixin(
 							default: 'open',
 							enum: statusOptions,
 							enumNames: statusNames,
-							readOnly: true,
-							$$formula: `
-                                contract.data.percentComplete === 100 ?
-                                    "completed" :
-                                    contract.data.percentComplete === 0 ?
-                                        "open" :
-                                        "in-progress"
-                            `,
 						},
 						percentComplete: {
 							title: 'Progress',
