@@ -1,4 +1,18 @@
 - commits:
+    - subject: Allow users to manually set milestone status
+      hash: 9b027c6115c59611bee5dd0c2e21801b3819699f
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 33.2.0
+  title: "'Allow users to manually set milestone status'"
+  date: 2022-08-29T09:50:08.818Z
+- commits:
     - subject: Update nock from 13.2.7 to 13.2.9
       hash: 251ad4330ec7cbf842b48ab616668c77fbdbf43b
       body: ""
