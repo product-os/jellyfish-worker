@@ -1,4 +1,20 @@
 - commits:
+    - subject: Remove incorrect Thread relationships
+      hash: d05227f1b3f9889e301c8e8ae56f72cb700bc9ab
+      body: |
+        Both patterns and brainstorm topics should use the wild card "is of"
+        relationship to threads.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 33.1.10
+  title: "'Remove incorrect Thread relationships'"
+  date: 2022-08-29T09:20:02.132Z
+- commits:
     - subject: Update lint-staged from 13.0.2 to 13.0.3
       hash: a925c4e32438f78ea2e52ab364724a67cf0101e2
       body: ""
