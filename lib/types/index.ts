@@ -5,7 +5,6 @@ import type {
 	ContractData,
 	ContractDefinition,
 	ContractSummary,
-	JsonSchema,
 	Kernel,
 	RelationshipContract,
 	TypeContract,
@@ -40,25 +39,6 @@ export declare var JellyfishError: JellyfishErrorConstructor;
 
 export interface QuerySelect {
 	[key: string]: any;
-}
-
-export interface StreamPayload {
-	id: string;
-	slug: string;
-	type: string;
-	cardType: string;
-}
-
-export interface Stream extends NodeJS.EventEmitter {
-	query: <TContract extends Contract>(
-		select: QuerySelect,
-		schema: JsonSchema,
-		options: any,
-	) => Promise<TContract[]>;
-	setSchema: (select: QuerySelect, schema: JsonSchema, options: any) => void;
-	push: (payload: StreamPayload) => Promise<void>;
-	tryEmitEvent: (payload: StreamPayload) => Promise<boolean>;
-	close: () => void;
 }
 
 export interface Action {

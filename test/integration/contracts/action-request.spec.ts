@@ -1,5 +1,4 @@
 import { testUtils } from '../../../lib';
-import type { Stream } from '../../../lib/types';
 
 let ctx: testUtils.TestContext;
 
@@ -12,9 +11,11 @@ afterAll(async () => {
 });
 
 describe('stream', () => {
-	it('should report back action requests', (done) => {
-		ctx.kernel
-			.stream(ctx.logContext, ctx.kernel.adminSession()!, {
+	it('should report back action requests', async () => {
+		const emitter = await ctx.kernel.stream(
+			ctx.logContext,
+			ctx.kernel.adminSession()!,
+			{
 				type: 'object',
 				additionalProperties: false,
 				properties: {
@@ -42,32 +43,21 @@ describe('stream', () => {
 					},
 				},
 				required: ['type'],
-			})
-			.then((emitter: Stream) => {
-				emitter.on('data', (change) => {
-					expect(change.after).toEqual({
-						type: 'action-request@1.0.0',
-						data: {
-							context: ctx.logContext,
-							epoch: 1521170969543,
-							action: 'action-delete-card@1.0.0',
-							actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-							input: {
-								id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
-								type: 'card@1.0.0',
-							},
-							timestamp: '2018-03-16T03:29:29.543Z',
-							arguments: {},
-						},
-					});
+			},
+		);
 
-					emitter.close();
-				});
+		const result = await new Promise<any>(async (resolve, reject) => {
+			emitter.on('data', (change) => {
+				emitter.close();
+				resolve(change);
+			});
 
-				emitter.on('error', done);
-				emitter.on('closed', done);
+			emitter.on('error', reject);
 
-				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+			await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
 					type: 'action-request@1.0.0',
 					data: {
 						context: ctx.logContext,
@@ -81,13 +71,35 @@ describe('stream', () => {
 						},
 						arguments: {},
 					},
-				});
-				ctx.kernel.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
+				},
+			);
+			await ctx.kernel.insertContract(
+				ctx.logContext,
+				ctx.kernel.adminSession()!,
+				{
 					type: 'card@1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 					},
-				});
-			});
+				},
+			);
+		});
+
+		expect(result.after).toEqual({
+			id: result.id,
+			type: 'action-request@1.0.0',
+			data: {
+				context: ctx.logContext,
+				epoch: 1521170969543,
+				action: 'action-delete-card@1.0.0',
+				actor: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+				input: {
+					id: '4a962ad9-20b5-4dd8-a707-bf819593cc84',
+					type: 'card@1.0.0',
+				},
+				timestamp: '2018-03-16T03:29:29.543Z',
+				arguments: {},
+			},
+		});
 	});
 });
