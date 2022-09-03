@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update just-permutations from 2.0.1 to 2.1.1
+      hash: e78576b05ac834907db829452016f17deaf84256
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.2.4
+  title: "'Update just-permutations from 2.0.1 to 2.1.1'"
+  date: 2022-09-03T07:52:09.911Z
+- commits:
     - subject: Update date-fns from 2.28.0 to 2.29.2
       hash: 7bed029e267f1b0c2d381733d04eba073d4bc6a0
       body: ""
