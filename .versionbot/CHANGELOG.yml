@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update cron-parser from 4.4.0 to 4.6.0
+      hash: baf2c4c8ab7618b9cda3c3dfcfdf3475d1c2cdf1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.2.2
+  title: "'Update cron-parser from 4.4.0 to 4.6.0'"
+  date: 2022-09-03T03:32:32.940Z
+- commits:
     - subject: Update ts-jest from 28.0.5 to 28.0.8
       hash: ea047c39948fdea8b20a4da29eb61e6371322bd1
       body: ""
