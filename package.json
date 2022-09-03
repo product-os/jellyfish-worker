@@ -64,7 +64,7 @@
     "blueimp-md5": "^2.19.0",
     "countries-and-timezones": "^3.3.0",
     "cron-parser": "^4.6.0",
-    "date-fns": "^2.28.0",
+    "date-fns": "^2.29.2",
     "fast-equals": "^3.0.3",
     "fast-json-patch": "^3.1.1",
     "googleapis": "^105.0.0",
