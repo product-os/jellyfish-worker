@@ -72,7 +72,7 @@
     "is-uuid": "^1.0.2",
     "iso8601-duration": "^2.1.1",
     "json-e": "^4.4.3",
-    "just-permutations": "^2.0.1",
+    "just-permutations": "^2.1.1",
     "lodash": "^4.17.21",
     "nock": "^13.2.9",
     "qs": "^6.10.5",
