@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update date-fns from 2.28.0 to 2.29.2
+      hash: 7bed029e267f1b0c2d381733d04eba073d4bc6a0
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.2.3
+  title: "'Update date-fns from 2.28.0 to 2.29.2'"
+  date: 2022-09-03T07:40:30.110Z
+- commits:
     - subject: Update cron-parser from 4.4.0 to 4.6.0
       hash: baf2c4c8ab7618b9cda3c3dfcfdf3475d1c2cdf1
       body: ""
