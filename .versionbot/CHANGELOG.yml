@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update ts-jest from 28.0.5 to 28.0.8
+      hash: ea047c39948fdea8b20a4da29eb61e6371322bd1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.2.1
+  title: "'Update ts-jest from 28.0.5 to 28.0.8'"
+  date: 2022-09-03T03:18:35.316Z
+- commits:
     - subject: Allow users to manually set milestone status
       hash: 9b027c6115c59611bee5dd0c2e21801b3819699f
       body: ""
