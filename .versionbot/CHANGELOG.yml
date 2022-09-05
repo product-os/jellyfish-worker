@@ -1,4 +1,19 @@
 - commits:
+    - subject: testing autumndb stream updates
+      hash: 6fe58716f9b2bd4057562b6b3d4da2384cdc3bbd
+      body: |
+        Testing https://github.com/product-os/autumndb/pull/1462
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 33.3.0
+  title: "'testing autumndb stream updates'"
+  date: 2022-09-05T13:35:02.411Z
+- commits:
     - subject: Update just-permutations from 2.0.1 to 2.1.1
       hash: e78576b05ac834907db829452016f17deaf84256
       body: ""
