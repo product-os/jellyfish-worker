@@ -1,4 +1,18 @@
 - commits:
+    - subject: Clean up invalid API email addresses coming from Front
+      hash: 4c343d4590252eb2126d0811fac60d6b2992b075
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+        signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+      author: Ramiro González Maciel
+      nested: []
+  version: 33.2.5
+  title: "'Clean up invalid API email addresses coming from Front'"
+  date: 2022-09-05T19:29:12.434Z
+- commits:
     - subject: Update just-permutations from 2.0.1 to 2.1.1
       hash: e78576b05ac834907db829452016f17deaf84256
       body: ""
