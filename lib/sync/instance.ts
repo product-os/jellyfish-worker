@@ -229,6 +229,8 @@ export const run = async (
 	const instance = await integration.initialize({
 		token,
 		defaultUser: options.defaultUser,
+		// TODO define a type
+		// options.context is SyncActionContext
 		context: {
 			log: options.context.log,
 			getContactByEmail: options.context.getContactByEmail,
@@ -326,6 +328,20 @@ export const run = async (
 			getActorId: async (information: ActorInformation) => {
 				options.context.log.info('Creating sync actor', information);
 
+				// Patch Front API actor
+				// Front sends an invalid email address ( no domain ) which is not accepted by the user contract
+				// so we patch the email address.
+				// {
+				// 	"handle": "front_api_jwt_23m3",
+				// 	"email": "api_jwt_23m3@resin_io",
+				// 	"name": {
+				// 		"first": "API",
+				// 		"last": ""
+				// 	}
+				// }
+
+				patchIfNeeded(information);
+
 				const username = information.handle || information.email;
 				if (!username) {
 					throw new Error("Can't get an actor id without a handle or email");
@@ -411,3 +427,21 @@ export const run = async (
 		throw error;
 	}
 };
+export function patchIfNeeded(information: ActorInformation) {
+	if (information && information.email) {
+		const FRONT_API_USER_RE = /api_(.*)@resin_io/;
+
+		const frontEmailMatches = information.email.match(FRONT_API_USER_RE);
+
+		if (frontEmailMatches) {
+			// frontEmailMatches[1] is the token name, which can be custom for example jwt_6gb, jwt_23m3, JF_0001, jwt_dnf1, jwt_265f
+			// lest be sure that it'still a valid address, remove invalid chars ( whitespace and @)
+			const cleanToken = frontEmailMatches[1].replace(' ', '').replace('@', '');
+			information.email = `front.api+${cleanToken}@resin.io`;
+			information.name = {
+				first: 'Front',
+				last: 'API',
+			};
+		}
+	}
+}
