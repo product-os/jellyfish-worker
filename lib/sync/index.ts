@@ -9,6 +9,7 @@ import * as errors from './errors';
 import * as instance from './instance';
 import * as oauth from './oauth';
 import * as pipeline from './pipeline';
+import { retryableContext } from './sync-action-context-retry-wrapper';
 import * as syncContext from './sync-context';
 import type {
 	HttpRequestOptions,
@@ -452,11 +453,8 @@ export class Sync {
 		context: any,
 		session: AutumnDBSession,
 	) {
-		return syncContext.getActionContext(
-			provider,
-			workerContext,
-			context,
-			session,
+		return retryableContext(
+			syncContext.getActionContext(provider, workerContext, context, session),
 		);
 	}
 }

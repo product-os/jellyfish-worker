@@ -96,7 +96,7 @@ export const getActionContext = (
 			return map ? map.remote : username;
 		},
 		// The upsertElement function has the property of being eventually
-		// consistent, sanely handling two seperate sync events on a new
+		// consistent, sanely handling two separate sync events on a new
 		// object with the same slug. If an ID is provided we don't need to do any
 		// checking though, as the object already exists and it can be patched
 		// immediately.
