@@ -1,4 +1,18 @@
 - commits:
+    - subject: Make worker use a SyncContext that retries queries that timeout
+      hash: 64081e6c5373529002986e719469be7e43cc87f7
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+        signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+      author: Ramiro González Maciel
+      nested: []
+  version: 33.4.0
+  title: "'Make worker use a SyncContext that retries queries that timeout'"
+  date: 2022-09-07T10:19:46.096Z
+- commits:
     - subject: Improve stream functionality and handling of links in streams
       hash: 2c21c55b709c70491e42fa7e0b441b68ca6ea2b0
       body: |
