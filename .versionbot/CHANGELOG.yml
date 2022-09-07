@@ -1,4 +1,19 @@
 - commits:
+    - subject: Improve stream functionality and handling of links in streams
+      hash: 2c21c55b709c70491e42fa7e0b441b68ca6ea2b0
+      body: |
+        See https://github.com/product-os/autumndb/pull/1462
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+        signed-off-by: Lucian Buzzo <lucian.buzzo@gmail.com>
+      author: Lucian Buzzo
+      nested: []
+  version: 33.3.0
+  title: "'Improve stream functionality and handling of links in streams'"
+  date: 2022-09-07T08:53:32.256Z
+- commits:
     - subject: Clean up invalid API email addresses coming from Front
       hash: 4c343d4590252eb2126d0811fac60d6b2992b075
       body: ""
