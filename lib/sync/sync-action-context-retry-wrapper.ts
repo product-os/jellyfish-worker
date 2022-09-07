@@ -1,5 +1,5 @@
 import { RetriesExhaustedError } from '../errors';
-import { JellyfishDatabaseTimeoutError, Contract } from 'autumndb';
+import { Contract } from 'autumndb';
 import { SyncActionContext } from './sync-context';
 
 /**
@@ -46,7 +46,7 @@ async function handleQueryTimeout(
 function isRetryAllowed(error: Error): boolean {
 	return (
 		(error.name === 'Error' && error.message === 'Query read timeout') ||
-		error instanceof JellyfishDatabaseTimeoutError
+		error.name === 'JellyfishDatabaseTimeoutError'
 	);
 }
 
