@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typescript from 4.7.4 to 4.8.3
+      hash: 331da948c455182117d7106cf3f9d3afdbc974c8
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.4.1
+  title: "'Update typescript from 4.7.4 to 4.8.3'"
+  date: 2022-09-08T20:52:10.301Z
+- commits:
     - subject: Make worker use a SyncContext that retries queries that timeout
       hash: 64081e6c5373529002986e719469be7e43cc87f7
       body: ""
