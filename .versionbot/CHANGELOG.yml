@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update jest from 29.0.2 to 29.0.3
+      hash: 46d84ac2673aee35a2529563dd6a768e154c9e55
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.4.11
+  title: "'Update jest from 29.0.2 to 29.0.3'"
+  date: 2022-09-10T23:15:47.416Z
+- commits:
     - subject: Update autumndb from 22.2.0 to 22.2.22
       hash: f02aca53abaf73367ff474bf5d7c7c7a373519c6
       body: ""
