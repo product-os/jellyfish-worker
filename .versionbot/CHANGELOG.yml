@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump external packages
+      hash: 2b2fac57873cbe193b5e2aa87a06d2f6deccdc15
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 33.4.1
+  title: "'Bump external packages'"
+  date: 2022-09-10T04:51:28.590Z
+- commits:
     - subject: Make worker use a SyncContext that retries queries that timeout
       hash: 64081e6c5373529002986e719469be7e43cc87f7
       body: ""
