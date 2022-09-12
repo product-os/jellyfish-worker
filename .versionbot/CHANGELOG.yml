@@ -1,4 +1,21 @@
 - commits:
+    - subject: Initialize with a lock
+      hash: 33c9a5e2d97ae228eabcc7b0563276534ff428de
+      body: |
+        Initialize worker instance using the autumndb migration functionality.
+        This gives us a system-wide db lock, ensuring that only a single
+        instance upserts contracts on boot.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 33.4.22
+  title: "'Initialize with a lock'"
+  date: 2022-09-12T01:48:15.422Z
+- commits:
     - subject: Update @balena/jellyfish-logger from 5.1.54 to 5.1.57
       hash: 3d2cdc15514027d1832cc2a36b87b40f26997472
       body: ""
