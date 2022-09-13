@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 13.0.13 to 14.0.0
+      hash: 7668c16f4c7b3fbf98a4a8a995972349fa473065
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 33.4.30
+  title: "'Update @balena/jellyfish-environment from 13.0.13 to 14.0.0'"
+  date: 2022-09-13T00:40:48.331Z
+- commits:
     - subject: Update autumndb from 22.2.35 to 22.2.38
       hash: c04c2d798f27942f8e55b7b8cd6218e22d440e70
       body: ""
