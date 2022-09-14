@@ -71,6 +71,7 @@ import { relationshipGroupHasGroupMemberUser } from './relationship-group-has-gr
 import { relationshipImprovementHasAttachedMilestone } from './relationship-improvement-has-attached-milestone';
 import { relationshipImprovementHasDedicatedUserUser } from './relationship-improvement-has-dedicated-user-user';
 import { relationshipImprovementIsAttachedToPattern } from './relationship-improvement-is-attached-to-pattern';
+import { relationshipImprovementIsAttachedToProduct } from './relationship-improvement-is-attached-to-product';
 import { relationshipImprovementIsContributedToByUser } from './relationship-improvement-is-contributed-to-by-user';
 import { relationshipImprovementIsGuidedByUser } from './relationship-improvement-is-guided-by-user';
 import { relationshipImprovementIsImplementedByProject } from './relationship-improvement-is-implemented-by-project';
@@ -263,6 +264,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipImprovementHasAttachedMilestone,
 	relationshipImprovementHasDedicatedUserUser,
 	relationshipImprovementIsAttachedToPattern,
+	relationshipImprovementIsAttachedToProduct,
 	relationshipImprovementIsContributedToByUser,
 	relationshipImprovementIsGuidedByUser,
 	relationshipImprovementIsImplementedByProject,
