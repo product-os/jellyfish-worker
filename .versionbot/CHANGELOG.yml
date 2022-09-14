@@ -1,4 +1,18 @@
 - commits:
+    - subject: Bump autumndb to 22.2.42
+      hash: df3049ffb0799880142d56db4b11ce8af8b76c0b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+        signed-off-by: Ramiro Gonzalez <ramiro.gonzalez@balena.io>
+      author: Ramiro González Maciel
+      nested: []
+  version: 33.4.31
+  title: "'Bump autumndb to 22.2.42'"
+  date: 2022-09-14T18:18:07.629Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 13.0.13 to 14.0.0
       hash: 7668c16f4c7b3fbf98a4a8a995972349fa473065
       body: ""
