@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-assert from 1.2.63 to 1.2.67
+      hash: 0f46602880b600d3c12492c49395f6f68104dd60
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.4.32
+  title: ""
+  date: 2022-09-14T05:49:40.449Z
+- commits:
     - subject: "CI: Move to Flowzone"
       hash: 05951048a78c6aba380290445c8af0884b8070ff
       body: ""
