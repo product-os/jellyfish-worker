@@ -90,7 +90,7 @@
     "@types/blueimp-md5": "^2.18.0",
     "@types/is-uuid": "^1.0.0",
     "@types/jest": "^29.0.0",
-    "@types/lodash": "^4.14.184",
+    "@types/lodash": "^4.14.185",
     "@types/pg": "^8.6.5",
     "@types/semver": "^7.3.12",
     "@types/sinon": "^10.0.13",
