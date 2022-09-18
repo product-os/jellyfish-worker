@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update ts-jest from 29.0.0 to 29.0.1
+      hash: 79d40094c2f2044333ed5dac34bbf03efd3dd36d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.4.53
+  title: ""
+  date: 2022-09-18T04:32:58.290Z
+- commits:
     - subject: Update date-fns from 2.29.2 to 2.29.3
       hash: 59fc6b8a1248bffc1986e1d412693af7376ae4c8
       body: ""
