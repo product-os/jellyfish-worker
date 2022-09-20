@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add more operator tests
+      hash: 3e7e38fc2cb88a20ea30bf72d2a6cdc0fb5037a6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 33.4.78
+  title: ""
+  date: 2022-09-20T03:29:12.455Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.184 to 2.0.186
       hash: 0ceb93e5c4680a2bb319223927ef52b61529e03a
       body: ""
