@@ -831,4 +831,109 @@ describe('action-create-card', () => {
 			);
 		}).rejects.toThrowError(errors.SyncNoElement);
 	});
+
+	test('operators should be able to create user contracts', async () => {
+		const operator = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.session,
+			'user@1.0.0',
+			autumndbTestUtils.generateRandomSlug(),
+			{
+				hash: autumndbTestUtils.generateRandomId(),
+				roles: ['user-community', 'user-operator'],
+			},
+		);
+
+		const request = makeRequest(ctx, {
+			properties: {
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'user@1.0.0',
+				data: {
+					hash: autumndbTestUtils.generateRandomId(),
+					roles: ['user-community'],
+				},
+			},
+		});
+		request.actor = operator.id;
+		const result: any = await actionCreateCard.handler(
+			{ actor: operator },
+			actionContext,
+			ctx.worker.typeContracts['user@1.0.0'],
+			request,
+		);
+		assert(result);
+		expect(result.slug).toEqual(request.arguments.properties.slug);
+	});
+
+	test('operators should not be able to create admin user contracts', async () => {
+		const operator = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.session,
+			'user@1.0.0',
+			autumndbTestUtils.generateRandomSlug(),
+			{
+				hash: autumndbTestUtils.generateRandomId(),
+				roles: ['user-community', 'user-operator'],
+			},
+		);
+
+		const request = makeRequest(ctx, {
+			properties: {
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'user@1.0.0',
+				data: {
+					hash: autumndbTestUtils.generateRandomId(),
+					roles: ['user-admin'],
+				},
+			},
+		});
+		request.actor = operator.id;
+		await expect(() => {
+			return actionCreateCard.handler(
+				{ actor: operator },
+				actionContext,
+				ctx.worker.typeContracts['user@1.0.0'],
+				request,
+			);
+		}).rejects.toThrow();
+	});
+
+	test('operators should not be able to create guest user contracts', async () => {
+		const operator = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.session,
+			'user@1.0.0',
+			autumndbTestUtils.generateRandomSlug(),
+			{
+				hash: autumndbTestUtils.generateRandomId(),
+				roles: ['user-community', 'user-operator'],
+			},
+		);
+
+		const request = makeRequest(ctx, {
+			properties: {
+				slug: autumndbTestUtils.generateRandomSlug({
+					prefix: 'user',
+				}),
+				type: 'user@1.0.0',
+				data: {
+					hash: autumndbTestUtils.generateRandomId(),
+					roles: ['user-guest'],
+				},
+			},
+		});
+		request.actor = operator.id;
+		await expect(() => {
+			return actionCreateCard.handler(
+				{ actor: operator },
+				actionContext,
+				ctx.worker.typeContracts['user@1.0.0'],
+				request,
+			);
+		}).rejects.toThrow();
+	});
 });
