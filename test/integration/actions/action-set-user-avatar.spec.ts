@@ -359,4 +359,64 @@ describe('action-set-user-avatar', () => {
 			`https://www.gravatar.com/avatar/${md5(user.data.email.trim())}?d=404`,
 		);
 	});
+
+	test('operators should be able to set other users avatars', async () => {
+		const operator: any = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.session,
+			'user@1.0.0',
+			autumndbTestUtils.generateRandomSlug(),
+			{
+				hash: autumndbTestUtils.generateRandomId(),
+				roles: ['user-community', 'user-operator'],
+				email: genEmail(),
+				avatar: null,
+			},
+		);
+
+		const user: any = await ctx.createContract(
+			ctx.adminUserId,
+			ctx.session,
+			'user@1.0.0',
+			autumndbTestUtils.generateRandomSlug(),
+			{
+				hash: autumndbTestUtils.generateRandomId(),
+				roles: [],
+				email: genEmail(),
+				avatar: null,
+			},
+		);
+
+		nock('https://www.gravatar.com')
+			.intercept(`/avatar/${md5(user.data.email.trim())}?d=404`, 'HEAD')
+			.reply(200, 'OK');
+
+		const handlerRequest = makeHandlerRequest(
+			ctx,
+			actionSetUserAvatar.contract,
+		);
+		handlerRequest.actor = operator.id;
+		const result = await handler(
+			{ actor: operator },
+			actionContext,
+			user,
+			handlerRequest,
+		);
+		expect(result).toEqual({
+			id: user.id,
+			slug: user.slug,
+			version: user.version,
+			type: user.type,
+		});
+
+		const updated = await ctx.kernel.getContractById(
+			ctx.logContext,
+			ctx.session,
+			user.id,
+		);
+		assert(updated);
+		expect(updated.data.avatar).toEqual(
+			`https://www.gravatar.com/avatar/${md5(user.data.email.trim())}?d=404`,
+		);
+	});
 });
