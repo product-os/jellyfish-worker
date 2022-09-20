@@ -52,7 +52,7 @@
   "dependencies": {
     "@balena/jellyfish-assert": "^1.2.73",
     "@balena/jellyfish-environment": "^14.0.11",
-    "@balena/jellyfish-jellyscript": "^7.1.74",
+    "@balena/jellyfish-jellyscript": "^7.1.75",
     "@balena/jellyfish-logger": "^5.1.82",
     "@balena/jellyfish-metrics": "^2.0.186",
     "@graphile/logger": "^0.2.0",
