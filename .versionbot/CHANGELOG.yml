@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 7.1.74 to 7.1.75
+      hash: 25dca335d689ce33d75e8fc41b5726b73f02470f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 33.4.80
+  title: ""
+  date: 2022-09-20T13:51:12.402Z
+- commits:
     - subject: Add CodeQL workflow
       hash: 159a8b20b765035a059e2474ab8d5c15294dc592
       body: ""
