@@ -156,6 +156,7 @@ import { triggeredActionUpdateEventEditedAt } from './triggered-action-update-ev
 import { triggeredActionUserContact } from './triggered-action-user-contact';
 import { update } from './update';
 import { userGuest } from './user-guest';
+import { userHubot } from './user-hubot';
 import { viewActive } from './view-active';
 import { viewActiveTriggeredActions } from './view-active-triggered-actions';
 import { viewAllBlogPosts } from './view-all-blog-posts';
@@ -349,6 +350,7 @@ export const contracts: ContractDefinition[] = [
 	triggeredActionUserContact,
 	update,
 	userGuest,
+	userHubot,
 	viewActive,
 	viewActiveTriggeredActions,
 	viewAllJellyfishSupportThreads,
