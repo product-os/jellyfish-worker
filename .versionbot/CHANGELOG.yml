@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add hubot user contract
+      hash: c78bde5dedadca090dd7a818c8e824db7c7ba69f
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 33.5.0
+  title: ""
+  date: 2022-09-22T05:09:36.928Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 7.1.75 to 7.1.76
       hash: f965155aafa70823ef146b15516cf346edb6d4c8
       body: ""
