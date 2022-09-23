@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove unused hangouts triggered action
+      hash: cfc7c5e4d778bffdee6db82a05fc1502e9273e79
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 34.0.0
+  title: ""
+  date: 2022-09-23T02:49:15.269Z
+- commits:
     - subject: Add hubot user contract
       hash: c78bde5dedadca090dd7a818c8e824db7c7ba69f
       body: ""
