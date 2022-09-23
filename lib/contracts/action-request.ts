@@ -17,6 +17,30 @@ export const actionRequest = {
 				data: {
 					type: 'object',
 					properties: {
+						executed: {
+							type: 'boolean',
+							default: false,
+						},
+						results: {
+							type: 'object',
+							required: ['error', 'data'],
+							properties: {
+								error: {
+									type: 'boolean',
+									default: false,
+								},
+								data: {
+									type: [
+										'object',
+										'string',
+										'number',
+										'boolean',
+										'array',
+										'null',
+									],
+								},
+							},
+						},
 						epoch: {
 							type: 'number',
 						},

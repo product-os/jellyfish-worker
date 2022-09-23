@@ -70,11 +70,6 @@ export type {
 	CreateData,
 } from './create';
 export type {
-	ExecuteContract,
-	ExecuteContractDefinition,
-	ExecuteData,
-} from './execute';
-export type {
 	ExternalEventContract,
 	ExternalEventContractDefinition,
 	ExternalEventData,

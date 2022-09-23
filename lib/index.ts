@@ -1329,35 +1329,31 @@ export class Worker {
 			},
 		});
 
-		const actionContract = await this.kernel.getContractBySlug<ActionContract>(
-			logContext,
-			session,
-			request.data.action,
-		);
-		if (!actionContract) {
-			logger.warn(logContext, 'Action not found', {
-				id: request.id,
-				card: request.data.input.id,
-				type: request.data.input.type,
-				actor: request.data.actor,
-				action: request.data.action,
+		const [actionContract, actionRequestContract] = await Promise.all([
+			this.kernel.getContractBySlug<ActionContract>(
+				logContext,
 				session,
-				actionContract,
-			});
-		}
-
-		assert.USER(
-			logContext,
+				request.data.action,
+			),
+			this.kernel.getContractById<ActionRequestContract>(
+				logContext,
+				this.kernel.adminSession()!,
+				request.id,
+			),
+		]);
+		strict(
 			actionContract,
-			errors.WorkerInvalidAction,
-			`No such action: ${request.data.action}`,
+			new errors.WorkerInvalidAction(`No such action: ${request.data.action}`),
 		);
-
-		// TS-TODO: Use asserts correctly so the `assert.USER` call above correctly
-		// validates that actionContract is non-null, so this double-check can be removed
-		if (!actionContract) {
-			throw new errors.WorkerInvalidAction(
-				`No such action: ${request.data.action}`,
+		strict(
+			actionRequestContract,
+			new errors.WorkerInvalidActionRequest(
+				`No such action-request: ${request.id}`,
+			),
+		);
+		if (actionRequestContract.data.executed) {
+			throw new errors.WorkerInvalidActionRequest(
+				`action-request already executed: ${request.id}`,
 			);
 		}
 
@@ -1522,29 +1518,9 @@ export class Worker {
 			};
 		}
 
-		const event = await this.consumer.postResults(
-			this.getId(),
-			logContext,
-			request,
-			result,
-		);
-		assert.INTERNAL(
-			logContext,
-			event,
-			errors.WorkerNoExecuteEvent,
-			`Could not create execute event for request: ${request.id}`,
-		);
-
-		logger.debug(logContext, 'Execute event posted', {
-			slug: event.slug,
-			type: event.type,
-			target: event.data.target,
-			actor: event.data.actor,
-			payload: {
-				id: event.data.payload.id,
-				card: event.data.payload.card,
-				error: event.data.payload.error,
-			},
+		await this.consumer.postResults(logContext, request, result);
+		logger.debug(logContext, 'action-request executed', {
+			id: request.id,
 		});
 
 		return result;

@@ -1,11 +1,6 @@
 import { strict as assert } from 'assert';
 import { Kernel, testUtils as autumndbTestUtils } from 'autumndb';
-import {
-	ActionContract,
-	ActionRequestData,
-	errors,
-	testUtils,
-} from '../../../lib';
+import { ActionContract, ActionRequestData, testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;
 
@@ -348,7 +343,7 @@ describe('queue', () => {
 
 			await expect(() => {
 				return ctx.flush(ctx.session);
-			}).rejects.toThrowError(errors.WorkerInvalidAction);
+			}).rejects.toThrowError();
 		});
 	});
 
@@ -446,7 +441,6 @@ describe('queue', () => {
 			});
 
 			await ctx.worker.consumer.postResults(
-				ctx.actor,
 				ctx.logContext,
 				actionRequest as any,
 				{
