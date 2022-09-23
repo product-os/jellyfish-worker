@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 14.0.11 to 14.0.12
+      hash: b36603fc95fa66e2d22316254108fb765b5e8851
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 34.1.1
+  title: ""
+  date: 2022-09-23T13:07:08.371Z
+- commits:
     - subject: Export Google Meet creation function
       hash: 3e04d6e209caba0e74f2393402b877be3c398ba7
       body: |
