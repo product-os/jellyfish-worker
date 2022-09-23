@@ -1,4 +1,22 @@
 - commits:
+    - subject: Export Google Meet creation function
+      hash: 3e04d6e209caba0e74f2393402b877be3c398ba7
+      body: |
+        Ideally this shouldn't be in the worker at all or at least not tied to
+        Google Meet directly in the code. We can move this later when we have
+        the time, but for now exporting the functionality so we can reuse it
+        in jellyfish-plugin-hubot.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 34.1.0
+  title: ""
+  date: 2022-09-23T03:52:12.179Z
+- commits:
     - subject: Remove unused hangouts triggered action
       hash: cfc7c5e4d778bffdee6db82a05fc1502e9273e79
       body: ""
