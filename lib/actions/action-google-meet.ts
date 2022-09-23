@@ -10,24 +10,19 @@ import type { ActionDefinition } from '../plugin';
 
 const CALENDAR_ID = 'primary';
 const GOOGLE_CALENDAR_API_VERSION = 'v3';
+const CREDENTIALS: GoogleMeetCredentials = JSON.parse(
+	defaultEnvironment.integration['google-meet'].credentials,
+);
 
-const handler: ActionDefinition['handler'] = async (
-	session,
-	context,
-	card,
-	request,
-) => {
-	const credentials: GoogleMeetCredentials = JSON.parse(
-		defaultEnvironment.integration['google-meet'].credentials,
-	);
+export async function createGoogleMeet(): Promise<string> {
 	const auth = new google.auth.GoogleAuth({
-		projectId: credentials.project_id,
+		projectId: CREDENTIALS.project_id,
 		credentials: {
-			client_email: credentials.client_email,
-			private_key: credentials.private_key,
+			client_email: CREDENTIALS.client_email,
+			private_key: CREDENTIALS.private_key,
 		},
 		clientOptions: {
-			clientId: credentials.client_id,
+			clientId: CREDENTIALS.client_id,
 
 			// `subject` required to impersonate real account using service account
 			// (neccessary for creating events with meet URLs)
@@ -84,13 +79,19 @@ const handler: ActionDefinition['handler'] = async (
 		});
 	}
 
-	const conferenceUrl = event.data.hangoutLink;
+	return event.data.hangoutLink;
+}
 
+const handler: ActionDefinition['handler'] = async (
+	session,
+	context,
+	card,
+	request,
+) => {
 	const typeCard = (await context.getCardBySlug(
 		session,
 		`${card.type}@latest`,
 	))! as TypeContract;
-
 	assert.INTERNAL(
 		request.logContext,
 		typeCard,
@@ -98,6 +99,7 @@ const handler: ActionDefinition['handler'] = async (
 		`No such type: ${card.type}`,
 	);
 
+	const conferenceUrl = await createGoogleMeet();
 	const patchResult = await context.patchCard(
 		context.privilegedSession,
 		typeCard,
