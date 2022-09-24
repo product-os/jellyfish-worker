@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 7.1.78 to 7.1.79
+      hash: 7c23db647f72a5e15a326169c9e92a9d025a353a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 34.1.10
+  title: ""
+  date: 2022-09-24T06:17:13.883Z
+- commits:
     - subject: Update @types/bluebird from 3.5.36 to 3.5.37
       hash: 0f66fb621eb745e9dc0c1a9e98d063186d9d865c
       body: ""
