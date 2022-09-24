@@ -85,7 +85,7 @@
   "devDependencies": {
     "@balena/lint": "^6.2.0",
     "@types/bcrypt": "^5.0.0",
-    "@types/bluebird": "^3.5.36",
+    "@types/bluebird": "^3.5.37",
     "@types/blueimp-md5": "^2.18.0",
     "@types/is-uuid": "^1.0.0",
     "@types/jest": "^29.0.3",
