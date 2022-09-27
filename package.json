@@ -53,7 +53,7 @@
     "@balena/jellyfish-assert": "^1.2.76",
     "@balena/jellyfish-environment": "^14.0.15",
     "@balena/jellyfish-jellyscript": "^7.1.85",
-    "@balena/jellyfish-logger": "^5.1.87",
+    "@balena/jellyfish-logger": "^5.1.91",
     "@balena/jellyfish-metrics": "^2.0.193",
     "@graphile/logger": "^0.2.0",
     "@types/node": "^17.0.41",
