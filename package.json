@@ -6,7 +6,7 @@
     "url": "https://github.com/product-os/jellyfish-worker.git"
   },
   "engines": {
-    "node": "^16.0.0"
+    "node": ">=16.0.0"
   },
   "description": "Worker library for Jellyfish",
   "main": "build/index.js",
