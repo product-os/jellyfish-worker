@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-assert from 1.2.74 to 1.2.75
+      hash: fccd77ae44349a6574e0655af202fb2bc5cc2a0c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 34.1.25
+  title: ""
+  date: 2022-09-27T12:12:46.687Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 7.1.82 to 7.1.83
       hash: 54220a4573bb8da65a66d00ae248d7fe3730cf3d
       body: ""
