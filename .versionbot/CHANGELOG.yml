@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update autumndb from 22.2.87 to 22.2.95
+      hash: 97f84dee3636af5f1f9a61af0f8422e21685db21
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 34.1.35
+  title: ""
+  date: 2022-09-28T06:49:04.665Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.193 to 2.0.198
       hash: a376ca2b64bdff85bc0c8cb4e7ad2b6a3aaef4b5
       body: ""
