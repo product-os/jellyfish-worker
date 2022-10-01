@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typescript from 4.8.3 to 4.8.4
+      hash: b8d608eb83557121728925376191049adbe76df7
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 34.1.37
+  title: ""
+  date: 2022-10-01T02:18:58.193Z
+- commits:
     - subject: Change engines to >=16 to enable node 18 tests/usage
       hash: d1be163f623798cfe83b0c0a9004eb4c3f3d10a3
       body: ""
