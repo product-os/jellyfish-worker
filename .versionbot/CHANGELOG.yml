@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 7.1.99 to 7.1.101
+      hash: 6a8212bef3b6d3a2b622d1fc3d8fcc96187ce2f4
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 34.1.56
+  title: ""
+  date: 2022-10-02T06:56:14.469Z
+- commits:
     - subject: Update ts-jest from 29.0.2 to 29.0.3
       hash: 50e9e0764296158958127dcaa9284bc732757f02
       body: ""
