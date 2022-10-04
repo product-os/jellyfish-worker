@@ -2,21 +2,14 @@ import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import * as metrics from '@balena/jellyfish-metrics';
 import { Logger } from '@graphile/logger';
-import type { AutumnDBSession, Kernel, LinkContract } from 'autumndb';
+import type { AutumnDBSession, Kernel } from 'autumndb';
 import * as graphileWorker from 'graphile-worker';
 import _ from 'lodash';
 import type { Pool } from 'pg';
 import { post } from './events';
-import type { ActionRequestContract, ExecuteContract } from '../types';
+import type { ActionRequestContract } from '../types';
 
 const logger = getLogger(__filename);
-
-const LINK_EXECUTE = {
-	NAME: 'executes',
-	INVERSE_NAME: 'is executed by',
-};
-
-const EXECUTE_LINK_VERSION = '1.0.0';
 
 const RUN_RETRIES = 10;
 const RUN_RETRY_DELAY = 1000;
@@ -37,11 +30,10 @@ export interface QueueConsumer {
 	) => Promise<boolean>;
 	cancel: () => Promise<void>;
 	postResults: (
-		actor: string,
 		logContext: LogContext,
 		actionRequest: ActionRequestContract,
 		results: PostResults,
-	) => Promise<ExecuteContract>;
+	) => Promise<ActionRequestContract>;
 }
 
 export interface PostResults {
@@ -53,45 +45,6 @@ export interface PostResults {
 		  };
 	error: boolean;
 }
-
-export interface PostOptions {
-	id: string;
-	actor: string;
-	action: string;
-	timestamp: string;
-	card: string;
-	originator?: string;
-}
-
-const getExecuteLinkSlug = (actionRequest: ActionRequestContract): string => {
-	return `link-execute-${actionRequest.slug}`;
-};
-
-const linkExecuteEvent = async (
-	kernel: Kernel,
-	logContext: LogContext,
-	session: AutumnDBSession,
-	eventContract: ExecuteContract,
-	actionRequest: ActionRequestContract,
-): Promise<LinkContract> => {
-	return kernel.insertContract<LinkContract>(logContext, session, {
-		slug: getExecuteLinkSlug(actionRequest),
-		type: 'link@1.0.0',
-		version: EXECUTE_LINK_VERSION,
-		name: LINK_EXECUTE.NAME,
-		data: {
-			inverseName: LINK_EXECUTE.INVERSE_NAME,
-			from: {
-				id: eventContract.id,
-				type: eventContract.type,
-			},
-			to: {
-				id: actionRequest.id,
-				type: actionRequest.type,
-			},
-		},
-	});
-};
 
 export class Consumer implements QueueConsumer {
 	messagesBeingHandled: number = 0;
@@ -178,41 +131,21 @@ export class Consumer implements QueueConsumer {
 	 * @function
 	 * @public
 	 *
-	 * @param _actor - actor. TS-TODO - this parameter is currently unused.
 	 * @param logContext - log context
 	 * @param actionRequest - action request contract
-	 * @param results - action results
 	 * @returns execute event contract
 	 */
 	async postResults(
-		_actor: string,
 		logContext: LogContext,
 		actionRequest: ActionRequestContract,
 		results: PostResults,
-	): Promise<ExecuteContract> {
-		const eventContract = await post(
+	): Promise<ActionRequestContract> {
+		return post(
 			logContext,
 			this.kernel,
 			this.session,
-			{
-				action: actionRequest.data.action,
-				actor: actionRequest.data.actor,
-				id: actionRequest.id,
-				card: actionRequest.data.input.id,
-				timestamp: actionRequest.data.timestamp,
-				originator: actionRequest.data.originator,
-			},
+			`${actionRequest.slug}@${actionRequest.version}`,
 			results,
 		);
-
-		await linkExecuteEvent(
-			this.kernel,
-			logContext,
-			this.session,
-			eventContract,
-			actionRequest,
-		);
-
-		return eventContract;
 	}
 }

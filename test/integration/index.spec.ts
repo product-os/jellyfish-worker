@@ -338,7 +338,7 @@ describe('Worker', () => {
 		ctx.worker.removeTrigger(ctx.logContext, trigger!.id);
 	});
 
-	it('should not re-enqueue requests after duplicated execute events', async () => {
+	it('should throw when attempting to execute the same action-request twice', async () => {
 		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
 		assert(typeContract);
 
@@ -381,7 +381,6 @@ describe('Worker', () => {
 		assert(enqueuedRequest1);
 
 		await ctx.worker.consumer.postResults(
-			autumndbTestUtils.generateRandomId(),
 			ctx.logContext,
 			enqueuedRequest1 as any,
 			{
@@ -1424,75 +1423,6 @@ describe('Worker', () => {
 		);
 		assert(insertRequest);
 		await expect(ctx.flush(ctx.session)).rejects.toThrowError();
-	});
-
-	it('should not re-enqueue requests after execute failure', async () => {
-		const typeContract = ctx.worker.typeContracts['card@1.0.0'];
-		assert(typeContract);
-
-		await ctx.worker.insertCard(
-			ctx.logContext,
-			ctx.session,
-			ctx.worker.typeContracts['action-request@1.0.0'],
-			{},
-			{
-				data: {
-					action: 'action-create-card@1.0.0',
-					context: ctx.logContext,
-					card: typeContract.id,
-					type: typeContract.type,
-					actor: ctx.adminUserId,
-					epoch: new Date().valueOf(),
-					input: {
-						id: typeContract.id,
-					},
-					timestamp: new Date().toISOString(),
-					arguments: {
-						reason: null,
-						properties: {
-							slug: 'foo',
-							version: '1.0.0',
-							data: {
-								foo: 'bar',
-							},
-						},
-					},
-				},
-			},
-		);
-
-		const enqueuedRequest1 = await ctx.dequeue();
-		assert(enqueuedRequest1);
-
-		await ctx.kernel.insertContract(ctx.logContext, ctx.session, {
-			slug: 'foo',
-			type: 'card@1.0.0',
-			version: '1.0.0',
-			data: {
-				foo: 'bar',
-			},
-		});
-
-		await ctx.worker.consumer.postResults(
-			autumndbTestUtils.generateRandomId(),
-			ctx.logContext,
-			enqueuedRequest1 as any,
-			{
-				error: false,
-				data: {
-					id: autumndbTestUtils.generateRandomId(),
-					type: 'card@1.0.0',
-					slug: 'foo',
-				},
-			},
-		);
-
-		await expect(
-			ctx.worker.execute(ctx.session, enqueuedRequest1),
-		).rejects.toThrowError();
-
-		const enqueuedRequest2 = await ctx.dequeue();
-		expect(enqueuedRequest2).toBeFalsy();
 	});
 
 	it('should be able to login as a user with a password', async () => {

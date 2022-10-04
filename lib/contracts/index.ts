@@ -12,7 +12,6 @@ import { checkin } from './checkin';
 import { contact } from './contact';
 import { contractRepository } from './contract-repository';
 import { create } from './create';
-import { execute } from './execute';
 import { externalEvent } from './external-event';
 import { faq } from './faq';
 import { feedbackItem } from './feedback-item';
@@ -64,7 +63,6 @@ import { relationshipContactIsAttachedToUser } from './relationship-contact-is-a
 import { relationshipContactIsOwnedByUser } from './relationship-contact-is-owned-by-user';
 import { relationshipContractRepositoryHasMemberAny } from './relationship-contract-repository-has-member-any';
 import { relationshipCreateIsAttachedToAny } from './relationship-create-is-attached-to-any';
-import { relationshipExecuteExecutesActionRequest } from './relationship-execute-executes-action-request';
 import { relationshipFeedbackItemIsFeedbackForUser } from './relationship-feedback-item-is-feedback-for-user';
 import { relationshipFirstTimeLoginIsAttachedToUser } from './relationship-first-time-login-is-attached-to-user';
 import { relationshipGroupHasGroupMemberUser } from './relationship-group-has-group-member-user';
@@ -180,7 +178,6 @@ import { viewCustomerSuccessSupportThreads } from './view-customer-success-suppo
 import { viewMyConversations } from './view-my-conversations';
 import { viewMyOpportunities } from './view-my-opportunities';
 import { viewMyOrgs } from './view-my-orgs';
-import { viewNonExecutedActionRequests } from './view-non-executed-action-requests';
 import { viewPaidSupportThreads } from './view-paid-support-threads';
 import { viewScheduledActions } from './view-scheduled-actions';
 import { viewSecuritySupportThreads } from './view-security-support-threads';
@@ -205,7 +202,6 @@ export const contracts: ContractDefinition[] = [
 	contact,
 	contractRepository,
 	create,
-	execute,
 	externalEvent,
 	faq,
 	feedbackItem,
@@ -257,7 +253,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipContactIsOwnedByUser,
 	relationshipContractRepositoryHasMemberAny,
 	relationshipCreateIsAttachedToAny,
-	relationshipExecuteExecutesActionRequest,
 	relationshipFeedbackItemIsFeedbackForUser,
 	relationshipFirstTimeLoginIsAttachedToUser,
 	relationshipGroupHasGroupMemberUser,
@@ -373,7 +368,6 @@ export const contracts: ContractDefinition[] = [
 	viewMyConversations,
 	viewMyOpportunities,
 	viewMyOrgs,
-	viewNonExecutedActionRequests,
 	viewPaidSupportThreads,
 	viewScheduledActions,
 	viewSecuritySupportThreads,

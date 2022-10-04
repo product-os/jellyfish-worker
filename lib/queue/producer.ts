@@ -1,22 +1,13 @@
-import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import { strict as nativeAssert } from 'assert';
+import { strict as assert } from 'assert';
 import type { AutumnDBSession, ContractData, Kernel } from 'autumndb';
 import { parseExpression } from 'cron-parser';
 import * as graphileWorker from 'graphile-worker';
 import type { Pool } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
-import {
-	QueueInvalidAction,
-	QueueInvalidRequest,
-	QueueNoRequest,
-} from './errors';
+import { QueueInvalidAction, QueueNoRequest } from './errors';
 import { wait } from './events';
-import type {
-	ActionRequestContract,
-	ExecuteContract,
-	ScheduledActionData,
-} from '../types';
+import type { ActionRequestContract, ScheduledActionData } from '../types';
 
 const logger = getLogger(__filename);
 
@@ -42,7 +33,15 @@ export interface ProducerOptions {
 export interface ProducerResults {
 	error: boolean;
 	timestamp: string;
-	data: ExecuteContract['data']['payload']['data'];
+	data:
+		| {
+				[k: string]: unknown;
+		  }
+		| string
+		| number
+		| boolean
+		| unknown[]
+		| null;
 }
 
 export interface QueueProducer {
@@ -244,12 +243,14 @@ export class Producer implements QueueProducer {
 			},
 		});
 
-		const request = await wait(logContext, this.kernel, this.session, {
-			id: actionRequest.id,
-			actor: actionRequest.data.actor,
-		});
+		const request = await wait(
+			logContext,
+			this.kernel,
+			this.session,
+			actionRequest.id,
+		);
 
-		logger.info(logContext, 'Got request results', {
+		logger.info(logContext, 'Got action-request results', {
 			request: {
 				id: actionRequest.id,
 				slug: actionRequest.slug,
@@ -260,29 +261,21 @@ export class Producer implements QueueProducer {
 			},
 		});
 
-		nativeAssert(
-			request,
+		assert(
+			request && request.data.results,
 			new QueueNoRequest(
-				`Request not found: ${JSON.stringify(actionRequest, null, 2)}`,
-			),
-		);
-		assert.INTERNAL(
-			logContext,
-			request.data.payload,
-			QueueInvalidRequest,
-			() => {
-				return `Execute event has no payload: ${JSON.stringify(
-					request,
+				`Executed action-request not found: ${JSON.stringify(
+					actionRequest,
 					null,
 					2,
-				)}`;
-			},
+				)}`,
+			),
 		);
 
 		return {
-			error: request.data.payload.error,
-			timestamp: request.data.payload.timestamp,
-			data: request.data.payload.data,
+			error: request.data.results.error,
+			timestamp: request.data.timestamp,
+			data: request.data.results.data,
 		};
 	}
 

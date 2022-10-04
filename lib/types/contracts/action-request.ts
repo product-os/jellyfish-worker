@@ -9,6 +9,20 @@
 import type { Contract, ContractDefinition } from 'autumndb';
 
 export interface ActionRequestData {
+	executed?: boolean;
+	results?: {
+		error: boolean;
+		data:
+			| {
+					[k: string]: unknown;
+			  }
+			| string
+			| number
+			| boolean
+			| unknown[]
+			| null;
+		[k: string]: unknown;
+	};
 	epoch: number;
 	timestamp: string;
 	context: {

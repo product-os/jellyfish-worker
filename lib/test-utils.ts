@@ -12,7 +12,8 @@ import path from 'path';
 import { v4 as uuid } from 'uuid';
 import { Worker } from '.';
 import { ActionDefinition, PluginDefinition, PluginManager } from './plugin';
-import { Action, ActionRequestContract, ExecuteContract, Map } from './types';
+import type { ProducerResults } from './queue/producer';
+import { Action, ActionRequestContract, Map } from './types';
 
 /**
  * Context that can be used in tests against the worker.
@@ -688,7 +689,7 @@ export async function webhookScenario(
 			request as ActionRequestContract,
 		);
 		assert.ok(result.error === false);
-		contracts.push(...(result.data as ExecuteContract[]));
+		contracts.push(...(result.data as Array<ProducerResults['data']>));
 	}
 
 	if (!testCase.expected.head) {
