@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-environment from 14.1.1 to 14.1.2
+      hash: 4a27580368062b6e7ccb6888764ab8510f910c38
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 35.0.1
+  title: ""
+  date: 2022-10-04T02:13:20.623Z
+- commits:
     - subject: Remove execute contract
       hash: 11946f42b9da269a94fdc1b3c2da0f62d8de830e
       body: ""
