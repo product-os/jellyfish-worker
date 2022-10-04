@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove execute contract
+      hash: 11946f42b9da269a94fdc1b3c2da0f62d8de830e
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 35.0.0
+  title: ""
+  date: 2022-10-04T01:32:20.653Z
+- commits:
     - subject: Update autumndb from 22.2.115 to 22.2.119
       hash: 83ed61697e46f6f838777ca0406ba242a846733a
       body: ""
