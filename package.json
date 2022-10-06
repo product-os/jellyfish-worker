@@ -54,7 +54,7 @@
     "@balena/jellyfish-environment": "^14.2.0",
     "@balena/jellyfish-jellyscript": "^7.1.106",
     "@balena/jellyfish-logger": "^5.1.105",
-    "@balena/jellyfish-metrics": "^2.0.219",
+    "@balena/jellyfish-metrics": "^2.0.221",
     "@graphile/logger": "^0.2.0",
     "@types/node": "^17.0.41",
     "autumndb": "^22.2.123",
