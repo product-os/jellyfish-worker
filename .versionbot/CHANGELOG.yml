@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-logger from 5.1.105 to 5.1.111
+      hash: fca1481d4bc63621556df6c411fab2a1f89a7d22
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 35.0.19
+  title: ""
+  date: 2022-10-09T13:15:17.297Z
+- commits:
     - subject: "Dev: Use prettier for json/yml"
       hash: a157ecefccd6579e2af053b1ec8e05aeb58f1156
       body: ""
