@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/jest from 29.1.1 to 29.1.2
+      hash: ef5da055c37a0699f98ed4da7d8c302d1219c4bc
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 35.0.26
+  title: ""
+  date: 2022-10-10T11:21:30.352Z
+- commits:
     - subject: "CI: Use JSON for Jest config"
       hash: aaa385ac06e86df32c3816d7dd96c306f94ebb35
       body: ""
