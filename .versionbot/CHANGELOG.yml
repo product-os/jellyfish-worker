@@ -1,4 +1,18 @@
 - commits:
+    - subject: "CI: Move all unit tests to test/unit"
+      hash: af22c145a3edcca87050d4e8b8c2855c1cba3fb9
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 35.0.32
+  title: ""
+  date: 2022-10-11T01:24:03.010Z
+- commits:
     - subject: Update autumndb from 22.2.123 to 22.2.139
       hash: ba7d90db0f4c70b58f35b47ba5a14d8a224225b4
       body: ""
