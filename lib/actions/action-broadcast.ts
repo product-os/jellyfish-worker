@@ -59,7 +59,7 @@ const handler: ActionDefinition['handler'] = async (
 
 	const eventRequest = Object.assign({}, request);
 	eventRequest.arguments = {
-		slug: await context.getEventSlug(`broadcast-${eventType.split('@')[0]}`),
+		slug: context.getEventSlug(`broadcast-${eventType.split('@')[0]}`),
 		type: eventType.split('@')[0],
 		payload: {
 			mentionsUser: [],

@@ -61,11 +61,7 @@ export const actionMergeDraftVersion: ActionDefinition = {
 			`Not a draft version: ${card.version}`,
 		);
 
-		const typeCard = (await context.getCardBySlug(
-			session,
-			card.type,
-		))! as TypeContract;
-
+		const typeCard = context.cards[card.type] as TypeContract;
 		assert.USER(
 			request.logContext,
 			typeCard,
@@ -113,10 +109,9 @@ export const actionMergeDraftVersion: ActionDefinition = {
 			// and the contracts. Also the explicit support for the local env stems from that
 
 			// Generate a shortlived session token to allow authentication with the registry
-			const sessionTypeContract = (await context.getCardBySlug(
-				session,
-				'session@1.0.0',
-			))! as TypeContract;
+			const sessionTypeContract = context.cards[
+				'session@1.0.0'
+			] as TypeContract;
 			// Set the expiration date to be 10 minutes from now
 			const expirationDate = new Date();
 			expirationDate.setMinutes(expirationDate.getMinutes() + 10);
@@ -257,10 +252,7 @@ const linkCards = async (
 	verb: string,
 	inverseVerb: string,
 ) => {
-	const linkTypeCard = (await context.getCardBySlug(
-		session,
-		'link@1.0.0',
-	))! as TypeContract;
+	const linkTypeCard = context.cards['link@1.0.0'] as TypeContract;
 	assert.INTERNAL(
 		request.logContext,
 		linkTypeCard,
@@ -278,7 +270,7 @@ const linkCards = async (
 			attachEvents: true,
 		},
 		{
-			slug: await context.getEventSlug('link'),
+			slug: context.getEventSlug('link'),
 			type: 'link@1.0.0',
 			name: verb,
 			data: {

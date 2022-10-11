@@ -1,6 +1,6 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger } from '@balena/jellyfish-logger';
-import type { AutumnDBSession, Contract, TypeContract } from 'autumndb';
+import type { Contract, TypeContract } from 'autumndb';
 import { get, includes, intersectionBy } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import * as errors from '../errors';
@@ -200,7 +200,7 @@ export async function addFirstTimeLogin(
 		},
 		{
 			version: '1.0.0',
-			slug: await context.getEventSlug('first-time-login'),
+			slug: context.getEventSlug('first-time-login'),
 			data: {
 				expiresAt: expiresAt.toISOString(),
 				requestedAt: requestedAt.toISOString(),
@@ -280,23 +280,17 @@ export async function checkOrgs(
  * @function
  *
  * @param context - execution context
- * @param session - user session
  * @param userCard - user card
  * @param request - action request
  */
 async function setCommunityRole(
 	context: WorkerContext,
-	session: AutumnDBSession,
 	userCard: Contract,
 	request: ActionHandlerRequest,
 ): Promise<void> {
-	const typeCard = (await context.getCardBySlug(
-		session,
-		'user@latest',
-	))! as TypeContract;
 	await context.patchCard(
 		context.privilegedSession,
-		typeCard,
+		context.cards['user@1.0.0'] as TypeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,
@@ -319,24 +313,11 @@ async function setCommunityRole(
 }
 
 const handler: ActionDefinition['handler'] = async (
-	session,
+	_session,
 	context,
 	userCard,
 	request,
 ) => {
-	const typeCard = (await context.getCardBySlug(
-		session,
-		'first-time-login@latest',
-	))! as TypeContract;
-	const userEmails = userCard.data.email as string[];
-
-	assert.USER(
-		request.logContext,
-		typeCard,
-		errors.WorkerNoElement,
-		'No such type: first-time-login',
-	);
-
 	assert.USER(
 		request.logContext,
 		userCard.active,
@@ -344,6 +325,15 @@ const handler: ActionDefinition['handler'] = async (
 		`User with slug ${userCard.slug} is not active`,
 	);
 
+	const typeCard = context.cards['first-time-login@1.0.0'] as TypeContract;
+	assert.USER(
+		request.logContext,
+		typeCard,
+		errors.WorkerNoElement,
+		'No such type: first-time-login',
+	);
+
+	const userEmails = userCard.data.email as string[];
 	assert.USER(
 		request.logContext,
 		userCard.data.email && userEmails.length,
@@ -358,7 +348,7 @@ const handler: ActionDefinition['handler'] = async (
 			request.logContext,
 			`User with slug ${userCard.slug} does not have community role. Setting role now`,
 		);
-		await setCommunityRole(context, session, userCard, request);
+		await setCommunityRole(context, userCard, request);
 	}
 
 	await invalidatePreviousFirstTimeLogins(

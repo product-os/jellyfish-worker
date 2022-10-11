@@ -30,18 +30,13 @@ const handler: ActionDefinition['handler'] = async (
 		};
 	}
 
-	const typeContract = (await context.getCardBySlug(
-		session,
-		contract.type,
-	))! as TypeContract;
-
 	const path = _.isString(request.arguments.property)
 		? `/${request.arguments.property.replace(/\./g, '/')}`
 		: `/${request.arguments.property.join('/')}`;
 
 	const result = await context.patchCard(
 		session,
-		typeContract,
+		context.cards[contract.type] as TypeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,

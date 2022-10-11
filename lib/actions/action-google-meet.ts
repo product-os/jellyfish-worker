@@ -83,15 +83,12 @@ export async function createGoogleMeet(): Promise<string> {
 }
 
 const handler: ActionDefinition['handler'] = async (
-	session,
+	_session,
 	context,
 	card,
 	request,
 ) => {
-	const typeCard = (await context.getCardBySlug(
-		session,
-		`${card.type}@latest`,
-	))! as TypeContract;
+	const typeCard = context.cards[card.type] as TypeContract;
 	assert.INTERNAL(
 		request.logContext,
 		typeCard,

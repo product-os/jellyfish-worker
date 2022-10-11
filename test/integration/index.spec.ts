@@ -731,6 +731,14 @@ describe('Worker', () => {
 		);
 		expect(typeResult.error).toBe(false);
 
+		// Wait for the worker type cache to include the new type
+		while (true) {
+			await delay(500);
+			if (ctx.worker.typeContracts[`${typeResult.data.slug}@1.0.0`]) {
+				break;
+			}
+		}
+
 		const insertRequest = await ctx.worker.insertCard<ActionRequestContract>(
 			ctx.logContext,
 			ctx.session,
@@ -897,6 +905,14 @@ describe('Worker', () => {
 			typeRequest,
 		);
 		expect(typeResult.error).toBe(false);
+
+		// Wait for the worker type cache to include the new type
+		while (true) {
+			await delay(500);
+			if (ctx.worker.typeContracts[`${typeResult.data.slug}@1.0.0`]) {
+				break;
+			}
+		}
 
 		const insertRequest = await ctx.worker.insertCard<ActionRequestContract>(
 			ctx.logContext,
@@ -1065,6 +1081,14 @@ describe('Worker', () => {
 		);
 		expect(typeResult.error).toBe(false);
 
+		// Wait for the worker type cache to include the new type
+		while (true) {
+			await delay(500);
+			if (ctx.worker.typeContracts[`${typeResult.data.slug}@1.0.0`]) {
+				break;
+			}
+		}
+
 		const insertRequest = await ctx.worker.insertCard<ActionRequestContract>(
 			ctx.logContext,
 			ctx.session,
@@ -1229,6 +1253,14 @@ describe('Worker', () => {
 			typeRequest,
 		);
 		expect(typeResult.error).toBe(false);
+
+		// Wait for the worker type cache to include the new type
+		while (true) {
+			await delay(500);
+			if (ctx.worker.typeContracts[`${typeResult.data.slug}@1.0.0`]) {
+				break;
+			}
+		}
 
 		const insertRequest = await ctx.worker.insertCard<ActionRequestContract>(
 			ctx.logContext,

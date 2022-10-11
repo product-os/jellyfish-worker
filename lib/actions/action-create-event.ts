@@ -70,10 +70,15 @@ const handler: ActionDefinition['handler'] = async (
 	contract,
 	request,
 ) => {
-	const typeContract = (await context.getCardBySlug(
-		session,
-		`${request.arguments.type}@1.0.0`,
-	))! as TypeContract;
+	const typeContract = context.cards[
+		`${request.arguments.type}@1.0.0`
+	] as TypeContract;
+	assert.USER(
+		request.logContext,
+		typeContract,
+		WorkerNoElement,
+		`No such type: ${request.arguments.type}`,
+	);
 
 	// In most cases, the `card` argument will contain all the information we
 	// need, but in some instances (for example when the guest user session
@@ -86,16 +91,8 @@ const handler: ActionDefinition['handler'] = async (
 		contract.id,
 	))!;
 
-	assert.USER(
-		request.logContext,
-		typeContract,
-		WorkerNoElement,
-		`No such type: ${request.arguments.type}`,
-	);
-
 	let tags: string[] = [];
 	let payload = request.arguments.payload;
-
 	if (typeContract.slug === 'message' || typeContract.slug === 'whisper') {
 		const metadata = getMessageMetaData(
 			request.arguments.payload.message || '',
@@ -130,9 +127,7 @@ const handler: ActionDefinition['handler'] = async (
 				attachEvents: false,
 			},
 			{
-				slug:
-					request.arguments.slug ||
-					(await context.getEventSlug(typeContract.slug)),
+				slug: request.arguments.slug || context.getEventSlug(typeContract.slug),
 				version: '1.0.0',
 				name: request.arguments.name || null,
 				tags: request.arguments.tags || tags,
@@ -151,15 +146,10 @@ const handler: ActionDefinition['handler'] = async (
 			throw error;
 		}))!;
 
-	const linkTypeContract = (await context.getCardBySlug(
-		session,
-		'link@1.0.0',
-	))! as TypeContract;
-
 	// Create a link card between the event and its target
 	await context.insertCard(
 		session,
-		linkTypeContract,
+		context.cards['link@1.0.0'] as TypeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,
@@ -167,7 +157,7 @@ const handler: ActionDefinition['handler'] = async (
 			attachEvents: false,
 		},
 		{
-			slug: await context.getEventSlug('link'),
+			slug: context.getEventSlug('link'),
 			type: 'link@1.0.0',
 			name: 'is attached to',
 			data: {

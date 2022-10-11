@@ -16,13 +16,9 @@ export async function addLinkCard(
 	fromCard: Contract,
 	userCard: Contract,
 ): Promise<void> {
-	const linkTypeCard = (await context.getCardBySlug(
-		context.privilegedSession,
-		'link@1.0.0',
-	))! as TypeContract;
 	await context.insertCard(
 		context.privilegedSession,
-		linkTypeCard,
+		context.cards['link@1.0.0'] as TypeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,
@@ -30,7 +26,7 @@ export async function addLinkCard(
 			attachEvents: false,
 		},
 		{
-			slug: await context.getEventSlug('link'),
+			slug: context.getEventSlug('link'),
 			type: 'link@1.0.0',
 			name: 'is attached to',
 			data: {

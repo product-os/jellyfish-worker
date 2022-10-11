@@ -1,4 +1,5 @@
-import { TypeContract } from 'autumndb';
+import { strict as assert } from 'assert';
+import type { TypeContract } from 'autumndb';
 import _ from 'lodash';
 import { setTimeout as delay } from 'timers/promises';
 import { testUtils } from '../../lib';
@@ -14,37 +15,40 @@ afterAll(() => {
 
 describe('Relationships', () => {
 	it('should calculate formula fields that use links when the relationship is inserted after the type', async () => {
-		const pilotType = await ctx.kernel.insertContract<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			{
-				type: 'type@1.0.0',
-				name: 'Pilot',
-				data: {
-					schema: {
-						type: 'object',
-						properties: {
-							data: {
-								type: 'object',
-								properties: {
-									planesFlown: {
-										type: 'number',
-										$$formula:
-											'contract.links["flies"] ? contract.links["flies"].length : 0',
+		const [pilotType, planeType] = await Promise.all([
+			ctx.worker.insertCard(
+				ctx.logContext,
+				ctx.session,
+				ctx.worker.typeContracts['type@1.0.0'],
+				{
+					attachEvents: false,
+				},
+				{
+					type: 'type@1.0.0',
+					active: true,
+					name: 'Pilot',
+					data: {
+						schema: {
+							type: 'object',
+							properties: {
+								data: {
+									type: 'object',
+									properties: {
+										planesFlown: {
+											type: 'number',
+											$$formula:
+												'contract.links["flies"] ? contract.links["flies"].length : 0',
+										},
 									},
 								},
 							},
 						},
 					},
 				},
-			},
-		);
-
-		const planeType = await ctx.kernel.insertContract<TypeContract>(
-			ctx.logContext,
-			ctx.session,
-			{
+			),
+			ctx.kernel.insertContract<TypeContract>(ctx.logContext, ctx.session, {
 				type: 'type@1.0.0',
+				active: true,
 				name: 'Plane',
 				data: {
 					schema: {
@@ -52,8 +56,21 @@ describe('Relationships', () => {
 						properties: {},
 					},
 				},
-			},
-		);
+			}),
+		]);
+		assert(pilotType, 'failed to create pilot type');
+		assert(planeType, 'failed to create plane type');
+
+		// Wait for both types to exist in worker cache
+		while (true) {
+			await delay(500);
+			if (
+				ctx.worker.typeContracts[`${pilotType.slug}@1.0.0`] &&
+				ctx.worker.typeContracts[`${planeType.slug}@1.0.0`]
+			) {
+				break;
+			}
+		}
 
 		// Now insert the relationship *after* the types have been created
 		const relationshipSlug = `relationship-${pilotType.slug}-flies-${planeType.slug}`;
@@ -82,7 +99,7 @@ describe('Relationships', () => {
 			},
 		);
 
-		// Wait until the relationship is ready and avaiable in the kernel
+		// Wait until the relationship is ready and available in the kernel
 		while (true) {
 			await delay(500);
 			const relationships = ctx.kernel.getRelationships();
@@ -96,7 +113,7 @@ describe('Relationships', () => {
 		const pilot = (await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			pilotType,
+			pilotType as TypeContract,
 			{
 				timestamp: new Date().toISOString(),
 				actor: ctx.adminUserId,
@@ -122,13 +139,11 @@ describe('Relationships', () => {
 			},
 		))!;
 
-		const linkType = ctx.worker.typeContracts['link@1.0.0'];
-
 		// Link the contracts together, which should result in the formula field being updated
 		await ctx.worker.insertCard(
 			ctx.logContext,
 			ctx.session,
-			linkType,
+			ctx.worker.typeContracts['link@1.0.0'],
 			{
 				timestamp: new Date().toISOString(),
 				actor: ctx.adminUserId,

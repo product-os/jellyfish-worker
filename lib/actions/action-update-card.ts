@@ -9,11 +9,7 @@ const handler: ActionDefinition['handler'] = async (
 	contract,
 	request,
 ) => {
-	const typeContract = (await context.getCardBySlug(
-		session,
-		contract.type,
-	))! as TypeContract;
-
+	const typeContract = context.cards[contract.type] as TypeContract;
 	assert.USER(
 		request.logContext,
 		typeContract,

@@ -77,7 +77,7 @@ const pre: ActionDefinition['pre'] = async (session, context, request) => {
 };
 
 const handler: ActionDefinition['handler'] = async (
-	session,
+	_session,
 	context,
 	contract,
 	request,
@@ -97,11 +97,7 @@ const handler: ActionDefinition['handler'] = async (
 		'Login disallowed',
 	);
 
-	const sessionTypeContract = (await context.getCardBySlug(
-		session,
-		'session@1.0.0',
-	))! as TypeContract;
-
+	const sessionTypeContract = context.cards['session@1.0.0'] as TypeContract;
 	assert.USER(
 		request.logContext,
 		sessionTypeContract,

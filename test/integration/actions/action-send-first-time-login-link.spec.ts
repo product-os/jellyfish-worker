@@ -4,7 +4,6 @@ import { testUtils as autumndbTestUtils } from 'autumndb';
 import nock from 'nock';
 import { testUtils } from '../../../lib';
 import { actionSendFirstTimeLoginLink } from '../../../lib/actions/action-send-first-time-login-link';
-import * as errors from '../../../lib/errors';
 import type { WorkerContext } from '../../../lib/types';
 import { includes, makeHandlerRequest } from './helpers';
 
@@ -519,7 +518,6 @@ describe('action-send-first-time-login-link', () => {
 		const requester = await ctx.createUser(
 			autumndbTestUtils.generateRandomSlug(),
 		);
-		const requesterSession = { actor: requester };
 		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
@@ -530,22 +528,25 @@ describe('action-send-first-time-login-link', () => {
 			'has member',
 		);
 
-		const results = await ctx.processAction(requesterSession, {
-			type: 'action-request@1.0.0',
-			data: {
-				action: 'action-send-first-time-login-link@1.0.0',
-				context: ctx.logContext,
-				card: user.id,
-				type: user.type,
-				epoch: new Date().valueOf(),
-				timestamp: new Date().toISOString(),
-				actor: user.id,
-				input: {
-					id: user.id,
+		const results = await ctx.processAction(
+			{ actor: requester },
+			{
+				type: 'action-request@1.0.0',
+				data: {
+					action: 'action-send-first-time-login-link@1.0.0',
+					context: ctx.logContext,
+					card: user.id,
+					type: user.type,
+					epoch: new Date().valueOf(),
+					timestamp: new Date().toISOString(),
+					actor: requester.id,
+					input: {
+						id: user.id,
+					},
+					arguments: {},
 				},
-				arguments: {},
 			},
-		});
+		);
 		expect(results.error).toBe(true);
 	});
 
@@ -767,30 +768,51 @@ describe('action-send-first-time-login-link', () => {
 	});
 
 	test('users with the "user-community" role cannot send a first-time login link to another user', async () => {
-		const targetUser = await ctx.createUser(
-			autumndbTestUtils.generateRandomId(),
-		);
-		const communityUser = await ctx.createUser(
-			autumndbTestUtils.generateRandomId(),
-		);
-		const session = { actor: communityUser };
-		await ctx.createLinkThroughWorker(
-			ctx.adminUserId,
-			ctx.session,
-			targetUser,
-			balenaOrg,
-			'is member of',
-			'has member',
-		);
-		await ctx.createLinkThroughWorker(
-			ctx.adminUserId,
-			ctx.session,
-			communityUser,
-			balenaOrg,
-			'is member of',
-			'has member',
-		);
+		const [requester, target] = await Promise.all([
+			ctx.createUser(autumndbTestUtils.generateRandomId()),
+			ctx.createUser(autumndbTestUtils.generateRandomId()),
+		]);
+		await Promise.all([
+			ctx.createLinkThroughWorker(
+				ctx.adminUserId,
+				ctx.session,
+				requester,
+				balenaOrg,
+				'is member of',
+				'has member',
+			),
+			ctx.createLinkThroughWorker(
+				ctx.adminUserId,
+				ctx.session,
+				target,
+				balenaOrg,
+				'is member of',
+				'has member',
+			),
+		]);
 
+		const results = await ctx.processAction(
+			{ actor: requester },
+			{
+				type: 'action-request@1.0.0',
+				data: {
+					action: 'action-send-first-time-login-link@1.0.0',
+					context: ctx.logContext,
+					card: target.id,
+					type: target.type,
+					epoch: new Date().valueOf(),
+					timestamp: new Date().toISOString(),
+					actor: requester.id,
+					input: {
+						id: target.id,
+					},
+					arguments: {},
+				},
+			},
+		);
+		expect(results.error).toBe(true);
+
+		/*
 		await expect(
 			handler(
 				session,
@@ -801,5 +823,6 @@ describe('action-send-first-time-login-link', () => {
 		).rejects.toThrow(
 			new errors.WorkerNoElement('No such type: first-time-login'),
 		);
+        */
 	});
 });

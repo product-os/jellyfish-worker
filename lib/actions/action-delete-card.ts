@@ -4,7 +4,7 @@ import * as errors from '../errors';
 import type { ActionDefinition } from '../plugin';
 
 const handler: ActionDefinition['handler'] = async (
-	session,
+	_session,
 	context,
 	card,
 	request,
@@ -18,10 +18,7 @@ const handler: ActionDefinition['handler'] = async (
 		};
 	}
 
-	const typeCard = (await context.getCardBySlug(
-		session,
-		card.type,
-	))! as TypeContract;
+	const typeCard = context.cards[card.type] as TypeContract;
 	assert.USER(
 		request.logContext,
 		typeCard,

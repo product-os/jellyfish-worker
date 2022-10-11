@@ -79,11 +79,7 @@ const handler: ActionDefinition['handler'] = async (
 		});
 	}
 
-	const typeCard = (await context.getCardBySlug(
-		session,
-		'user@1.0.0',
-	))! as TypeContract;
-
+	const typeCard = context.cards['user@1.0.0'] as TypeContract;
 	assert.INTERNAL(
 		request.logContext,
 		typeCard,

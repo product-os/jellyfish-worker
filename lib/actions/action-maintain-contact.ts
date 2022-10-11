@@ -28,10 +28,7 @@ const handler: ActionDefinition['handler'] = async (
 	const LINK_NAME_CONTACT_USER = 'is attached to user';
 	const LINK_NAME_USER_CONTACT = 'has contact';
 
-	const typeCard = (await context.getCardBySlug(
-		session,
-		'contact@1.0.0',
-	)) as TypeContract;
+	const typeCard = context.cards['contact@1.0.0'] as TypeContract;
 	assert.INTERNAL(
 		request.logContext,
 		typeCard,
@@ -215,10 +212,7 @@ const handler: ActionDefinition['handler'] = async (
 		_.set(contact, property.path, property.value);
 	}
 
-	const linkTypeCard = (await context.getCardBySlug(
-		session,
-		'link@1.0.0',
-	)) as TypeContract;
+	const linkTypeCard = context.cards['link@1.0.0'] as TypeContract;
 	assert.INTERNAL(
 		request.logContext,
 		linkTypeCard,
@@ -257,7 +251,7 @@ const handler: ActionDefinition['handler'] = async (
 			reason: 'Created user contact',
 		},
 		{
-			slug: await context.getEventSlug('link'),
+			slug: context.getEventSlug('link'),
 			type: 'link@1.0.0',
 			name: LINK_NAME_CONTACT_USER,
 			data: {
