@@ -305,33 +305,31 @@ describe('role-user-community', () => {
 		expect(user.data.roles).toEqual(['user-external-support']);
 		user.data.roles.push('user-operator');
 
-		await expect(() => {
-			return actionUpdateCard.handler(
-				{
-					actor: user,
+		await actionUpdateCard.handler(
+			{
+				actor: user,
+			},
+			actionContext,
+			user,
+			{
+				action: {} as ActionContract,
+				card: user.id,
+				timestamp: new Date().toISOString(),
+				actor: user.id,
+				logContext: ctx.logContext,
+				epoch: new Date().valueOf(),
+				arguments: {
+					reason: null,
+					patch: [
+						{
+							op: 'replace',
+							path: '/data/roles',
+							value: user.data.roles,
+						},
+					],
 				},
-				actionContext,
-				user,
-				{
-					action: {} as ActionContract,
-					card: user.id,
-					timestamp: new Date().toISOString(),
-					actor: user.id,
-					logContext: ctx.logContext,
-					epoch: new Date().valueOf(),
-					arguments: {
-						reason: null,
-						patch: [
-							{
-								op: 'replace',
-								path: '/data/roles',
-								value: user.data.roles,
-							},
-						],
-					},
-				},
-			);
-		}).rejects.toThrow();
+			},
+		);
 
 		const updated = await ctx.kernel.getContractById<UserContract>(
 			ctx.logContext,

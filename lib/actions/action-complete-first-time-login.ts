@@ -87,13 +87,9 @@ export async function invalidateFirstTimeLogin(
 	request: ActionHandlerRequest,
 	card: Contract,
 ): Promise<Contract> {
-	const typeCard = (await context.getCardBySlug(
-		context.privilegedSession,
-		'first-time-login@latest',
-	))! as TypeContract;
 	return (await context.patchCard(
 		context.privilegedSession,
-		typeCard,
+		context.cards['first-time-login@1.0.0'] as TypeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,
@@ -112,7 +108,7 @@ export async function invalidateFirstTimeLogin(
 }
 
 const handler: ActionDefinition['handler'] = async (
-	session,
+	_session,
 	context,
 	_card,
 	request,
@@ -174,15 +170,10 @@ const handler: ActionDefinition['handler'] = async (
 		'User already has a password set',
 	);
 
-	const userTypeCard = (await context.getCardBySlug(
-		session,
-		'user@latest',
-	))! as TypeContract;
-
 	return context
 		.patchCard(
 			context.privilegedSession,
-			userTypeCard,
+			context.cards['user@1.0.0'] as TypeContract,
 			{
 				timestamp: request.timestamp,
 				actor: request.actor,

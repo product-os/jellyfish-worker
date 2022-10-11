@@ -91,13 +91,9 @@ export async function invalidatePasswordReset(
 	request: ActionHandlerRequest,
 	passwordResetCard: Contract,
 ): Promise<Contract> {
-	const typeCard = (await context.getCardBySlug(
-		context.privilegedSession,
-		'password-reset@1.0.0',
-	))! as TypeContract;
 	return (await context.patchCard(
 		context.privilegedSession,
-		typeCard,
+		context.cards['password-reset@1.0.0'] as TypeContract,
 		{
 			timestamp: request.timestamp,
 			actor: request.actor,
@@ -116,7 +112,7 @@ export async function invalidatePasswordReset(
 }
 
 const handler: ActionDefinition['handler'] = async (
-	session,
+	_session,
 	context,
 	_card,
 	request,
@@ -143,15 +139,10 @@ const handler: ActionDefinition['handler'] = async (
 		);
 	}
 
-	const userTypeCard = (await context.getCardBySlug(
-		session,
-		'user@latest',
-	))! as TypeContract;
-
 	return context
 		.patchCard(
 			context.privilegedSession,
-			userTypeCard,
+			context.cards['user@1.0.0'] as TypeContract,
 			{
 				timestamp: request.timestamp,
 				actor: request.actor,

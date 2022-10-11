@@ -8,6 +8,7 @@ import {
 	TypeContract,
 } from 'autumndb';
 import _ from 'lodash';
+import { setTimeout as delay } from 'timers/promises';
 import {
 	PluginDefinition,
 	testUtils,
@@ -894,6 +895,14 @@ describe('.insertCard()', () => {
 			},
 		))! as TypeContract;
 
+		// Wait for the worker type cache to include the new type
+		while (true) {
+			await delay(500);
+			if (ctx.worker.typeContracts[`${newType.slug}@1.0.0`]) {
+				break;
+			}
+		}
+
 		const triggeredAction = await ctx.waitForMatch({
 			type: 'object',
 			additionalProperties: true,
@@ -1072,7 +1081,7 @@ describe('.insertCard()', () => {
 		expect(testContractAfterUpdate.data.linkedProperty).toEqual(magicNumber);
 	});
 
-	test('should correctly evaluate formula that consumes contract.links["..."] formula field', async () => {
+	test.only('should correctly evaluate formula that consumes contract.links["..."] formula field', async () => {
 		// This test
 		// * creates a required relationship
 		// * creates a new type with a link formula and a formula that references this field
@@ -1141,6 +1150,14 @@ describe('.insertCard()', () => {
 				},
 			},
 		))! as TypeContract;
+
+		// Wait for the worker type cache to include the new type
+		while (true) {
+			await delay(500);
+			if (ctx.worker.typeContracts[`${newType.slug}@1.0.0`]) {
+				break;
+			}
+		}
 
 		// Wait for the formula trigger to be registered
 		await ctx.waitForMatch({

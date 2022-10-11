@@ -158,7 +158,6 @@ export async function invalidatePreviousPasswordResets(
  *
  * @param context - execution context
  * @param request - action request
- * @param user - user for whom the password reset card is for
  * @param typeCard - type card
  * @returns created password reset card
  */
@@ -182,7 +181,7 @@ export async function addPasswordResetCard(
 		},
 		{
 			version: '1.0.0',
-			slug: await context.getEventSlug('password-reset'),
+			slug: context.getEventSlug('password-reset'),
 			data: {
 				expiresAt: expiresAt.toISOString(),
 				requestedAt: requestedAt.toISOString(),
@@ -266,10 +265,7 @@ const handler: ActionDefinition['handler'] = async (
 	}
 
 	try {
-		const typeCard = (await context.getCardBySlug(
-			context.privilegedSession,
-			'password-reset@1.0.0',
-		))! as TypeContract;
+		const typeCard = context.cards['password-reset@1.0.0'] as TypeContract;
 		await invalidatePreviousPasswordResets(context, user.id, request, typeCard);
 		const passwordResetCard = await addPasswordResetCard(
 			context,

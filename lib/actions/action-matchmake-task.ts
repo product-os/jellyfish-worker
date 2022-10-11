@@ -130,7 +130,7 @@ const handler: ActionDefinition['handler'] = async (
 			attachEvents: true,
 		},
 		{
-			slug: await context.getEventSlug('link'),
+			slug: context.getEventSlug('link'),
 			type: 'link@1.0.0',
 			name: 'owns',
 			data: {
