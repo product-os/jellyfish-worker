@@ -1,4 +1,4 @@
-import * as triggers from './triggers';
+import * as triggers from '../../lib/triggers';
 
 describe('.findUsedPropertyPaths()', () => {
 	test('finds all final paths', () => {

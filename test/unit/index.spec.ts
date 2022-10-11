@@ -1,7 +1,7 @@
 import type { AutumnDBSession, Kernel } from 'autumndb';
 import type { Pool } from 'pg';
-import { Worker } from './index';
-import { TransformerContract } from './types';
+import { Worker } from '../../lib/index';
+import type { TransformerContract } from '../../lib/types';
 
 function makeTransformer(
 	id: string,

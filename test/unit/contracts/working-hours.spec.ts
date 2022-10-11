@@ -1,4 +1,4 @@
-import { asTimeSlot } from './working-hours';
+import { asTimeSlot } from '../../../lib/contracts/working-hours';
 
 describe('asTimeSlot', () => {
 	test('should return full list of half hour time slots', async () => {

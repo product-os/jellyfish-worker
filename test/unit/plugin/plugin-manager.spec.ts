@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { PluginManager } from '.';
+import { PluginManager } from '../../../lib/plugin';
 import {
 	action1,
 	action2,

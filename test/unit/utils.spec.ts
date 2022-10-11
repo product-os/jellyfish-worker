@@ -1,6 +1,6 @@
 import type { Contract, JsonSchema } from 'autumndb';
-import type { ActionContract } from '.';
-import * as utils from './utils';
+import type { ActionContract } from '../../lib';
+import * as utils from '../../lib/utils';
 
 describe('.durationToMs()', () => {
 	test('converts a duration to milliseconds', () => {

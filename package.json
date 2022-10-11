@@ -23,7 +23,7 @@
     "lint": "balena-lint lib test && deplint && prettier --check **/*.json **/*.yml",
     "lint:fix": "balena-lint --fix lib test && prettier -w **/*.json **/*.yml",
     "test": "npm run lint && npm run test:unit",
-    "test:unit": "jest ./lib ./test/unit",
+    "test:unit": "jest test/unit",
     "test:integration": "find test/integration -name *.spec.ts | xargs -L 1 npx jest",
     "doc": "typedoc ./lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
