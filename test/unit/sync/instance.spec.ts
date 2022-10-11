@@ -2,10 +2,13 @@ import type { Contract } from 'autumndb';
 import _ from 'lodash';
 import nock from 'nock';
 import querystring from 'querystring';
-import * as errors from './errors';
-import * as instance from './instance';
-import type { SyncActionContext } from './sync-context';
-import type { Integration, IntegrationInitializationOptions } from './types';
+import * as errors from '../../../lib/sync/errors';
+import * as instance from '../../../lib/sync/instance';
+import type { SyncActionContext } from '../../../lib/sync/sync-context';
+import type {
+	Integration,
+	IntegrationInitializationOptions,
+} from '../../../lib/sync/types';
 
 const firstNock = () => {
 	nock.disableNetConnect();

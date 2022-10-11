@@ -8,7 +8,7 @@ import {
 	integration2,
 	testPlugin,
 } from './helpers';
-import { Plugin } from './plugin';
+import { Plugin } from '../../../lib/plugin/plugin';
 
 describe('Plugin', () => {
 	describe('validates the plugin', () => {

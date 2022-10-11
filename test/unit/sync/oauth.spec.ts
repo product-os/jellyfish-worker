@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import nock from 'nock';
 import querystring from 'querystring';
-import { OauthProviderContract } from '../contracts/oauth-provider';
-import * as oauth from './oauth';
+import { OauthProviderContract } from '../../../lib/contracts/oauth-provider';
+import * as oauth from '../../../lib/sync/oauth';
 
 const authorizationNock = () => {
 	nock('https://api.balena-cloud.com')

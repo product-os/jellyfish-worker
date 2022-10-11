@@ -1,7 +1,7 @@
-import { Sync } from '.';
-import * as errors from './errors';
-import type { SyncActionContext } from './sync-context';
-import type { IntegrationDefinition } from './types';
+import { Sync } from '../../../lib/sync';
+import * as errors from '../../../lib/errors';
+import type { SyncActionContext } from '../../../lib/sync/sync-context';
+import type { IntegrationDefinition } from '../../../lib/sync/types';
 
 const sync = new Sync({
 	integrations: {},

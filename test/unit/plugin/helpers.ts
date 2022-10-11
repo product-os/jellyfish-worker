@@ -1,9 +1,9 @@
 import type { LogContext } from '@balena/jellyfish-logger';
 import type { Contract } from 'autumndb';
 import _ from 'lodash';
-import { ActionDefinition, PluginDefinition } from '.';
-import type { Integration, IntegrationDefinition } from '../sync';
-import type { Map } from '../types';
+import type { ActionDefinition, PluginDefinition } from '../../../lib/plugin';
+import type { Integration, IntegrationDefinition } from '../../../lib//sync';
+import type { Map } from '../../../lib/types';
 
 const commonContract = {
 	tags: [],

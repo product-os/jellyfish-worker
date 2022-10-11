@@ -1,4 +1,4 @@
-import { getNextExecutionDate } from './producer';
+import { getNextExecutionDate } from '../../../lib/queue/producer';
 
 describe('.getNextExecutionDate()', () => {
 	test('should return expected date for one-time schedule', () => {

@@ -1,11 +1,10 @@
 import { Jellyscript } from '@balena/jellyfish-jellyscript';
-import type { RelationshipContract } from 'autumndb';
-import { v4 as uuidv4 } from 'uuid';
-import * as formulas from './formulas';
+import { RelationshipContract, testUtils as aTestUtils } from 'autumndb';
+import * as formulas from '../../lib/formulas';
 
 const relationships: RelationshipContract[] = [
 	{
-		id: uuidv4(),
+		id: aTestUtils.generateRandomId(),
 		slug: 'relationship-foo-buz-bar',
 		type: 'relationship@1.0.0',
 		version: '1.0.0',
@@ -29,7 +28,7 @@ const relationships: RelationshipContract[] = [
 		capabilities: [],
 	},
 	{
-		id: uuidv4(),
+		id: aTestUtils.generateRandomId(),
 		slug: 'relationship-any-is-creator-of-any',
 		type: 'relationship@1.0.0',
 		version: '1.0.0',
