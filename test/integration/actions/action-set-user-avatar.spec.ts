@@ -45,7 +45,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 			},
 		);
@@ -80,7 +79,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 				avatar: autumndbTestUtils.generateRandomId(),
 			},
@@ -115,7 +113,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 				email: genEmail(),
 			},
@@ -154,7 +151,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 				email: [genEmail(), genEmail()],
 			},
@@ -196,7 +192,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 				email: genEmail(),
 			},
@@ -237,7 +232,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 				email: [genEmail(), genEmail()],
 			},
@@ -281,7 +275,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 				email: [genEmail(), genEmail()],
 			},
@@ -325,7 +318,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 				email: genEmail(),
 				avatar: null,
@@ -367,7 +359,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: ['user-community', 'user-operator'],
 				email: genEmail(),
 				avatar: null,
@@ -380,7 +371,6 @@ describe('action-set-user-avatar', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 				email: genEmail(),
 				avatar: null,

@@ -30,7 +30,6 @@ describe('action-oauth-associate', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: [],
 			},
 		);

@@ -239,9 +239,6 @@ export const roleUserExternalSupport: RoleContractDefinition = {
 								email: {
 									type: ['string', 'array'],
 								},
-								hash: {
-									type: 'string',
-								},
 								avatar: {
 									type: ['string', 'null'],
 								},

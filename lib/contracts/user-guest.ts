@@ -7,7 +7,6 @@ export const userGuest: UserContractDefinition = {
 	markers: [],
 	data: {
 		email: 'accounts+jellyfish@resin.io',
-		hash: 'PASSWORDLESS',
 		roles: [],
 	},
 };

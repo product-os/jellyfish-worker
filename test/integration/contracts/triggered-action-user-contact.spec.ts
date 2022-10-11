@@ -32,7 +32,6 @@ test('The contact is updated when the user is updated', async () => {
 			markers: [],
 			data: {
 				email: `${username}@example.com`,
-				hash: 'foobar',
 				roles: ['user-community'],
 			},
 		},
@@ -126,7 +125,6 @@ test('The contact is updated when user tags are updated', async () => {
 			markers: [],
 			data: {
 				email: `${username}@example.com`,
-				hash: 'foobar',
 				roles: ['user-community'],
 			},
 			tags: [firstTag],

@@ -1583,7 +1583,6 @@ describe('Worker', () => {
 				}),
 				data: {
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: [],
 				},
 			},
@@ -1626,7 +1625,6 @@ describe('Worker', () => {
 				}),
 				data: {
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: [],
 				},
 			},
@@ -1659,7 +1657,6 @@ describe('Worker', () => {
 				data: {
 					disallowLogin: false,
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: [],
 				},
 			},
@@ -1703,7 +1700,6 @@ describe('Worker', () => {
 				data: {
 					disallowLogin: true,
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: [],
 				},
 			},

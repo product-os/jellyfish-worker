@@ -4,7 +4,6 @@ import { testUtils as autumndbTestUtils } from 'autumndb';
 import nock from 'nock';
 import { testUtils } from '../../../lib';
 import { actionCompleteFirstTimeLogin } from '../../../lib/actions/action-complete-first-time-login';
-import { PASSWORDLESS_USER_HASH } from '../../../lib/actions/constants';
 import type { WorkerContext } from '../../../lib/types';
 import { makeHandlerRequest } from './helpers';
 
@@ -63,10 +62,7 @@ afterEach(async () => {
 
 describe('action-complete-first-time-login', () => {
 	test("should update the user's password when the firstTimeLoginToken is valid", async () => {
-		const user = await ctx.createUser(
-			autumndbTestUtils.generateRandomSlug(),
-			PASSWORDLESS_USER_HASH,
-		);
+		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 		const session = { actor: user };
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
@@ -361,10 +357,7 @@ describe('action-complete-first-time-login', () => {
 	});
 
 	test('should fail if the user becomes inactive between requesting and completing the first-time login', async () => {
-		const user = await ctx.createUser(
-			autumndbTestUtils.generateRandomSlug(),
-			PASSWORDLESS_USER_HASH,
-		);
+		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 		const session = { actor: user };
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
@@ -448,10 +441,7 @@ describe('action-complete-first-time-login', () => {
 	});
 
 	test('should invalidate the first-time-login card', async () => {
-		const user = await ctx.createUser(
-			autumndbTestUtils.generateRandomSlug(),
-			PASSWORDLESS_USER_HASH,
-		);
+		const user = await ctx.createUser(autumndbTestUtils.generateRandomSlug());
 		await ctx.createLinkThroughWorker(
 			ctx.adminUserId,
 			ctx.session,

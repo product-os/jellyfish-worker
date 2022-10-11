@@ -119,9 +119,6 @@ export const roleTransformerWorker: ContractDefinition = {
 								email: {
 									type: ['string', 'array'],
 								},
-								hash: {
-									type: 'string',
-								},
 								avatar: {
 									type: ['string', 'null'],
 								},

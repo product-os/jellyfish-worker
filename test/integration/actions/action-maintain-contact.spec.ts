@@ -82,7 +82,6 @@ describe('action-maintain-contact', () => {
 				type: 'user@1.0.0',
 				data: {
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: ['user-community'],
 					origin: origin.id,
 					profile: {
@@ -121,7 +120,6 @@ describe('action-maintain-contact', () => {
 				data: {
 					email: 'johndoe@example.com',
 					roles: ['user-community'],
-					hash: 'PASSWORDLESS',
 					profile: {
 						name: {
 							first: 'john   ',
@@ -151,7 +149,6 @@ describe('action-maintain-contact', () => {
 				data: {
 					email: 'johndoe@example.com',
 					roles: ['user-community'],
-					hash: 'PASSWORDLESS',
 				},
 			},
 		);
@@ -190,7 +187,6 @@ describe('action-maintain-contact', () => {
 				data: {
 					email: 'johndoe@example.com',
 					roles: ['user-community'],
-					hash: 'PASSWORDLESS',
 					profile: {
 						title: 'Frontend Engineer',
 						name: {
@@ -239,7 +235,6 @@ describe('action-maintain-contact', () => {
 				data: {
 					email: 'johndoe@example.com',
 					roles: ['user-community'],
-					hash: 'PASSWORDLESS',
 					profile: {
 						title: 'Frontend Engineer',
 					},
@@ -293,7 +288,6 @@ describe('action-maintain-contact', () => {
 				data: {
 					email: 'johndoe@example.com',
 					roles: ['user-community'],
-					hash: 'PASSWORDLESS',
 					profile: {
 						title: 'Frontend Engineer',
 					},
@@ -333,7 +327,6 @@ describe('action-maintain-contact', () => {
 				data: {
 					email: 'johndoe@example.com',
 					roles: ['user-community'],
-					hash: 'PASSWORDLESS',
 					profile: {
 						title: 'Frontend Engineer',
 					},
@@ -373,7 +366,6 @@ describe('action-maintain-contact', () => {
 				data: {
 					email: 'johndoe@example.com',
 					roles: ['user-community'],
-					hash: 'PASSWORDLESS',
 					profile: {
 						title: 'Frontend Engineer',
 					},
@@ -413,7 +405,6 @@ describe('action-maintain-contact', () => {
 				type: 'user@1.0.0',
 				data: {
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: ['user-community'],
 				},
 			},
@@ -459,7 +450,6 @@ describe('action-maintain-contact', () => {
 				type: 'user@1.0.0',
 				data: {
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: ['user-community'],
 				},
 			},
@@ -487,7 +477,6 @@ describe('action-maintain-contact', () => {
 				type: 'user@1.0.0',
 				data: {
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: ['user-community'],
 				},
 			},
@@ -510,7 +499,6 @@ describe('action-maintain-contact', () => {
 				type: 'user@1.0.0',
 				data: {
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: ['user-community'],
 				},
 			},
@@ -532,7 +520,6 @@ describe('action-maintain-contact', () => {
 				type: 'user@1.0.0',
 				data: {
 					email: 'johndoe@example.com',
-					hash: 'PASSWORDLESS',
 					roles: ['user-community'],
 					profile: {
 						company: 'Balena.io',
@@ -576,7 +563,6 @@ describe('action-maintain-contact', () => {
 				type: 'user@1.0.0',
 				data: {
 					email: ['johndoe@example.com', 'johndoe@gmail.com'],
-					hash: 'PASSWORDLESS',
 					roles: ['user-community'],
 					profile: {
 						name: {

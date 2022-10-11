@@ -538,7 +538,6 @@ describe('action-create-card', () => {
 							}),
 							data: {
 								roles: [],
-								hash: autumndbTestUtils.generateRandomId(),
 							},
 						},
 					},
@@ -665,7 +664,6 @@ describe('action-create-card', () => {
 				}),
 				type: 'user@1.0.0',
 				data: {
-					hash: autumndbTestUtils.generateRandomId(),
 					roles: [],
 				},
 				links: {
@@ -736,7 +734,6 @@ describe('action-create-card', () => {
 				}),
 				type: 'user@1.0.0',
 				data: {
-					hash: autumndbTestUtils.generateRandomId(),
 					roles: [],
 				},
 				links: {
@@ -770,7 +767,6 @@ describe('action-create-card', () => {
 				}),
 				type: 'user@1.0.0',
 				data: {
-					hash: autumndbTestUtils.generateRandomId(),
 					roles: [],
 				},
 				links: {
@@ -807,7 +803,6 @@ describe('action-create-card', () => {
 				}),
 				type: 'user@1.0.0',
 				data: {
-					hash: autumndbTestUtils.generateRandomId(),
 					roles: [],
 				},
 				links: {
@@ -839,7 +834,6 @@ describe('action-create-card', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: ['user-community', 'user-operator'],
 			},
 		);
@@ -851,7 +845,6 @@ describe('action-create-card', () => {
 				}),
 				type: 'user@1.0.0',
 				data: {
-					hash: autumndbTestUtils.generateRandomId(),
 					roles: ['user-community'],
 				},
 			},
@@ -874,7 +867,6 @@ describe('action-create-card', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: ['user-community', 'user-operator'],
 			},
 		);
@@ -886,7 +878,6 @@ describe('action-create-card', () => {
 				}),
 				type: 'user@1.0.0',
 				data: {
-					hash: autumndbTestUtils.generateRandomId(),
 					roles: ['user-admin'],
 				},
 			},
@@ -909,7 +900,6 @@ describe('action-create-card', () => {
 			'user@1.0.0',
 			autumndbTestUtils.generateRandomSlug(),
 			{
-				hash: autumndbTestUtils.generateRandomId(),
 				roles: ['user-community', 'user-operator'],
 			},
 		);
@@ -921,7 +911,6 @@ describe('action-create-card', () => {
 				}),
 				type: 'user@1.0.0',
 				data: {
-					hash: autumndbTestUtils.generateRandomId(),
 					roles: ['user-guest'],
 				},
 			},

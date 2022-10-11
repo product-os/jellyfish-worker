@@ -394,10 +394,6 @@ export const run = async (
 				}
 
 				const data = {
-					// A hash that can never occur in the real-world
-					// See https://github.com/product-os/jellyfish/issues/2011
-					hash: 'PASSWORDLESS',
-
 					roles: [],
 					profile,
 				};
