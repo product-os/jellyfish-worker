@@ -1,4 +1,18 @@
 - commits:
+    - subject: Use type cache when possible
+      hash: 4dfef96bbbe03ee87d08c15fb54e416fd83c0349
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 35.0.34
+  title: ""
+  date: 2022-10-11T05:58:44.532Z
+- commits:
     - subject: Update uuid from 8.3.2 to 9.0.0
       hash: 8aafa407ffc8a5af9b2a345d3383295cd3cab35c
       body: ""
