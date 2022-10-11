@@ -1,4 +1,18 @@
 - commits:
+    - subject: Update uuid from 8.3.2 to 9.0.0
+      hash: 8aafa407ffc8a5af9b2a345d3383295cd3cab35c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 35.0.33
+  title: ""
+  date: 2022-10-11T02:14:09.268Z
+- commits:
     - subject: "CI: Move all unit tests to test/unit"
       hash: af22c145a3edcca87050d4e8b8c2855c1cba3fb9
       body: ""
