@@ -91,6 +91,12 @@ const handler: ActionDefinition['handler'] = async (
 			}),
 		);
 	}
+	const properties = request.arguments.properties;
+
+	if (properties?.payload) {
+		properties.data.payload = properties.payload;
+		delete properties.payload;
+	}
 
 	// Create contract
 	const result = await context.insertCard(
@@ -103,7 +109,7 @@ const handler: ActionDefinition['handler'] = async (
 			reason: request.arguments.reason,
 			attachEvents: true,
 		},
-		request.arguments.properties,
+		properties,
 	);
 
 	if (!result) {
@@ -245,6 +251,9 @@ export const actionCreateCard: ActionDefinition = {
 							},
 						},
 						linked_at: {
+							type: 'object',
+						},
+						payload: {
 							type: 'object',
 						},
 					},

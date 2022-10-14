@@ -643,6 +643,87 @@ describe('action-create-card', () => {
 		).rejects.toThrow(autumndbErrors.JellyfishPermissionsError);
 	});
 
+	test('should add the file payload in data when payload exists in arguments', async () => {
+		const data = {
+			user: 'user',
+			sent: 'some-date',
+		};
+
+		const payload = {
+			file: {
+				name: '-omyb1-v645-KsVKap5sMw_file name.png',
+				slug: '8b571824-1caa-42bf-b0bb-0176363d3b78.-omyb1-v645-KsVKap5sMw_file name.png',
+				mime: 'image/png',
+				bytesize: 265457,
+			},
+		};
+
+		const expectedData = {
+			payload,
+			user: 'user',
+			sent: 'some-date',
+		};
+
+		const typeContract = await ctx.kernel.getContractBySlug(
+			ctx.logContext,
+			ctx.session,
+			'card@latest',
+		);
+		assert(typeContract);
+		const slug = autumndbTestUtils.generateRandomSlug();
+
+		const createRequest = await ctx.worker.insertCard<ActionRequestContract>(
+			ctx.logContext,
+			ctx.session,
+			ctx.worker.typeContracts['action-request@1.0.0'],
+			{},
+			{
+				data: {
+					action: 'action-create-card@1.0.0',
+					context: ctx.logContext,
+					card: typeContract.id,
+					type: typeContract.type,
+					actor: ctx.adminUserId,
+					epoch: new Date().valueOf(),
+					input: {
+						id: typeContract.id,
+					},
+					timestamp: new Date().toISOString(),
+					arguments: {
+						reason: null,
+						properties: {
+							slug,
+							version: '1.0.0',
+							data,
+							payload,
+						},
+					},
+				},
+			},
+		);
+
+		assert(createRequest);
+		await ctx.flushAll(ctx.session);
+
+		const createResult = await ctx.worker.producer.waitResults(
+			ctx.logContext,
+			createRequest,
+		);
+		expect(createResult.error).toBe(false);
+
+		const contract = await ctx.kernel.getContractById(
+			ctx.logContext,
+			ctx.session,
+			(createResult.data as any).id,
+		);
+		assert(contract);
+		expect(contract.slug).toBe(slug);
+		expect(contract.version).toBe('1.0.0');
+		expect(contract.data).toEqual(expectedData);
+		// @ts-expect-error
+		expect(contract.payload).toBe(undefined);
+	});
+
 	test('should create specified links', async () => {
 		// Create an org
 		const org = await ctx.createOrg(autumndbTestUtils.generateRandomId());
