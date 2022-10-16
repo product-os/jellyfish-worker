@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update bcrypt from 5.0.1 to 5.1.0
+      hash: 1e4b4d850e30a1aae91d435080654157a423b54b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 35.0.50
+  title: ""
+  date: 2022-10-16T12:49:11.503Z
+- commits:
     - subject: Update typedoc from 0.23.15 to 0.23.16
       hash: a8a2f16422e0fb20e30aed9424d51df581ca1ea9
       body: ""
