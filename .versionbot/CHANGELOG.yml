@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update sinon from 14.0.0 to 14.0.1
+      hash: 9bcb3a678702047a60ee7ece381375c97d5f35b5
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 35.0.48
+  title: ""
+  date: 2022-10-16T11:19:07.666Z
+- commits:
     - subject: Update semver from 7.3.7 to 7.3.8
       hash: 02b8e24d0d592ff0fbd51d2e4b88967caba9eb4f
       body: ""
