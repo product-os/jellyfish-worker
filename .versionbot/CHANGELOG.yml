@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update semver from 7.3.7 to 7.3.8
+      hash: 02b8e24d0d592ff0fbd51d2e4b88967caba9eb4f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 35.0.47
+  title: ""
+  date: 2022-10-16T10:35:07.758Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.244 to 2.0.250
       hash: 0007e27eb242a1822b564c88f09a7e56b45dd1b8
       body: ""
