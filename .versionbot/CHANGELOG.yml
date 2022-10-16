@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update jest from 29.1.2 to 29.2.0
+      hash: 390a1b4fe39d2004c3313893fb101f3d71301993
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 35.0.51
+  title: ""
+  date: 2022-10-16T13:26:17.401Z
+- commits:
     - subject: Update bcrypt from 5.0.1 to 5.1.0
       hash: 1e4b4d850e30a1aae91d435080654157a423b54b
       body: ""
