@@ -237,7 +237,7 @@ export class Sync {
 		},
 	) {
 		const integration = this.integrations[name];
-		if (!integration || !token) {
+		if (!integration) {
 			return false;
 		}
 
