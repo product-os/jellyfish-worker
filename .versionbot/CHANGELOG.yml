@@ -1,4 +1,17 @@
 - commits:
+    - subject: Add file payload to action create card
+      hash: 85d6df710002b03d26591594ce337e10e212f28e
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Amit Solanki <amit.fash@gmail.com>
+        signed-off-by: Amit Solanki <amit.fash@gmail.com>
+      author: Amit Solanki
+      nested: []
+  version: 35.1.0
+  date: 2022-10-17T05:47:05.478Z
+- commits:
     - subject: Update @balena/jellyfish-metrics from 2.0.240 to 2.0.244
       hash: 45db5a3d97d6d43bb8bb333a545470b7ce814b15
       body: ""
