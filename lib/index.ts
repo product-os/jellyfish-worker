@@ -2055,7 +2055,7 @@ export class Worker {
 				const actionRequest =
 					await this.kernel.insertContract<ActionRequestContract>(
 						logContext,
-						session,
+						this.session,
 						{
 							slug: utils.getEventSlug('action-request'),
 							type: 'action-request@1.0.0',
