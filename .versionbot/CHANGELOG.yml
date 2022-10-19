@@ -1,4 +1,21 @@
 - commits:
+    - subject: Schedule action requests with correct session
+      hash: 855281417450ee2e1c7765fd7746650202c3b5a0
+      body: |
+        Use privileged session to insert action-request contracts for
+        future execution as non-privileged sessions are not allowed to
+        create action-request contracts.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 35.0.66
+  title: ""
+  date: 2022-10-19T04:22:46.874Z
+- commits:
     - subject: Stop creating creates/updates for external-events
       hash: 835663eb5f581e6afbc4c83c6c5bb44288f004b8
       body: |
