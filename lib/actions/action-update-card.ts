@@ -31,6 +31,9 @@ const handler: ActionDefinition['handler'] = async (
 		);
 	}
 
+	// Don't attach events for certain types
+	const attachEvents = !['external-event'].includes(typeContract.slug);
+
 	const result = await context.patchCard(
 		session,
 		typeContract,
@@ -39,7 +42,7 @@ const handler: ActionDefinition['handler'] = async (
 			reason: request.arguments.reason,
 			actor: request.actor,
 			originator: request.originator,
-			attachEvents: true,
+			attachEvents,
 		},
 		contract,
 		request.arguments.patch,

@@ -92,6 +92,9 @@ const handler: ActionDefinition['handler'] = async (
 		);
 	}
 
+	// Don't attach events for certain types
+	const attachEvents = !['external-event'].includes(typeContract.slug);
+
 	// Create contract
 	const result = await context.insertCard(
 		session,
@@ -101,7 +104,7 @@ const handler: ActionDefinition['handler'] = async (
 			actor: request.actor,
 			originator: request.originator,
 			reason: request.arguments.reason,
-			attachEvents: true,
+			attachEvents,
 		},
 		request.arguments.properties,
 	);
