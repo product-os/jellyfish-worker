@@ -1,4 +1,21 @@
 - commits:
+    - subject: Stop creating creates/updates for external-events
+      hash: 835663eb5f581e6afbc4c83c6c5bb44288f004b8
+      body: |
+        There is no need to attach create and update contracts to
+        external-event contracts. This only results in the system creating
+        unnecessary extra records in the database.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 35.0.65
+  title: ""
+  date: 2022-10-19T03:07:46.684Z
+- commits:
     - subject: Update @balena/jellyfish-jellyscript from 7.1.128 to 7.1.129
       hash: 8c2131641ccc337be350471c5aa0e14f0ad7d386
       body: ""
