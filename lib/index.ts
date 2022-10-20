@@ -780,7 +780,11 @@ export class Worker {
 						instance.session,
 						options.actor,
 					);
-					if (actor) {
+					if (
+						actor &&
+						actor.type === 'user@1.0.0' &&
+						!['user-admin', 'user-guest', 'user-hubot'].includes(actor.slug)
+					) {
 						await kernel.insertContract(logContext, insertSession, {
 							// A lot of these links are created, so relying on the default slug
 							// can be unreliable and potenitally cause slug collisions.

@@ -1081,7 +1081,7 @@ describe('.insertCard()', () => {
 		expect(testContractAfterUpdate.data.linkedProperty).toEqual(magicNumber);
 	});
 
-	test.only('should correctly evaluate formula that consumes contract.links["..."] formula field', async () => {
+	test('should correctly evaluate formula that consumes contract.links["..."] formula field', async () => {
 		// This test
 		// * creates a required relationship
 		// * creates a new type with a link formula and a formula that references this field
@@ -1398,14 +1398,18 @@ describe('.insertCard()', () => {
 	});
 
 	test('should create actor links', async () => {
+		const user = await ctx.createUser(
+			autumndbTestUtils.generateRandomId().split('-')[0],
+		);
+
 		// Insert contract
 		const inserted = await ctx.worker.insertCard(
 			ctx.logContext,
-			ctx.session,
+			{ actor: user },
 			ctx.worker.typeContracts['card@1.0.0'],
 			{
 				timestamp: new Date().toISOString(),
-				actor: ctx.adminUserId,
+				actor: user.id,
 				attachEvents: false,
 				reason: null,
 			},
@@ -1443,7 +1447,7 @@ describe('.insertCard()', () => {
 									const: 'user@1.0.0',
 								},
 								id: {
-									const: ctx.adminUserId,
+									const: user.id,
 								},
 							},
 						},
@@ -1463,192 +1467,6 @@ describe('.insertCard()', () => {
 				},
 			},
 		});
-	});
-
-	test('should not create actor links if actor is not provided', async () => {
-		// Insert contract without options.actor set
-		const inserted = await ctx.worker.insertCard(
-			ctx.logContext,
-			ctx.session,
-			ctx.worker.typeContracts['card@1.0.0'],
-			{
-				timestamp: new Date().toISOString(),
-				attachEvents: false,
-				reason: null,
-			},
-			{
-				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'card',
-				}),
-				version: '1.0.0',
-				data: {},
-			},
-		);
-		assert(inserted);
-
-		// Assert that no actor links were created for this contract
-		const links = await ctx.kernel.query(ctx.logContext, ctx.session, {
-			type: 'object',
-			additionalProperties: true,
-			required: ['type', 'name', 'data'],
-			properties: {
-				type: {
-					const: 'link@1.0.0',
-				},
-				name: {
-					const: 'is creator of',
-				},
-				data: {
-					type: 'object',
-					required: ['from', 'to'],
-					properties: {
-						from: {
-							type: 'object',
-							required: ['type', 'id'],
-							properties: {
-								type: {
-									const: 'user@1.0.0',
-								},
-								id: {
-									const: ctx.adminUserId,
-								},
-							},
-						},
-						to: {
-							type: 'object',
-							required: ['type', 'id'],
-							properties: {
-								type: {
-									const: inserted.type,
-								},
-								id: {
-									const: inserted.id,
-								},
-							},
-						},
-					},
-				},
-			},
-		});
-		expect(links).toEqual([]);
-	});
-
-	test('should not create actor links if contract is a link', async () => {
-		// Set up relationship for testing
-		await ctx.worker.insertCard(
-			ctx.logContext,
-			ctx.session,
-			ctx.worker.typeContracts['relationship@1.0.0'],
-			{
-				attachEvents: false,
-			},
-			{
-				slug: `relationship-card-owns-card`,
-				type: 'relationship@1.0.0',
-				name: 'owns',
-				data: {
-					inverseName: 'is owned by',
-					title: 'Card',
-					inverseTitle: 'Card',
-					from: {
-						type: 'card',
-					},
-					to: {
-						type: `card`,
-					},
-				},
-			},
-		);
-
-		// Insert contracts for link
-		const [from, to] = await Promise.all([
-			ctx.kernel.insertContract(ctx.logContext, ctx.session, {
-				type: 'card@1.0.0',
-				data: {},
-			}),
-			ctx.kernel.insertContract(ctx.logContext, ctx.session, {
-				type: 'card@1.0.0',
-				data: {},
-			}),
-		]);
-
-		// Insert link contract
-		const inserted = await ctx.worker.insertCard(
-			ctx.logContext,
-			ctx.session,
-			ctx.worker.typeContracts['link@1.0.0'],
-			{
-				timestamp: new Date().toISOString(),
-				attachEvents: false,
-				actor: ctx.adminUserId,
-				reason: null,
-			},
-			{
-				slug: autumndbTestUtils.generateRandomSlug({
-					prefix: 'link',
-				}),
-				version: '1.0.0',
-				name: 'owns',
-				data: {
-					inverseName: 'is owned by',
-					from: {
-						type: from.type,
-						id: from.id,
-					},
-					to: {
-						type: to.type,
-						id: to.id,
-					},
-				},
-			},
-		);
-		assert(inserted);
-
-		// Assert that no actor links were created for this link contract
-		const links = await ctx.kernel.query(ctx.logContext, ctx.session, {
-			type: 'object',
-			additionalProperties: true,
-			required: ['type', 'name', 'data'],
-			properties: {
-				type: {
-					const: 'link@1.0.0',
-				},
-				name: {
-					const: 'is creator of',
-				},
-				data: {
-					type: 'object',
-					required: ['from', 'to'],
-					properties: {
-						from: {
-							type: 'object',
-							required: ['type', 'id'],
-							properties: {
-								type: {
-									const: 'user@1.0.0',
-								},
-								id: {
-									const: ctx.adminUserId,
-								},
-							},
-						},
-						to: {
-							type: 'object',
-							required: ['type', 'id'],
-							properties: {
-								type: {
-									const: inserted.type,
-								},
-								id: {
-									const: inserted.id,
-								},
-							},
-						},
-					},
-				},
-			},
-		});
-		expect(links).toEqual([]);
 	});
 });
 
