@@ -11,10 +11,8 @@ import {
 	ActionRequestContract,
 	ActionRequestData,
 	errors,
-	PluginDefinition,
 	ScheduledActionData,
 	testUtils,
-	TransformerContract,
 	TriggeredActionContract,
 	TriggeredActionData,
 	Worker,
@@ -22,37 +20,9 @@ import {
 import { getNextExecutionDate } from '../../lib/queue/producer';
 
 let ctx: testUtils.TestContext;
-const transformerSlugs = _.map(['foo', 'bar'], (name) => {
-	return `transformer-${name}`;
-});
 
 beforeAll(async () => {
-	const foobarPlugin = (): PluginDefinition => {
-		return {
-			slug: 'plugin-foobar',
-			name: 'Foobar Plugin',
-			version: '1.0.0',
-			contracts: [
-				{
-					slug: transformerSlugs[0],
-					type: 'transformer@1.0.0',
-					active: true,
-					data: {
-						requirements: {},
-						inputFilter: {},
-						workerFilter: {},
-						$transformer: {
-							artifactReady: true,
-						},
-					},
-				},
-			],
-		};
-	};
-
-	ctx = await testUtils.newContext({
-		plugins: [foobarPlugin()],
-	});
+	ctx = await testUtils.newContext();
 });
 
 afterAll(() => {
@@ -233,44 +203,6 @@ describe('Worker', () => {
 
 		// Remove the test trigger
 		ctx.worker.removeTrigger(ctx.logContext, contract.id);
-	});
-
-	it('instance should update on new transformer contract', async () => {
-		// Insert a new transformer contract
-		await ctx.kernel.insertContract<TransformerContract>(
-			ctx.logContext,
-			ctx.session,
-			{
-				slug: transformerSlugs[1],
-				type: 'transformer@1.0.0',
-				active: true,
-				data: {
-					requirements: {},
-					inputFilter: {},
-					workerFilter: {},
-					$transformer: {
-						artifactReady: true,
-					},
-				},
-			},
-		);
-
-		// Wait for the polling mechanism to update the worker
-		await delay(15 * 1000);
-		const match = (transformer: TransformerContract) => {
-			return _.includes(transformerSlugs, transformer.slug);
-		};
-		await ctx.retry(
-			() => {
-				return _.concat(
-					_.filter(ctx.worker.transformers, match),
-					_.filter(ctx.worker.latestTransformers, match),
-				);
-			},
-			(matches: TransformerContract[]) => {
-				return matches.length === 4;
-			},
-		);
 	});
 
 	it('instance should update on new formula generated triggered-action', async () => {
