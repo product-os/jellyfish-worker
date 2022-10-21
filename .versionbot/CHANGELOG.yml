@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove transformers
+      hash: 2c221e7f2cfb05961c0b909135b5c4c9ef544e0d
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 36.0.0
+  title: ""
+  date: 2022-10-21T01:24:50.551Z
+- commits:
     - subject: Reduce 'is creator of' link usage
       hash: d9bc44535aef6d4adbb8b4362be8bebf40353893
       body: ""
