@@ -13,8 +13,6 @@ import { actionIncrement } from './action-increment';
 import { actionIncrementTag } from './action-increment-tag';
 import { actionIntegrationImportEvent } from './action-integration-import-event';
 import { actionMaintainContact } from './action-maintain-contact';
-import { actionMatchMakeTask } from './action-matchmake-task';
-import { actionMergeDraftVersion } from './action-merge-draft-version';
 import { actionOAuthAssociate } from './action-oauth-associate';
 import { actionOAuthAuthorize } from './action-oauth-authorize';
 import { actionPing } from './action-ping';
@@ -42,8 +40,6 @@ export const actions: ActionDefinition[] = [
 	actionIncrementTag,
 	actionIntegrationImportEvent,
 	actionMaintainContact,
-	actionMatchMakeTask,
-	actionMergeDraftVersion,
 	actionOAuthAssociate,
 	actionOAuthAuthorize,
 	actionPing,

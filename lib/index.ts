@@ -20,7 +20,6 @@ import * as fastEquals from 'fast-equals';
 import type { Operation } from 'fast-json-patch';
 import _ from 'lodash';
 import type { Pool } from 'pg';
-import * as semver from 'semver';
 import { serializeError } from 'serialize-error';
 import * as skhema from 'skhema';
 import { setTimeout as delay } from 'timers/promises';
@@ -35,7 +34,6 @@ import type { OnMessageEventHandler } from './queue/consumer';
 import { enqueue, getNextExecutionDate } from './queue/producer';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
-import { evaluate as evaluateTransformers } from './transformers';
 import * as triggersLib from './triggers';
 import type {
 	Action,
@@ -45,7 +43,6 @@ import type {
 	ActionRequestData,
 	Map,
 	ScheduledActionContract,
-	TransformerContract,
 	TriggeredActionContract,
 	WorkerContext,
 } from './types';
@@ -92,12 +89,7 @@ export { createGoogleMeet } from './actions/action-google-meet';
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');
 
-const formulaParser = new Jellyscript({
-	formulas: {
-		NEEDS: formulas.NEEDS,
-		NEEDS_ALL: formulas.NEEDS_ALL,
-	},
-});
+const formulaParser = new Jellyscript();
 
 /**
  * @summary The "type" contract type
@@ -128,42 +120,6 @@ const SCHEMA_ACTIVE_TRIGGERS: JsonSchema = {
 		data: {
 			type: 'object',
 			additionalProperties: true,
-		},
-	},
-};
-
-/**
- * @summary Query for stream to watch for new transformer contracts
- * @private
- */
-const SCHEMA_ACTIVE_TRANSFORMERS: JsonSchema = {
-	type: 'object',
-	required: ['active', 'type', 'data', 'version'],
-	properties: {
-		active: {
-			const: true,
-		},
-		type: {
-			const: 'transformer@1.0.0',
-		},
-		// ignoring draft versions
-		version: { not: { pattern: '-' } },
-		data: {
-			type: 'object',
-			required: ['$transformer'],
-			properties: {
-				$transformer: {
-					type: 'object',
-					required: ['artifactReady'],
-					properties: {
-						artifactReady: {
-							not: {
-								const: false,
-							},
-						},
-					},
-				},
-			},
 		},
 	},
 };
@@ -376,8 +332,6 @@ export class Worker {
 	consumer: Consumer;
 	producer: Producer;
 	triggers: TriggeredActionContract[];
-	transformers: TransformerContract[];
-	latestTransformers: TransformerContract[];
 	typeContracts: { [key: string]: TypeContract };
 	session: AutumnDBSession;
 	library: Map<Action>;
@@ -414,8 +368,6 @@ export class Worker {
 		this.pluginManager = new PluginManager(plugins);
 		this.pool = pool;
 		this.triggers = [];
-		this.transformers = [];
-		this.latestTransformers = [];
 		this.typeContracts = {};
 		this.session = session;
 		this.library = this.pluginManager.getActions();
@@ -589,12 +541,10 @@ export class Worker {
 	}
 
 	async fetchCacheData(logContext: LogContext) {
-		const [triggers, transformers, types] = await Promise.all(
-			[
-				SCHEMA_ACTIVE_TRIGGERS,
-				SCHEMA_ACTIVE_TRANSFORMERS,
-				SCHEMA_ACTIVE_TYPE_CONTRACTS,
-			].map((schema) => this.kernel.query(logContext, this.session, schema)),
+		const [triggers, types] = await Promise.all(
+			[SCHEMA_ACTIVE_TRIGGERS, SCHEMA_ACTIVE_TYPE_CONTRACTS].map((schema) =>
+				this.kernel.query(logContext, this.session, schema),
+			),
 		);
 
 		if (!_.isEqual(triggers, this.getTriggers())) {
@@ -602,13 +552,6 @@ export class Worker {
 				triggers: triggers.length,
 			});
 			this.setTriggers(logContext, triggers as TriggeredActionContract[]);
-		}
-
-		if (!_.isEqual(transformers, this.transformers)) {
-			logger.info(logContext, 'Loading transformers', {
-				transformers: transformers.length,
-			});
-			this.setTransformers(logContext, transformers as TransformerContract[]);
 		}
 
 		if (!_.isEqual(types, Object.values(this.getTypeContracts()))) {
@@ -1102,56 +1045,6 @@ export class Worker {
 	}
 
 	/**
-	 * @summary Updates the list of transformers, such that only the latest release version of each major version exists
-	 * @function
-	 * @private
-	 *
-	 * @example
-	 * this.updateLatestTransformers();
-	 */
-	updateLatestTransformers() {
-		const transformersMap: { [slug: string]: TransformerContract } = {};
-		this.transformers.forEach((tf) => {
-			const majorV = semver.major(tf.version) || 1; // we treat 0.x.y versions as "drafts" of 1.x.y versions
-			const slugMajV = `${tf.slug}@${majorV}`;
-			const prerelease = semver.prerelease(tf.version);
-			if (
-				!prerelease &&
-				(!transformersMap[slugMajV] ||
-					semver.gt(tf.version, transformersMap[slugMajV].version))
-			) {
-				transformersMap[slugMajV] = tf;
-			}
-		});
-
-		this.latestTransformers = Object.values(transformersMap);
-	}
-
-	/**
-	 * @summary Set all registered transformers
-	 * @function
-	 * @public
-	 *
-	 * @param logContext - log context
-	 * @param transformerContracts - transformer contracts
-	 *
-	 * @example
-	 * const worker = new Worker({ ... });
-	 * worker.settransformers([ ... ]);
-	 */
-	setTransformers(
-		logContext: LogContext,
-		transformerContracts: TransformerContract[],
-	) {
-		logger.info(logContext, 'Setting transformers', {
-			count: transformerContracts.length,
-		});
-
-		this.transformers = transformerContracts;
-		this.updateLatestTransformers();
-	}
-
-	/**
 	 * @summary Set type contracts
 	 * @function
 	 * @public
@@ -1188,77 +1081,6 @@ export class Worker {
 	 */
 	getTypeContracts() {
 		return this.typeContracts;
-	}
-
-	/**
-	 * @summary Upsert a single registered transformer
-	 * @function
-	 * @public
-	 *
-	 * @param logContext - log context
-	 * @param transformer - transformer contract
-	 *
-	 * @example
-	 * const worker = new Worker({ ... });
-	 * worker.upserttransformer({ ... });
-	 */
-	upsertTransformer(logContext: LogContext, transformer: TransformerContract) {
-		logger.info(logContext, 'Upserting transformer', {
-			slug: transformer.slug,
-		});
-
-		// Find the index of an existing transformer with the same id
-		const existingTransformerIndex = _.findIndex(this.transformers, {
-			id: transformer.id,
-		});
-
-		if (existingTransformerIndex === -1) {
-			// If an existing transformer is not found, add the transformer
-			this.transformers.push(transformer);
-		} else {
-			// If an existing transformer is found, replace it
-			this.transformers.splice(existingTransformerIndex, 1, transformer);
-		}
-		this.updateLatestTransformers();
-	}
-
-	/**
-	 * @summary Remove a single registered transformer
-	 * @function
-	 * @public
-	 *
-	 * @param logContext - log context
-	 * @param id - id of transformer contract
-	 *
-	 * @example
-	 * const worker = new Worker({ ... });
-	 * worker.removetransformer('ed3c21f2-fa5e-4cdf-b862-392a2697abe4');
-	 */
-	removeTransformer(logContext: LogContext, id: string) {
-		logger.info(logContext, 'Removing transformer', {
-			id,
-		});
-
-		this.transformers = _.reject(this.transformers, {
-			id,
-		});
-		this.updateLatestTransformers();
-	}
-
-	/**
-	 * @summary Get filtered list of transformers, where only latest release version of each major version exists.
-	 * @function
-	 * @public
-	 *
-	 * @returns transformer contracts
-	 *
-	 * @example
-	 * const worker = new Worker({ ... });
-	 * const transformers = worker.getLatestTransformers();
-	 * console.log(transformers.length);
-	 */
-	getLatestTransformers() {
-		return this.latestTransformers;
 	}
 
 	/**
@@ -1444,7 +1266,7 @@ export class Worker {
 			// Generate an interface object for the action function to use.
 			// This ensures that any CRUD operations performed by the action
 			// function are mediates by the worker instance, ensuring that
-			// things like triggers, transformers etc are always processed correctly.
+			// things like triggers etc are always processed correctly.
 			const actionContext = this.getActionContext(logContext);
 
 			// TS-TODO: `input` gets verified as non-null by a jellyfish-assert
@@ -1599,47 +1421,6 @@ export class Worker {
 
 			return null;
 		}
-
-		evaluateTransformers({
-			transformers: this.latestTransformers,
-			oldContract: currentContract,
-			newContract: insertedContract,
-			logContext,
-			getTypeContract: (type) => {
-				return this.typeContracts[type];
-			},
-			query: (querySchema, queryOpts) => {
-				return this.kernel.query(
-					logContext,
-					workerContext.privilegedSession,
-					querySchema,
-					queryOpts,
-				);
-			},
-			executeAndAwaitAction: async (actionRequest) => {
-				const req = await this.insertCard(
-					logContext,
-					workerContext.privilegedSession,
-					this.typeContracts['action-request@1.0.0'],
-					{
-						actor: options.actor,
-						timestamp: new Date().toISOString(),
-					},
-					actionRequest,
-				);
-				const result = await this.producer.waitResults(
-					logContext,
-					req as ActionRequestContract,
-				);
-
-				return result;
-			},
-		}).catch((err) => {
-			logger.error(logContext, 'Error evaluating transformers', {
-				contract: insertedContract.id,
-				error: err,
-			});
-		});
 
 		subscriptionsLib
 			.evaluate({

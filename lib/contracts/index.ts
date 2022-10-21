@@ -16,10 +16,7 @@ import { externalEvent } from './external-event';
 import { faq } from './faq';
 import { feedbackItem } from './feedback-item';
 import { firstTimeLogin } from './first-time-login';
-import { genericSource } from './generic-source';
 import { group } from './group';
-import { image } from './image';
-import { imageSource } from './image-source';
 import { improvement } from './improvement';
 import { loopBalenaIo } from './loop-balena-io';
 import { loopBalenalabs } from './loop-balenalabs';
@@ -76,7 +73,6 @@ import { relationshipImprovementIsImplementedByProject } from './relationship-im
 import { relationshipImprovementIsOwnedByUser } from './relationship-improvement-is-owned-by-user';
 import { relationshipLoopHasChannel } from './relationship-loop-has-channel';
 import { relationshipLoopHasThread } from './relationship-loop-has-thread';
-import { relationshipLoopOwnsTransformer } from './relationship-loop-owns-transformer';
 import { relationshipLoopHasSubLoop } from './relationship-loop-has-sub-loop';
 import { relationshipMessageIsAttachedToAny } from './relationship-message-is-attached-to-any';
 import { relationshipMilestoneIsOwnedByUser } from './relationship-milestone-is-owned-by-user';
@@ -111,9 +107,7 @@ import { relationshipSupportThreadIsOwnedByUser } from './relationship-support-t
 import { relationshipSupportThreadIsSourceForFeedbackItem } from './relationship-support-thread-is-source-for-feedback-item';
 import { relationshipTaskGeneratedAny } from './relationship-task-generated-any';
 import { relationshipThreadIsOfAny } from './relationship-thread-is-of-any';
-import { relationshipTransformerGeneratedTask } from './relationship-transformer-generated-task';
 import { relationshipTaskHasResultAny } from './relationship-task-has-result-any';
-import { relationshipTransformerWorkerOwnsTask } from './relationship-transformer-worker-owns-task';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
 import { relationshipUserHasNotification } from './relationship-user-has-notification';
@@ -123,26 +117,20 @@ import { relationshipUserOwnsRating } from './relationship-user-owns-rating';
 import { relationshipViewIsAttachedToChannel } from './relationship-view-is-attached-to-channel';
 import { relationshipWhisperIsAttachedToAny } from './relationship-whisper-is-attached-to-any';
 import { roleLoop } from './role-loop';
-import { roleTransformerWorker } from './role-transformer-worker';
 import { roleUserExternalSupport } from './role-user-external-support';
 import { saga } from './saga';
 import { salesThread } from './sales-thread';
 import { scheduledAction } from './scheduled-action';
-import { serviceSource } from './service-source';
 import { subscription } from './subscription';
 import { summary } from './summary';
 import { supportThread } from './support-thread';
 import { tag } from './tag';
-import { task } from './task';
 import { thread } from './thread';
-import { transformer } from './transformer';
-import { transformerWorker } from './transformer-worker';
 import { triggeredAction } from './triggered-action';
 import { triggeredActionDirectMessageSubscription } from './triggered-action-direct-message-subscription';
 import { triggeredActionIncrementTag } from './triggered-action-increment-tag';
 import { triggeredActionIntegrationImportEvent } from './triggered-action-integration-import-event';
 import { triggeredActionMatchmakeTask } from './triggered-action-matchmake-task';
-import { triggeredActionMergeDraftVersion } from './triggered-action-merge-draft-version';
 import { triggeredActionOrgCreationMembership } from './triggered-action-org-creation-membership';
 import { triggeredActionSetUserAvatar } from './triggered-action-set-user-avatar';
 import { triggeredActionSupportCompletedImprovementReopen } from './triggered-action-support-completed-improvement-reopen';
@@ -170,9 +158,6 @@ import { viewAllPatterns } from './view-all-patterns';
 import { viewAllProjects } from './view-all-projects';
 import { viewAllSagas } from './view-all-sagas';
 import { viewAllSalesThreads } from './view-all-sales-threads';
-import { viewAllTransformerTypes } from './view-all-transformer-types';
-import { viewAllTransformerWorkers } from './view-all-transformer-workers';
-import { viewAllTransformers } from './view-all-transformers';
 import { viewAllViews } from './view-all-views';
 import { viewCustomerSuccessSupportThreads } from './view-customer-success-support-threads';
 import { viewMyConversations } from './view-my-conversations';
@@ -206,10 +191,7 @@ export const contracts: ContractDefinition[] = [
 	faq,
 	feedbackItem,
 	firstTimeLogin,
-	genericSource,
 	group,
-	image,
-	imageSource,
 	improvement,
 	loopBalenaIo,
 	loopBalenalabs,
@@ -266,7 +248,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipImprovementIsOwnedByUser,
 	relationshipLoopHasChannel,
 	relationshipLoopHasThread,
-	relationshipLoopOwnsTransformer,
 	relationshipLoopHasSubLoop,
 	relationshipMessageIsAttachedToAny,
 	relationshipMilestoneIsOwnedByUser,
@@ -301,9 +282,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipSupportThreadIsSourceForFeedbackItem,
 	relationshipTaskGeneratedAny,
 	relationshipThreadIsOfAny,
-	relationshipTransformerGeneratedTask,
 	relationshipTaskHasResultAny,
-	relationshipTransformerWorkerOwnsTask,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
 	relationshipUserHasNotification,
@@ -313,26 +292,20 @@ export const contracts: ContractDefinition[] = [
 	relationshipViewIsAttachedToChannel,
 	relationshipWhisperIsAttachedToAny,
 	roleLoop,
-	roleTransformerWorker,
 	roleUserExternalSupport,
 	saga,
 	salesThread,
 	scheduledAction,
-	serviceSource,
 	subscription,
 	summary,
 	supportThread,
 	tag,
-	task,
 	thread,
-	transformer,
-	transformerWorker,
 	triggeredAction,
 	triggeredActionDirectMessageSubscription,
 	triggeredActionIncrementTag,
 	triggeredActionIntegrationImportEvent,
 	triggeredActionMatchmakeTask,
-	triggeredActionMergeDraftVersion,
 	triggeredActionOrgCreationMembership,
 	triggeredActionSetUserAvatar,
 	triggeredActionSupportCompletedImprovementReopen,
@@ -347,9 +320,6 @@ export const contracts: ContractDefinition[] = [
 	viewActive,
 	viewActiveTriggeredActions,
 	viewAllJellyfishSupportThreads,
-	viewAllTransformerTypes,
-	viewAllTransformerWorkers,
-	viewAllTransformers,
 	viewAllViews,
 	viewAllBlogPosts,
 	viewAllBrainstormCalls,
