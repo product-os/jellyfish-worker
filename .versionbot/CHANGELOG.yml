@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update simple-git-hooks from 2.8.0 to 2.8.1
+      hash: bee6635d8d6e5657f18a01d97005ff081742a210
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 36.0.1
+  title: ""
+  date: 2022-10-22T00:37:30.317Z
+- commits:
     - subject: Remove transformers
       hash: 2c221e7f2cfb05961c0b909135b5c4c9ef544e0d
       body: ""
