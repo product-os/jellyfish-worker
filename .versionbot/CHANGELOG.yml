@@ -1,4 +1,20 @@
 - commits:
+    - subject: Make scheduled-actions more flexible
+      hash: dfed3c2c9422352a26f7d762ce6400a4678e9ddc
+      body: |
+        Update options necessary to run scheduled actions, making them more
+        flexible so they can be used with more actions.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 36.0.18
+  title: ""
+  date: 2022-10-24T05:49:11.174Z
+- commits:
     - subject: Update @balena/jellyfish-environment from 14.4.5 to 14.4.7
       hash: 3b10da1b76a2f4f84a38a326ccece78b2388754a
       body: ""
