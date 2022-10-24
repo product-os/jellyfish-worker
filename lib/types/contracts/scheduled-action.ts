@@ -21,7 +21,7 @@ export interface ActionRequestOptions {
 	action: string;
 	card?: string;
 	type?: string;
-	arguments?: {
+	arguments: {
 		[k: string]: unknown;
 	};
 	context?: {
