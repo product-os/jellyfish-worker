@@ -1,4 +1,18 @@
 - commits:
+    - subject: Remove contract-repository contract
+      hash: a5cef74ad1ceaa2c8b7af6328e2a930137dbb902
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 37.0.0
+  title: ""
+  date: 2022-10-24T23:03:52.747Z
+- commits:
     - subject: Make scheduled-actions more flexible
       hash: dfed3c2c9422352a26f7d762ce6400a4678e9ddc
       body: |
