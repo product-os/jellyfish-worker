@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-assert from 1.2.91 to 1.2.92
+      hash: 4eefd79363684c21412a7869d1ac80f95c49cdbd
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 36.0.16
+  title: ""
+  date: 2022-10-24T03:40:22.924Z
+- commits:
     - subject: "Docs: Remove badge from readme"
       hash: 49d55c2ea5772b70b667be782254178c1e480a33
       body: ""
