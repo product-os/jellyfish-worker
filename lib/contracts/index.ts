@@ -10,7 +10,6 @@ import { channel } from './channel';
 import { chartConfiguration } from './chart-configuration';
 import { checkin } from './checkin';
 import { contact } from './contact';
-import { contractRepository } from './contract-repository';
 import { create } from './create';
 import { externalEvent } from './external-event';
 import { faq } from './faq';
@@ -58,7 +57,6 @@ import { relationshipCheckinIsAttendedByUser } from './relationship-checkin-is-a
 import { relationshipContactHasBackupOwnerUser } from './relationship-contact-has-backup-owner-user';
 import { relationshipContactIsAttachedToUser } from './relationship-contact-is-attached-to-user';
 import { relationshipContactIsOwnedByUser } from './relationship-contact-is-owned-by-user';
-import { relationshipContractRepositoryHasMemberAny } from './relationship-contract-repository-has-member-any';
 import { relationshipCreateIsAttachedToAny } from './relationship-create-is-attached-to-any';
 import { relationshipFeedbackItemIsFeedbackForUser } from './relationship-feedback-item-is-feedback-for-user';
 import { relationshipFirstTimeLoginIsAttachedToUser } from './relationship-first-time-login-is-attached-to-user';
@@ -185,7 +183,6 @@ export const contracts: ContractDefinition[] = [
 	chartConfiguration,
 	checkin,
 	contact,
-	contractRepository,
 	create,
 	externalEvent,
 	faq,
@@ -233,7 +230,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipContactHasBackupOwnerUser,
 	relationshipContactIsAttachedToUser,
 	relationshipContactIsOwnedByUser,
-	relationshipContractRepositoryHasMemberAny,
 	relationshipCreateIsAttachedToAny,
 	relationshipFeedbackItemIsFeedbackForUser,
 	relationshipFirstTimeLoginIsAttachedToUser,
