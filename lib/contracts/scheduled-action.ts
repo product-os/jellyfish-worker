@@ -17,7 +17,7 @@ export const scheduledAction: ContractDefinition = {
 						options: {
 							title: 'Action request options',
 							type: 'object',
-							required: ['action'],
+							required: ['action', 'arguments'],
 							properties: {
 								action: {
 									type: 'string',

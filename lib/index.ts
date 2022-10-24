@@ -1815,7 +1815,6 @@ export class Worker {
 		if (
 			scheduledAction &&
 			scheduledAction.active &&
-			scheduledAction.data.options.card &&
 			scheduledAction.data.options.arguments
 		) {
 			const runAt = getNextExecutionDate(scheduledAction.data.schedule);
@@ -1824,9 +1823,9 @@ export class Worker {
 				const data: ActionRequestData = {
 					actor,
 					input: {
-						id: scheduledAction.data.options.card,
+						id: scheduledAction.data.options.card || scheduledAction.id,
 					},
-					card: scheduledAction.data.options.card,
+					card: scheduledAction.data.options.card || scheduledAction.id,
 					action: scheduledAction.data.options.action,
 					context: logContext,
 					epoch,
