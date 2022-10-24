@@ -1,4 +1,18 @@
 - commits:
+    - subject: "Docs: Remove badge from readme"
+      hash: 49d55c2ea5772b70b667be782254178c1e480a33
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 36.0.15
+  title: ""
+  date: 2022-10-24T03:05:09.137Z
+- commits:
     - subject: Update typedoc from 0.23.17 to 0.23.18
       hash: 8f0230876a8003a98fa1e60c97b9b5f9f4c201b3
       body: ""
