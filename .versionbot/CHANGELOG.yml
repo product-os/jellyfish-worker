@@ -1,4 +1,18 @@
 - commits:
+    - subject: Schedule actions even if previous attempt failed
+      hash: 3106647f5563a515a8e291f03cfaaaa446eb6275
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 37.0.1
+  title: ""
+  date: 2022-10-25T05:33:38.405Z
+- commits:
     - subject: Remove contract-repository contract
       hash: a5cef74ad1ceaa2c8b7af6328e2a930137dbb902
       body: ""
