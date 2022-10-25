@@ -1291,7 +1291,7 @@ export class Worker {
 				time: endDate.getTime() - startDate.getTime(),
 			});
 
-			// Schedule actions for future execution
+			// Schedule initial execution for new scheduled-action contracts
 			if (
 				data &&
 				data.id &&
@@ -1304,15 +1304,6 @@ export class Worker {
 					request.data.actor,
 					request.data.epoch,
 					data.id,
-					request.data.originator,
-				);
-			} else if (request.data.schedule) {
-				await this.scheduleAction(
-					logContext,
-					session,
-					request.data.actor,
-					request.data.epoch,
-					request.data.schedule,
 					request.data.originator,
 				);
 			}
@@ -1342,6 +1333,18 @@ export class Worker {
 				error: true,
 				data: errorObject,
 			};
+		}
+
+		// Schedule future executions even if previous attempt failed
+		if (request.data.schedule) {
+			await this.scheduleAction(
+				logContext,
+				session,
+				request.data.actor,
+				request.data.epoch,
+				request.data.schedule,
+				request.data.originator,
+			);
 		}
 
 		await this.consumer.postResults(logContext, request, result);
