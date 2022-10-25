@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-jellyscript from 7.1.133 to 7.1.138
+      hash: aff5de1206faa846755e97f4ab099ce6e2a1bc2c
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.0.2
+  title: ""
+  date: 2022-10-25T06:04:19.908Z
+- commits:
     - subject: Schedule actions even if previous attempt failed
       hash: 3106647f5563a515a8e291f03cfaaaa446eb6275
       body: ""
