@@ -1818,6 +1818,7 @@ export class Worker {
 		if (
 			scheduledAction &&
 			scheduledAction.active &&
+			scheduledAction.type.split('@')[0] === 'scheduled-action' &&
 			scheduledAction.data.options.arguments
 		) {
 			const runAt = getNextExecutionDate(scheduledAction.data.schedule);
