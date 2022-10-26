@@ -1,4 +1,18 @@
 - commits:
+    - subject: Assert scheduled-action type
+      hash: 8f517a70438f35e4ee3fb17daae706c74a97758e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 37.0.8
+  title: ""
+  date: 2022-10-26T03:40:18.837Z
+- commits:
     - subject: Update autumndb from 22.2.158 to 22.2.167
       hash: 2477fffb786d972b2329104154cce810b88b1e84
       body: ""
