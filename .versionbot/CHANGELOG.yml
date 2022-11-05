@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/lodash from 4.14.186 to 4.14.188
+      hash: f46ab672528c2a0c6d79bc4ddc3dc6b381550551
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.0.22
+  title: ""
+  date: 2022-11-05T01:00:38.320Z
+- commits:
     - subject: Update typedoc from 0.23.19 to 0.23.20
       hash: 453290a7854ad0759918cf4e21718f11d9f0599d
       body: ""
