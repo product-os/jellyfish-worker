@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/semver from 7.3.12 to 7.3.13
+      hash: affb242292418d218c0a0e92bf6e6cabb1f1989b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.0.23
+  title: ""
+  date: 2022-11-05T01:32:21.084Z
+- commits:
     - subject: Update @types/lodash from 4.14.186 to 4.14.188
       hash: f46ab672528c2a0c6d79bc4ddc3dc6b381550551
       body: ""
