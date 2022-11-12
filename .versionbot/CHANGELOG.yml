@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update jest from 29.2.2 to 29.3.1
+      hash: 409c97cfc54cf36529ae3954f65141b56a296b3a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.0.40
+  title: ""
+  date: 2022-11-12T04:48:52.159Z
+- commits:
     - subject: Update sinon from 14.0.1 to 14.0.2
       hash: cbaba78aecf9d76b88b1e0559923a5e1193de0f9
       body: ""
