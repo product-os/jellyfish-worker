@@ -93,6 +93,7 @@ export interface IntegrationInitializationOptions {
 			requestOptions: HttpRequestOptions,
 		) => Promise<{ code: number; body: any }>;
 		getActorId: (information: ActorInformation) => Promise<string>;
+		query: SyncActionContext['query'];
 	};
 }
 
