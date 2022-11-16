@@ -1,4 +1,18 @@
 - commits:
+    - subject: Expose query to sync context
+      hash: e305218bc85489df5a0e14daa48b0aed1d133b16
+      body: ""
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 37.1.0
+  title: ""
+  date: 2022-11-16T04:50:59.295Z
+- commits:
     - subject: Update typedoc from 0.23.20 to 0.23.21
       hash: ae760bcb6a168963c41a546c4c628cf5e1b6bbca
       body: ""
