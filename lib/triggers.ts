@@ -23,7 +23,7 @@ interface CompileContext {
 		pattern: string | RegExp,
 		flags: string | undefined,
 		str: string,
-	) => RegExpMatchArray;
+	) => RegExpMatchArray | [];
 	source?: Contract;
 	actor: {
 		id: string;
