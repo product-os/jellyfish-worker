@@ -1,7 +1,14 @@
 import * as assert from '@balena/jellyfish-assert';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
 import { strict } from 'assert';
-import { AutumnDBSession, Contract, Kernel, TypeContract } from 'autumndb';
+import {
+	AutumnDBSession,
+	Contract,
+	JsonSchema,
+	Kernel,
+	QueryOptions,
+	TypeContract,
+} from 'autumndb';
 import jsonpatch, { Operation } from 'fast-json-patch';
 import _ from 'lodash';
 import { OauthProviderContract } from '../contracts/oauth-provider';
@@ -301,6 +308,9 @@ export const getActionContext = (
 			);
 
 			return contact || null;
+		},
+		query: async (query: JsonSchema, options?: QueryOptions) => {
+			return workerContext.query(session, query, options);
 		},
 		getElementByMirrorId: async (
 			type: string,
