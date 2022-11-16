@@ -1,4 +1,18 @@
 - commits:
+    - subject: Add query function to sync interfaces
+      hash: c67c2bfd6c2b4ac72add5d099ddc1b9ff30c1ad4
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 37.1.1
+  title: ""
+  date: 2022-11-16T05:46:11.406Z
+- commits:
     - subject: Expose query to sync context
       hash: e305218bc85489df5a0e14daa48b0aed1d133b16
       body: ""
