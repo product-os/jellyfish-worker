@@ -415,6 +415,7 @@ export const run = async (
 					data,
 				});
 			},
+			query: options.context.query,
 		},
 	});
 
