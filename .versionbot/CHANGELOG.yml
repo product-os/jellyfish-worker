@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-metrics from 2.0.289 to 2.0.291
+      hash: d5f2365f97a79f91bb126d879283df73f897dbf7
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.1.9
+  title: ""
+  date: 2022-11-19T05:54:24.592Z
+- commits:
     - subject: Update cron-parser from 4.6.0 to 4.7.0
       hash: 4dd9388b89841953ee6a43e5fd0af5dece6e0bc6
       body: ""
