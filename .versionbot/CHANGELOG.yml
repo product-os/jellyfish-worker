@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update cron-parser from 4.6.0 to 4.7.0
+      hash: 4dd9388b89841953ee6a43e5fd0af5dece6e0bc6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.1.8
+  title: ""
+  date: 2022-11-19T05:22:29.692Z
+- commits:
     - subject: Update @types/lodash from 4.14.188 to 4.14.189
       hash: a3e184c3ada8896ec755d2bfb9a570ba27e8a44c
       body: ""
