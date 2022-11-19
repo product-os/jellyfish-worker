@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-assert from 1.2.100 to 1.2.102
+      hash: 7a30ce6af4fcf9cbb14a41fcd4bf2360f96eba10
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.1.2
+  title: ""
+  date: 2022-11-19T01:57:31.161Z
+- commits:
     - subject: Add query function to sync interfaces
       hash: c67c2bfd6c2b4ac72add5d099ddc1b9ff30c1ad4
       body: ""
