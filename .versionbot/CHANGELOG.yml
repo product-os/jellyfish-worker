@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @balena/jellyfish-metrics from 2.0.291 to 2.0.292
+      hash: 96aecac7e48a84ecf2c3457a2c8945d3d07871d5
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.1.12
+  title: ""
+  date: 2022-11-19T10:19:49.990Z
+- commits:
     - subject: Update typescript from 4.8.4 to 4.9.3
       hash: 12e4aed1ebf33054e26804528e3d15e42de85899
       body: ""
