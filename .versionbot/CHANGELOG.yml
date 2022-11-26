@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/lodash from 4.14.189 to 4.14.190
+      hash: b912184a6e30ed998e2d248818b92b5c2de552a6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: renovate[bot]
+      nested: []
+  version: 37.1.19
+  title: ""
+  date: 2022-11-26T01:02:06.192Z
+- commits:
     - subject: Update product-os/flowzone action from v0.39.9 to v0.39.11
       hash: 3a20f8953b3d5b164f088d47fea4e7322669a35a
       body: ""
