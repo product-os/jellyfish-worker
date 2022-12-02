@@ -1,4 +1,18 @@
 - commits:
+    - subject: "CI: Use flowzone master"
+      hash: 96d47624bb549d522aee8effc32746c6a47c5210
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Josh Bowling <josh@monarci.com>
+        signed-off-by: Josh Bowling <josh@monarci.com>
+      author: Josh Bowling
+      nested: []
+  version: 37.1.27
+  title: ""
+  date: 2022-12-02T08:11:40.023Z
+- commits:
     - subject: Update @balena/jellyfish-assert from 1.2.105 to 1.2.106
       hash: 8fede206f60419165ffd0defaab69ac6676ac9e9
       body: ""
