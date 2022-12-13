@@ -1,16 +1,3 @@
 {
-  "extends": ["github>product-os/renovate-config"],
-  "ignoreDeps": ["serialize-error"],
-  "packageRules": [
-    {
-      "matchDepTypes": ["devDependencies", "peerDependencies"],
-      "matchPackagePatterns": ["@balena/jellyfish-*"],
-      "matchUpdateTypes": ["patch"],
-      "enabled": false
-    },
-    {
-      "matchPackageNames": ["resinci/jellyfish-test"],
-      "groupName": "jellyfish-test-image"
-    }
-  ]
+  "ignoreDeps": ["serialize-error"]
 }
