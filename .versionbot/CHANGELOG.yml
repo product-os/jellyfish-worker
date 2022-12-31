@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update dependency axios to 1.2.1
+      hash: 0632a96a51079e2d02f87033ccc37434e3343528
+      body: |
+        Update axios to 1.2.1
+
+        Update axios from 0.27.2 to 1.2.1
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 37.6.0
+  title: ""
+  date: 2022-12-31T12:31:20.503Z
+- commits:
     - subject: Update dependency @types/uuid to 9.0.0
       hash: 702879ee6fe954e7ec620014e47e82c1d0b23916
       body: |
