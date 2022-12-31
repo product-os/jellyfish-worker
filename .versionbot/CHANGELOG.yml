@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update dependency googleapis to 110.0.0
+      hash: 1fc06e8527965f2d0ccc033565f1d0db9648862f
+      body: |
+        Update googleapis to 110.0.0
+
+        Update googleapis from 105.0.0 to 110.0.0
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 37.7.0
+  title: ""
+  date: 2022-12-31T13:52:59.432Z
+- commits:
     - subject: Update dependency axios to 1.2.1
       hash: 0632a96a51079e2d02f87033ccc37434e3343528
       body: |
