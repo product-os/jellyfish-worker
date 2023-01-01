@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update postgres Docker tag to v15
+      hash: 3d649f28df9b198d3557c975f1ab4ee0acad3486
+      body: |
+        Update postgres to 15
+
+        Update postgres from 14 to 15
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 37.9.0
+  title: ""
+  date: 2023-01-01T09:01:37.541Z
+- commits:
     - subject: Update dependency fast-equals to 4.0.3
       hash: a522c8ec53f6fa7c40929266d5d15805bb16c371
       body: |
