@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update dependency fast-equals to 4.0.3
+      hash: a522c8ec53f6fa7c40929266d5d15805bb16c371
+      body: |
+        Update fast-equals to 4.0.3
+
+        Update fast-equals from 3.0.3 to 4.0.3
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 37.8.0
+  title: ""
+  date: 2023-01-01T06:28:43.923Z
+- commits:
     - subject: Update dependency sinon to 15.0.1
       hash: c6b12bbfdd6874dfdf9d2aec7275db85fca1ce77
       body: |
