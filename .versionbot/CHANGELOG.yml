@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update actions/checkout digest to ac59398
+      hash: 0a2be54e2a3d02725183d45d9bb83f54b5774817
+      body: |
+        Update actions/checkout to
+
+        Update actions/checkout from 3 to
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 37.11.0
+  title: ""
+  date: 2023-01-05T15:29:18.339Z
+- commits:
     - subject: Update dependency @balena/jellyfish-environment to 15.0.1
       hash: 5fc625240f8f5a1fcc7d6cafcee9200b79af39f1
       body: |
