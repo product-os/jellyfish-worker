@@ -1,4 +1,19 @@
 - commits:
+    - subject: Update Node.js to 18.14.0
+      hash: 4d6adce67f7a0a9b29b77eadb87a4f7f7741ba5c
+      body: |
+        Update node to 18.14.0
+
+        Update node from 18.13.0 to 18.14.0
+      footer:
+        Change-type: minor
+        change-type: minor
+      author: Renovate Bot
+      nested: []
+  version: 37.16.0
+  title: ""
+  date: 2023-02-02T20:59:27.789Z
+- commits:
     - subject: Update github/codeql-action digest to 3ebbd71
       hash: bd99ae0f3e025233a3ade228235353e7c36ef657
       body: |
