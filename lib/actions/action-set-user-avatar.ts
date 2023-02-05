@@ -100,7 +100,7 @@ const handler: ActionDefinition['handler'] = async (
 			reason: 'Updated user avatar',
 			actor: request.actor,
 			originator: request.originator,
-			attachEvents: true,
+			attachEvents: false,
 		},
 		card,
 		patch,

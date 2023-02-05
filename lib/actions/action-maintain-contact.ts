@@ -180,7 +180,7 @@ const handler: ActionDefinition['handler'] = async (
 				reason: 'Updated user contact',
 				actor: request.actor,
 				originator: request.originator,
-				attachEvents: true,
+				attachEvents: false,
 			},
 			attachedContact,
 			patch,
@@ -235,7 +235,7 @@ const handler: ActionDefinition['handler'] = async (
 				actor: request.actor,
 				originator: request.originator,
 				reason: 'Created user contact',
-				attachEvents: true,
+				attachEvents: false,
 			},
 			contact,
 		))!;

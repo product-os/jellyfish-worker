@@ -136,7 +136,7 @@ export async function invalidatePreviousPasswordResets(
 						timestamp: request.timestamp,
 						actor: request.actor,
 						originator: request.originator,
-						attachEvents: true,
+						attachEvents: false,
 					},
 					passwordReset,
 					[
@@ -177,7 +177,7 @@ export async function addPasswordResetCard(
 			timestamp: request.timestamp,
 			actor: request.actor,
 			originator: request.originator,
-			attachEvents: true,
+			attachEvents: false,
 		},
 		{
 			version: '1.0.0',

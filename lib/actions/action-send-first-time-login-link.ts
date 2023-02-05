@@ -151,7 +151,7 @@ export async function invalidatePreviousFirstTimeLogins(
 						timestamp: request.timestamp,
 						actor: request.actor,
 						originator: request.originator,
-						attachEvents: true,
+						attachEvents: false,
 					},
 					firstTimeLogin,
 					[
@@ -196,7 +196,7 @@ export async function addFirstTimeLogin(
 			timestamp: request.timestamp,
 			actor: request.actor,
 			originator: request.originator,
-			attachEvents: true,
+			attachEvents: false,
 		},
 		{
 			version: '1.0.0',
@@ -295,7 +295,7 @@ async function setCommunityRole(
 			timestamp: request.timestamp,
 			actor: request.actor,
 			originator: request.originator,
-			attachEvents: true,
+			attachEvents: false,
 		},
 		userCard,
 		[
