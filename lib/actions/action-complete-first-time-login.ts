@@ -94,7 +94,7 @@ export async function invalidateFirstTimeLogin(
 			timestamp: request.timestamp,
 			actor: request.actor,
 			originator: request.originator,
-			attachEvents: true,
+			attachEvents: false,
 		},
 		card,
 		[

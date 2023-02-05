@@ -105,7 +105,7 @@ const handler: ActionDefinition['handler'] = async (
 			actor: request.actor,
 			originator: request.originator,
 			reason: `Google Meet created: [join here](${conferenceUrl})`,
-			attachEvents: true,
+			attachEvents: false,
 		},
 		card,
 		[

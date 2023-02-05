@@ -98,7 +98,7 @@ export async function invalidatePasswordReset(
 			timestamp: request.timestamp,
 			actor: request.actor,
 			originator: request.originator,
-			attachEvents: true,
+			attachEvents: false,
 		},
 		passwordResetCard,
 		[

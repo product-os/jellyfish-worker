@@ -27,7 +27,7 @@ const handler: ActionDefinition['handler'] = async (
 			reason: request.arguments.reason,
 			actor: request.actor,
 			originator: request.originator,
-			attachEvents: true,
+			attachEvents: false,
 		},
 		card,
 		[
