@@ -1,4 +1,16 @@
 - commits:
+    - subject: Reduce number of event creations/links
+      hash: b6b5a95945584cf4c6bd352137def46ea4dcb1c6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 37.16.1
+  title: ""
+  date: 2023-02-05T23:30:11.046Z
+- commits:
     - subject: Update Node.js to 18.14.0
       hash: 4d6adce67f7a0a9b29b77eadb87a4f7f7741ba5c
       body: |
