@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update autumndb to v22.8.1
+      hash: b244beb45f6e8d7c2e902439600a5886f672c441
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 37.16.2
+  title: ""
+  date: 2023-03-21T01:13:19.152Z
+- commits:
     - subject: Reduce number of event creations/links
       hash: b6b5a95945584cf4c6bd352137def46ea4dcb1c6
       body: ""
