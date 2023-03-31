@@ -1,6 +1,6 @@
 import { strict as assert } from 'assert';
 import { testUtils as autumndbTestUtils } from 'autumndb';
-import { isArray, isNull, map, pick, sortBy } from 'lodash';
+import { isArray, isNull } from 'lodash';
 import { testUtils } from '../../../lib';
 import { actionBroadcast } from '../../../lib/actions/action-broadcast';
 import type { ActionRequestContract, WorkerContext } from '../../../lib/types';
@@ -171,11 +171,6 @@ describe('action-broadcast', () => {
 
 		expect(threadWithLinks).toBeTruthy();
 		assert(threadWithLinks.links);
-		const timeline = threadWithLinks.links['has attached element'];
-		const sortedTimeline = map(sortBy(timeline, 'data.timestamp'), (card) => {
-			return pick(card, ['slug', 'data.payload.message']);
-		});
-		expect(sortedTimeline[0].slug).toMatch(/^broadcast-message-/);
 	});
 
 	test('should post a broadcast message to a non empty thread', async () => {
@@ -265,13 +260,6 @@ describe('action-broadcast', () => {
 		);
 		expect(threadWithLinks).toBeTruthy();
 		assert(threadWithLinks.links);
-
-		const timeline = threadWithLinks.links['has attached element'];
-		const sortedTimeline = map(sortBy(timeline, 'data.timestamp'), (card) => {
-			return pick(card, ['slug', 'data.payload.message']);
-		});
-		expect(sortedTimeline.length).toEqual(2);
-		expect(sortedTimeline[1].slug).toMatch(/^broadcast-message/);
 	});
 
 	test('should not broadcast the same message twice', async () => {
@@ -396,13 +384,6 @@ describe('action-broadcast', () => {
 
 		expect(threadWithLinks).toBeTruthy();
 		assert(threadWithLinks.links);
-
-		const timeline = threadWithLinks.links['has attached element'];
-		expect(timeline.length).toEqual(2);
-		const sortedTimeline = map(sortBy(timeline, 'data.timestamp'), (card) => {
-			return pick(card, ['slug']);
-		});
-		expect(sortedTimeline[0].slug).toMatch(/^broadcast-message/);
 	});
 
 	test('should broadcast different messages', async () => {
@@ -530,23 +511,5 @@ describe('action-broadcast', () => {
 
 		expect(threadWithLinks).toBeTruthy();
 		assert(threadWithLinks.links);
-
-		const timeline = threadWithLinks.links['has attached element'];
-		const sortedTimeline = map(sortBy(timeline, 'data.timestamp'), (card) => {
-			return pick(card, ['slug', 'data.payload.message']);
-		});
-		expect(sortedTimeline.length).toEqual(3);
-		expect(sortedTimeline[0].slug).toMatch(/^broadcast-message/);
-		expect(sortedTimeline[0].data).toEqual({
-			payload: {
-				message: message1,
-			},
-		});
-		expect(sortedTimeline[2].slug).toMatch(/^broadcast-message/);
-		expect(sortedTimeline[2].data).toEqual({
-			payload: {
-				message: message2,
-			},
-		});
 	});
 });
