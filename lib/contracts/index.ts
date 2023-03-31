@@ -2,7 +2,6 @@ import type { ContractDefinition } from 'autumndb';
 import { account } from './account';
 import { action } from './action';
 import { actionRequest } from './action-request';
-import { agentChannelSettings } from './agent-channel-settings';
 import { blogPost } from './blog-post';
 import { brainstormCall } from './brainstorm-call';
 import { brainstormTopic } from './brainstorm-topic';
@@ -51,7 +50,6 @@ import { relationshipBrainstormTopicHasAttachedPattern } from './relationship-br
 import { relationshipBrainstormTopicHasAttachedSalesThread } from './relationship-brainstorm-topic-has-attached-sales-thread';
 import { relationshipBrainstormTopicHasAttachedSupportThread } from './relationship-brainstorm-topic-has-attached-support-thread';
 import { relationshipChannelHasAgentUser } from './relationship-channel-has-agent-user';
-import { relationshipChannelHasSettingsAgentChannelSettings } from './relationship-channel-has-settings-agent-channel-settings';
 import { relationshipChartConfigurationIsAttachedToView } from './relationship-chart-configuration-is-attached-to-view';
 import { relationshipCheckinIsAttendedByUser } from './relationship-checkin-is-attended-by-user';
 import { relationshipContactHasBackupOwnerUser } from './relationship-contact-has-backup-owner-user';
@@ -109,7 +107,6 @@ import { relationshipTaskHasResultAny } from './relationship-task-has-result-any
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
 import { relationshipUserHasNotification } from './relationship-user-has-notification';
-import { relationshipUserHasSettingsAgentChannelSettings } from './relationship-user-has-settings-agent-channel-settings';
 import { relationshipUserHasSettingsWorkingHours } from './relationship-user-has-settings-working-hours';
 import { relationshipUserOwnsRating } from './relationship-user-owns-rating';
 import { relationshipViewIsAttachedToChannel } from './relationship-view-is-attached-to-channel';
@@ -175,7 +172,6 @@ export const contracts: ContractDefinition[] = [
 	account,
 	action,
 	actionRequest,
-	agentChannelSettings,
 	blogPost,
 	brainstormCall,
 	brainstormTopic,
@@ -224,7 +220,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipBrainstormTopicHasAttachedSalesThread,
 	relationshipBrainstormTopicHasAttachedSupportThread,
 	relationshipChannelHasAgentUser,
-	relationshipChannelHasSettingsAgentChannelSettings,
 	relationshipChartConfigurationIsAttachedToView,
 	relationshipCheckinIsAttendedByUser,
 	relationshipContactHasBackupOwnerUser,
@@ -282,7 +277,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
 	relationshipUserHasNotification,
-	relationshipUserHasSettingsAgentChannelSettings,
 	relationshipUserHasSettingsWorkingHours,
 	relationshipUserOwnsRating,
 	relationshipViewIsAttachedToChannel,
