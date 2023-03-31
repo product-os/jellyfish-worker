@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typescript to v5
+      hash: 7e0e08398e12fd8a17f9787af9609537e6bf81c1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 37.16.5
+  title: ""
+  date: 2023-03-31T22:10:46.101Z
+- commits:
     - subject: Bump dev deps
       hash: 59f60e4de8022a1ade83a2dbe061917c5b65e56b
       body: ""
