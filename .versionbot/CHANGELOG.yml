@@ -1,4 +1,16 @@
 - commits:
+    - subject: Bump dev deps
+      hash: 59f60e4de8022a1ade83a2dbe061917c5b65e56b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 37.16.4
+  title: ""
+  date: 2023-03-31T21:17:34.166Z
+- commits:
     - subject: Downgrade axios
       hash: d94a926b64e7977612c0637212275bbd2bc93284
       body: ""
