@@ -84,7 +84,6 @@ export {
 export * as testUtils from './test-utils';
 export * from './types';
 export { mirror } from './actions/mirror';
-export { createGoogleMeet } from './actions/action-google-meet';
 
 // TODO: use a single logger instance for the worker
 const logger = getLogger('worker');

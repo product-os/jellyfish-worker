@@ -8,7 +8,6 @@ import { actionCreateSession } from './action-create-session';
 import { actionCreateUser } from './action-create-user';
 import { actionDeleteCard } from './action-delete-card';
 import { actionDirectMessageSubscription } from './action-direct-message-subscription';
-import { actionGoogleMeet } from './action-google-meet';
 import { actionIncrement } from './action-increment';
 import { actionIncrementTag } from './action-increment-tag';
 import { actionIntegrationImportEvent } from './action-integration-import-event';
@@ -35,7 +34,6 @@ export const actions: ActionDefinition[] = [
 	actionCreateUser,
 	actionDeleteCard,
 	actionDirectMessageSubscription,
-	actionGoogleMeet,
 	actionIncrement,
 	actionIncrementTag,
 	actionIntegrationImportEvent,
