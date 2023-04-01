@@ -81,9 +81,6 @@ export const actionRequest = {
 						arguments: {
 							type: 'object',
 						},
-						schedule: {
-							type: 'string',
-						},
 					},
 					required: [
 						'epoch',
