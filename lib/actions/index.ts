@@ -1,5 +1,4 @@
 import type { ActionDefinition } from '../plugin';
-import { actionBroadcast } from './action-broadcast';
 import { actionCompleteFirstTimeLogin } from './action-complete-first-time-login';
 import { actionCompletePasswordReset } from './action-complete-password-reset';
 import { actionCreateCard } from './action-create-card';
@@ -24,7 +23,6 @@ import { actionSetUpdate } from './action-set-update';
 import { actionUpdateCard } from './action-update-card';
 
 export const actions: ActionDefinition[] = [
-	actionBroadcast,
 	actionCompleteFirstTimeLogin,
 	actionCompletePasswordReset,
 	actionCreateCard,
