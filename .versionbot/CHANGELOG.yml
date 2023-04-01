@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove chart-configuration contract
+      hash: 687aeea441032b95fc7cea812a04b40703b9701c
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 43.0.0
+  title: ""
+  date: 2023-04-01T03:23:04.029Z
+- commits:
     - subject: Remove scheduled actions
       hash: 0b8f815d2041a6cccc6723b9249887e97d057014
       body: ""
