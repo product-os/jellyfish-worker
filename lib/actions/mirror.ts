@@ -1,6 +1,5 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { getLogger } from '@balena/jellyfish-logger';
-import * as metrics from '@balena/jellyfish-metrics';
 import type { AutumnDBSession, ContractSummary } from 'autumndb';
 import type { ActionHandlerRequest, WorkerContext } from '../types';
 
@@ -36,38 +35,31 @@ const mirror = async (
 		}
 	}
 
-	const cards = await metrics
-		.measureMirror(type, async () => {
-			return context.sync.mirror(
-				type,
-				defaultEnvironment.getIntegration(type),
-				card,
-				context.sync.getActionContext(
-					type,
-					context,
-					request.logContext,
-					session,
-				),
-				{
-					actor: request.actor,
-					defaultUser: defaultEnvironment.integration.default.user,
-					origin: `${defaultEnvironment.oauth.redirectBaseUrl}/oauth/${type}`,
-				},
-			);
-		})
-		.catch((error) => {
-			logger.exception(request.logContext, 'Mirror error', error);
-			throw error;
-		});
+	try {
+		const cards = await context.sync.mirror(
+			type,
+			defaultEnvironment.getIntegration(type),
+			card,
+			context.sync.getActionContext(type, context, request.logContext, session),
+			{
+				actor: request.actor,
+				defaultUser: defaultEnvironment.integration.default.user,
+				origin: `${defaultEnvironment.oauth.redirectBaseUrl}/oauth/${type}`,
+			},
+		);
 
-	return cards.map((element: ContractSummary) => {
-		return {
-			id: element.id,
-			type: element.type,
-			version: element.version,
-			slug: element.slug,
-		};
-	});
+		return cards.map((element: ContractSummary) => {
+			return {
+				id: element.id,
+				type: element.type,
+				version: element.version,
+				slug: element.slug,
+			};
+		});
+	} catch (error: any) {
+		logger.exception(request.logContext, 'Mirror error', error);
+		throw error;
+	}
 };
 
 export { mirror };

@@ -1,6 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
 import type { LogContext } from '@balena/jellyfish-logger';
-import * as metrics from '@balena/jellyfish-metrics';
 import { strict } from 'assert';
 import type { AutumnDBSession, Contract } from 'autumndb';
 import _ from 'lodash';
@@ -355,14 +354,16 @@ export class Sync {
 			integration: name,
 		});
 
-		const contracts = await metrics.measureTranslate(name, async () => {
-			return pipeline.translateExternalEvent(integration, contract, {
+		const contracts = await pipeline.translateExternalEvent(
+			integration,
+			contract,
+			{
 				actor: options.actor,
 				defaultUser: options.defaultUser,
 				token,
 				context,
-			});
-		});
+			},
+		);
 
 		context.log.info('Translated external event', {
 			slugs: contracts.map((translatedContract) => {
