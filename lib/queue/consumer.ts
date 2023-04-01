@@ -1,6 +1,5 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { getLogger, LogContext } from '@balena/jellyfish-logger';
-import * as metrics from '@balena/jellyfish-metrics';
 import { Logger } from '@graphile/logger';
 import type { AutumnDBSession, Kernel } from 'autumndb';
 import * as graphileWorker from 'graphile-worker';
@@ -82,18 +81,11 @@ export class Consumer implements QueueConsumer {
 					actionRequest: async (result) => {
 						// TS-TODO: Update graphile types to support Task list type parmaeterisation so we don't need to cast
 						const payload = result as ActionRequestContract;
-						const action = payload.data.action.split('@')[0];
 						try {
 							this.messagesBeingHandled++;
-							metrics.markJobAdd(action, logContext.id);
 							await onMessageEventHandler(payload);
 						} finally {
 							this.messagesBeingHandled--;
-							metrics.markJobDone(
-								action,
-								logContext.id,
-								payload.data.timestamp,
-							);
 						}
 					},
 				},
