@@ -17,9 +17,7 @@ import { actionPing } from './action-ping';
 import { actionRequestPasswordReset } from './action-request-password-reset';
 import { actionSendEmail } from './action-send-email';
 import { actionSendFirstTimeLoginLink } from './action-send-first-time-login-link';
-import { actionSetAdd } from './action-set-add';
 import { actionSetPassword } from './action-set-password';
-import { actionSetUpdate } from './action-set-update';
 import { actionUpdateCard } from './action-update-card';
 
 export const actions: ActionDefinition[] = [
@@ -41,8 +39,6 @@ export const actions: ActionDefinition[] = [
 	actionRequestPasswordReset,
 	actionSendEmail,
 	actionSendFirstTimeLoginLink,
-	actionSetAdd,
 	actionSetPassword,
-	actionSetUpdate,
 	actionUpdateCard,
 ];

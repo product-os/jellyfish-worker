@@ -3,7 +3,7 @@ import { testUtils as autumndbTestUtils } from 'autumndb';
 import { isArray, isEmpty } from 'lodash';
 import sinon from 'sinon';
 import { testUtils } from '../../../lib';
-import { actionSetUpdate } from '../../../lib/actions/action-set-update';
+import { actionPing } from '../../../lib/actions/action-ping';
 import { mirror } from '../../../lib/actions/mirror';
 import type { WorkerContext } from '../../../lib/types';
 import { makeHandlerRequest } from './helpers';
@@ -62,7 +62,7 @@ describe('mirror()', () => {
 			},
 		);
 
-		const request = makeHandlerRequest(ctx, actionSetUpdate.contract);
+		const request = makeHandlerRequest(ctx, actionPing.contract);
 		request.originator = externalEvent.id;
 
 		const result = await mirror(
@@ -86,7 +86,7 @@ describe('mirror()', () => {
 			ctx.session,
 			actionContext,
 			supportThread,
-			makeHandlerRequest(ctx, actionSetUpdate.contract),
+			makeHandlerRequest(ctx, actionPing.contract),
 		);
 		expect(isArray(result)).toBe(true);
 		if (isArray(result)) {
