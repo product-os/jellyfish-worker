@@ -119,7 +119,6 @@ import { tag } from './tag';
 import { thread } from './thread';
 import { triggeredAction } from './triggered-action';
 import { triggeredActionDirectMessageSubscription } from './triggered-action-direct-message-subscription';
-import { triggeredActionIncrementTag } from './triggered-action-increment-tag';
 import { triggeredActionIntegrationImportEvent } from './triggered-action-integration-import-event';
 import { triggeredActionOrgCreationMembership } from './triggered-action-org-creation-membership';
 import { triggeredActionSupportCompletedImprovementReopen } from './triggered-action-support-completed-improvement-reopen';
@@ -281,7 +280,6 @@ export const contracts: ContractDefinition[] = [
 	thread,
 	triggeredAction,
 	triggeredActionDirectMessageSubscription,
-	triggeredActionIncrementTag,
 	triggeredActionIntegrationImportEvent,
 	triggeredActionOrgCreationMembership,
 	triggeredActionSupportCompletedImprovementReopen,
