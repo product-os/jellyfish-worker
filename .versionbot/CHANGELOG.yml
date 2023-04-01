@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove agent-channel-settings contract
+      hash: 0b1be6d2c2c002e8c69719d72291b25b187ef5ed
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 39.0.0
+  title: ""
+  date: 2023-04-01T00:36:31.994Z
+- commits:
     - subject: Update nock from 13.2.9 to 13.3.0
       hash: 1977f7bc2d4768dc3ca83241dc7af222f2adfac1
       body: ""
