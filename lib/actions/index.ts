@@ -21,7 +21,6 @@ import { actionSendFirstTimeLoginLink } from './action-send-first-time-login-lin
 import { actionSetAdd } from './action-set-add';
 import { actionSetPassword } from './action-set-password';
 import { actionSetUpdate } from './action-set-update';
-import { actionSetUserAvatar } from './action-set-user-avatar';
 import { actionUpdateCard } from './action-update-card';
 
 export const actions: ActionDefinition[] = [
@@ -47,6 +46,5 @@ export const actions: ActionDefinition[] = [
 	actionSetAdd,
 	actionSetPassword,
 	actionSetUpdate,
-	actionSetUserAvatar,
 	actionUpdateCard,
 ];
