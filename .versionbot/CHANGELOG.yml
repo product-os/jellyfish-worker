@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove set-user-avatar action
+      hash: cd0d66789c4f0eb4afb8745351cb41dd2f28b157
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 45.0.0
+  title: ""
+  date: 2023-04-01T04:37:54.270Z
+- commits:
     - subject: Remove triggered-action-matchmake-task
       hash: ab02e286109f79e3ba9119162c310e6c81b29a26
       body: ""
