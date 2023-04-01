@@ -153,11 +153,6 @@ export type {
 	SalesThreadData,
 } from './sales-thread';
 export type {
-	ScheduledActionContract,
-	ScheduledActionContractDefinition,
-	ScheduledActionData,
-} from './scheduled-action';
-export type {
 	SubscriptionContract,
 	SubscriptionContractDefinition,
 	SubscriptionData,

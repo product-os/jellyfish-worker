@@ -114,7 +114,6 @@ import { roleLoop } from './role-loop';
 import { roleUserExternalSupport } from './role-user-external-support';
 import { saga } from './saga';
 import { salesThread } from './sales-thread';
-import { scheduledAction } from './scheduled-action';
 import { subscription } from './subscription';
 import { summary } from './summary';
 import { supportThread } from './support-thread';
@@ -158,7 +157,6 @@ import { viewMyConversations } from './view-my-conversations';
 import { viewMyOpportunities } from './view-my-opportunities';
 import { viewMyOrgs } from './view-my-orgs';
 import { viewPaidSupportThreads } from './view-paid-support-threads';
-import { viewScheduledActions } from './view-scheduled-actions';
 import { viewSecuritySupportThreads } from './view-security-support-threads';
 import { viewSupportThreadsParticipation } from './view-support-threads-participation';
 import { viewWorkflows } from './view-workflows';
@@ -282,7 +280,6 @@ export const contracts: ContractDefinition[] = [
 	roleUserExternalSupport,
 	saga,
 	salesThread,
-	scheduledAction,
 	subscription,
 	summary,
 	supportThread,
@@ -326,7 +323,6 @@ export const contracts: ContractDefinition[] = [
 	viewMyOpportunities,
 	viewMyOrgs,
 	viewPaidSupportThreads,
-	viewScheduledActions,
 	viewSecuritySupportThreads,
 	viewSupportThreadsParticipation,
 	viewWorkflows,

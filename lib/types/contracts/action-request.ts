@@ -39,7 +39,6 @@ export interface ActionRequestData {
 	arguments: {
 		[k: string]: unknown;
 	};
-	schedule?: string;
 	[k: string]: unknown;
 }
 

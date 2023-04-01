@@ -31,7 +31,7 @@ import * as formulas from './formulas';
 import { PluginDefinition, PluginManager } from './plugin';
 import { Consumer, Producer } from './queue';
 import type { OnMessageEventHandler } from './queue/consumer';
-import { enqueue, getNextExecutionDate } from './queue/producer';
+import { enqueue } from './queue/producer';
 import * as subscriptionsLib from './subscriptions';
 import { Sync } from './sync';
 import * as triggersLib from './triggers';
@@ -40,9 +40,7 @@ import type {
 	ActionContract,
 	ActionPreRequest,
 	ActionRequestContract,
-	ActionRequestData,
 	Map,
-	ScheduledActionContract,
 	TriggeredActionContract,
 	WorkerContext,
 } from './types';
@@ -1290,23 +1288,6 @@ export class Worker {
 				time: endDate.getTime() - startDate.getTime(),
 			});
 
-			// Schedule initial execution for new scheduled-action contracts
-			if (
-				data &&
-				data.id &&
-				data.type &&
-				data.type.split('@')[0] === 'scheduled-action'
-			) {
-				await this.scheduleAction(
-					logContext,
-					session,
-					request.data.actor,
-					request.data.epoch,
-					data.id,
-					request.data.originator,
-				);
-			}
-
 			result = {
 				error: false,
 				data,
@@ -1332,18 +1313,6 @@ export class Worker {
 				error: true,
 				data: errorObject,
 			};
-		}
-
-		// Schedule future executions even if previous attempt failed
-		if (request.data.schedule) {
-			await this.scheduleAction(
-				logContext,
-				session,
-				request.data.actor,
-				request.data.epoch,
-				request.data.schedule,
-				request.data.originator,
-			);
 		}
 
 		await this.consumer.postResults(logContext, request, result);
@@ -1784,85 +1753,6 @@ export class Worker {
 					},
 				),
 		);
-	}
-
-	/**
-	 * Enqueue an action to be executed later, using schedule configuration
-	 * @function
-	 *
-	 * @param logContext - log context
-	 * @param session - session id
-	 * @param actor - actor id
-	 * @param epoch - epoch
-	 * @param id - scheduled action contract ID
-	 */
-	async scheduleAction(
-		logContext: LogContext,
-		session: AutumnDBSession,
-		actor: string,
-		epoch: number,
-		id: string,
-		originator: string | undefined,
-	): Promise<void> {
-		// Remove any already enqueued jobs
-		await this.producer.deleteJob(logContext, id);
-
-		// Enqueue request if schedule configuration results in future date
-		const scheduledAction =
-			await this.kernel.getContractById<ScheduledActionContract>(
-				logContext,
-				session,
-				id,
-			);
-		if (
-			scheduledAction &&
-			scheduledAction.active &&
-			scheduledAction.type.split('@')[0] === 'scheduled-action' &&
-			scheduledAction.data.options.arguments
-		) {
-			const runAt = getNextExecutionDate(scheduledAction.data.schedule);
-			if (runAt) {
-				// Create new action-request contract
-				const data: ActionRequestData = {
-					actor,
-					input: {
-						id: scheduledAction.data.options.card || scheduledAction.id,
-					},
-					card: scheduledAction.data.options.card || scheduledAction.id,
-					action: scheduledAction.data.options.action,
-					context: logContext,
-					epoch,
-					timestamp: new Date().toISOString(),
-					arguments: scheduledAction.data.options.arguments,
-					schedule: scheduledAction.id,
-				};
-				if (originator) {
-					data.originator = originator;
-				}
-				const actionRequest =
-					await this.kernel.insertContract<ActionRequestContract>(
-						logContext,
-						this.session,
-						{
-							slug: utils.getEventSlug('action-request'),
-							type: 'action-request@1.0.0',
-							data,
-						},
-					);
-				strict(
-					actionRequest,
-					new errors.WorkerNoElement(
-						`Failed to insert action-request for scheduled action`,
-					),
-				);
-
-				// Enqueue new action-request
-				await enqueue(logContext, this.pool, actor, actionRequest, {
-					runAt,
-					contract: scheduledAction.id,
-				});
-			}
-		}
 	}
 
 	// Safely stop the worker, waiting for any ongoing jobs to complete.
