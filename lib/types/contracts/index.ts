@@ -203,8 +203,3 @@ export type {
 	WorkflowContractDefinition,
 	WorkflowData,
 } from './workflow';
-export type {
-	WorkingHoursContract,
-	WorkingHoursContractDefinition,
-	WorkingHoursData,
-} from './working-hours';
