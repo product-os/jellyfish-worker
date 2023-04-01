@@ -20,11 +20,6 @@ export type {
 	ActionRequestData,
 } from './action-request';
 export type {
-	AgentChannelSettingsContract,
-	AgentChannelSettingsContractDefinition,
-	AgentChannelSettingsData,
-} from './agent-channel-settings';
-export type {
 	BlogPostContract,
 	BlogPostContractDefinition,
 	BlogPostData,
