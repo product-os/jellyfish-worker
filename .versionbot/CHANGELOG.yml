@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove set-add and set-update actions
+      hash: a424d5b96c5e63e3503b16c1937ea73f690e1cd8
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 47.0.0
+  title: ""
+  date: 2023-04-01T09:43:52.569Z
+- commits:
     - subject: Remove action-increment-tag
       hash: 5e4a808a92968ee778680cb2828992ae04aafb5d
       body: ""
