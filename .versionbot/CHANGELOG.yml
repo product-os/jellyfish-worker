@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove jellyfish-metrics
+      hash: acddd3aaf618d734ba7fe4351395df9e0b26f957
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 41.0.0
+  title: ""
+  date: 2023-04-01T01:41:10.186Z
+- commits:
     - subject: Remove working-hours contract
       hash: c92ac19696c7f91adc3dcb59ad86c748a0398ffe
       body: ""
