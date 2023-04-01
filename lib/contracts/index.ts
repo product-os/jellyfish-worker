@@ -121,7 +121,6 @@ import { triggeredAction } from './triggered-action';
 import { triggeredActionDirectMessageSubscription } from './triggered-action-direct-message-subscription';
 import { triggeredActionIncrementTag } from './triggered-action-increment-tag';
 import { triggeredActionIntegrationImportEvent } from './triggered-action-integration-import-event';
-import { triggeredActionMatchmakeTask } from './triggered-action-matchmake-task';
 import { triggeredActionOrgCreationMembership } from './triggered-action-org-creation-membership';
 import { triggeredActionSetUserAvatar } from './triggered-action-set-user-avatar';
 import { triggeredActionSupportCompletedImprovementReopen } from './triggered-action-support-completed-improvement-reopen';
@@ -285,7 +284,6 @@ export const contracts: ContractDefinition[] = [
 	triggeredActionDirectMessageSubscription,
 	triggeredActionIncrementTag,
 	triggeredActionIntegrationImportEvent,
-	triggeredActionMatchmakeTask,
 	triggeredActionOrgCreationMembership,
 	triggeredActionSetUserAvatar,
 	triggeredActionSupportCompletedImprovementReopen,
