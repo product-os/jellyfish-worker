@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update nock from 13.2.9 to 13.3.0
+      hash: 1977f7bc2d4768dc3ca83241dc7af222f2adfac1
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 38.0.1
+  title: ""
+  date: 2023-04-01T00:03:25.876Z
+- commits:
     - subject: Remove Google Meet action
       hash: 336ef63b1c60e3c43199c35ea92ca81b9fa9ca0a
       body: ""
