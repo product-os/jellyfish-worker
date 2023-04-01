@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove scheduled actions
+      hash: 0b8f815d2041a6cccc6723b9249887e97d057014
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 42.0.0
+  title: ""
+  date: 2023-04-01T02:43:21.332Z
+- commits:
     - subject: Remove jellyfish-metrics
       hash: acddd3aaf618d734ba7fe4351395df9e0b26f957
       body: ""
