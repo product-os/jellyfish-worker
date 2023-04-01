@@ -107,7 +107,6 @@ import { relationshipTaskHasResultAny } from './relationship-task-has-result-any
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
 import { relationshipUserHasNotification } from './relationship-user-has-notification';
-import { relationshipUserHasSettingsWorkingHours } from './relationship-user-has-settings-working-hours';
 import { relationshipUserOwnsRating } from './relationship-user-owns-rating';
 import { relationshipViewIsAttachedToChannel } from './relationship-view-is-attached-to-channel';
 import { relationshipWhisperIsAttachedToAny } from './relationship-whisper-is-attached-to-any';
@@ -166,7 +165,6 @@ import { viewWorkflows } from './view-workflows';
 import { webPushSubscription } from './web-push-subscription';
 import { whisper } from './whisper';
 import { workflow } from './workflow';
-import { workingHours } from './working-hours';
 
 export const contracts: ContractDefinition[] = [
 	account,
@@ -277,7 +275,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
 	relationshipUserHasNotification,
-	relationshipUserHasSettingsWorkingHours,
 	relationshipUserOwnsRating,
 	relationshipViewIsAttachedToChannel,
 	relationshipWhisperIsAttachedToAny,
@@ -336,5 +333,4 @@ export const contracts: ContractDefinition[] = [
 	webPushSubscription,
 	whisper,
 	workflow,
-	workingHours,
 ];
