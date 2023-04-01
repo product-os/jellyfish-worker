@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove triggered-action-matchmake-task
+      hash: ab02e286109f79e3ba9119162c310e6c81b29a26
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 44.0.0
+  title: ""
+  date: 2023-04-01T03:52:47.122Z
+- commits:
     - subject: Remove chart-configuration contract
       hash: 687aeea441032b95fc7cea812a04b40703b9701c
       body: ""
