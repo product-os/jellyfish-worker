@@ -75,7 +75,7 @@
     "json-e": "^4.4.3",
     "just-permutations": "^2.1.1",
     "lodash": "^4.17.21",
-    "nock": "^13.2.9",
+    "nock": "^13.3.0",
     "qs": "^6.10.5",
     "semver": "^7.3.8",
     "serialize-error": "8.1.0",
