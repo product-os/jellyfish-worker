@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove working-hours contract
+      hash: c92ac19696c7f91adc3dcb59ad86c748a0398ffe
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 40.0.0
+  title: ""
+  date: 2023-04-01T01:12:19.633Z
+- commits:
     - subject: Remove agent-channel-settings contract
       hash: 0b1be6d2c2c002e8c69719d72291b25b187ef5ed
       body: ""
