@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove action-increment-tag
+      hash: 5e4a808a92968ee778680cb2828992ae04aafb5d
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 46.0.0
+  title: ""
+  date: 2023-04-01T07:23:13.448Z
+- commits:
     - subject: Remove set-user-avatar action
       hash: cd0d66789c4f0eb4afb8745351cb41dd2f28b157
       body: ""
