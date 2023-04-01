@@ -6,7 +6,6 @@ import { blogPost } from './blog-post';
 import { brainstormCall } from './brainstorm-call';
 import { brainstormTopic } from './brainstorm-topic';
 import { channel } from './channel';
-import { chartConfiguration } from './chart-configuration';
 import { checkin } from './checkin';
 import { contact } from './contact';
 import { create } from './create';
@@ -50,7 +49,6 @@ import { relationshipBrainstormTopicHasAttachedPattern } from './relationship-br
 import { relationshipBrainstormTopicHasAttachedSalesThread } from './relationship-brainstorm-topic-has-attached-sales-thread';
 import { relationshipBrainstormTopicHasAttachedSupportThread } from './relationship-brainstorm-topic-has-attached-support-thread';
 import { relationshipChannelHasAgentUser } from './relationship-channel-has-agent-user';
-import { relationshipChartConfigurationIsAttachedToView } from './relationship-chart-configuration-is-attached-to-view';
 import { relationshipCheckinIsAttendedByUser } from './relationship-checkin-is-attended-by-user';
 import { relationshipContactHasBackupOwnerUser } from './relationship-contact-has-backup-owner-user';
 import { relationshipContactIsAttachedToUser } from './relationship-contact-is-attached-to-user';
@@ -172,7 +170,6 @@ export const contracts: ContractDefinition[] = [
 	brainstormCall,
 	brainstormTopic,
 	channel,
-	chartConfiguration,
 	checkin,
 	contact,
 	create,
@@ -216,7 +213,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipBrainstormTopicHasAttachedSalesThread,
 	relationshipBrainstormTopicHasAttachedSupportThread,
 	relationshipChannelHasAgentUser,
-	relationshipChartConfigurationIsAttachedToView,
 	relationshipCheckinIsAttendedByUser,
 	relationshipContactHasBackupOwnerUser,
 	relationshipContactIsAttachedToUser,
