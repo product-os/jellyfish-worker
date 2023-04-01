@@ -40,11 +40,6 @@ export type {
 	ChannelData,
 } from './channel';
 export type {
-	ChartConfigurationContract,
-	ChartConfigurationContractDefinition,
-	ChartConfigurationData,
-} from './chart-configuration';
-export type {
 	CheckinContract,
 	CheckinContractDefinition,
 	CheckinData,
