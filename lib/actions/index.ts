@@ -9,7 +9,6 @@ import { actionCreateUser } from './action-create-user';
 import { actionDeleteCard } from './action-delete-card';
 import { actionDirectMessageSubscription } from './action-direct-message-subscription';
 import { actionIncrement } from './action-increment';
-import { actionIncrementTag } from './action-increment-tag';
 import { actionIntegrationImportEvent } from './action-integration-import-event';
 import { actionMaintainContact } from './action-maintain-contact';
 import { actionOAuthAssociate } from './action-oauth-associate';
@@ -34,7 +33,6 @@ export const actions: ActionDefinition[] = [
 	actionDeleteCard,
 	actionDirectMessageSubscription,
 	actionIncrement,
-	actionIncrementTag,
 	actionIntegrationImportEvent,
 	actionMaintainContact,
 	actionOAuthAssociate,
