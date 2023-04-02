@@ -1,4 +1,16 @@
 - commits:
+    - subject: Bump deps
+      hash: 1ba4c525986d51747f9b4aed36e7f989409540c6
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 47.0.1
+  title: ""
+  date: 2023-04-02T06:11:29.273Z
+- commits:
     - subject: Remove set-add and set-update actions
       hash: a424d5b96c5e63e3503b16c1937ea73f690e1cd8
       body: ""
