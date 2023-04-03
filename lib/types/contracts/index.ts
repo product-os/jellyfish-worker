@@ -136,11 +136,6 @@ export type {
 	RatingContractDefinition,
 	RatingData,
 } from './rating';
-export type {
-	ReactionContract,
-	ReactionContractDefinition,
-	ReactionData,
-} from './reaction';
 export type { SagaContract, SagaContractDefinition, SagaData } from './saga';
 export type {
 	SalesThreadContract,

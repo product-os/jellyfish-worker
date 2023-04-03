@@ -30,11 +30,6 @@ export const message: ContractDefinition = {
 							type: 'object',
 							required: ['message'],
 							properties: {
-								reactions: {
-									type: 'object',
-									$$formula:
-										'contract.links["has attached element"] && contract.links["has attached element"].length ? (COUNT_BY(FILTER(contract.links["has attached element"], { type: "reaction@1.0.0" }), "data.reaction")) : {}',
-								},
 								mentionsUser: {
 									type: 'array',
 									items: {

@@ -35,7 +35,6 @@ import { productBalenaCloud } from './product-balena-cloud';
 import { productJellyfish } from './product-jellyfish';
 import { project } from './project';
 import { rating } from './rating';
-import { reaction } from './reaction';
 import { relationshipAccountHasBackupOwnerUser } from './relationship-account-has-backup-owner-user';
 import { relationshipAccountHasContact } from './relationship-account-has-contact';
 import { relationshipAccountIsOwnedByUser } from './relationship-account-is-owned-by-user';
@@ -87,8 +86,6 @@ import { relationshipProjectIsContributedToByUser } from './relationship-project
 import { relationshipProjectIsGuidedByUser } from './relationship-project-is-guided-by-user';
 import { relationshipProjectIsObservedByUser } from './relationship-project-is-observed-by-user';
 import { relationshipProjectIsOwnedByUser } from './relationship-project-is-owned-by-user';
-import { relationshipReactionIsAttachedToMessage } from './relationship-reaction-is-attached-to-message';
-import { relationshipReactionIsAttachedToWhisper } from './relationship-reaction-is-attached-to-whisper';
 import { relationshipSagaHasAttachedImprovement } from './relationship-saga-has-attached-improvement';
 import { relationshipSalesThreadIsAttachedToOpportunity } from './relationship-sales-thread-is-attached-to-opportunity';
 import { relationshipSalesThreadIsOwnedByUser } from './relationship-sales-thread-is-owned-by-user';
@@ -191,7 +188,6 @@ export const contracts: ContractDefinition[] = [
 	product,
 	project,
 	rating,
-	reaction,
 	relationshipAccountHasBackupOwnerUser,
 	relationshipAccountHasContact,
 	relationshipAccountIsOwnedByUser,
@@ -243,8 +239,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipProjectIsGuidedByUser,
 	relationshipProjectIsObservedByUser,
 	relationshipProjectIsOwnedByUser,
-	relationshipReactionIsAttachedToMessage,
-	relationshipReactionIsAttachedToWhisper,
 	relationshipSagaHasAttachedImprovement,
 	relationshipSalesThreadIsAttachedToOpportunity,
 	relationshipSalesThreadIsOwnedByUser,
