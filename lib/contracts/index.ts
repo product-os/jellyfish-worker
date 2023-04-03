@@ -48,7 +48,6 @@ import { relationshipBrainstormTopicHasAttachedImprovement } from './relationshi
 import { relationshipBrainstormTopicHasAttachedPattern } from './relationship-brainstorm-topic-has-attached-pattern';
 import { relationshipBrainstormTopicHasAttachedSalesThread } from './relationship-brainstorm-topic-has-attached-sales-thread';
 import { relationshipBrainstormTopicHasAttachedSupportThread } from './relationship-brainstorm-topic-has-attached-support-thread';
-import { relationshipChannelHasAgentUser } from './relationship-channel-has-agent-user';
 import { relationshipCheckinIsAttendedByUser } from './relationship-checkin-is-attended-by-user';
 import { relationshipContactHasBackupOwnerUser } from './relationship-contact-has-backup-owner-user';
 import { relationshipContactIsAttachedToUser } from './relationship-contact-is-attached-to-user';
@@ -209,7 +208,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipBrainstormTopicHasAttachedPattern,
 	relationshipBrainstormTopicHasAttachedSalesThread,
 	relationshipBrainstormTopicHasAttachedSupportThread,
-	relationshipChannelHasAgentUser,
 	relationshipCheckinIsAttendedByUser,
 	relationshipContactHasBackupOwnerUser,
 	relationshipContactIsAttachedToUser,
