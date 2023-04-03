@@ -41,8 +41,6 @@ import { relationshipAccountHasContact } from './relationship-account-has-contac
 import { relationshipAccountIsOwnedByUser } from './relationship-account-is-owned-by-user';
 import { relationshipAnyIsBookmarkedByUser } from './relationship-any-is-bookmarked-by-user';
 import { relationshipAnyIsCreatorOfAny } from './relationship-any-is-creator-of-any';
-import { relationshipAnyWasTransformedToAny } from './relationship-any-was-transformed-to-any';
-import { relationshipAnyWasBuiltIntoAny } from './relationship-any-was-built-into-any';
 import { relationshipBrainstormCallHasAttachedBrainstormTopic } from './relationship-brainstorm-call-has-attached-brainstorm-topic';
 import { relationshipBrainstormTopicHasAttachedImprovement } from './relationship-brainstorm-topic-has-attached-improvement';
 import { relationshipBrainstormTopicHasAttachedPattern } from './relationship-brainstorm-topic-has-attached-pattern';
@@ -199,8 +197,6 @@ export const contracts: ContractDefinition[] = [
 	relationshipAccountIsOwnedByUser,
 	relationshipAnyIsBookmarkedByUser,
 	relationshipAnyIsCreatorOfAny,
-	relationshipAnyWasTransformedToAny,
-	relationshipAnyWasBuiltIntoAny,
 	relationshipBrainstormCallHasAttachedBrainstormTopic,
 	relationshipBrainstormTopicHasAttachedImprovement,
 	relationshipBrainstormTopicHasAttachedPattern,
