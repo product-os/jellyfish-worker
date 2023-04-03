@@ -8,7 +8,6 @@ import { actionCreateSession } from './action-create-session';
 import { actionCreateUser } from './action-create-user';
 import { actionDeleteCard } from './action-delete-card';
 import { actionDirectMessageSubscription } from './action-direct-message-subscription';
-import { actionIncrement } from './action-increment';
 import { actionIntegrationImportEvent } from './action-integration-import-event';
 import { actionMaintainContact } from './action-maintain-contact';
 import { actionOAuthAssociate } from './action-oauth-associate';
@@ -30,7 +29,6 @@ export const actions: ActionDefinition[] = [
 	actionCreateUser,
 	actionDeleteCard,
 	actionDirectMessageSubscription,
-	actionIncrement,
 	actionIntegrationImportEvent,
 	actionMaintainContact,
 	actionOAuthAssociate,
