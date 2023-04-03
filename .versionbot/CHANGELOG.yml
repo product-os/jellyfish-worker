@@ -1,4 +1,24 @@
 - commits:
+    - subject: Remove channel agent user relationship
+      hash: ca1cd6ea0b859b16f541429c32f26ca8a9d9fd14
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+    - subject: Remove action-increment
+      hash: 1043d5da1630e3b11e97a9182ce2c773749136fb
+      body: ""
+      footer:
+        Change-type: major
+        change-type: major
+      author: Josh Bowling
+      nested: []
+  version: 48.0.0
+  title: ""
+  date: 2023-04-03T07:06:36.893Z
+- commits:
     - subject: Bump deps
       hash: 1ba4c525986d51747f9b4aed36e7f989409540c6
       body: ""
