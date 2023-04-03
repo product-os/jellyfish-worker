@@ -98,9 +98,7 @@ import { relationshipSubscriptionIsAttachedToAny } from './relationship-subscrip
 import { relationshipSupportThreadHasAttachedRating } from './relationship-support-thread-has-attached-rating';
 import { relationshipSupportThreadIsOwnedByUser } from './relationship-support-thread-is-owned-by-user';
 import { relationshipSupportThreadIsSourceForFeedbackItem } from './relationship-support-thread-is-source-for-feedback-item';
-import { relationshipTaskGeneratedAny } from './relationship-task-generated-any';
 import { relationshipThreadIsOfAny } from './relationship-thread-is-of-any';
-import { relationshipTaskHasResultAny } from './relationship-task-has-result-any';
 import { relationshipUpdateIsAttachedToAny } from './relationship-update-is-attached-to-any';
 import { relationshipUserHasAttachedContactContact } from './relationship-user-has-attached-contact-contact';
 import { relationshipUserHasNotification } from './relationship-user-has-notification';
@@ -258,9 +256,7 @@ export const contracts: ContractDefinition[] = [
 	relationshipSupportThreadHasAttachedRating,
 	relationshipSupportThreadIsOwnedByUser,
 	relationshipSupportThreadIsSourceForFeedbackItem,
-	relationshipTaskGeneratedAny,
 	relationshipThreadIsOfAny,
-	relationshipTaskHasResultAny,
 	relationshipUpdateIsAttachedToAny,
 	relationshipUserHasAttachedContactContact,
 	relationshipUserHasNotification,
