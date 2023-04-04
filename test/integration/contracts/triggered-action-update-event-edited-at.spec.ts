@@ -173,7 +173,7 @@ test('updating a meta field in the message payload triggers an update to the edi
 			attachEvents: true,
 			actor: user.id,
 		},
-		message,
+		updatedMessage,
 		[
 			{
 				op: 'remove',
