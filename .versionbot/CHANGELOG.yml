@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update autumndb to 26.0.4
+      hash: c6cdefa726a7afa3f77041bd56d51fb09899416e
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.1
+  title: ""
+  date: 2023-04-06T01:34:30.602Z
+- commits:
     - subject: Remove reactions
       hash: c390cc31b9e893b9e0bd8dc96868452eaf323548
       body: ""
