@@ -1,4 +1,16 @@
 - commits:
+    - subject: Bump internal dependencies
+      hash: fbff8631d0ca08c51bc784db01e4b16671a73490
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.2
+  title: ""
+  date: 2023-08-12T08:02:55.764Z
+- commits:
     - subject: Update autumndb to 26.0.4
       hash: c6cdefa726a7afa3f77041bd56d51fb09899416e
       body: ""
@@ -5718,9 +5730,9 @@
     - subject: Initialize default contracts before inserting them
       hash: 52fd4dd1fcba4ee51f15a913491fcc2cf8e41534
       body: >
-        When loading default contracts into the worker, ensure they are intialized
-        in the same way that contracts loaded from plugins are. This sets the
-        contract up with sane default fields and a uiSchema reset.
+        When loading default contracts into the worker, ensure they are
+        intialized in the same way that contracts loaded from plugins are. This
+        sets the contract up with sane default fields and a uiSchema reset.
       footer:
         Change-type: patch
         change-type: patch
@@ -6132,7 +6144,8 @@
     - subject: Fix bug where triggers are not recalculated when a relationship is added
       hash: dd360ad78d517e39700a3dda5c4d85e946507551
       body: >
-        Fixes a bug where some materialized fields won't be calculated correctly.
+        Fixes a bug where some materialized fields won't be calculated
+        correctly.
 
         What happens is that because we now use relationships to create the triggered actions, used to process materialized fields, if you insert the relationship after the type then the triggered action won't be generated.  The triggered actions only get generated when a type contract is inserted.
 
@@ -7064,8 +7077,8 @@
     - subject: Add back token
       hash: 6bcb733806beae44882a2fbb579cd3c1cebe38cb
       body: >
-        Token contains not only oauth app id and app secret, but also private key
-        for encryption.
+        Token contains not only oauth app id and app secret, but also private
+        key for encryption.
       footer:
         Change-type: major
         change-type: major
@@ -7090,8 +7103,9 @@
     - subject: Oauth flow with contracts
       hash: 41b6011da4884681dbd81f860a2c7170be126256
       body: >
-        All necessary data for interacting with outh providers should be read from
-        `oauth-provider` contracts instead of hardcoding it in integrations.
+        All necessary data for interacting with outh providers should be read
+        from `oauth-provider` contracts instead of hardcoding it in
+        integrations.
       footer:
         Change-type: major
         change-type: major
@@ -13139,8 +13153,8 @@
     - subject: Remove tick related code
       hash: 47b4c62b7cff46488a215cb7f1abb66f62fad184
       body: >
-        We have removed the tick server from our backend, so removing related code
-        from the worker as well:
+        We have removed the tick server from our backend, so removing related
+        code from the worker as well:
         https://github.com/product-os/jellyfish/pull/7096
       footer:
         Change-type: major
@@ -15478,8 +15492,8 @@
     - subject: fix local unit test run
       hash: 496b332d913f6b5534606b8f4ed329511aa0789c
       body: >
-        jest would not interpret "lib" as a relative path by default and also run
-        integration tests
+        jest would not interpret "lib" as a relative path by default and also
+        run integration tests
       footer:
         Change-type: patch
         change-type: patch
@@ -16416,8 +16430,8 @@
     - subject: "build(deps): bump hosted-git-info from 2.8.8 to 2.8.9"
       hash: 369f4408a7bb707000f6476e5e69df6041ba7813
       body: >
-        Bumps [hosted-git-info](https://github.com/npm/hosted-git-info) from 2.8.8
-        to 2.8.9.
+        Bumps [hosted-git-info](https://github.com/npm/hosted-git-info) from
+        2.8.8 to 2.8.9.
 
         - [Release notes](https://github.com/npm/hosted-git-info/releases)
 
