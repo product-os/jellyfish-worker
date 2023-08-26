@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update bcrypt from 5.1.0 to 5.1.1
+      hash: 1ae1d66dabe04f43e129a699bb45a356fe986562
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.3
+  title: ""
+  date: 2023-08-26T11:29:00.142Z
+- commits:
     - subject: Bump internal dependencies
       hash: fbff8631d0ca08c51bc784db01e4b16671a73490
       body: ""
