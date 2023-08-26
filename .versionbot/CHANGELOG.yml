@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update json-e to 4.5.3
+      hash: 721d009f964f47cc127d08a680319ebbb3fea466
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.4
+  title: ""
+  date: 2023-08-26T12:25:33.594Z
+- commits:
     - subject: Update bcrypt from 5.1.0 to 5.1.1
       hash: 1ae1d66dabe04f43e129a699bb45a356fe986562
       body: ""
