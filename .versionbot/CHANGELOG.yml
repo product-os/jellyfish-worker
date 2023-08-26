@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update typed-error to 3.2.2
+      hash: e455d023b91ffd9c1117b654636979c941bab25d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.5
+  title: ""
+  date: 2023-08-26T13:04:59.196Z
+- commits:
     - subject: Update json-e to 4.5.3
       hash: 721d009f964f47cc127d08a680319ebbb3fea466
       body: ""
