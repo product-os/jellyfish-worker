@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update @types/semver to 7.5.0
+      hash: 0a3317b4d8fbafcc508e74a7adb4d2b77f59e855
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.7
+  title: ""
+  date: 2023-08-26T14:02:46.516Z
+- commits:
     - subject: Update lint-staged to 14.0.1
       hash: fcf4901fc13a3e99b24625766419c68a3d329a62
       body: ""
