@@ -25,7 +25,6 @@
     "test": "npm run lint && npm run test:unit",
     "test:unit": "jest test/unit",
     "test:integration": "find test/integration -name *.spec.ts | xargs -L 1 npx jest",
-    "doc": "typedoc ./lib/ && touch docs/.nojekyll",
     "prepack": "npm run build",
     "compose": "docker-compose up",
     "types": "npm run build && autumndb generate-contract-interfaces && balena-lint --fix lib/types/contracts"
@@ -101,7 +100,6 @@
     "simple-git-hooks": "^2.9.0",
     "sinon": "^15.2.0",
     "ts-jest": "^29.0.5",
-    "typedoc": "^0.23.28",
     "typescript": "^5.0.3"
   },
   "simple-git-hooks": {
