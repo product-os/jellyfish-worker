@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update prettier to 3.0.2
+      hash: 5cf23e7df5bb34e620883d5a985f2058eb0336fe
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.17
+  title: ""
+  date: 2023-08-27T12:21:10.835Z
+- commits:
     - subject: Remove unused @types/bluebird
       hash: 35ea32ca2e1c2ab28326284382bdf29bad007ccd
       body: ""
