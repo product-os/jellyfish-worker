@@ -74,10 +74,6 @@ const bootstrap = async () => {
 }
 ```
 
-# Documentation
-
-Visit the website for complete documentation: https://product-os.github.io/jellyfish-worker
-
 # Testing
 
 Unit tests can be easily run with the command `npm test`.
