@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update simple-git-hooks to 2.9.0
+      hash: 329c276620723f9aa3e8cefa19a8f99338d005b5
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.11
+  title: ""
+  date: 2023-08-27T04:58:43.825Z
+- commits:
     - subject: Update nock to 13.3.3
       hash: e350af1e045d3e6b03b45f251222d9771782cf6d
       body: ""
