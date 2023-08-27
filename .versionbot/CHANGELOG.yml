@@ -1,4 +1,16 @@
 - commits:
+    - subject: Remove unused @types/bluebird
+      hash: 35ea32ca2e1c2ab28326284382bdf29bad007ccd
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.16
+  title: ""
+  date: 2023-08-27T10:30:06.870Z
+- commits:
     - subject: Update just-permutations to 2.2.1
       hash: 3eee7e45665b3f19601ade472c81c8324a4594f7
       body: ""
