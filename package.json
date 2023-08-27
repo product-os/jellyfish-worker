@@ -73,7 +73,7 @@
     "just-permutations": "^2.1.1",
     "lodash": "^4.17.21",
     "nock": "^13.3.0",
-    "qs": "^6.11.1",
+    "qs": "^6.11.2",
     "semver": "^7.3.8",
     "serialize-error": "8.1.0",
     "skhema": "^6.0.6",
