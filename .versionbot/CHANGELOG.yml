@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update qs to 6.11.2
+      hash: 5f94b8d6daa76631c41b02e7b641bb29f0d3f5d9
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.8
+  title: ""
+  date: 2023-08-27T03:07:55.289Z
+- commits:
     - subject: Update @types/semver to 7.5.0
       hash: 0a3317b4d8fbafcc508e74a7adb4d2b77f59e855
       body: ""
