@@ -1,4 +1,16 @@
 - commits:
+    - subject: Update sinon to 15.2.0
+      hash: e237b19478920b07880c3b25a45dedc48e5bb96b
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Josh Bowling
+      nested: []
+  version: 51.0.12
+  title: ""
+  date: 2023-08-27T07:45:39.355Z
+- commits:
     - subject: Update simple-git-hooks to 2.9.0
       hash: 329c276620723f9aa3e8cefa19a8f99338d005b5
       body: ""
