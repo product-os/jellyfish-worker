@@ -170,13 +170,14 @@ export const newContext = async (
 	};
 
 	const flushAll = async (session: AutumnDBSession) => {
+		let complete = false;
 		try {
-			while (true) {
+			while (!complete) {
 				await flush(session);
 			}
 		} catch {
 			// Once an error is thrown, there are no more requests to dequeue.
-			return;
+			complete = true;
 		}
 	};
 

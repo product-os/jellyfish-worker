@@ -39,7 +39,6 @@ export interface PatternData {
 	[k: string]: unknown;
 }
 
-export interface PatternContractDefinition
-	extends ContractDefinition<PatternData> {}
+export type PatternContractDefinition = ContractDefinition<PatternData>;
 
-export interface PatternContract extends Contract<PatternData> {}
+export type PatternContract = Contract<PatternData>;

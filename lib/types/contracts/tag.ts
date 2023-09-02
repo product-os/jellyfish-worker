@@ -15,6 +15,6 @@ export interface TagData {
 	[k: string]: unknown;
 }
 
-export interface TagContractDefinition extends ContractDefinition<TagData> {}
+export type TagContractDefinition = ContractDefinition<TagData>;
 
-export interface TagContract extends Contract<TagData> {}
+export type TagContract = Contract<TagData>;

@@ -12,7 +12,7 @@ export interface SubscriptionData {
 	[k: string]: unknown;
 }
 
-export interface SubscriptionContractDefinition
-	extends ContractDefinition<SubscriptionData> {}
+export type SubscriptionContractDefinition =
+	ContractDefinition<SubscriptionData>;
 
-export interface SubscriptionContract extends Contract<SubscriptionData> {}
+export type SubscriptionContract = Contract<SubscriptionData>;

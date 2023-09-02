@@ -23,7 +23,6 @@ export interface WorkflowData {
 	[k: string]: unknown;
 }
 
-export interface WorkflowContractDefinition
-	extends ContractDefinition<WorkflowData> {}
+export type WorkflowContractDefinition = ContractDefinition<WorkflowData>;
 
-export interface WorkflowContract extends Contract<WorkflowData> {}
+export type WorkflowContract = Contract<WorkflowData>;

@@ -24,7 +24,6 @@ export interface MilestoneData {
 	[k: string]: unknown;
 }
 
-export interface MilestoneContractDefinition
-	extends ContractDefinition<MilestoneData> {}
+export type MilestoneContractDefinition = ContractDefinition<MilestoneData>;
 
-export interface MilestoneContract extends Contract<MilestoneData> {}
+export type MilestoneContract = Contract<MilestoneData>;

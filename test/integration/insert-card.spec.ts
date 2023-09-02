@@ -7,7 +7,6 @@ import {
 	testUtils as autumndbTestUtils,
 	TypeContract,
 } from 'autumndb';
-import _ from 'lodash';
 import {
 	PluginDefinition,
 	testUtils,
@@ -689,8 +688,8 @@ describe('.insertCard()', () => {
 							},
 							version: '1.0.0',
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},
@@ -731,8 +730,8 @@ describe('.insertCard()', () => {
 							},
 							version: '1.0.0',
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},

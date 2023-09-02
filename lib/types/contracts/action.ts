@@ -25,7 +25,6 @@ export interface ActionData {
 	[k: string]: unknown;
 }
 
-export interface ActionContractDefinition
-	extends ContractDefinition<ActionData> {}
+export type ActionContractDefinition = ContractDefinition<ActionData>;
 
-export interface ActionContract extends Contract<ActionData> {}
+export type ActionContract = Contract<ActionData>;

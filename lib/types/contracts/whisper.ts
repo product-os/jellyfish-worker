@@ -35,7 +35,6 @@ export interface WhisperData {
 	[k: string]: unknown;
 }
 
-export interface WhisperContractDefinition
-	extends ContractDefinition<WhisperData> {}
+export type WhisperContractDefinition = ContractDefinition<WhisperData>;
 
-export interface WhisperContract extends Contract<WhisperData> {}
+export type WhisperContract = Contract<WhisperData>;

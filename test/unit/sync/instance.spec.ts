@@ -135,7 +135,6 @@ class OAuthTokenRefreshTestIntegration implements Integration {
 		this.context = this.options.context;
 	}
 
-	// eslint-disable-next-line class-methods-use-this
 	async destroy() {
 		return Promise.resolve();
 	}

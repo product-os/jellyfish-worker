@@ -42,7 +42,7 @@ export interface ActionRequestData {
 	[k: string]: unknown;
 }
 
-export interface ActionRequestContractDefinition
-	extends ContractDefinition<ActionRequestData> {}
+export type ActionRequestContractDefinition =
+	ContractDefinition<ActionRequestData>;
 
-export interface ActionRequestContract extends Contract<ActionRequestData> {}
+export type ActionRequestContract = Contract<ActionRequestData>;

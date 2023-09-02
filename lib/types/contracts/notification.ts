@@ -13,7 +13,7 @@ export interface NotificationData {
 	[k: string]: unknown;
 }
 
-export interface NotificationContractDefinition
-	extends ContractDefinition<NotificationData> {}
+export type NotificationContractDefinition =
+	ContractDefinition<NotificationData>;
 
-export interface NotificationContract extends Contract<NotificationData> {}
+export type NotificationContract = Contract<NotificationData>;

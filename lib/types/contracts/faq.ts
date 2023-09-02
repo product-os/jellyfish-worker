@@ -14,6 +14,6 @@ export interface FaqData {
 	[k: string]: unknown;
 }
 
-export interface FaqContractDefinition extends ContractDefinition<FaqData> {}
+export type FaqContractDefinition = ContractDefinition<FaqData>;
 
-export interface FaqContract extends Contract<FaqData> {}
+export type FaqContract = Contract<FaqData>;

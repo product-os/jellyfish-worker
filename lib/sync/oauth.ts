@@ -1,6 +1,5 @@
 import * as assert from '@balena/jellyfish-assert';
 import axios from 'axios';
-import _ from 'lodash';
 import qs from 'qs';
 import { setTimeout as delay } from 'timers/promises';
 import { TypedError } from 'typed-error';

@@ -21,6 +21,6 @@ export interface SagaData {
 	[k: string]: unknown;
 }
 
-export interface SagaContractDefinition extends ContractDefinition<SagaData> {}
+export type SagaContractDefinition = ContractDefinition<SagaData>;
 
-export interface SagaContract extends Contract<SagaData> {}
+export type SagaContract = Contract<SagaData>;

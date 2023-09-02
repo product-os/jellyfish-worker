@@ -4,7 +4,6 @@ import {
 	testUtils as autumndbTestUtils,
 	UserContract,
 } from 'autumndb';
-import _ from 'lodash';
 import { ActionContract, testUtils, WorkerContext } from '../../../lib';
 import { actionUpdateCard } from '../../../lib/actions/action-update-card';
 

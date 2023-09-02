@@ -33,7 +33,6 @@ export interface ContactData {
 	[k: string]: unknown;
 }
 
-export interface ContactContractDefinition
-	extends ContractDefinition<ContactData> {}
+export type ContactContractDefinition = ContractDefinition<ContactData>;
 
-export interface ContactContract extends Contract<ContactData> {}
+export type ContactContract = Contract<ContactData>;

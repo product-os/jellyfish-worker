@@ -113,7 +113,7 @@ describe('.execute()', () => {
 		});
 
 		ctx.worker.library[slug] = {
-			handler: async (_session, _context, _typeContract, _request) => {
+			handler: async () => {
 				const err = new Error('circular error');
 				(err as any).circularRef = err;
 				throw err;

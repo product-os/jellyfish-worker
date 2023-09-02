@@ -699,8 +699,8 @@ describe('.getRequest()', () => {
 							$eval: 'source.data.slug',
 						},
 						data: {
-							number: {
-								$eval: 'source.data.number',
+							bar: {
+								$eval: 'source.data.bar',
 							},
 						},
 					},
@@ -724,7 +724,7 @@ describe('.getRequest()', () => {
 				data: {
 					command: 'foo-bar-baz',
 					slug: 'hello-world',
-					number: 6,
+					bar: 6,
 				},
 			},
 		);
@@ -752,7 +752,7 @@ describe('.getRequest()', () => {
 				properties: {
 					slug: 'hello-world',
 					data: {
-						number: 6,
+						bar: 6,
 					},
 				},
 			},
@@ -789,8 +789,8 @@ describe('.getRequest()', () => {
 							$eval: 'source.data.slug',
 						},
 						data: {
-							number: {
-								$eval: 'source.data.number',
+							bar: {
+								$eval: 'source.data.bar',
 							},
 						},
 					},
@@ -814,7 +814,7 @@ describe('.getRequest()', () => {
 				data: {
 					command: 'foo-bar-baz',
 					slug: 'hello-world',
-					number: 6,
+					bar: 6,
 				},
 			},
 		);
@@ -842,7 +842,7 @@ describe('.getRequest()', () => {
 				properties: {
 					slug: 'hello-world',
 					data: {
-						number: 6,
+						bar: 6,
 					},
 				},
 			},
@@ -879,8 +879,8 @@ describe('.getRequest()', () => {
 							$eval: 'source.data.slug',
 						},
 						data: {
-							number: {
-								$eval: 'source.data.number',
+							bar: {
+								$eval: 'source.data.bar',
 							},
 						},
 					},
@@ -904,7 +904,7 @@ describe('.getRequest()', () => {
 				data: {
 					command: 'foo-bar-baz',
 					slug: 'hello-world',
-					number: 6,
+					bar: 6,
 				},
 			},
 		);
@@ -932,7 +932,7 @@ describe('.getRequest()', () => {
 				properties: {
 					slug: 'hello-world',
 					data: {
-						number: 6,
+						bar: 6,
 					},
 				},
 			},
@@ -969,8 +969,8 @@ describe('.getRequest()', () => {
 							$eval: 'source.data.slug',
 						},
 						data: {
-							number: {
-								$eval: 'source.data.number',
+							bar: {
+								$eval: 'source.data.bar',
 							},
 						},
 					},
@@ -994,7 +994,7 @@ describe('.getRequest()', () => {
 				data: {
 					command: 'foo-bar-baz',
 					slug: 'hello-world',
-					number: 6,
+					bar: 6,
 				},
 			},
 		);
@@ -1058,7 +1058,7 @@ describe('.getRequest()', () => {
 				data: {
 					command: 'foo-bar-baz',
 					slug: 'hello-world',
-					number: 6,
+					bar: 6,
 				},
 			},
 		);
@@ -1123,8 +1123,8 @@ describe('.getRequest()', () => {
 							$eval: 'source.data.slug',
 						},
 						data: {
-							number: {
-								$eval: 'source.data.number',
+							bar: {
+								$eval: 'source.data.bar',
 							},
 						},
 					},
@@ -1202,8 +1202,8 @@ describe('.getTypeTriggers()', () => {
 								$eval: 'source.data.slug',
 							},
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},
@@ -1278,8 +1278,8 @@ describe('.getTypeTriggers()', () => {
 								$eval: 'source.data.slug',
 							},
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},
@@ -1341,8 +1341,8 @@ describe('.getTypeTriggers()', () => {
 								$eval: 'source.data.slug',
 							},
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},
@@ -1381,8 +1381,8 @@ describe('.getTypeTriggers()', () => {
 								$eval: 'source.data.slug',
 							},
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},
@@ -1456,8 +1456,8 @@ describe('.getTypeTriggers()', () => {
 								$eval: 'source.data.slug',
 							},
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},
@@ -1496,8 +1496,8 @@ describe('.getTypeTriggers()', () => {
 								$eval: 'source.data.slug',
 							},
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},
@@ -1569,8 +1569,8 @@ describe('.getTypeTriggers()', () => {
 								$eval: 'source.data.slug',
 							},
 							data: {
-								number: {
-									$eval: 'source.data.number',
+								bar: {
+									$eval: 'source.data.bar',
 								},
 							},
 						},

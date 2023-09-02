@@ -25,8 +25,7 @@ export interface BrainstormTopicData {
 	[k: string]: unknown;
 }
 
-export interface BrainstormTopicContractDefinition
-	extends ContractDefinition<BrainstormTopicData> {}
+export type BrainstormTopicContractDefinition =
+	ContractDefinition<BrainstormTopicData>;
 
-export interface BrainstormTopicContract
-	extends Contract<BrainstormTopicData> {}
+export type BrainstormTopicContract = Contract<BrainstormTopicData>;

@@ -39,7 +39,7 @@ export interface SupportThreadData {
 	[k: string]: unknown;
 }
 
-export interface SupportThreadContractDefinition
-	extends ContractDefinition<SupportThreadData> {}
+export type SupportThreadContractDefinition =
+	ContractDefinition<SupportThreadData>;
 
-export interface SupportThreadContract extends Contract<SupportThreadData> {}
+export type SupportThreadContract = Contract<SupportThreadData>;

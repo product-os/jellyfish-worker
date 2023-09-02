@@ -84,7 +84,6 @@ const evaluateObject = (object: any, environment: any) => {
 
 	for (const key of Object.keys(object)) {
 		// For performance reasons
-		// eslint-disable-next-line lodash/prefer-lodash-typecheck
 		if (typeof object[key] !== 'object' || object[key] === null) {
 			continue;
 		}

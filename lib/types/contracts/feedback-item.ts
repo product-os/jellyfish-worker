@@ -27,7 +27,7 @@ export interface FeedbackItemData {
 	[k: string]: unknown;
 }
 
-export interface FeedbackItemContractDefinition
-	extends ContractDefinition<FeedbackItemData> {}
+export type FeedbackItemContractDefinition =
+	ContractDefinition<FeedbackItemData>;
 
-export interface FeedbackItemContract extends Contract<FeedbackItemData> {}
+export type FeedbackItemContract = Contract<FeedbackItemData>;

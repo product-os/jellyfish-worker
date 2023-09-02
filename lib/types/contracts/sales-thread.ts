@@ -20,7 +20,6 @@ export interface SalesThreadData {
 	[k: string]: unknown;
 }
 
-export interface SalesThreadContractDefinition
-	extends ContractDefinition<SalesThreadData> {}
+export type SalesThreadContractDefinition = ContractDefinition<SalesThreadData>;
 
-export interface SalesThreadContract extends Contract<SalesThreadData> {}
+export type SalesThreadContract = Contract<SalesThreadData>;

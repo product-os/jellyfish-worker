@@ -1,5 +1,4 @@
 import { Kernel } from 'autumndb';
-import _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import type { Integration, IntegrationDefinition } from '../../../../lib/sync';
 

@@ -15,7 +15,7 @@ export interface FirstTimeLoginData {
 	[k: string]: unknown;
 }
 
-export interface FirstTimeLoginContractDefinition
-	extends ContractDefinition<FirstTimeLoginData> {}
+export type FirstTimeLoginContractDefinition =
+	ContractDefinition<FirstTimeLoginData>;
 
-export interface FirstTimeLoginContract extends Contract<FirstTimeLoginData> {}
+export type FirstTimeLoginContract = Contract<FirstTimeLoginData>;

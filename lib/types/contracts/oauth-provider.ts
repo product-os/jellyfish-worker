@@ -17,7 +17,7 @@ export interface OauthProviderData {
 	[k: string]: unknown;
 }
 
-export interface OauthProviderContractDefinition
-	extends ContractDefinition<OauthProviderData> {}
+export type OauthProviderContractDefinition =
+	ContractDefinition<OauthProviderData>;
 
-export interface OauthProviderContract extends Contract<OauthProviderData> {}
+export type OauthProviderContract = Contract<OauthProviderData>;
