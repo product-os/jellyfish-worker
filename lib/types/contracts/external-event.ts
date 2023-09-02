@@ -21,7 +21,7 @@ export interface ExternalEventData {
 	[k: string]: unknown;
 }
 
-export interface ExternalEventContractDefinition
-	extends ContractDefinition<ExternalEventData> {}
+export type ExternalEventContractDefinition =
+	ContractDefinition<ExternalEventData>;
 
-export interface ExternalEventContract extends Contract<ExternalEventData> {}
+export type ExternalEventContract = Contract<ExternalEventData>;

@@ -23,13 +23,13 @@ export interface MessageData {
 			slug?: string;
 			[k: string]: unknown;
 		};
-		attachments?: {
+		attachments?: Array<{
 			url: string;
 			name: string;
 			mime: string;
 			bytesize: number;
 			[k: string]: unknown;
-		}[];
+		}>;
 		message: string;
 		[k: string]: unknown;
 	};
@@ -41,7 +41,6 @@ export interface MessageData {
 	[k: string]: unknown;
 }
 
-export interface MessageContractDefinition
-	extends ContractDefinition<MessageData> {}
+export type MessageContractDefinition = ContractDefinition<MessageData>;
 
-export interface MessageContract extends Contract<MessageData> {}
+export type MessageContract = Contract<MessageData>;

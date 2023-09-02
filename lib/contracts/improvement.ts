@@ -71,7 +71,6 @@ export const improvement: ContractDefinition = contractMixins.mixin(
 							default: 0,
 							type: 'number',
 							readOnly: true,
-							// eslint-disable-next-line max-len
 							$$formula:
 								'contract.links["has attached"] && contract.links["has attached"].length ? (FILTER(contract.links["has attached"], { type: "milestone@1.0.0", data: { status: "completed" } }).length / REJECT(FILTER(contract.links["has attached"], { type: "milestone@1.0.0" }), { data: { status: "denied-or-failed" } }).length) * 100 : 0',
 						},

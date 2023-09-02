@@ -921,8 +921,8 @@ export class Worker {
 			contract,
 			{
 				attachEvents,
-				eventPayload: !!contract ? null : _.omit(object, ['id']),
-				eventType: !!contract ? null : 'create',
+				eventPayload: contract != null ? null : _.omit(object, ['id']),
+				eventType: contract != null ? null : 'create',
 				timestamp: options.timestamp,
 				reason: options.reason,
 				actor: options.actor,
@@ -1686,11 +1686,12 @@ export class Worker {
 			// There is potential for a race condition here where we try to get
 			// the relationship before its been set in the kernel cache.
 			// Set up a small loop to ensure the relationship is available before proceeding
-			while (true) {
+			let found = false;
+			while (!found) {
 				if (
 					_.find(this.kernel.getRelationships(), { slug: relationship.slug })
 				) {
-					break;
+					found = true;
 				}
 				await delay(50);
 			}

@@ -43,7 +43,6 @@ export const milestone: ContractDefinition = contractMixins.mixin(
 							default: 0,
 							type: 'number',
 							readOnly: true,
-							// eslint-disable-next-line max-len
 							$$formula: `
 								contract.links["is attached to"] && FILTER(contract.links["is attached to"], { type: "issue@1.0.0" }).length ? (
 									FILTER(contract.links["is attached to"], { type: "issue@1.0.0", data: { status: "closed" } }).length /

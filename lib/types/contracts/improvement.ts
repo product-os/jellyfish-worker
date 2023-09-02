@@ -32,7 +32,6 @@ export interface ImprovementData {
 	[k: string]: unknown;
 }
 
-export interface ImprovementContractDefinition
-	extends ContractDefinition<ImprovementData> {}
+export type ImprovementContractDefinition = ContractDefinition<ImprovementData>;
 
-export interface ImprovementContract extends Contract<ImprovementData> {}
+export type ImprovementContract = Contract<ImprovementData>;

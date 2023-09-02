@@ -225,7 +225,6 @@ export const run = async (
 ) => {
 	const getUsername = options.context.getLocalUsername || _.identity;
 
-	// eslint-disable-next-line new-cap
 	const instance = await integration.initialize({
 		token,
 		defaultUser: options.defaultUser,

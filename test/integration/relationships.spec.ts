@@ -1,6 +1,5 @@
 import { strict as assert } from 'assert';
 import type { TypeContract } from 'autumndb';
-import _ from 'lodash';
 import { setTimeout as delay } from 'timers/promises';
 import { testUtils } from '../../lib';
 
@@ -62,13 +61,14 @@ describe('Relationships', () => {
 		assert(planeType, 'failed to create plane type');
 
 		// Wait for both types to exist in worker cache
-		while (true) {
+		let exists = false;
+		while (!exists) {
 			await delay(500);
 			if (
 				ctx.worker.typeContracts[`${pilotType.slug}@1.0.0`] &&
 				ctx.worker.typeContracts[`${planeType.slug}@1.0.0`]
 			) {
-				break;
+				exists = true;
 			}
 		}
 
@@ -100,12 +100,13 @@ describe('Relationships', () => {
 		);
 
 		// Wait until the relationship is ready and available in the kernel
-		while (true) {
+		exists = false;
+		while (!exists) {
 			await delay(500);
 			const relationships = ctx.kernel.getRelationships();
 			const found = relationships.find((r) => r.slug === relationshipSlug);
 			if (found) {
-				break;
+				exists = true;
 			}
 		}
 

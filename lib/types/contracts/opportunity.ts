@@ -40,7 +40,6 @@ export interface OpportunityData {
 	[k: string]: unknown;
 }
 
-export interface OpportunityContractDefinition
-	extends ContractDefinition<OpportunityData> {}
+export type OpportunityContractDefinition = ContractDefinition<OpportunityData>;
 
-export interface OpportunityContract extends Contract<OpportunityData> {}
+export type OpportunityContract = Contract<OpportunityData>;

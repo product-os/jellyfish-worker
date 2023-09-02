@@ -34,8 +34,7 @@ export interface TriggeredActionData1 {
 	[k: string]: unknown;
 }
 
-export interface TriggeredActionContractDefinition
-	extends ContractDefinition<TriggeredActionData> {}
+export type TriggeredActionContractDefinition =
+	ContractDefinition<TriggeredActionData>;
 
-export interface TriggeredActionContract
-	extends Contract<TriggeredActionData> {}
+export type TriggeredActionContract = Contract<TriggeredActionData>;

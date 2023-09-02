@@ -15,7 +15,7 @@ export interface PasswordResetData {
 	[k: string]: unknown;
 }
 
-export interface PasswordResetContractDefinition
-	extends ContractDefinition<PasswordResetData> {}
+export type PasswordResetContractDefinition =
+	ContractDefinition<PasswordResetData>;
 
-export interface PasswordResetContract extends Contract<PasswordResetData> {}
+export type PasswordResetContract = Contract<PasswordResetData>;

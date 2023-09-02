@@ -20,7 +20,6 @@ export interface CreateData {
 	[k: string]: unknown;
 }
 
-export interface CreateContractDefinition
-	extends ContractDefinition<CreateData> {}
+export type CreateContractDefinition = ContractDefinition<CreateData>;
 
-export interface CreateContract extends Contract<CreateData> {}
+export type CreateContract = Contract<CreateData>;

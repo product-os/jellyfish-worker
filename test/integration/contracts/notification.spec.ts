@@ -1,6 +1,5 @@
 import { testUtils as autumndbTestUtils } from 'autumndb';
 import { strict as assert } from 'assert';
-import _ from 'lodash';
 import { testUtils } from '../../../lib';
 
 let ctx: testUtils.TestContext;

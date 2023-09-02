@@ -26,7 +26,6 @@ export interface ThreadData {
 	[k: string]: unknown;
 }
 
-export interface ThreadContractDefinition
-	extends ContractDefinition<ThreadData> {}
+export type ThreadContractDefinition = ContractDefinition<ThreadData>;
 
-export interface ThreadContract extends Contract<ThreadData> {}
+export type ThreadContract = Contract<ThreadData>;

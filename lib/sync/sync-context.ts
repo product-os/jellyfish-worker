@@ -146,11 +146,11 @@ export const getActionContext = (
 
 			let patch: Operation[] = [];
 
-			if (object.hasOwnProperty('patch')) {
+			if (Object.prototype.hasOwnProperty.call(object, 'patch')) {
 				patch = (object as any).patch;
 				if (!current) {
 					throw new Error(
-						`Can\'t patch a contract that doesn\'t exist: ${object.id}`,
+						`Can't patch a contract that doesn't exist: ${object.id}`,
 					);
 				}
 			} else {

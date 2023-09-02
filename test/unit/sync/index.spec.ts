@@ -26,12 +26,12 @@ describe('.isValidEvent()', () => {
 describe('.associate()', () => {
 	const makeSyncContextStub = (data: any) =>
 		({
-			upsertElement: async (type: string, object: any, _options: any) => {
+			upsertElement: async (type: string, object: any) => {
 				data[object.slug] = Object.assign({}, object, {
 					type,
 				});
 			},
-		} as any as SyncActionContext);
+		}) as any as SyncActionContext;
 
 	test('should throw given an invalid integration', async () => {
 		const data = {

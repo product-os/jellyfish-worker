@@ -34,7 +34,6 @@ export interface RatingData {
 	[k: string]: unknown;
 }
 
-export interface RatingContractDefinition
-	extends ContractDefinition<RatingData> {}
+export type RatingContractDefinition = ContractDefinition<RatingData>;
 
-export interface RatingContract extends Contract<RatingData> {}
+export type RatingContract = Contract<RatingData>;

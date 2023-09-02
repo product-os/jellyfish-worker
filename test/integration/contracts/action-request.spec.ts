@@ -46,7 +46,7 @@ describe('stream', () => {
 			},
 		);
 
-		const result = await new Promise<any>(async (resolve, reject) => {
+		const result = await new Promise<any>((resolve, reject) => {
 			emitter.on('data', (change) => {
 				emitter.close();
 				resolve(change);
@@ -54,10 +54,8 @@ describe('stream', () => {
 
 			emitter.on('error', reject);
 
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
+			ctx.kernel
+				.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'action-request@1.0.0',
 					data: {
 						context: ctx.logContext,
@@ -71,18 +69,20 @@ describe('stream', () => {
 						},
 						arguments: {},
 					},
-				},
-			);
-			await ctx.kernel.insertContract(
-				ctx.logContext,
-				ctx.kernel.adminSession()!,
-				{
+				})
+				.catch((err) => {
+					reject(err);
+				});
+			ctx.kernel
+				.insertContract(ctx.logContext, ctx.kernel.adminSession()!, {
 					type: 'card@1.0.0',
 					data: {
 						email: 'johndoe@example.com',
 					},
-				},
-			);
+				})
+				.catch((err) => {
+					reject(err);
+				});
 		});
 
 		expect(result.after).toEqual({

@@ -607,10 +607,11 @@ describe('Worker', () => {
 		expect(typeResult.error).toBe(false);
 
 		// Wait for the worker type cache to include the new type
-		while (true) {
+		let exists = false;
+		while (!exists) {
 			await delay(500);
 			if (ctx.worker.typeContracts[`${typeResult.data.slug}@1.0.0`]) {
-				break;
+				exists = true;
 			}
 		}
 
@@ -782,10 +783,11 @@ describe('Worker', () => {
 		expect(typeResult.error).toBe(false);
 
 		// Wait for the worker type cache to include the new type
-		while (true) {
+		let exists = false;
+		while (!exists) {
 			await delay(500);
 			if (ctx.worker.typeContracts[`${typeResult.data.slug}@1.0.0`]) {
-				break;
+				exists = true;
 			}
 		}
 
@@ -957,10 +959,11 @@ describe('Worker', () => {
 		expect(typeResult.error).toBe(false);
 
 		// Wait for the worker type cache to include the new type
-		while (true) {
+		let exists = false;
+		while (!exists) {
 			await delay(500);
 			if (ctx.worker.typeContracts[`${typeResult.data.slug}@1.0.0`]) {
-				break;
+				exists = true;
 			}
 		}
 
@@ -1130,10 +1133,11 @@ describe('Worker', () => {
 		expect(typeResult.error).toBe(false);
 
 		// Wait for the worker type cache to include the new type
-		while (true) {
+		let exists = false;
+		while (!exists) {
 			await delay(500);
 			if (ctx.worker.typeContracts[`${typeResult.data.slug}@1.0.0`]) {
-				break;
+				exists = true;
 			}
 		}
 
@@ -2893,8 +2897,8 @@ describe('.patchCard()', () => {
 							$eval: 'source.data.slug',
 						},
 						data: {
-							number: {
-								$eval: 'source.data.number',
+							bar: {
+								$eval: 'source.data.bar',
 							},
 						},
 					},

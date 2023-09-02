@@ -1,6 +1,5 @@
 import { defaultEnvironment } from '@balena/jellyfish-environment';
 import { testUtils as autumndbTestUtils } from 'autumndb';
-import _ from 'lodash';
 import nock from 'nock';
 import { testUtils } from '../../../lib';
 import { actionSendEmail } from '../../../lib/actions/action-send-email';

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { patchIfNeeded } from '../../lib/sync/instance';
 
 describe('front api user', () => {

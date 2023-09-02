@@ -18,7 +18,6 @@ export interface PipelineData {
 	[k: string]: unknown;
 }
 
-export interface PipelineContractDefinition
-	extends ContractDefinition<PipelineData> {}
+export type PipelineContractDefinition = ContractDefinition<PipelineData>;
 
-export interface PipelineContract extends Contract<PipelineData> {}
+export type PipelineContract = Contract<PipelineData>;

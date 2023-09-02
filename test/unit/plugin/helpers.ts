@@ -1,9 +1,7 @@
-import type { LogContext } from '@balena/jellyfish-logger';
 import type { Contract } from 'autumndb';
 import _ from 'lodash';
 import type { ActionDefinition, PluginDefinition } from '../../../lib/plugin';
 import type { Integration, IntegrationDefinition } from '../../../lib//sync';
-import type { Map } from '../../../lib/types';
 
 const commonContract = {
 	tags: [],
@@ -48,15 +46,15 @@ class TestIntegration implements Integration {
 		return Promise.resolve();
 	}
 
-	async translate(_contract: Contract, _options: { actor: string }) {
+	async translate() {
 		return Promise.resolve([]);
 	}
 
-	async mirror(_contract: Contract, _options: { actor: string }) {
+	async mirror() {
 		return Promise.resolve([]);
 	}
 
-	async getFile(_file: string) {
+	async getFile() {
 		return Promise.resolve(Buffer.from([]));
 	}
 }
@@ -67,12 +65,7 @@ const integrationDefinitionFor = (slug: string): IntegrationDefinition => {
 
 		initialize: async () => new TestIntegration(slug),
 
-		isEventValid: (
-			_logContext: LogContext,
-			_token: any,
-			_rawEvent: any,
-			_headers: Map<string>,
-		) => true,
+		isEventValid: () => true,
 	};
 };
 export const integration1 = integrationDefinitionFor('integration1');

@@ -14,7 +14,6 @@ export interface GroupData {
 	[k: string]: unknown;
 }
 
-export interface GroupContractDefinition
-	extends ContractDefinition<GroupData> {}
+export type GroupContractDefinition = ContractDefinition<GroupData>;
 
-export interface GroupContract extends Contract<GroupData> {}
+export type GroupContract = Contract<GroupData>;

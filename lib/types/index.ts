@@ -35,7 +35,7 @@ export interface JellyfishErrorConstructor {
 	readonly prototype: JellyfishError;
 }
 
-export declare var JellyfishError: JellyfishErrorConstructor;
+export declare const JellyfishError: JellyfishErrorConstructor;
 
 export interface QuerySelect {
 	[key: string]: any;

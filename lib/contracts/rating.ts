@@ -70,9 +70,7 @@ export const rating: ContractDefinition = {
 									title: 'Message',
 									type: 'string',
 									$$formula:
-										// eslint-disable-next-line max-len
 										'(contract.data.payload.score ? "Review score: " + contract.data.payload.score + "/5" : "") +' +
-										// eslint-disable-next-line max-len
 										'(contract.data.payload.comment ? "\\n\\nReview comment:\\n" + contract.data.payload.comment : "")',
 									readOnly: true,
 								},

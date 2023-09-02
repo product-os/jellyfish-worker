@@ -13,6 +13,6 @@ export interface PingData {
 	[k: string]: unknown;
 }
 
-export interface PingContractDefinition extends ContractDefinition<PingData> {}
+export type PingContractDefinition = ContractDefinition<PingData>;
 
-export interface PingContract extends Contract<PingData> {}
+export type PingContract = Contract<PingData>;

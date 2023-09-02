@@ -15,7 +15,7 @@ export interface BrainstormCallData {
 	[k: string]: unknown;
 }
 
-export interface BrainstormCallContractDefinition
-	extends ContractDefinition<BrainstormCallData> {}
+export type BrainstormCallContractDefinition =
+	ContractDefinition<BrainstormCallData>;
 
-export interface BrainstormCallContract extends Contract<BrainstormCallData> {}
+export type BrainstormCallContract = Contract<BrainstormCallData>;

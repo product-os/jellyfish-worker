@@ -18,7 +18,6 @@ export interface ChannelData {
 	[k: string]: unknown;
 }
 
-export interface ChannelContractDefinition
-	extends ContractDefinition<ChannelData> {}
+export type ChannelContractDefinition = ContractDefinition<ChannelData>;
 
-export interface ChannelContract extends Contract<ChannelData> {}
+export type ChannelContract = Contract<ChannelData>;

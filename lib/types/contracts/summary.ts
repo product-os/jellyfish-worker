@@ -26,7 +26,6 @@ export interface SummaryData {
 	[k: string]: unknown;
 }
 
-export interface SummaryContractDefinition
-	extends ContractDefinition<SummaryData> {}
+export type SummaryContractDefinition = ContractDefinition<SummaryData>;
 
-export interface SummaryContract extends Contract<SummaryData> {}
+export type SummaryContract = Contract<SummaryData>;

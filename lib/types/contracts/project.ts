@@ -27,7 +27,6 @@ export interface ProjectData {
 	[k: string]: unknown;
 }
 
-export interface ProjectContractDefinition
-	extends ContractDefinition<ProjectData> {}
+export type ProjectContractDefinition = ContractDefinition<ProjectData>;
 
-export interface ProjectContract extends Contract<ProjectData> {}
+export type ProjectContract = Contract<ProjectData>;

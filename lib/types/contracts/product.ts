@@ -13,7 +13,6 @@ export interface ProductData {
 	[k: string]: unknown;
 }
 
-export interface ProductContractDefinition
-	extends ContractDefinition<ProductData> {}
+export type ProductContractDefinition = ContractDefinition<ProductData>;
 
-export interface ProductContract extends Contract<ProductData> {}
+export type ProductContract = Contract<ProductData>;

@@ -25,11 +25,11 @@ export type LengthOfNextCheckin2 = Minutes | Minutes1 | Minutes2;
 export type Minutes = 600;
 export type Minutes1 = 1800;
 export type Minutes2 = 3000;
-export type ExtraAttendeesNeeded = {
+export type ExtraAttendeesNeeded = Array<{
 	user?: string;
 	role?: 'owner' | 'guide' | 'dedicated' | 'contributor' | 'observer';
 	[k: string]: unknown;
-}[];
+}>;
 export type UnnecessaryAttendees = string[];
 
 export interface CheckinData {
@@ -48,7 +48,6 @@ export interface CheckinData {
 	[k: string]: unknown;
 }
 
-export interface CheckinContractDefinition
-	extends ContractDefinition<CheckinData> {}
+export type CheckinContractDefinition = ContractDefinition<CheckinData>;
 
-export interface CheckinContract extends Contract<CheckinData> {}
+export type CheckinContract = Contract<CheckinData>;

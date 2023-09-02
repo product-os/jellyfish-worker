@@ -32,15 +32,15 @@ export type TargetURL = string;
 export type UTMMedium = string;
 export type UTMCampaign = string;
 export type UTMContent = string;
-export type PostBody = (
+export type PostBody = Array<
 	| Text
 	| ProjectStep
 	| MediaYoutubeVimeo
 	| Images
 	| EditorSNote
 	| PromotionalObject
-)[];
-export type PostPromotionalContent = (string | string | string)[];
+>;
+export type PostPromotionalContent = Array<string | string | string>;
 
 export interface BlogPostData {
 	post_header_meta?: PostHeaderAndMeta;
@@ -94,7 +94,6 @@ export interface PromotionalObject {
 	[k: string]: unknown;
 }
 
-export interface BlogPostContractDefinition
-	extends ContractDefinition<BlogPostData> {}
+export type BlogPostContractDefinition = ContractDefinition<BlogPostData>;
 
-export interface BlogPostContract extends Contract<BlogPostData> {}
+export type BlogPostContract = Contract<BlogPostData>;

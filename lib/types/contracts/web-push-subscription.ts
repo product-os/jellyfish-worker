@@ -15,8 +15,7 @@ export interface WebPushSubscriptionData {
 	[k: string]: unknown;
 }
 
-export interface WebPushSubscriptionContractDefinition
-	extends ContractDefinition<WebPushSubscriptionData> {}
+export type WebPushSubscriptionContractDefinition =
+	ContractDefinition<WebPushSubscriptionData>;
 
-export interface WebPushSubscriptionContract
-	extends Contract<WebPushSubscriptionData> {}
+export type WebPushSubscriptionContract = Contract<WebPushSubscriptionData>;

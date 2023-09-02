@@ -16,7 +16,6 @@ export interface UpdateData {
 	[k: string]: unknown;
 }
 
-export interface UpdateContractDefinition
-	extends ContractDefinition<UpdateData> {}
+export type UpdateContractDefinition = ContractDefinition<UpdateData>;
 
-export interface UpdateContract extends Contract<UpdateData> {}
+export type UpdateContract = Contract<UpdateData>;

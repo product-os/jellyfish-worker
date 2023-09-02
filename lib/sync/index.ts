@@ -447,7 +447,6 @@ export class Sync {
 		);
 	}
 
-	// eslint-disable-next-line class-methods-use-this
 	getActionContext(
 		provider: string,
 		workerContext: WorkerContext,

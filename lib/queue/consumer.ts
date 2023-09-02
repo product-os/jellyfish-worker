@@ -74,7 +74,7 @@ export class Consumer implements QueueConsumer {
 				pgPool: this.pool,
 				concurrency: defaultEnvironment.queue.concurrency,
 				pollInterval: 1000,
-				logger: new Logger((_scope) => {
+				logger: new Logger(() => {
 					return _.noop;
 				}),
 				taskList: {

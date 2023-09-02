@@ -61,7 +61,6 @@ export interface AccountData {
 	[k: string]: unknown;
 }
 
-export interface AccountContractDefinition
-	extends ContractDefinition<AccountData> {}
+export type AccountContractDefinition = ContractDefinition<AccountData>;
 
-export interface AccountContract extends Contract<AccountData> {}
+export type AccountContract = Contract<AccountData>;
